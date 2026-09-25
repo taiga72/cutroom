@@ -4,6 +4,9 @@ const { env, send, calendarReady } = require('./_lib');
 
 module.exports = (req, res) => {
   const url = env('SUPABASE_URL'), key = env('SUPABASE_ANON_KEY');
-  if (!url || !key) return send(res, 503, { error: 'Supabase is not set up yet: add SUPABASE_URL and SUPABASE_ANON_KEY in Vercel.' });
-  send(res, 200, { supabaseUrl: url.replace(/\/+$/, ''), supabaseAnonKey: key, calendar: calendarReady() });
+  // Only names are reported, never values, so the page can say what's left to set up.
+  const missing = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'].filter(k => !env(k));
+  if (!url || !key) return send(res, 503, { error: 'not_configured', missing });
+  if (!/^https:\/\/[^/]+$/.test(url.replace(/\/+$/, ''))) return send(res, 503, { error: 'bad_url', missing });
+  send(res, 200, { supabaseUrl: url.replace(/\/+$/, ''), supabaseAnonKey: key, calendar: calendarReady(), missing });
 };
