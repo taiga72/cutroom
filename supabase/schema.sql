@@ -34,12 +34,13 @@ create table if not exists public.gcal_links (
 );
 alter table public.gcal_links enable row level security;
 
--- Pictures (job/client/app logos and task thumbnails). Files live in a folder named
+-- Pictures (job/client/app logos) and brand guide PDFs. Files live in a folder named
 -- after the owner's user id. The bucket is public so pictures load by their
 -- (random, unguessable) address; only the owner can add, replace or delete them.
+-- Also holds brand guide PDFs (up to 20 MB each).
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('pictures', 'pictures', true, 5242880, array['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
-on conflict (id) do nothing;
+values ('pictures', 'pictures', true, 20971520, array['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'])
+on conflict (id) do update set file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
 
 drop policy if exists "Cutroom pictures read own"   on storage.objects;
 drop policy if exists "Cutroom pictures add own"    on storage.objects;
