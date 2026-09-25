@@ -391,6 +391,20 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .head h1{font-size:24px}
 }
 .nav-new{display:none}
+.crop-wrap{z-index:35}
+.crop{width:min(420px,100%)}
+.crop .m-body{align-items:center;gap:14px}
+.crop-stage{position:relative;width:min(300px,calc(100vw - 80px));aspect-ratio:1;overflow:hidden;border-radius:10px;cursor:grab;touch-action:none;user-select:none;
+  background:repeating-conic-gradient(var(--surface-2) 0 25%,var(--surface-3) 0 50%) 0 0/20px 20px}
+.crop-stage:active{cursor:grabbing}
+.crop-stage:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.crop-stage img{position:absolute;left:50%;top:50%;max-width:none;pointer-events:none}
+.crop-frame{position:absolute;inset:0;border-radius:26%;box-shadow:0 0 0 200px rgba(10,12,16,.45);outline:1.5px solid rgba(255,255,255,.85);outline-offset:-1px;pointer-events:none}
+.crop-zoom{display:flex;align-items:center;gap:10px;width:min(300px,calc(100vw - 80px))}
+.crop-zoom input{flex:1;accent-color:var(--accent)}
+.crop-zi{font-weight:700;color:var(--muted);width:12px;text-align:center}
+.crop-hint{text-align:center;max-width:320px}
+.crop-quick{display:flex;gap:6px;flex-wrap:wrap}
 /* sign-in screen (hosted copy) */
 .auth{min-height:100vh;display:grid;place-items:center;padding:24px 16px;background:var(--bg)}
 .auth-card{width:min(400px,100%);background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:28px 24px;display:flex;flex-direction:column;gap:14px}
@@ -449,6 +463,7 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 <div class="scrim" id="scrim" hidden data-act="drawer-close"></div>
 <aside class="drawer" id="drawer" hidden aria-label="Task details"></aside>
 <div class="modal-wrap" id="modal" hidden></div>
+<div class="modal-wrap crop-wrap" id="crop" hidden></div>
 <div class="toast" id="toast" hidden role="status"></div>
 <input type="file" id="file-in" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
 <input type="file" id="logo-in" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
@@ -1302,6 +1317,87 @@ async function setAppLogo(file){
   catch(e){console.error(e);toast(uploadError(e))}
   finally{if(SM===sm){sm.busy=false;renderSettings()}}
 }
+/* ================= crop (logos) =================
+   The square stage is exactly the saved picture. Zoom runs from "whole picture fits"
+   (t=0, gaps stay transparent) up to 4x the "fills the square" scale. */
+let CR=null;
+const CROP_OUT=320;
+function openCrop(file,done){
+  if(!/^image\/(png|jpe?g|webp|gif)$/.test(file.type)){toast(uploadError({code:'bad_type'}));return}
+  const url=URL.createObjectURL(file),img=new Image();
+  img.onload=()=>{
+    const w=img.naturalWidth,h=img.naturalHeight;
+    if(!w||!h){URL.revokeObjectURL(url);toast("Couldn't read that picture. Try a PNG or JPG.");return}
+    const fit=Math.min(1/w,1/h),cover=Math.max(1/w,1/h),max=cover*4;   // scales per 1px of stage
+    CR={img,url,done,w,h,fit,max,coverT:Math.log(cover/fit)/Math.log(max/fit)||0,t:0,x:0,y:0,ptrs:new Map(),pinch:null};
+    CR.t=CR.coverT;renderCrop();
+  };
+  img.onerror=()=>{URL.revokeObjectURL(url);toast("Couldn't read that picture. Try a PNG or JPG.")};
+  img.src=url;
+}
+function closeCrop(){if(!CR)return;URL.revokeObjectURL(CR.url);CR=null;const c=$('#crop');c.hidden=true;c.innerHTML=''}
+const cropScale=()=>CR.fit*Math.pow(CR.max/CR.fit,CR.t);   // image px -> stage fraction
+function cropClamp(){
+  const k=cropScale(),lx=Math.abs(CR.w*k-1)/2,ly=Math.abs(CR.h*k-1)/2;
+  CR.x=Math.max(-lx,Math.min(lx,CR.x));CR.y=Math.max(-ly,Math.min(ly,CR.y));
+}
+function cropApply(){
+  if(!CR)return;cropClamp();
+  const V=$('#crop-stage').clientWidth,k=cropScale()*V,im=$('#crop-img');
+  im.style.width=CR.w*k+'px';im.style.height=CR.h*k+'px';
+  im.style.transform=`translate(-50%,-50%) translate(${CR.x*V}px,${CR.y*V}px)`;
+  const z=$('#crop-z');if(z&&+z.value!==Math.round(CR.t*1000))z.value=Math.round(CR.t*1000);
+}
+/* zoom keeping the stage centre fixed on the same spot of the picture */
+function cropZoomTo(t){
+  const k0=cropScale();CR.t=Math.max(0,Math.min(1,t));const r=cropScale()/k0;
+  CR.x*=r;CR.y*=r;cropApply();
+}
+function renderCrop(){
+  const c=$('#crop');
+  c.innerHTML=`<div class="modal crop" role="dialog" aria-modal="true" aria-labelledby="crop-title">
+  <header><h2 id="crop-title">Crop picture</h2><button type="button" class="icon-btn" data-act="crop-cancel" aria-label="Cancel">${I.x}</button></header>
+  <div class="m-body">
+    <div class="crop-stage" id="crop-stage" tabindex="0" aria-label="Picture position. Drag or use the arrow keys to move it, and plus or minus to zoom."><img id="crop-img" src="${esc(CR.url)}" alt="" draggable="false"><div class="crop-frame"></div></div>
+    <label class="crop-zoom"><span class="crop-zi">−</span><input type="range" id="crop-z" min="0" max="1000" value="${Math.round(CR.t*1000)}" aria-label="Zoom"><span class="crop-zi">+</span></label>
+    <p class="hint crop-hint">Drag the picture to choose what shows. The rounded corners show how it looks in the sidebar and on cards.</p>
+  </div>
+  <footer><div class="crop-quick"><button type="button" class="btn sm" data-act="crop-fit">Show whole picture</button><button type="button" class="btn sm" data-act="crop-fill">Fill the square</button></div>
+  <div style="display:flex;gap:8px"><button type="button" class="btn" data-act="crop-cancel">Cancel</button><button type="button" class="btn primary" data-act="crop-use">Use picture</button></div></footer></div>`;
+  c.hidden=false;
+  const st=$('#crop-stage');
+  st.addEventListener('pointerdown',e=>{st.setPointerCapture(e.pointerId);CR.ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});CR.pinch=null;e.preventDefault()});
+  st.addEventListener('pointermove',e=>{
+    const p=CR&&CR.ptrs.get(e.pointerId);if(!p)return;
+    const V=st.clientWidth;
+    if(CR.ptrs.size===1){CR.x+=(e.clientX-p.x)/V;CR.y+=(e.clientY-p.y)/V;p.x=e.clientX;p.y=e.clientY;cropApply();return}
+    p.x=e.clientX;p.y=e.clientY;
+    const [a,b]=[...CR.ptrs.values()],d=Math.hypot(a.x-b.x,a.y-b.y);
+    if(CR.pinch){const f=d/CR.pinch;cropZoomTo(CR.t+Math.log(f)/Math.log(CR.max/CR.fit))}
+    CR.pinch=d;
+  });
+  const up=e=>{if(!CR)return;CR.ptrs.delete(e.pointerId);CR.pinch=null};
+  st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);
+  st.addEventListener('wheel',e=>{e.preventDefault();cropZoomTo(CR.t-e.deltaY*0.0012)},{passive:false});
+  st.addEventListener('keydown',e=>{
+    const m={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
+    if(m){e.preventDefault();CR.x-=m[0]*0.03;CR.y-=m[1]*0.03;cropApply()}
+    else if(e.key==='+'||e.key==='='){e.preventDefault();cropZoomTo(CR.t+0.05)}
+    else if(e.key==='-'||e.key==='_'){e.preventDefault();cropZoomTo(CR.t-0.05)}
+  });
+  $('#crop-z').addEventListener('input',e=>cropZoomTo(e.target.value/1000));
+  requestAnimationFrame(()=>{cropApply();st.focus()});
+}
+function useCrop(){
+  if(!CR)return;
+  const k=cropScale()*CROP_OUT,cv=document.createElement('canvas');cv.width=cv.height=CROP_OUT;
+  const ctx=cv.getContext('2d');ctx.imageSmoothingQuality='high';
+  const dw=CR.w*k,dh=CR.h*k;
+  ctx.drawImage(CR.img,CROP_OUT/2+CR.x*CROP_OUT-dw/2,CROP_OUT/2+CR.y*CROP_OUT-dh/2,dw,dh);
+  const done=CR.done;
+  cv.toBlob(b=>{closeCrop();if(b)done(new File([b],'logo.png',{type:'image/png'}));else toast("Couldn't crop that picture. Try another one.")},'image/png');
+}
+
 let logoTarget=null;
 function pickLogo(target){if(!canUpload()){toast("Pictures can't be uploaded from this view.");return}logoTarget=target;$('#logo-in').click()}
 async function setModalLogo(file){
@@ -1444,6 +1540,10 @@ document.addEventListener('click',e=>{
     case 'cal-sync': calSync(true);break;
     case 'cal-disconnect': if(CAL.disArmed)calDisconnect();else{CAL.disArmed=true;renderSettings()}break;
     case 'auth-google': authGoogle();break;
+    case 'crop-cancel': closeCrop();break;
+    case 'crop-use': useCrop();break;
+    case 'crop-fit': cropZoomTo(0);break;
+    case 'crop-fill': cropZoomTo(CR.coverT);break;
     case 'setup-local': $('#auth').hidden=true;$('#auth').innerHTML='';$('.app').hidden=false;localBoot();break;
     case 'auth-reset': showAuth({sent:null,error:''});$('#auth-email')?.focus();break;
     case 's-theme': SM.theme=el.dataset.themeOpt;renderSettings();applyTheme(SM.theme);break;
@@ -1462,7 +1562,7 @@ document.addEventListener('click',e=>{
   if(a!=='delete-task'&&deleteArmed&&$('#drawer').contains(el)){deleteArmed=false;renderDrawer()}
 });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
+  if(e.key==='Escape'){if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'');
   if(e.key==='Enter'&&!typing){const r=e.target.closest?.('[data-act="open"]');if(r){openTask(r.dataset.id);return}}
   if(typing||e.metaKey||e.ctrlKey||e.altKey)return;
@@ -1475,7 +1575,7 @@ document.addEventListener('change',e=>{
   if(el.id==='f-due'){u.due=el.value;render();return}
   if(el.id==='arch-job'){u.ajob=el.value;saveUi();render();return}
   if(el.id==='f-sort'){u.sort=el.value;saveUi();render();return}
-  if(el.id==='logo-in'){const f=el.files[0];el.value='';if(logoTarget?.kind==='app')setAppLogo(f);else setModalLogo(f);return}
+  if(el.id==='logo-in'){const f=el.files[0];el.value='';if(!f)return;const app=logoTarget?.kind==='app';openCrop(f,blob=>app?setAppLogo(blob):setModalLogo(blob));return}
   if(el.id==='file-in'){const f=el.files[0];el.value='';if(u.openTask)setPicture(f,u.openTask);return}
   const act=el.dataset.act;
   if(act==='row-status'){setStatus(el.dataset.id,el.value);if(u.openTask===el.dataset.id)renderDrawer();return}
