@@ -3,7 +3,7 @@ const { env, sb, getLink, saveLink } = require('./_lib');
 
 const SCOPES = 'openid email https://www.googleapis.com/auth/calendar.app.created';
 const API = 'https://www.googleapis.com/calendar/v3';
-const STATUS = { not_started: 'Not started', in_progress: 'In progress', internal_review: 'Internal review', revisions: 'Revisions', done: 'Done' };
+const STATUS = { not_started: 'Not started', in_progress: 'In progress', internal_review: 'Internal review', client_review: 'Client review', revisions: 'Revisions', waiting_client: 'Waiting on client', done: 'Done', dropped: 'Dropped' };
 const PRIO = { urgent: 'Urgent', high: 'High', normal: 'Normal', low: 'Low' };
 
 class NeedsReconnect extends Error {}
@@ -132,7 +132,7 @@ async function syncUser(uid, appUrl) {
     const { jobs, clients, tasks } = await loadDocs(uid);
     const want = {};
     for (const t of Object.values(tasks)) {
-      if (t.archived || t.status === 'done' || !/^\d{4}-\d{2}-\d{2}$/.test(t.due || '') || !jobs[t.jobId]) continue;
+      if (t.archived || t.status === 'done' || t.status === 'dropped' || !/^\d{4}-\d{2}-\d{2}$/.test(t.due || '') || !jobs[t.jobId]) continue;
       want[t.id] = eventFor(t, jobs, clients, appUrl);
     }
     const seen = new Set(), ops = [];
