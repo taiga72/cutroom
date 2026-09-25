@@ -13,7 +13,7 @@
   --line:#dadee6; --line-strong:#c4c9d4;
   --text:#161a22; --muted:#5b6272; --faint:#8a91a0;
   --accent:#0b7f93; --accent-ink:#ffffff; --accent-soft:#dff2f5;
-  --st-not:#7d8596; --st-prog:#2f73e8; --st-review:#8b5cf6; --st-rev:#e07b00; --st-done:#2b9348;
+  --st-not:#7d8596; --st-prog:#2f73e8; --st-review:#8b5cf6; --st-rev:#e07b00; --st-done:#2b9348; --st-client:#0b7f93; --st-wait:#c2417a; --st-drop:#9aa0a8;
   --danger:#d9362b; --danger-soft:#fde8e6; --warn:#b86b00;
   --shadow:0 1px 2px rgba(22,26,34,.06),0 4px 16px rgba(22,26,34,.06);
   --shadow-lg:0 12px 40px rgba(22,26,34,.18);
@@ -28,7 +28,7 @@
     --line:#282d38; --line-strong:#363c49;
     --text:#e6e8ee; --muted:#9aa1b0; --faint:#6d7483;
     --accent:#2fb8cc; --accent-ink:#06191d; --accent-soft:#12303a;
-    --st-not:#8b93a3; --st-prog:#5b9bff; --st-review:#a98bff; --st-rev:#ffa53d; --st-done:#4cc26f;
+    --st-not:#8b93a3; --st-prog:#5b9bff; --st-review:#a98bff; --st-rev:#ffa53d; --st-done:#4cc26f; --st-client:#2fb8cc; --st-wait:#ef6fa8; --st-drop:#6d7483;
     --danger:#ff6b5e; --danger-soft:#3a1c1a; --warn:#ffb14d;
     --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
     --shadow-lg:0 16px 48px rgba(0,0,0,.5);
@@ -40,7 +40,7 @@
   --line:#282d38; --line-strong:#363c49;
   --text:#e6e8ee; --muted:#9aa1b0; --faint:#6d7483;
   --accent:#2fb8cc; --accent-ink:#06191d; --accent-soft:#12303a;
-  --st-not:#8b93a3; --st-prog:#5b9bff; --st-review:#a98bff; --st-rev:#ffa53d; --st-done:#4cc26f;
+  --st-not:#8b93a3; --st-prog:#5b9bff; --st-review:#a98bff; --st-rev:#ffa53d; --st-done:#4cc26f; --st-client:#2fb8cc; --st-wait:#ef6fa8; --st-drop:#6d7483;
   --danger:#ff6b5e; --danger-soft:#3a1c1a; --warn:#ffb14d;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
   --shadow-lg:0 16px 48px rgba(0,0,0,.5);
@@ -86,7 +86,8 @@ svg.i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .nav-sub{display:flex;flex-direction:column;gap:1px;margin:1px 0 4px 18px;padding-left:10px;border-left:1px solid var(--line)}
 .nav-sub .nav-item{padding:5px 10px;font-weight:400;color:var(--muted);font-size:13px}
 .nav-sub .nav-item.on{color:var(--text);font-weight:600}
-.side-foot{margin-top:auto;padding:10px;font-size:12px;color:var(--faint);display:flex;align-items:center;gap:7px}
+.side-foot{margin-top:auto;padding:4px 0 0;font-size:12px;color:var(--faint);display:flex;flex-direction:column;align-items:stretch;gap:4px;border-top:1px solid var(--line)}
+.side-foot .save-state{padding:8px 10px 2px}
 .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--st-done)}
 .sync-dot.local{background:var(--warn)}
 
@@ -154,6 +155,11 @@ button.stat:hover{border-color:var(--line-strong)}
 .search input{border:0;background:none;outline:none;padding:7px 0;width:100%;color:var(--text)}
 .sel{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:6px 8px;font-size:13px;font-weight:500;max-width:100%}
 .toolbar .spacer{flex:1}
+.restore-box{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--surface-2)}
+.details-head{display:flex;justify-content:flex-end;margin-bottom:10px}
+.tip{position:fixed;z-index:60;pointer-events:none;background:var(--text);color:var(--bg);font:600 12px/1.3 var(--body);padding:5px 8px;border-radius:6px;max-width:260px;box-shadow:var(--shadow);white-space:normal}
+.mtop{display:none}
+.side-scrim{display:none}
 .brand-panel{border:1px solid var(--line);background:var(--surface);border-radius:12px;overflow:hidden}
 .bp-head h2{margin:0;font:700 17px var(--display);display:flex;align-items:center;gap:8px}
 .pane-tabs{display:flex;gap:4px;margin-top:14px;border-bottom:1px solid var(--line)}
@@ -213,7 +219,7 @@ button.stat:hover{border-color:var(--line-strong)}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:2px}
 .seg button{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:5px 10px;border-radius:7px;color:var(--muted);font-weight:600;font-size:13px}
 .seg button.on{background:var(--surface-3);color:var(--text)}
-.work{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:14px}
+.work{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .work-item{box-shadow:1px 0 0 var(--line),0 1px 0 var(--line)}
 .work-item{background:var(--surface);padding:10px 13px;display:flex;flex-direction:column;gap:2px;min-width:0}
 .work-item small{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
@@ -238,19 +244,6 @@ button.stat:hover{border-color:var(--line-strong)}
 .day-pick{display:flex;gap:4px;flex-wrap:wrap}
 .day-pick button{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:5px 9px;font-size:12.5px;font-weight:600;color:var(--muted)}
 .day-pick button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
-.im-steps{margin:0;padding-left:20px;line-height:1.7;font-size:13.5px}
-.im-drop{border:1.5px dashed var(--line-strong);border-radius:12px;padding:26px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;color:var(--muted);text-align:center}
-.im-drop:hover,.im-drop:focus-visible{border-color:var(--accent);color:var(--text)}
-.im-drop svg{width:24px;height:24px}
-.im-file{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0;font-size:13.5px}
-.im-dest{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.im-opt{display:flex;align-items:center;gap:8px;font-size:13.5px}
-.im-list{border:1px solid var(--line);border-radius:10px;max-height:300px;overflow:auto}
-.im-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto 64px;align-items:center;gap:10px;padding:7px 10px;border-top:1px solid var(--line);font-size:13px;cursor:pointer}
-.im-row:first-child{border-top:0}
-.im-row.off{opacity:.5;cursor:default}
-.im-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
-.im-name em{font-weight:400;color:var(--faint)}
 .btn[disabled]{opacity:.5;cursor:default}
 .load-warn{display:inline-flex;align-items:center;gap:6px;color:var(--warn);font-size:12.5px;font-weight:600;margin:0}
 .load-warn svg{flex:none}
@@ -288,7 +281,7 @@ button.stat:hover{border-color:var(--line-strong)}
 /* ---------- status pills ---------- */
 .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap;background:color-mix(in srgb,var(--c) 14%,transparent);color:color-mix(in srgb,var(--c) 80%,var(--text))}
 .pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c)}
-.st-not_started{--c:var(--st-not)} .st-in_progress{--c:var(--st-prog)} .st-internal_review{--c:var(--st-review)} .st-revisions{--c:var(--st-rev)} .st-done{--c:var(--st-done)}
+.st-not_started{--c:var(--st-not)} .st-in_progress{--c:var(--st-prog)} .st-internal_review{--c:var(--st-review)} .st-revisions{--c:var(--st-rev)} .st-done{--c:var(--st-done)} .st-client_review{--c:var(--st-client)} .st-waiting_client{--c:var(--st-wait)} .st-dropped{--c:var(--st-drop)}
 select.pill{appearance:none;-webkit-appearance:none;border:0;cursor:pointer;padding-right:10px;max-width:100%}
 select.pill::before{display:none}
 
@@ -456,6 +449,8 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .c-status{display:flex;align-items:center;gap:6px;min-width:0}
 .archive-btn{padding:3px 8px;font-size:12px}
 .group-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.group-add{color:var(--faint);padding:2px 6px}
+.group-add:hover{color:var(--text)}
 .card .archive-btn{align-self:flex-start}
 .d-archived{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:9px;background:var(--surface-2);color:var(--muted);font-size:13px}
 .d-archived b{color:var(--text)}
@@ -483,56 +478,13 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .row > .c-start,.row-head > .c-start,.row > .c-prio,.row-head > .c-prio{display:none}
   .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
-@media (max-width:820px){
-  .app{grid-template-columns:minmax(0,1fr)}
-  .side{position:static;height:auto;flex-direction:row;align-items:center;gap:10px;overflow-x:auto;padding:10px 16px;border-right:0;border-bottom:1px solid var(--line)}
-  .side .brand{padding:0}
-  .side .brand b{display:none}
-  .nav{flex-direction:row;gap:4px}
-  .nav-label{display:none}
-  .nav-sub{display:none}
-  .im-dest{grid-template-columns:1fr}
-  .bv-dd{grid-template-columns:1fr}
-  .bm-color{grid-template-columns:40px minmax(0,1fr) auto}
-  .bm-color input[data-bm-cname]{grid-column:2/3}
-  .im-row{grid-template-columns:auto minmax(0,1fr) auto}
-  .im-row .date{display:none}
-  .head-row{flex-direction:column-reverse;gap:12px;align-items:stretch}
-  .top-right{flex:none;width:100%}
-  .top-search{flex:1;max-width:none}
-  .nav-row .edit{display:none}
-  .nav-item{white-space:nowrap;width:auto;padding:6px 10px}
-  .nav-item .count{display:none}
-  .side-foot{margin:0 0 0 auto;padding:0}
-  .save-state{display:none}
-  .nav.jobs{margin:0;padding:0;border:0}
-  .jobs-toggle > svg:last-child{display:none}
-  .nav.jobs .nav-new{display:inline-flex}
-  .main{padding:16px 16px 60px}
-  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .stats .stat:first-child{grid-column:1/-1}
-  .row,.row-head{grid-template-columns:36px minmax(0,1fr) auto;gap:10px}
-  .row-head{display:none}
-  .row > .c-status{grid-column:2/4;grid-row:2;justify-self:start}
-  .row > .c-due{grid-column:3;grid-row:1}
-  .row > .c-links{display:none}
-  .arow{grid-template-columns:36px minmax(0,1fr) auto}
-  .arow .c-done{display:none}
-  .arow .acts{grid-column:2/4;justify-self:start}
-  .props{grid-template-columns:1fr}
-  .props > label,.props > .lbl{margin-bottom:-4px}
-  .tool-grid,.type-pick{grid-template-columns:1fr}
-  .head h1{font-size:24px}
-}
 /* Jobs dropdown in the sidebar */
 .jobs-toggle > svg:last-child{color:var(--faint);transition:transform .15s;width:14px;height:14px}
 .jobs-toggle.open > svg:last-child{transform:rotate(90deg)}
 .nav.jobs{margin:-12px 0 0 18px;padding-left:10px;border-left:1px solid var(--line)}
 .nav.jobs .nav-new{color:var(--muted);font-weight:500}
-.side-foot{justify-content:space-between;gap:6px;padding-right:0}
 .save-state{display:flex;align-items:center;gap:7px;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .save-state .sync-dot{flex:none}
-.foot-settings{color:var(--muted);flex:none}
 .crop-wrap{z-index:35}
 .crop{width:min(420px,100%)}
 .crop .m-body{align-items:center;gap:14px}
@@ -570,9 +522,83 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .acct-btns{display:flex;gap:6px;flex-wrap:wrap}
 .acct-btns .btn[disabled]{opacity:.6;cursor:default}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:820px){
+  .app{display:block}
+  .mtop{display:flex;flex-direction:column;gap:8px;position:sticky;top:0;z-index:15;background:var(--surface);border-bottom:1px solid var(--line);padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top,0px))}
+  .mtop-row{display:flex;align-items:center;gap:8px}
+  .mtop .brand{padding:0;flex:1;min-width:0}
+  .mtop .brand b{font-size:17px}
+  .mtop .top-right{width:100%;flex:none}
+  .mtop .top-search{flex:1;max-width:none;min-width:0}
+  .mtop .bell{width:34px;height:34px}
+  .side{position:fixed;top:0;left:0;bottom:0;height:auto;width:min(280px,86vw);z-index:40;transform:translateX(-102%);transition:transform .2s ease;box-shadow:var(--shadow-lg)}
+  .side.open{transform:none}
+  .side-scrim{display:block;position:fixed;inset:0;z-index:39;background:rgba(10,12,16,.35)}
+  .side-scrim[hidden]{display:none}
+  .main{padding:10px 12px 40px;gap:10px}
+  .banner{padding:8px 10px;font-size:12px;gap:6px 10px}
+  .banner p{min-width:0}
+  .head{gap:8px}
+  .head-title{min-width:0;gap:3px}
+  .head h1{font-size:20px;gap:8px}
+  .head h1 .logo{--s:26px!important}
+  .head .sub{font-size:12px;gap:4px 8px}
+  .tools{flex-wrap:nowrap;overflow-x:auto;gap:6px;width:100%;padding-bottom:2px}
+  .tool{padding:5px 9px;flex:none}
+  .tool small{font-size:9.5px}
+  .tool span{font-size:13px}
+  .tools .btn{flex:none;padding:6px 10px}
+  .stats{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+  .stat{padding:6px 6px;border-radius:8px;gap:0}
+  .stat small{font-size:8.5px;letter-spacing:.03em;line-height:1.2;white-space:normal}
+  .stat b{font-size:17px}
+  .jobs-grid{display:flex;overflow-x:auto;gap:8px;scroll-snap-type:x mandatory;padding-bottom:2px}
+  .jobs-grid > .job-wrap{flex:0 0 80%;scroll-snap-align:start}
+  .job-card{padding:10px;gap:6px}
+  .job-card h3{font-size:14px}
+  .toolbar{flex-wrap:nowrap;overflow-x:auto;gap:6px;padding-block:6px;margin-block:-6px;position:static}
+  .toolbar > *{flex:none}
+  .toolbar .spacer{display:none}
+  .seg button{padding:5px 8px}
+  .sel{padding:5px 6px;font-size:12px}
+  #new-task-btn{padding:6px 10px}
+  .pane-tabs{margin-top:8px}
+  .pane-tabs button{padding:7px 10px;font-size:13px}
+  .client-tabs button{padding:6px 10px;font-size:13px}
+  .group + .group{margin-top:8px}
+  .group-head{padding:3px 2px}
+  .row{padding:7px 10px}
+  .row,.row-head{grid-template-columns:32px minmax(0,1fr) auto;gap:8px}
+  .row .tmark{width:32px;height:32px}
+  .row select.pill{font-size:11px;padding:2px 8px}
+  .row-head{display:none}
+  .row > .c-status{grid-column:2/4;grid-row:2;justify-self:start}
+  .row > .c-due{grid-column:3;grid-row:1}
+  .row > .c-links{display:none}
+  .t-meta{font-size:11.5px}
+  .quick-add{padding:2px 10px}
+  .arow{grid-template-columns:32px minmax(0,1fr) auto;padding:7px 10px}
+  .arow .c-done{display:none}
+  .arow .acts{grid-column:2/4;justify-self:start}
+  .work{grid-template-columns:1fr 1fr}
+  .work-item{padding:8px 10px}
+  .work-item b{font-size:13px}
+  .props{grid-template-columns:1fr}
+  .props > label,.props > .lbl{margin-bottom:-4px}
+  .tool-grid,.type-pick{grid-template-columns:1fr}
+  .bv-dd{grid-template-columns:1fr}
+  .bm-color{grid-template-columns:40px minmax(0,1fr) auto}
+  .bm-color input[data-bm-cname]{grid-column:2/3}
+  .brand-cards{grid-template-columns:1fr 1fr}
+  .d-body{padding:14px;gap:14px}
+  .modal .m-body{padding:14px;gap:14px}
+}
+@media (max-width:420px){.work,.brand-cards{grid-template-columns:1fr}}
 </style>
 
 <div class="app">
+  <header class="mtop" id="mtop"><div class="mtop-row"><button type="button" class="icon-btn" id="menu-btn" data-act="menu" aria-label="Menu" aria-expanded="false" aria-controls="side"><svg class="i" viewBox="0 0 16 16"><path d="M2.5 4h11M2.5 8h11M2.5 12h11"/></svg></button><div class="brand" id="mbrand"></div></div><div id="mtop-slot"></div></header>
+  <div class="side-scrim" id="side-scrim" hidden data-act="menu-close"></div>
   <aside class="side" id="side"></aside>
   <main class="main" id="main">
     <div id="banner"></div>
@@ -606,8 +632,8 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 <div class="modal-wrap" id="modal" hidden></div>
 <div class="modal-wrap crop-wrap" id="crop" hidden></div>
 <div class="toast" id="toast" hidden role="status"></div>
+<input type="file" id="backup-in" accept="application/json,.json" hidden>
 <input type="file" id="pdf-in" accept="application/pdf,.pdf" hidden>
-<input type="file" id="csv-in" accept=".csv,text/csv" hidden>
 <input type="file" id="logo-in" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
 
 <script>
@@ -619,10 +645,15 @@ const STATUSES=[
   {id:'not_started',label:'Not started'},
   {id:'in_progress',label:'In progress'},
   {id:'internal_review',label:'Internal review'},
+  {id:'client_review',label:'Client review'},
   {id:'revisions',label:'Revisions'},
-  {id:'done',label:'Done'}];
+  {id:'waiting_client',label:'Waiting on client'},
+  {id:'done',label:'Done'},
+  {id:'dropped',label:'Dropped'}];
 const ST=Object.fromEntries(STATUSES.map(s=>[s.id,s]));
-const STATUS_VAR={not_started:'--st-not',in_progress:'--st-prog',internal_review:'--st-review',revisions:'--st-rev',done:'--st-done'};
+const STATUS_VAR={not_started:'--st-not',in_progress:'--st-prog',internal_review:'--st-review',client_review:'--st-client',revisions:'--st-rev',waiting_client:'--st-wait',done:'--st-done',dropped:'--st-drop'};
+/* Done and Dropped are closed: no deadlines, counts, notifications or calendar events */
+const isClosed=t=>t.status==='done'||t.status==='dropped';
 const PRIORITIES=[{id:'urgent',label:'Urgent'},{id:'high',label:'High'},{id:'normal',label:'Normal'},{id:'low',label:'Low'}];
 const PRIO_RANK={urgent:0,high:1,normal:2,low:3};
 const TOOL_ROLES=[
@@ -659,6 +690,9 @@ const I={
   download:'<svg class="i" viewBox="0 0 16 16"><path d="M8 2.5v8M4.8 7.5 8 10.7l3.2-3.2M2.5 13.5h11"/></svg>',
   palette:'<svg class="i" viewBox="0 0 16 16"><path d="M8 2a6 6 0 1 0 0 12c.9 0 1.3-.6 1.3-1.2 0-.8-.7-1-.7-1.7 0-.6.5-1 1.1-1h1.6A2.7 2.7 0 0 0 14 7.4C14 4.4 11.3 2 8 2z"/><circle cx="5.2" cy="7.3" r=".8" fill="currentColor"/><circle cx="7.4" cy="4.9" r=".8" fill="currentColor"/><circle cx="10.4" cy="5.3" r=".8" fill="currentColor"/></svg>',
   file:'<svg class="i" viewBox="0 0 16 16"><path d="M9.5 1.8H4.5A1.5 1.5 0 0 0 3 3.3v9.4a1.5 1.5 0 0 0 1.5 1.5h7a1.5 1.5 0 0 0 1.5-1.5V5.3z"/><path d="M9.5 1.8v3.5H13M5.5 9h5M5.5 11.5h3.5"/></svg>',
+  upload:'<svg class="i" viewBox="0 0 16 16"><path d="M8 10.5v-8M4.8 5.7 8 2.5l3.2 3.2M2.5 13.5h11"/></svg>',
+  menu:'<svg class="i" viewBox="0 0 16 16"><path d="M2.5 4h11M2.5 8h11M2.5 12h11"/></svg>',
+  info:'<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.8"/><path d="M8 7.3v3.6M8 5.1h.01"/></svg>',
   pencil:'<svg class="i" viewBox="0 0 16 16"><path d="M10.8 2.7a1.5 1.5 0 0 1 2.1 0l.4.4a1.5 1.5 0 0 1 0 2.1L5.6 12.9l-3.1.6.6-3.1z"/><path d="M9.5 4l2.5 2.5"/></svg>',
   grid:'<svg class="i" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><rect x="9" y="9" width="4.5" height="4.5" rx="1"/></svg>',
   building:'<svg class="i" viewBox="0 0 16 16"><path d="M3 14V3.2c0-.4.3-.7.7-.7h5.6c.4 0 .7.3.7.7V14M9 6.5h3.3c.4 0 .7.3.7.7V14M1.5 14h13M5 5h2M5 7.5h2M5 10h2M11 9h.01M11 11.5h.01"/></svg>',
@@ -749,7 +783,7 @@ function fmtDate(s){
 }
 function dueClass(t){
   if(!t.due) return 'none';
-  if(t.status==='done') return '';
+  if(isClosed(t)) return '';
   const dd=diffDays(t.due,today());
   if(dd<0) return 'over'; if(dd<=2) return 'soon'; return '';
 }
@@ -767,7 +801,7 @@ const safeUrl=u=>{u=String(u||'').trim();if(!u)return '';if(!/^[a-z][a-z0-9+.-]*
 
 /* ================= state ================= */
 const S={jobs:{},clients:{},tasks:{},settings:{},ready:false,
-  ui:{tab:'overview',client:'all',view:'list',q:'',prio:'all',due:'all',sort:'due',month:today().slice(0,7),collapsed:{done:true},openTask:null}};
+  ui:{tab:'overview',client:'all',view:'list',q:'',prio:'all',due:'all',sort:'due',month:today().slice(0,7),collapsed:{done:true,dropped:true},openTask:null}};
 const saved=lsGet(LS_UI); if(saved) S.ui=Object.assign(S.ui,saved,{q:'',openTask:null});
 const saveUi=()=>{const {q,aq,openTask,...rest}=S.ui;lsSet(LS_UI,rest)};
 
@@ -1036,8 +1070,8 @@ function filtered(){
   const u=S.ui,t0=today(),q=u.q.trim().toLowerCase();
   let list=tasksOfScope();
   if(u.prio!=='all') list=list.filter(t=>(t.priority||'normal')===u.prio);
-  if(u.due==='overdue') list=list.filter(t=>t.due&&t.due<t0&&t.status!=='done');
-  if(u.due==='week') list=list.filter(t=>t.due&&t.status!=='done'&&diffDays(t.due,t0)>=0&&diffDays(t.due,t0)<=7);
+  if(u.due==='overdue') list=list.filter(t=>t.due&&t.due<t0&&!isClosed(t));
+  if(u.due==='week') list=list.filter(t=>t.due&&!isClosed(t)&&diffDays(t.due,t0)>=0&&diffDays(t.due,t0)<=7);
   if(u.due==='nodate') list=list.filter(t=>!t.due);
   if(q) list=list.filter(t=>[t.name,t.notes,S.clients[t.clientId]?.name,S.jobs[t.jobId]?.name].some(x=>String(x||'').toLowerCase().includes(q)));
   const by={
@@ -1051,7 +1085,7 @@ function filtered(){
 }
 function statsFor(list){
   const t0=today();
-  const open=list.filter(t=>t.status!=='done');
+  const open=list.filter(t=>!isClosed(t));
   return {
     open:open.length,
     overdue:open.filter(t=>t.due&&t.due<t0).length,
@@ -1099,8 +1133,8 @@ function render(){
 
 function renderSide(){
   const u=S.ui,jobsOpen=u.jobsOpen!==false;
-  const openCount=jid=>live().filter(t=>t.jobId===jid&&t.status!=='done').length;
-  const allOpen=live().filter(t=>S.jobs[t.jobId]&&t.status!=='done').length;
+  const openCount=jid=>live().filter(t=>t.jobId===jid&&!isClosed(t)).length;
+  const allOpen=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)).length;
   const app=appSettings();const appLogo=imgSrc(app.logo);
   let html=`<div class="brand">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></div>
   <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button>
@@ -1110,10 +1144,11 @@ function renderSide(){
     const on=u.tab===j.id;
     html+=`<div class="nav-row"><button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}">${jobMark(j,18)}<span class="name">${esc(j.name)}</span><span class="count">${openCount(j.id)}</span></button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.pencil}</button></div>`;
   }
-  html+=`<button class="nav-item nav-new" data-act="new-job">${I.plus}<span class="name">New job</span></button>${jobsSorted().length?`<button class="nav-item nav-new" data-act="import-clickup">${I.download}<span class="name">Import from ClickUp</span></button>`:''}</nav>
+  html+=`<button class="nav-item nav-new" data-act="new-job">${I.plus}<span class="name">New job</span></button></nav>
   <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='db'||B.mode==='cloud'?'<span class="sync-dot"></span>Saved to your account':B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
-    <button class="btn sm ghost foot-settings" data-act="open-settings" title="Settings">${I.gear}<span>Settings</span></button></div>`;
+    <button class="nav-item foot-settings" data-act="open-settings">${I.gear}<span class="name">Settings</span></button></div>`;
   $('#side').innerHTML=html;
+  $('#mbrand').innerHTML=`${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b>`;
 }
 
 function renderMain(){
@@ -1140,14 +1175,13 @@ function renderMain(){
     $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${jobMark(job,34)}${esc(job.name)}</h1>
       <div class="sub"><span class="badge">${job.type==='agency'?I.briefcase+'Agency':I.user+'Direct client'}</span>${job.type==='agency'?`<span>${cl.length} client${cl.length===1?'':'s'}</span>`:''}</div></div>
       <div class="tools">${tools}<button class="btn" data-act="edit-job" data-id="${job.id}" style="align-self:stretch">${I.pencil}Edit job</button></div></div>
-      ${workCard(job)}
-      <div class="pane-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${u.pane==='brand'?'':'on'}" aria-selected="${u.pane!=='brand'}" data-act="pane" data-pane="tasks">${I.task}Tasks</button><button role="tab" class="${u.pane==='brand'?'on':''}" aria-selected="${u.pane==='brand'}" data-act="pane" data-pane="brand">${I.palette}Brand guide</button></div>
+      <div class="pane-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${u.pane==='brand'||u.pane==='details'?'':'on'}" aria-selected="${u.pane!=='brand'&&u.pane!=='details'}" data-act="pane" data-pane="tasks">${I.task}Tasks</button><button role="tab" class="${u.pane==='details'?'on':''}" aria-selected="${u.pane==='details'}" data-act="pane" data-pane="details">${I.info}Details</button><button role="tab" class="${u.pane==='brand'?'on':''}" aria-selected="${u.pane==='brand'}" data-act="pane" data-pane="brand">${I.palette}Brand guide</button></div>
       ${job.type==='agency'?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}`;
   }
 
-  if(job&&u.pane==='brand'){
+  if(job&&(u.pane==='brand'||u.pane==='details')){
     $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
-    $('#view').innerHTML=brandPane(job);return;
+    $('#view').innerHTML=u.pane==='brand'?brandPane(job):detailsPane(job);return;
   }
   const st=statsFor(scope);
   const stat=(key,label,val,cls='')=>`<button class="stat ${cls} ${u.due===key?'on':''}" data-act="stat" data-due="${key}"><small>${label}</small><b>${val}</b></button>`;
@@ -1177,7 +1211,7 @@ function jobCard(j){
   const st=statsFor(ts);
   const total=ts.length||1;
   const bar=STATUSES.map(s=>{const n=ts.filter(t=>t.status===s.id).length;return n?`<i style="width:${n/total*100}%;background:var(${STATUS_VAR[s.id]})" title="${s.label}: ${n}"></i>`:''}).join('');
-  const next=ts.filter(t=>t.status!=='done'&&t.due).sort((a,b)=>a.due.localeCompare(b.due))[0];
+  const next=ts.filter(t=>!isClosed(t)&&t.due).sort((a,b)=>a.due.localeCompare(b.due))[0];
   const cl=clientsOf(j.id).length;
   return `<div class="job-wrap"><button class="job-card" data-act="nav" data-tab="${j.id}">
     <h3>${jobMark(j,24)}${esc(j.name)}</h3>
@@ -1213,10 +1247,10 @@ const prioHtml=p=>{p=p||'normal';return `<span class="prio ${p}">${p==='normal'?
 const statusSelect=(t,act)=>`<select class="pill st-${t.status}" data-act="${act}" data-id="${t.id}" aria-label="Status">${STATUSES.map(s=>`<option value="${s.id}" ${s.id===t.status?'selected':''}>${s.label}</option>`).join('')}</select>`;
 
 const ROW_HEAD=`<div class="row-head"><span></span><span>Task</span><span>Status</span><span class="c-prio">Priority</span><span class="c-start">Start</span><span>Due</span><span>Links</span></div>`;
-const rowHtml=(t,job,showJob)=>`<div class="row ${t.status==='done'?'done-row':''} ${S.ui.openTask===t.id?'focus':''}" data-act="open" data-id="${t.id}" tabindex="0">
+const rowHtml=(t,job,showJob)=>`<div class="row ${isClosed(t)?'done-row':''} ${S.ui.openTask===t.id?'focus':''}" data-act="open" data-id="${t.id}" tabindex="0">
         ${taskMark(t)}
         <div class="t-main"><div class="t-name">${esc(t.name||'Untitled task')}</div>${metaLine(t,job,showJob)}</div>
-        <div class="c-status" data-stop>${statusSelect(t,'row-status')}${t.status==='done'?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
+        <div class="c-status" data-stop>${statusSelect(t,'row-status')}${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
         <div class="c-prio">${prioHtml(t.priority)}</div>
         <div class="c-start date ${t.start?'':'none'}">${t.start?fmtDate(t.start):'—'}</div>
         <div class="c-due date ${dueClass(t)}">${t.due?fmtDate(t.due):'—'}</div>
@@ -1227,8 +1261,8 @@ function listView(list,job){
   for(const s of STATUSES){
     const rows=list.filter(t=>t.status===s.id);
     const open=!S.ui.collapsed[s.id];
-    html+=`<section class="group" id="grp-${s.id}"><div class="group-bar"><button class="group-head ${open?'open':''}" data-act="group" data-status="${s.id}" aria-expanded="${open}">${I.chev}<span class="pill st-${s.id}">${s.label}</span><span class="count">${rows.length}</span></button>${s.id==='done'&&rows.length?`<button class="btn sm ghost" data-act="archive-all">${I.archive}Archive all ${rows.length} done</button>`:''}</div>`;
-    if(open){
+    html+=`<section class="group" id="grp-${s.id}"><div class="group-bar"><button class="group-head ${open?'open':''}" data-act="group" data-status="${s.id}" aria-expanded="${open}">${I.chev}<span class="pill st-${s.id}">${s.label}</span><span class="count">${rows.length}</span></button>${(s.id==='done'||s.id==='dropped')&&rows.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}">${I.archive}Archive all ${rows.length} ${s.id}</button>`:''}${rows.length?'':`<button class="btn sm ghost group-add" data-act="new-task" data-status="${s.id}" title="Add a ${esc(s.label)} task">${I.plus}Add</button>`}</div>`;
+    if(open&&rows.length){
       html+=`<div class="rows">${rows.length?ROW_HEAD:''}`;
       html+=rows.map(t=>rowHtml(t,job,showJob)).join('');
       html+=`<form class="quick-add" data-act="quick-add" data-status="${s.id}">${I.plus}<input data-fk="qa-${s.id}" placeholder="Add a task${job?'':' to '+esc(jobsSorted()[0]?.name||'')}" aria-label="Add a task to ${s.label}"></form></div>`;
@@ -1242,10 +1276,10 @@ function listView(list,job){
 function boardView(list,job){
   return `<div class="board-wrap"><div class="board">${STATUSES.map(s=>{
     const cards=list.filter(t=>t.status===s.id);
-    return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill st-${s.id}">${s.label}</span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
+    return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill st-${s.id}">${s.label}</span>${(s.id==='done'||s.id==='dropped')&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
       ${cards.map(t=>`<div class="card" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="card-top">${taskMark(t)}<div class="t-name">${esc(t.name||'Untitled task')}</div></div>${metaLine(t,job,!job)}
-        <div class="card-foot"><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):'No due date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${t.status==='done'?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
+        <div class="card-foot"><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):'No due date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
       <button class="add-card" data-act="new-task" data-status="${s.id}">${I.plus}Add task</button></div>`;
   }).join('')}</div></div>`;
 }
@@ -1264,10 +1298,10 @@ function calendarView(list){
     const evs=byDay[k]||[];
     const heavy=(load[k]||0)>=lim;
     cells+=`<div class="day ${d.getMonth()!==m-1?'out':''} ${k===t0?'today':''} ${heavy?'busy':''}"><div class="dn"><b>${d.getDate()}</b>${heavy?`<span class="busy-tag" title="${load[k]} tasks due across all jobs">${I.warn}${load[k]}</span>`:''}<button class="add-day" data-act="new-task" data-due="${k}" title="Add task due ${fmtDate(k)}" aria-label="Add task due ${k}">${I.plus}</button></div>
-      ${evs.slice(0,4).map(t=>`<button class="ev ${t.status==='done'?'is-done':''}" style="--c:var(${STATUS_VAR[t.status]})" data-act="open" data-id="${t.id}" title="${esc(t.name)} · ${ST[t.status]?.label}"><span>${esc(t.name||'Untitled task')}</span></button>`).join('')}
+      ${evs.slice(0,4).map(t=>`<button class="ev ${isClosed(t)?'is-done':''}" style="--c:var(${STATUS_VAR[t.status]})" data-act="open" data-id="${t.id}" title="${esc(t.name)} · ${ST[t.status]?.label}"><span>${esc(t.name||'Untitled task')}</span></button>`).join('')}
       ${evs.length>4?`<span class="more">+${evs.length-4} more</span>`:''}</div>`;
   }
-  const noDate=list.filter(t=>!t.due&&t.status!=='done').length;
+  const noDate=list.filter(t=>!t.due&&!isClosed(t)).length;
   return `<div class="cal-bar"><h2>${MONTH_FULL[m-1]} ${y}</h2><button class="icon-btn" data-act="cal" data-step="-1" aria-label="Previous month">${I.left}</button><button class="btn sm" data-act="cal" data-step="0">Today</button><button class="icon-btn" data-act="cal" data-step="1" aria-label="Next month">${I.chev}</button>
     <span class="hint" style="margin-left:auto">Tasks show on their due date${noDate?` · ${noDate} open task${noDate===1?' has':'s have'} no due date`:''}</span></div>
     <div class="cal-wrap"><div class="cal">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="dow">${d}</div>`).join('')}${cells}</div></div>`;
@@ -1276,7 +1310,7 @@ function calendarView(list){
 /* ================= workload ================= */
 /* A day is busy when this many open tasks (any job) are due on it. Set in Settings. */
 const dayLimit=()=>Math.min(20,Math.max(1,parseInt(appSettings().dayLimit,10)||3));
-function dueLoad(exceptId){const m={};live().forEach(t=>{if(t.id!==exceptId&&t.due&&t.status!=='done'&&S.jobs[t.jobId])m[t.due]=(m[t.due]||0)+1});return m}
+function dueLoad(exceptId){const m={};live().forEach(t=>{if(t.id!==exceptId&&t.due&&!isClosed(t)&&S.jobs[t.jobId])m[t.due]=(m[t.due]||0)+1});return m}
 const WEEKDAY=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 /* ================= notifications =================
    Built from the tasks every time the page draws, so they are always current.
@@ -1292,7 +1326,7 @@ function saveNotes(){
 }
 function notifications(all){
   const t0=today(),out=[],lim=dayLimit();
-  const open=live().filter(t=>S.jobs[t.jobId]&&t.status!=='done');
+  const open=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t));
   const who=t=>{const c=S.clients[t.clientId],j=S.jobs[t.jobId];return c?`${j.name} · ${c.name}`:j.name};
   const steps=t=>{const c=t.checklist||[],left=c.filter(x=>!x.done).length;return left?`${left} of ${c.length} checklist step${c.length===1?'':'s'} left.`:''};
   for(const t of open){
@@ -1301,9 +1335,9 @@ function notifications(all){
     else if(t.due===t0)out.push({key:`today:${t.id}:${t.due}`,rank:1,kind:'warn',icon:'clock',task:t,title:`${nm} is due today`,body:steps(t)});
     else if(t.due&&diffDays(t.due,t0)===1)out.push({key:`tmrw:${t.id}:${t.due}`,rank:2,kind:'warn',icon:'clock',task:t,title:`${nm} is due tomorrow`,body:steps(t)});
     if(t.start===t0&&t.status==='not_started')out.push({key:`start:${t.id}:${t.start}`,rank:3,kind:'info',icon:'flag',task:t,title:`${nm} starts today`,body:"It's still Not started."});
-    if((t.status==='internal_review'||t.status==='revisions')&&t.updated&&Date.now()-t.updated>=3*86400000){
+    if(['internal_review','client_review','revisions','waiting_client'].includes(t.status)&&t.updated&&Date.now()-t.updated>=3*86400000){
       const d=Math.floor((Date.now()-t.updated)/86400000);
-      out.push({key:`stale:${t.id}:${ymd(new Date(t.updated))}`,rank:4,kind:'info',icon:'loop',task:t,title:`${nm} has been in ${ST[t.status].label} for ${d} days`,body:'No changes since. Worth a follow-up?'});
+      out.push({key:`stale:${t.id}:${ymd(new Date(t.updated))}`,rank:4,kind:'info',icon:'loop',task:t,title:`${nm} has been in ${ST[t.status].label} for ${d} days`,body:t.status==='client_review'||t.status==='waiting_client'?'No update since. Worth a nudge to the client?':'No changes since. Worth a follow-up?'});
     }
     if((t.revision||0)>=3)out.push({key:`rev:${t.id}:${t.revision}`,rank:5,kind:'info',icon:'loop',task:t,title:`${nm} is on revision round ${t.revision}`,body:'Might be time to agree the remaining changes in one go.'});
     if(!t.due&&(t.priority==='urgent'||t.priority==='high'))out.push({key:`nodate:${t.id}`,rank:6,kind:'info',icon:'cal',task:t,title:`${nm} is ${t.priority==='urgent'?'urgent':'high priority'} but has no due date`,body:''});
@@ -1394,7 +1428,7 @@ function renderDrawer(){
       <label for="d-job">${I.briefcase}Job</label><select id="d-job" data-field="jobId">${jobsSorted().map(x=>`<option value="${x.id}" ${x.id===t.jobId?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
       ${j?.type==='agency'?`<label for="d-client">${I.user}Client</label><select id="d-client" data-field="clientId"><option value="">No client</option>${cl.map(c=>`<option value="${c.id}" ${c.id===t.clientId?'selected':''}>${esc(c.name)}</option>`).join('')}</select>`:''}
       <span class="lbl">${I.cal}Dates</span><div class="pair"><input type="date" id="d-start" data-field="start" value="${esc(t.start||'')}" aria-label="Start date" title="Start date"><input type="date" id="d-due" data-field="due" value="${esc(t.due||'')}" aria-label="Due date" title="Due date"></div>
-      ${(()=>{if(!t.due||t.status==='done'||t.archived)return'';const n=dueLoad(t.id)[t.due]||0;return n+1>=dayLimit()?`<span></span><p class="load-warn">${I.warn}Busy day: ${n} other task${n===1?' is':'s are'} due ${(d=>/^(Today|Tomorrow|Yesterday)$/.test(d)?d.toLowerCase():'on '+d)(fmtDate(t.due))}.</p>`:''})()}
+      ${(()=>{if(!t.due||isClosed(t)||t.archived)return'';const n=dueLoad(t.id)[t.due]||0;return n+1>=dayLimit()?`<span></span><p class="load-warn">${I.warn}Busy day: ${n} other task${n===1?' is':'s are'} due ${(d=>/^(Today|Tomorrow|Yesterday)$/.test(d)?d.toLowerCase():'on '+d)(fmtDate(t.due))}.</p>`:''})()}
       <span class="lbl">${I.ratio}Format</span><div class="fmt-pick">${FORMATS.map(f=>`<button data-act="fmt" data-fmt="${f}" class="${t.format===f?'on':''}" aria-pressed="${t.format===f}">${f}</button>`).join('')}</div>
       <label for="d-len">${I.clock}Length</label><input type="text" id="d-len" data-field="length" data-fk="d-len" value="${esc(t.length||'')}" placeholder="e.g. 0:30 or 3 × 0:15">
       <span class="lbl">${I.loop}Revision round</span><div class="stepper"><button data-act="rev" data-step="-1" aria-label="Decrease revision round">−</button><output>R${t.revision||0}</output><button data-act="rev" data-step="1" aria-label="Increase revision round">+</button></div>
@@ -1407,7 +1441,7 @@ function renderDrawer(){
       <form class="check-add" data-act="check-add">${I.plus}<input data-fk="ck-new" placeholder="Add a step (rough cut, captions, color…)" aria-label="Add checklist item"></form></div></div>
     <div><h4 class="section-title">Notes</h4><textarea class="notes" data-field="notes" data-fk="d-notes" placeholder="Brief, feedback, music choices, specs…">${esc(t.notes||'')}</textarea></div>
     <div class="d-foot"><span>${t.created?'Created '+fmtDate(ymd(new Date(t.created))):''}${t.doneAt?' · Done '+fmtDate(t.doneAt):''}</span>
-      <span style="display:flex;gap:6px">${t.status==='done'&&!t.archived?`<button class="btn sm" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}<button class="btn sm danger ${deleteArmed?'armed':''}" data-act="delete-task">${I.trash}${deleteArmed?'Click again to delete':'Delete task'}</button></span></div>
+      <span style="display:flex;gap:6px">${isClosed(t)&&!t.archived?`<button class="btn sm" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}<button class="btn sm danger ${deleteArmed?'armed':''}" data-act="delete-task">${I.trash}${deleteArmed?'Click again to delete':'Delete task'}</button></span></div>
   </div>`});
   autosize($('.d-name'));
 }
@@ -1489,14 +1523,14 @@ function openJobModal(id){
   setTimeout(()=>{const n=$('#m-name');if(n&&!M.id)n.focus()},0);
 }
 function closeModal(discard=true){
-  IM=null;if(BM){closeBrand();return}
+if(BM){closeBrand();return}
   if(discard&&M) M.uploaded.forEach(dropImage);
   M=null;$('#modal').hidden=true;$('#modal').innerHTML='';
 }
 let SM=null;
 function openSettings(){
   const a=appSettings();
-  SM={name:a.name||'',logo:a.logo||null,theme:a.theme||'system',dayLimit:dayLimit(),orig:a.logo||null,uploaded:[],busy:false};
+  SM={restore:null,name:a.name||'',logo:a.logo||null,theme:a.theme||'system',dayLimit:dayLimit(),orig:a.logo||null,uploaded:[],busy:false};
   CAL.disArmed=false;if(B.mode==='cloud'&&B.cfg.calendar)calStatus();
   renderSettings();$('#modal').hidden=false;render();
 }
@@ -1527,6 +1561,7 @@ function renderSettings(){
       <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${canUpload()?`<button type="button" class="btn sm" data-act="s-logo-pick">${I.image}${src?'Replace':'Upload'}</button>`:''}${src?'<button type="button" class="btn sm" data-act="s-logo-remove">Remove</button>':''}${SM.busy?'<span class="hint">Uploading…</span>':''}</div>
       <p class="hint">Replaces the ${esc(APP_NAME)} logo next to the app name and in the browser tab. A square image works best.</p></div></div></div>
     <div class="field"><label for="s-limit">Busy day warning</label><div class="limit-row"><span>Warn me when</span><input type="number" id="s-limit" data-fk="s-limit" min="1" max="20" value="${esc(SM.dayLimit)}"><span>or more tasks are due on the same day.</span></div><p class="hint">Busy days are flagged on Today, on the Calendar, and when you pick a due date.</p></div>
+    ${backupSettingsHtml()}
     ${accountSettingsHtml()}
   </form>
   <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="s-cancel">Cancel</button><button type="submit" form="s-form" class="btn primary">Save</button></div></footer></div>`});
@@ -1690,102 +1725,6 @@ function deleteJob(id){
   S.ui.tab='overview';S.ui.client='all';saveUi();closeModal();render();toast(`Deleted ${name||'job'}`);
 }
 function dropTaskPicture(t){dropImage(t.thumb)}
-
-/* ================= import from ClickUp (CSV export) ================= */
-let IM=null;
-function parseCsv(text){
-  const rows=[];let row=[],f='',q=false;
-  text=text.replace(/^﻿/,'');
-  for(let i=0;i<text.length;i++){
-    const c=text[i];
-    if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
-    else if(c==='"')q=true;
-    else if(c===','){row.push(f);f=''}
-    else if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n')i++;row.push(f);f='';if(row.some(x=>x!==''))rows.push(row);row=[]}
-    else f+=c;
-  }
-  row.push(f);if(row.some(x=>x!==''))rows.push(row);
-  return rows;
-}
-/* ClickUp dates come as epoch milliseconds, or as text like "Friday, October 3rd 2025". */
-function cuDate(v){
-  v=String(v||'').trim();if(!v)return '';
-  if(/^\d{10,13}$/.test(v)){const d=new Date(+v*(v.length===10?1000:1));return isNaN(d)?'':ymd(d)}
-  if(/^\d{4}-\d{2}-\d{2}/.test(v))return v.slice(0,10);
-  const d=new Date(v.replace(/^[A-Za-z]+,\s*/,'').replace(/(\d+)(st|nd|rd|th)\b/i,'$1').replace(/\sat\s/i,' '));
-  return isNaN(d)?'':ymd(d);
-}
-function cuStatus(v){
-  v=String(v||'').toLowerCase();
-  if(/complete|closed|done|delivered|approved|published|finished/.test(v))return 'done';
-  if(/revision|changes|feedback|fix/.test(v))return 'revisions';
-  if(/review|qa|approval|check/.test(v))return 'internal_review';
-  if(/progress|doing|editing|working|active|started|wip/.test(v))return 'in_progress';
-  return 'not_started';
-}
-const cuPrio=v=>({urgent:'urgent',high:'high',normal:'normal',low:'low','1':'urgent','2':'high','3':'normal','4':'low'})[String(v||'').trim().toLowerCase()]||'normal';
-function readClickUp(text){
-  const rows=parseCsv(text);if(rows.length<2)return {error:'That file has no tasks in it.'};
-  const head=rows[0].map(h=>h.trim().toLowerCase());
-  const col=(...names)=>{for(const n of names){const i=head.indexOf(n);if(i>=0)return i}return -1};
-  const c={name:col('task name','name','task'),id:col('task id','id'),status:col('status'),prio:col('priority'),
-    due:col('due date'),dueText:col('due date text'),start:col('start date'),startText:col('start date text'),
-    content:col('task content','description','content'),url:col('task url','url'),list:col('list name','list')};
-  if(c.name<0)return {error:"This doesn't look like a ClickUp export: there's no “Task Name” column."};
-  const have=new Set(Object.values(S.tasks).map(t=>t.clickupId).filter(Boolean));
-  const get=(r,i)=>i>=0?String(r[i]??'').trim():'';
-  const items=rows.slice(1).map((r,i)=>{
-    const id=get(r,c.id),name=get(r,c.name);if(!name)return null;
-    const raw=get(r,c.status);
-    return {key:'r'+i,cuId:id,name,rawStatus:raw,status:cuStatus(raw),priority:cuPrio(get(r,c.prio)),
-      due:cuDate(get(r,c.due))||cuDate(get(r,c.dueText)),start:cuDate(get(r,c.start))||cuDate(get(r,c.startText)),
-      notes:get(r,c.content).slice(0,5000),url:get(r,c.url)||(id?`https://app.clickup.com/t/${id}`:''),list:get(r,c.list),dup:!!id&&have.has(id)};
-  }).filter(Boolean);
-  if(!items.length)return {error:'That file has no tasks in it.'};
-  return {items};
-}
-function openImport(){
-  const u=S.ui,j=S.jobs[u.tab]||jobsSorted()[0];
-  IM={step:'pick',items:[],skip:{},jobId:j?.id||'',clientId:u.tab===j?.id&&u.client!=='all'?u.client:'',skipDone:true,error:'',file:''};
-  renderImport();$('#modal').hidden=false;
-}
-function importable(){return IM.items.filter(x=>!x.dup&&!(IM.skipDone&&x.status==='done')&&!IM.skip[x.key])}
-function renderImport(){
-  if(!IM)return;
-  const job=S.jobs[IM.jobId],cl=job?.type==='agency'?clientsOf(job.id):[];
-  const dup=IM.items.filter(x=>x.dup).length,done=IM.items.filter(x=>!x.dup&&x.status==='done').length,n=importable().length;
-  const body=IM.step==='pick'?`
-    <ol class="im-steps"><li>In ClickUp, open the List you want to bring over.</li><li>Click <b>•••</b> next to the List's name, choose <b>Export</b>, pick <b>CSV</b> and download it.</li><li>Choose that file here.</li></ol>
-    <div class="im-drop" data-act="im-pick" data-drop-csv tabindex="0" role="button">${I.download}<b>Choose a ClickUp CSV file</b><span class="hint">Or drop it here</span></div>
-    ${IM.error?`<p class="auth-err" role="alert">${esc(IM.error)}</p>`:''}`
-  :`<p class="im-file">${I.task}<b>${esc(IM.file)}</b> · ${IM.items.length} task${IM.items.length===1?'':'s'}${dup?` · ${dup} already imported`:''}<button type="button" class="btn sm ghost" data-act="im-restart">Choose another file</button></p>
-    <div class="im-dest"><div class="field"><label for="im-job">Add them to</label><select id="im-job">${jobsSorted().map(x=>`<option value="${x.id}" ${x.id===IM.jobId?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>
-      ${cl.length?`<div class="field"><label for="im-client">Client</label><select id="im-client"><option value="">No client</option>${cl.map(c=>`<option value="${c.id}" ${c.id===IM.clientId?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>`:''}</div>
-    <label class="im-opt"><input type="checkbox" id="im-skipdone" ${IM.skipDone?'checked':''}> Leave out tasks that are closed or complete in ClickUp${done?` (${done})`:''}</label>
-    <div class="im-list">${IM.items.map(x=>{const off=x.dup||(IM.skipDone&&x.status==='done');return `<label class="im-row ${off?'off':''}"><input type="checkbox" data-im-key="${x.key}" ${off?'disabled':''} ${!off&&!IM.skip[x.key]?'checked':''}>
-      <span class="im-name">${esc(x.name)}${x.dup?' <em>already imported</em>':''}</span><span class="pill st-${x.status}" title="ClickUp status: ${esc(x.rawStatus||'none')}">${ST[x.status].label}</span><span class="date ${x.due?'':'none'}">${x.due?fmtDate(x.due):'No date'}</span></label>`}).join('')}</div>
-    <p class="hint">Statuses are matched by name (for example “review” becomes Internal review and “complete” becomes Done). Each task keeps a link back to ClickUp, and importing the same file again skips tasks you already have.</p>`;
-  $('#modal').innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="im-title">
-  <header><h2 id="im-title">Import from ClickUp</h2><button class="icon-btn" data-act="modal-close" aria-label="Close">${I.x}</button></header>
-  <div class="m-body">${body}</div>
-  <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="modal-close">Cancel</button>${IM.step==='review'?`<button type="button" class="btn primary" data-act="im-import" ${n&&job?'':'disabled'}>Import ${n} task${n===1?'':'s'}</button>`:''}</div></footer></div>`;
-}
-async function importFile(file){
-  if(!IM||!file)return;
-  if(file.size>10*1024*1024){IM.error='That file is too large. Export one List at a time.';renderImport();return}
-  const r=readClickUp(await file.text());
-  if(r.error){IM.error=r.error;renderImport();return}
-  Object.assign(IM,{step:'review',items:r.items,skip:{},error:'',file:file.name});renderImport();
-}
-function runImport(){
-  const job=S.jobs[IM.jobId];if(!job)return;
-  const list=importable(),now=Date.now();
-  const clientId=job.type==='agency'&&S.clients[IM.clientId]?IM.clientId:null;
-  list.forEach((x,i)=>create('tasks',{jobId:job.id,clientId,name:x.name,status:x.status,priority:x.priority,start:x.start,due:x.due,format:'',length:'',revision:0,
-    links:{task:x.url,upload:'',file:''},thumb:null,notes:x.notes,checklist:[],created:now+i,clickupId:x.cuId||null,...(x.status==='done'?{doneAt:today()}:{})}));
-  closeModal();S.ui.tab=job.id;S.ui.client=clientId||'all';saveUi();render();
-  toast(`Imported ${list.length} task${list.length===1?'':'s'} into ${job.name}`);
-}
 
 /* ================= job work details (schedule, pay, location) ================= */
 const MY_TZ=(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC'}catch(e){return 'UTC'}})();
@@ -2021,6 +1960,91 @@ async function addBrandPdf(file){
   finally{if(BM===bm){bm.busy=false;renderBrand()}}
 }
 
+/* ================= backup & restore ================= */
+function downloadBackup(){
+  flushAll();
+  const data={};COLS.forEach(c=>{data[c]={};for(const id in S[c])data[c][id]=clean(S[c][id])});
+  const file={app:'splice-co',version:1,exported:new Date().toISOString(),data};
+  const blob=new Blob([JSON.stringify(file,null,1)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`splice-co-backup-${today()}.json`;
+  document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  toast('Backup downloaded');
+}
+async function readBackup(file){
+  if(!SM||!file)return;
+  try{
+    const j=JSON.parse(await file.text()),d=j&&j.data;
+    if(!d||typeof d!=='object'||!COLS.some(c=>d[c]&&typeof d[c]==='object'))throw 0;
+    const n=c=>Object.keys(d[c]||{}).length;
+    SM.restore={data:d,date:j.exported||'',counts:{jobs:n('jobs'),clients:n('clients'),tasks:n('tasks')},name:file.name};
+  }catch(e){SM.restore=null;toast("That file isn't a Splice & Co. backup.")}
+  renderSettings();
+}
+function runRestore(){
+  const r=SM&&SM.restore;if(!r)return;
+  let n=0;
+  COLS.forEach(c=>{const m=r.data[c]||{};for(const id in m){const doc=m[id];if(doc&&typeof doc==='object'){create(c,{...doc},id);n++}}});
+  closeSettings(false);render();toast(`Restored ${n} item${n===1?'':'s'} from the backup`);
+}
+function backupSettingsHtml(){
+  const r=SM.restore;
+  return `<div class="field"><span class="lbl">Backup</span>
+    <div class="acct-btns"><button type="button" class="btn sm" data-act="backup-download">${I.download}Download backup</button><button type="button" class="btn sm" data-act="backup-pick">${I.upload}Restore from a backup…</button></div>
+    ${r?`<div class="restore-box"><p class="acct-line"><b>${esc(r.name)}</b>${r.date?` · saved ${esc(fmtDate(ymd(new Date(r.date))))}`:''}<br>${r.counts.jobs} jobs, ${r.counts.clients} clients and ${r.counts.tasks} tasks. Restoring adds back anything missing and sets items that are in both back to the backup's version. Nothing else is deleted.</p>
+      <div class="acct-btns"><button type="button" class="btn sm primary" data-act="backup-restore">Restore now</button><button type="button" class="btn sm ghost" data-act="backup-cancel">Cancel</button></div></div>`
+    :`<p class="hint">Downloads every job, client, task, brand guide and setting as one file. Pictures and PDFs stay where they're stored; the backup keeps links to them.</p>`}</div>`;
+}
+/* Details tab on a job page */
+function detailsPane(job){
+  const w=workCard(job);
+  if(w.includes('work-empty'))return `<div class="empty"><h3>No details for ${esc(job.name)} yet</h3><p>Add the days you work for them, hours, pay, their location and time zone, and a contact person.</p><button class="btn primary" data-act="edit-job" data-id="${job.id}">${I.pencil}Add details</button></div>`;
+  return `<div class="details-head"><button class="btn sm" data-act="edit-job" data-id="${job.id}">${I.pencil}Edit details</button></div>${w}`;
+}
+/* ================= hover labels =================
+   Any element with a title shows it as a label right away (the title moves to data-tip
+   so the browser's own slow tooltip doesn't double up). Icon-only buttons fall back to
+   their aria-label. Touch screens don't hover, so nothing shows there. */
+const tipEl=document.createElement('div');tipEl.className='tip';tipEl.hidden=true;tipEl.setAttribute('role','tooltip');document.body.append(tipEl);
+let tipFor=null;
+function tipText(el){
+  if(el.hasAttribute('title')){const t=el.getAttribute('title');el.removeAttribute('title');if(t)el.dataset.tip=t}
+  if(el.dataset.tip)return el.dataset.tip;
+  const al=el.getAttribute('aria-label');
+  return al&&!el.textContent.trim()?al:'';
+}
+function showTip(el){
+  const t=tipText(el);if(!t){hideTip();return}
+  tipFor=el;tipEl.textContent=t;tipEl.hidden=false;
+  const r=el.getBoundingClientRect(),w=tipEl.offsetWidth,h=tipEl.offsetHeight;
+  let x=r.left+r.width/2-w/2,y=r.top-h-6;
+  if(y<4)y=r.bottom+6;
+  x=Math.max(4,Math.min(innerWidth-w-4,x));
+  tipEl.style.left=x+'px';tipEl.style.top=y+'px';
+}
+function hideTip(){tipFor=null;tipEl.hidden=true}
+if(matchMedia('(hover:hover)').matches){
+  document.addEventListener('mouseover',e=>{
+    const el=e.target.closest?.('[title],[data-tip],button[aria-label],a[aria-label]');
+    if(!el||el===tipFor)return;
+    if(el.closest('.tip'))return;
+    showTip(el);
+  });
+  document.addEventListener('mouseout',e=>{if(tipFor&&!tipFor.contains(e.relatedTarget))hideTip()});
+  document.addEventListener('scroll',hideTip,true);
+  document.addEventListener('mousedown',hideTip);
+}
+/* ================= phone / narrow layout: sidebar slides in ================= */
+const narrow=matchMedia('(max-width:820px)');
+function placeTopRight(){
+  const tr=$('.top-right');if(!tr)return;
+  const home=$('.head-row'),slot=$('#mtop-slot');
+  if(narrow.matches){if(tr.parentNode!==slot)slot.append(tr)}else if(tr.parentNode!==home)home.append(tr);
+  if(!narrow.matches)closeSide();
+}
+function openSide(){$('#side').classList.add('open');$('#side-scrim').hidden=false;$('#menu-btn').setAttribute('aria-expanded','true')}
+function closeSide(){$('#side').classList.remove('open');$('#side-scrim').hidden=true;$('#menu-btn')?.setAttribute('aria-expanded','false')}
+narrow.addEventListener?.('change',placeTopRight);
+
 /* ================= toast ================= */
 let toastT;
 function toast(msg,action){
@@ -2032,6 +2056,7 @@ function toast(msg,action){
 
 /* ================= events ================= */
 document.addEventListener('click',e=>{
+  if(narrow.matches&&$('#side').classList.contains('open')&&e.target.closest('#side [data-act]:not([data-act=toggle-jobs])'))setTimeout(closeSide,0);
   if(notesOpen&&!e.target.closest('.bell-wrap')){notesOpen=false;renderBell()}
   const stop=e.target.closest('[data-stop]');
   const el=e.target.closest('[data-act]');
@@ -2044,10 +2069,6 @@ document.addEventListener('click',e=>{
   switch(a){
     case 'nav': if(el.dataset.tab!==u.tab)u.pane='tasks';u.tab=el.dataset.tab;u.client=el.dataset.client||'all';saveUi();render();window.scrollTo({top:0});break;
     case 'view': u.view=el.dataset.view;saveUi();render();break;
-    case 'import-clickup': openImport();break;
-    case 'im-pick': $('#csv-in').click();break;
-    case 'im-restart': Object.assign(IM,{step:'pick',items:[],error:''});renderImport();break;
-    case 'im-import': runImport();break;
     case 'bell': notesOpen=!notesOpen;if(notesOpen)saveNotes();renderBell();break;
     case 'notes-read': notifications().forEach(n=>NS.read[n.key]=1);saveNotes();renderBell();break;
     case 'note-open': openNote(el.dataset.key);break;
@@ -2062,6 +2083,12 @@ document.addEventListener('click',e=>{
     case 'bm-add-pdf': $('#pdf-in').click();break;
     case 'bm-del-pdf': BM.b.pdfs.splice(+el.dataset.i,1);renderBrand();break;
     case 'copy-hex':{const h=el.dataset.hex;try{navigator.clipboard.writeText(h).then(()=>toast(`Copied ${h}`),()=>toast(h))}catch(x){toast(h)}break}
+    case 'backup-download': downloadBackup();break;
+    case 'backup-pick': $('#backup-in').click();break;
+    case 'backup-cancel': SM.restore=null;renderSettings();break;
+    case 'backup-restore': runRestore();break;
+    case 'menu': $('#side').classList.contains('open')?closeSide():openSide();break;
+    case 'menu-close': closeSide();break;
     case 'toggle-jobs': u.jobsOpen=u.jobsOpen===false;saveUi();renderSide();break;
     case 'group': u.collapsed[el.dataset.status]=!u.collapsed[el.dataset.status];saveUi();render();break;
     case 'stat': u.due=u.due===el.dataset.due?'all':el.dataset.due;render();break;
@@ -2093,7 +2120,7 @@ document.addEventListener('click',e=>{
       break}
     case 'check-del':{const t=S.tasks[u.openTask];patch('tasks',t.id,{checklist:(t.checklist||[]).filter(c=>c.id!==el.dataset.cid)});renderDrawer();break}
     case 'archive': archiveTasks([el.dataset.id]);break;
-    case 'archive-all': archiveTasks(filtered().filter(t=>t.status==='done').map(t=>t.id));break;
+    case 'archive-all': archiveTasks(filtered().filter(t=>t.status===el.dataset.status).map(t=>t.id));break;
     case 'restore': restoreTasks([el.dataset.id]);break;
     case 'arch-delete':
       if(archDelArmed!==el.dataset.id){archDelArmed=el.dataset.id;render();break}
@@ -2133,7 +2160,7 @@ document.addEventListener('click',e=>{
   if(a!=='delete-task'&&deleteArmed&&$('#drawer').contains(el)){deleteArmed=false;renderDrawer()}
 });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
+  if(e.key==='Escape'){if($('#side').classList.contains('open')){closeSide();return}if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'');
   if(e.key==='Enter'&&!typing){const r=e.target.closest?.('[data-act="open"]');if(r){openTask(r.dataset.id);return}}
   if(typing||e.metaKey||e.ctrlKey||e.altKey)return;
@@ -2146,13 +2173,9 @@ document.addEventListener('change',e=>{
   if(el.id==='f-due'){u.due=el.value;render();return}
   if(el.id==='arch-job'){u.ajob=el.value;saveUi();render();return}
   if(el.id==='f-sort'){u.sort=el.value;saveUi();render();return}
+  if(el.id==='backup-in'){const f=el.files[0];el.value='';readBackup(f);return}
   if(el.id==='pdf-in'){const f=el.files[0];el.value='';addBrandPdf(f);return}
   if(BM&&el.dataset.bmColor!==undefined){const c=BM.b.colors[+el.dataset.bmColor];if(c){c.hex=el.value;renderBrand()}return}
-  if(el.id==='csv-in'){const f=el.files[0];el.value='';importFile(f);return}
-  if(IM&&el.id==='im-job'){IM.jobId=el.value;IM.clientId='';renderImport();return}
-  if(IM&&el.id==='im-client'){IM.clientId=el.value;return}
-  if(IM&&el.id==='im-skipdone'){IM.skipDone=el.checked;renderImport();return}
-  if(IM&&el.dataset.imKey){IM.skip[el.dataset.imKey]=!el.checked;renderImport();return}
   if(el.id==='logo-in'){const f=el.files[0];el.value='';if(!f)return;const app=logoTarget?.kind==='app';openCrop(f,blob=>app?setAppLogo(blob):setModalLogo(blob));return}
   const act=el.dataset.act;
   if(act==='row-status'){setStatus(el.dataset.id,el.value);if(u.openTask===el.dataset.id)renderDrawer();return}
@@ -2212,18 +2235,17 @@ let dragId=null;
 document.addEventListener('dragstart',e=>{const c=e.target.closest?.('.card');if(!c)return;dragId=c.dataset.id;c.classList.add('dragging');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',dragId)}catch(x){}});
 document.addEventListener('dragend',e=>{e.target.classList?.remove('dragging');document.querySelectorAll('.col.drag').forEach(c=>c.classList.remove('drag'));dragId=null});
 document.addEventListener('dragover',e=>{
-  if(e.target.closest?.('[data-drop-csv]')){e.preventDefault();return}
   const col=e.target.closest?.('[data-drop]');
   if(col&&dragId){e.preventDefault();document.querySelectorAll('.col.drag').forEach(c=>c!==col&&c.classList.remove('drag'));col.classList.add('drag')}
 });
 document.addEventListener('drop',e=>{
-  const csv=e.target.closest?.('[data-drop-csv]');if(csv){e.preventDefault();importFile(e.dataTransfer.files[0]);return}
   const col=e.target.closest?.('[data-drop]');
   if(col&&dragId){e.preventDefault();setStatus(dragId,col.dataset.drop);dragId=null}
 });
 
 setInterval(()=>{if(S.ready&&!document.hidden&&$('#modal').hidden)scheduleRender()},60000);
 document.addEventListener('toggle',e=>{if(e.target.classList?.contains('d-brand')){S.ui.brandTaskOpen=e.target.open;saveUi()}},true);
+placeTopRight();
 boot();
 })();
 </script>
