@@ -424,6 +424,15 @@ select.pill::before{display:none}
 .link-row input{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 9px;font-size:calc(13px*var(--ts));width:100%;color:var(--text)}
 .link-row .acts{display:flex;gap:2px}
 .link-row .acts a.off{pointer-events:none;opacity:.35}
+.link-row .path-hint{grid-column:1/-1;margin:0}
+.links .lbtn{border:0;background:none;padding:0;display:grid;place-items:center;width:26px;height:26px;border-radius:6px;color:var(--accent);cursor:pointer}
+.links .lbtn:hover{background:var(--accent-soft)}
+button.tool{font:inherit;color:inherit;text-align:left;cursor:pointer}
+button.tool:hover{border-color:var(--accent)}
+button.tool svg{color:var(--faint)}
+.finder-set summary{cursor:pointer;list-style:revert}
+.steps{margin:8px 0;padding-left:20px;font-size:calc(13px*var(--ts));color:var(--text);display:flex;flex-direction:column;gap:6px;line-height:1.5}
+.copy-code{font-family:var(--mono);font-size:calc(12px*var(--ts));background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;user-select:all}
 .checklist{display:flex;flex-direction:column;gap:2px}
 .check{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:7px}
 .check:hover{background:var(--surface-2)}
@@ -887,6 +896,15 @@ const initials=n=>String(n||'').trim().split(/\s+/).filter(Boolean).slice(0,2).m
 const jobMark=(j,size)=>{const s=imgSrc(j?.logo);return s?`<img class="logo" style="--s:${size}px" src="${esc(s)}" alt="" onerror="this.remove()">`:`<span class="dot" style="background:${esc(j?.color)}"></span>`};
 const clientMark=(c,size)=>{const s=imgSrc(c?.logo);return s?`<img class="logo" style="--s:${size}px" src="${esc(s)}" alt="" onerror="this.remove()">`:''};
 const safeUrl=u=>{u=String(u||'').trim();if(!u)return '';if(!/^[a-z][a-z0-9+.-]*:/i.test(u))u='https://'+u;return /^https?:/i.test(u)?u:''};
+/* Finder paths. Browsers won't open file:// links from a website, so on a Mac a path opens through the
+   user's "Splice Open" shortcut (shortcuts:// URL, set up once from Settings → Finder folders); elsewhere it can be copied. */
+const OPEN_SHORTCUT='Splice Open';
+const IS_MAC=/Mac/.test(navigator.platform||navigator.userAgent)&&!(navigator.maxTouchPoints>1);
+const localPath=v=>{v=String(v||'').trim().replace(/^["']|["']$/g,'');if(/^file:\/\//i.test(v)){try{v=decodeURIComponent(v.replace(/^file:\/\/(localhost)?/i,''))}catch(e){return ''}}return /^(\/|~\/)/.test(v)?v:''};
+const pathOpenUrl=p=>`shortcuts://run-shortcut?name=${encodeURIComponent(OPEN_SHORTCUT)}&input=text&text=${encodeURIComponent(p)}`;
+const linkHref=v=>{const p=localPath(v);return p?(IS_MAC?pathOpenUrl(p):''):safeUrl(v)};
+const linkTarget=v=>localPath(v)?'':' target="_blank" rel="noopener"';
+const pathName=p=>p.replace(/\/+$/,'').split('/').pop()||p;
 
 /* ================= state ================= */
 const S={jobs:{},clients:{},tasks:{},settings:{},ready:false,
@@ -1362,7 +1380,9 @@ function metaLine(t,job,showJob){
 }
 function linkIcons(t){
   const j=S.jobs[t.jobId];
-  const one=(kind,icon)=>{const u=safeUrl(t.links?.[kind]);const label=linkLabel(j,kind);return u?`<a href="${esc(u)}" target="_blank" rel="noopener" title="Open ${esc(label)}" aria-label="Open ${esc(label)}" data-stop>${icon}</a>`:`<span title="No ${esc(label)} yet">${icon}</span>`};
+  const one=(kind,icon)=>{const v=t.links?.[kind],u=linkHref(v),p=localPath(v),label=linkLabel(j,kind);
+    if(p&&!u)return `<button type="button" class="lbtn" data-act="copy-path" data-path="${esc(p)}" title="Copy Finder path (opens on your Mac)" aria-label="Copy ${esc(label)} path" data-stop>${icon}</button>`;
+    return u?`<a href="${esc(u)}"${linkTarget(v)} title="${p?`Open “${esc(pathName(p))}” in Finder`:`Open ${esc(label)}`}" aria-label="Open ${esc(label)}" data-stop>${icon}</a>`:`<span title="No ${esc(label)} yet">${icon}</span>`};
   return `<div class="links">${one('task',I.task)}${one('upload',I.film)}${one('file',I.folder)}</div>`;
 }
 /* A task shows its client's logo, else its job's logo, else a plain company icon. */
@@ -1542,8 +1562,8 @@ function renderDrawer(){
   if(!t){if(S.ui.openTask)closeDrawer();return}
   const j=S.jobs[t.jobId];const cl=j?clientsOf(j.id):[];
   const checklist=t.checklist||[];const doneN=checklist.filter(x=>x.done).length;
-  const linkRow=(kind,icon)=>{const u=safeUrl(t.links?.[kind]);const label=linkLabel(j,kind);return `<div class="link-row"><label><span>${icon}${esc(label)}</span><input type="url" data-field="links.${kind}" data-fk="d-link-${kind}" value="${esc(t.links?.[kind]||'')}" placeholder="Paste link"></label>
-    <div class="acts"><a class="icon-btn ${u?'':'off'}" href="${esc(u||'#')}" target="_blank" rel="noopener" title="Open" aria-label="Open ${esc(label)}">${I.ext}</a><button class="icon-btn" data-act="copy" data-kind="${kind}" title="Copy link" aria-label="Copy ${esc(label)}">${I.copy}</button></div></div>`};
+  const linkRow=(kind,icon)=>{const v=t.links?.[kind],u=linkHref(v);const label=linkLabel(j,kind);return `<div class="link-row"><label><span>${icon}${esc(label)}</span><input type="${kind==='file'?'text':'url'}" data-field="links.${kind}" data-fk="d-link-${kind}" value="${esc(v||'')}" placeholder="${kind==='file'?'Paste a link or a Finder path':'Paste link'}" ${kind==='file'?'autocapitalize="off" spellcheck="false"':''}></label>
+    <div class="acts"><a class="icon-btn ${u?'':'off'}" href="${esc(u||'#')}"${linkTarget(v)} title="${localPath(v)?'Open in Finder':'Open'}" aria-label="Open ${esc(label)}">${I.ext}</a><button class="icon-btn" data-act="copy" data-kind="${kind}" title="Copy" aria-label="Copy ${esc(label)}">${I.copy}</button></div>${kind==='file'?`<p class="hint path-hint" ${localPath(v)?'':'hidden'}>${pathHint()}</p>`:''}</div>`};
   withFocus(()=>{$('#drawer').innerHTML=`
   ${t._draft?`<div class="d-draft">${I.plus}<b>New task</b><span>Not saved yet</span></div>`:''}
   <div class="d-top"><div class="crumb">${taskMark(t)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
@@ -1711,6 +1731,7 @@ function renderSettings(){
       <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${canUpload()?`<button type="button" class="btn sm" data-act="s-logo-pick">${I.image}${src?'Replace':'Upload'}</button>`:''}${src?'<button type="button" class="btn sm" data-act="s-logo-remove">Remove</button>':''}${SM.busy?'<span class="hint">Uploading…</span>':''}</div>
       <p class="hint">Replaces the ${esc(APP_NAME)} logo next to the app name and in the browser tab. A square image works best.</p></div></div></div>
     <div class="field"><label for="s-limit">Busy day warning</label><div class="limit-row"><span>Warn me when</span><input type="number" id="s-limit" data-fk="s-limit" min="1" max="20" value="${esc(SM.dayLimit)}"><span>or more tasks are due on the same day.</span></div><p class="hint">Busy days are flagged on the Calendar, in notifications, and when you pick a due date.</p></div>
+    ${finderSettingsHtml()}
     ${backupSettingsHtml()}
     ${accountSettingsHtml()}
   </form>
@@ -1834,7 +1855,7 @@ function renderModal(){
     <div class="field"><span class="lbl">Tools for this job</span><div class="tool-grid">${TOOL_ROLES.map(r=>{const v=M.tools[r.id];const custom=v&&!r.opts.includes(v);return `<div class="tool-cell"><span class="lbl">${r.label}</span>
       <select data-m-tool="${r.id}" aria-label="${r.label}">${r.opts.map(o=>`<option ${o===v||(custom&&o==='Other')?'selected':''}>${o}</option>`).join('')}</select>
       ${v==='Other'||custom?`<input type="text" data-m-toolname="${r.id}" data-fk="m-tn-${r.id}" value="${custom?esc(v):''}" placeholder="Tool name">`:''}
-      <input type="url" data-m-link="${r.id}" data-fk="m-tl-${r.id}" value="${esc(M.toolLinks[r.id]||'')}" placeholder="Workspace link (optional)"></div>`}).join('')}</div>
+      <input type="${r.id==='storage'?'text':'url'}" data-m-link="${r.id}" data-fk="m-tl-${r.id}" value="${esc(M.toolLinks[r.id]||'')}" placeholder="${r.id==='storage'?'Link or Finder path (optional)':'Workspace link (optional)'}" ${r.id==='storage'?'autocapitalize="off" spellcheck="false"':''}></div>`}).join('')}</div>
       <p class="hint">Workspace links show as buttons at the top of the job, so the Slack channel or Frame.io project is one click away.</p></div>
     ${workForm()}
     ${M.type==='agency'?`<div class="field"><span class="lbl">Clients</span><div class="client-list">${M.clients.map((c,i)=>`<div class="cl"><button type="button" class="logo-box sm ${c.logo?'has':''}" data-act="m-client-logo" data-i="${i}" title="${c.logo?'Replace':'Add'} picture for ${esc(c.name||'this client')}" aria-label="${c.logo?'Replace':'Add'} client picture">${c.logo?`<img src="${esc(imgSrc(c.logo))}" alt="">`:I.image}</button><input type="text" data-m-client="${i}" data-fk="m-cl-${c.id||'n'+i}" value="${esc(c.name)}" placeholder="Client name" aria-label="Client name">${c.logo?`<button type="button" class="btn sm ghost" data-act="m-client-logo-remove" data-i="${i}">Remove picture</button>`:''}<button type="button" class="icon-btn" data-act="m-del-client" data-i="${i}" aria-label="Remove client">${I.x}</button></div>`).join('')}
@@ -2136,6 +2157,20 @@ function runRestore(){
   COLS.forEach(c=>{const m=r.data[c]||{};for(const id in m){const doc=m[id];if(doc&&typeof doc==='object'){create(c,{...doc},id);n++}}});
   closeSettings(false);render();toast(`Restored ${n} item${n===1?'':'s'} from the backup`);
 }
+function pathHint(){return IS_MAC?`Opens in Finder through your “${esc(OPEN_SHORTCUT)}” shortcut. First time? Set it up in Settings → Finder folders.`:'Finder paths open only on your Mac. On this device the button copies the path.'}
+function finderSettingsHtml(){
+  return `<details class="field finder-set"><summary class="lbl">Finder folders (Mac)</summary>
+    <p class="hint" style="margin-top:6px">Paste a Finder path into a task's files field or a job's File storage, and clicking it opens that folder (or file) on your Mac. To copy a path in Finder, select the item and press <b>Option ⌥ + Command ⌘ + C</b>. Websites aren't allowed to open Finder by themselves, so it goes through a small shortcut you set up once:</p>
+    <ol class="steps">
+      <li>Open the <b>Shortcuts</b> app. In its menu bar choose <b>Shortcuts → Settings → Advanced</b> and turn on <b>Allow Running Scripts</b>.</li>
+      <li>Click <b>+</b> to make a new shortcut and name it exactly <b>${esc(OPEN_SHORTCUT)}</b>.</li>
+      <li>Add the <b>Run Shell Script</b> action. Set <b>Input</b> to <b>Shortcut Input</b> and <b>Pass Input</b> to <b>as arguments</b>.</li>
+      <li>Replace the script with this line: <code class="copy-code">open "\${1/#\\~/$HOME}"</code> <button type="button" class="btn sm ghost" data-act="copy-path" data-path="open &quot;\${1/#\\~/$HOME}&quot;">${I.copy}Copy</button></li>
+      <li>If the shortcut shows “Receive … input”, set it to <b>Text</b>. Close the editor.</li>
+    </ol>
+    <p class="hint">The first time you click a path, the browser asks to open Shortcuts. Allow it (tick “Always allow” if offered).</p>
+    ${IS_MAC?`<div class="acct-btns"><a class="btn sm" href="${pathOpenUrl('~')}">${I.folder}Test: open my home folder</a></div>`:''}</details>`;
+}
 function backupSettingsHtml(){
   const r=SM.restore;
   return `<div class="field"><span class="lbl">Backup</span>
@@ -2147,8 +2182,9 @@ function backupSettingsHtml(){
 /* Details tab on a job page */
 function toolsHtml(job){
   return TOOL_ROLES.map(r=>{
-    const name=job.tools?.[r.id]||'—';const url=safeUrl(job.toolLinks?.[r.id]);
-    return url?`<a class="tool" href="${esc(url)}" target="_blank" rel="noopener" title="Open ${esc(name)}"><small>${r.label}</small><span>${esc(name)}${I.ext}</span></a>`:`<div class="tool"><small>${r.label}</small><span>${esc(name)}</span></div>`;
+    const name=job.tools?.[r.id]||'—',v=job.toolLinks?.[r.id],url=linkHref(v),lp=localPath(v);
+    if(lp&&!url)return `<button type="button" class="tool" data-act="copy-path" data-path="${esc(lp)}" title="Copy Finder path (opens on your Mac)"><small>${r.label}</small><span>${esc(name)}${I.copy}</span></button>`;
+    return url?`<a class="tool" href="${esc(url)}"${linkTarget(v)} title="${lp?`Open “${esc(pathName(lp))}” in Finder`:`Open ${esc(name)}`}"><small>${r.label}</small><span>${esc(name)}${I.ext}</span></a>`:`<div class="tool"><small>${r.label}</small><span>${esc(name)}</span></div>`;
   }).join('');
 }
 function detailsPane(job){
@@ -2278,7 +2314,12 @@ document.addEventListener('click',e=>{
     case 'copy':{
       const v=S.tasks[u.openTask]?.links?.[el.dataset.kind];if(!v){toast('Paste a link first.');break}
       const inp=$(`[data-field="links.${el.dataset.kind}"]`);
-      try{navigator.clipboard.writeText(v).then(()=>toast('Link copied'),()=>{inp?.select();toast('Press Ctrl/Cmd+C to copy')})}catch(x){inp?.select();toast('Press Ctrl/Cmd+C to copy')}
+      const what=localPath(v)?'Path copied':'Link copied';
+      try{navigator.clipboard.writeText(v).then(()=>toast(what),()=>{inp?.select();toast('Press Ctrl/Cmd+C to copy')})}catch(x){inp?.select();toast('Press Ctrl/Cmd+C to copy')}
+      break}
+    case 'copy-path':{
+      const v=el.dataset.path,msg=IS_MAC?'Path copied':'Path copied. Finder paths open on your Mac.';
+      try{navigator.clipboard.writeText(v).then(()=>toast(msg),()=>toast(v))}catch(x){toast(v)}
       break}
     case 'check-del':{const t=S.tasks[u.openTask];patch('tasks',t.id,{checklist:(t.checklist||[]).filter(c=>c.id!==el.dataset.cid)});renderDrawer();break}
     case 'archive': archiveTasks([el.dataset.id]);break;
@@ -2381,7 +2422,7 @@ document.addEventListener('input',e=>{
     const p=f.startsWith('links.')?{links:{[f.slice(6)]:el.value.trim()}}:{[f]:f==='name'?el.value.replace(/\n/g,' '):el.value};
     patch('tasks',u.openTask,p,600);
     if(f==='name')autosize(el);
-    if(f.startsWith('links.')){const a=el.closest('.link-row')?.querySelector('a.icon-btn');const url=safeUrl(el.value);if(a){a.href=url||'#';a.classList.toggle('off',!url)}}
+    if(f.startsWith('links.')){const row=el.closest('.link-row'),a=row?.querySelector('a.icon-btn');const url=linkHref(el.value),lp=localPath(el.value);const h=row?.querySelector('.path-hint');if(h)h.hidden=!lp;if(a){if(lp){a.removeAttribute('target');a.title='Open in Finder'}else{a.target='_blank';a.title='Open'}a.href=url||'#';a.classList.toggle('off',!url)}}
   }
 });
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.classList?.contains('d-name')){e.preventDefault();e.target.blur()}});
