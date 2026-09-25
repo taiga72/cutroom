@@ -1,4 +1,4 @@
-// Google Calendar: one all-day event per open task, on its due date, in a "Cutroom" calendar.
+// Google Calendar: one all-day event per open task, on its due date, in a "Splice & Co." calendar.
 const { env, sb, getLink, saveLink } = require('./_lib');
 
 const SCOPES = 'openid email https://www.googleapis.com/auth/calendar.app.created';
@@ -56,7 +56,9 @@ function client(accessToken) {
   };
 }
 
-const createCalendar = g => g('POST', '/calendars', { summary: 'Cutroom', description: 'Task due dates from Cutroom. Changes here are overwritten by Cutroom.' });
+const APP_NAME = 'Splice & Co.';
+const CAL_INFO = { summary: APP_NAME, description: `Task due dates from ${APP_NAME}. Changes here are overwritten by ${APP_NAME}.` };
+const createCalendar = g => g('POST', '/calendars', CAL_INFO);
 
 const nextDay = d => { const t = new Date(d + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() + 1); return t.toISOString().slice(0, 10); };
 
@@ -72,7 +74,7 @@ function eventFor(t, jobs, clients, appUrl) {
     links.task ? `Task: ${links.task}` : '',
     links.upload ? `Review: ${links.upload}` : '',
     links.file ? `Files: ${links.file}` : '',
-    appUrl ? `\nOpen Cutroom: ${appUrl}` : ''
+    appUrl ? `\nOpen ${APP_NAME}: ${appUrl}` : ''
   ].filter(Boolean);
   return {
     summary: `${who} · ${t.name || 'Untitled task'}`,
@@ -101,6 +103,7 @@ async function listEvents(g, cal) {
   let page = '';
   do {
     const j = await g('GET', `/calendars/${encodeURIComponent(cal)}/events?maxResults=2500&showDeleted=false${page ? '&pageToken=' + page : ''}`);
+    all.calendarName = j.summary;
     all.push(...(j.items || []));
     page = j.nextPageToken || '';
   } while (page);
@@ -112,7 +115,7 @@ async function pool(items, n, fn) {
   await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => { while (i < items.length) await fn(items[i++]); }));
 }
 
-// Makes the Cutroom calendar match the user's tasks. Safe to run any number of times.
+// Makes the app's calendar match the user's tasks. Safe to run any number of times.
 async function syncUser(uid, appUrl) {
   const link = await getLink(uid);
   if (!link) return { connected: false };
@@ -123,6 +126,8 @@ async function syncUser(uid, appUrl) {
     let existing;
     try { existing = cal ? await listEvents(g, cal) : null; } catch (e) { if (e.status !== 404 && e.status !== 410) throw e; }
     if (!existing) { cal = (await createCalendar(g)).id; existing = []; await saveLink(uid, { calendar_id: cal }); }
+    // calendars made before the rename are still called "Cutroom"
+    else if (existing.calendarName !== undefined && existing.calendarName !== APP_NAME) await g('PATCH', `/calendars/${encodeURIComponent(cal)}`, CAL_INFO).catch(() => {});
 
     const { jobs, clients, tasks } = await loadDocs(uid);
     const want = {};
