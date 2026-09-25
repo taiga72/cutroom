@@ -157,6 +157,25 @@ button.stat:hover{border-color:var(--line-strong)}
 .toolbar .spacer{flex:1}
 .restore-box{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--surface-2)}
 .details-head{display:flex;justify-content:flex-end;margin-bottom:10px}
+.h1-edit{width:30px;height:30px;color:var(--faint)}
+.h1-edit:hover{color:var(--text)}
+.head h1 > span{min-width:0;overflow-wrap:anywhere}
+#subnav:empty{display:none}
+#subnav .pane-tabs{margin-top:0}
+.d-h{margin:4px 0 8px;font:700 14px var(--display);color:var(--muted)}
+.details-head + .d-h{margin-top:0}
+#view .tools{margin-bottom:14px}
+.filters{display:contents}
+.filter-btn{display:none;position:relative;padding:6px 9px}
+.fdot{position:absolute;top:3px;right:3px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.filter-sheet{position:fixed;inset:0;z-index:45;background:rgba(10,12,16,.35);display:flex;align-items:flex-end;justify-content:center}
+.filter-sheet[hidden]{display:none}
+.fs-card{background:var(--surface);width:100%;max-width:480px;border-radius:14px 14px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow-lg)}
+.fs-head{display:flex;align-items:center;justify-content:space-between}
+.fs-head b{font:700 16px var(--display)}
+#fs-slot .filters{display:flex;flex-direction:column;gap:8px}
+#fs-slot .sel{width:100%;padding:9px 10px;font-size:14px}
+.fs-foot{display:flex;justify-content:space-between;gap:8px}
 .tip{position:fixed;z-index:60;pointer-events:none;background:var(--text);color:var(--bg);font:600 12px/1.3 var(--body);padding:5px 8px;border-radius:6px;max-width:260px;box-shadow:var(--shadow);white-space:normal}
 .mtop{display:none}
 .side-scrim{display:none}
@@ -476,7 +495,7 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 @media (max-width:1100px){
   .row,.row-head{grid-template-columns:36px minmax(0,1fr) 180px 84px 92px}
   .row > .c-start,.row-head > .c-start,.row > .c-prio,.row-head > .c-prio{display:none}
-  .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .stat small{font-size:10px}
 }
 /* Jobs dropdown in the sidebar */
 .jobs-toggle > svg:last-child{color:var(--faint);transition:transform .15s;width:14px;height:14px}
@@ -543,7 +562,8 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .head h1{font-size:20px;gap:8px}
   .head h1 .logo{--s:26px!important}
   .head .sub{font-size:12px;gap:4px 8px}
-  .tools{flex-wrap:nowrap;overflow-x:auto;gap:6px;width:100%;padding-bottom:2px}
+  .tools{gap:6px}
+  .head h1 .h1-edit{width:28px;height:28px}
   .tool{padding:5px 9px;flex:none}
   .tool small{font-size:9.5px}
   .tool span{font-size:13px}
@@ -556,12 +576,14 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .jobs-grid > .job-wrap{flex:0 0 80%;scroll-snap-align:start}
   .job-card{padding:10px;gap:6px}
   .job-card h3{font-size:14px}
-  .toolbar{flex-wrap:nowrap;overflow-x:auto;gap:6px;padding-block:6px;margin-block:-6px;position:static}
+  .toolbar{flex-wrap:nowrap;gap:6px;padding-block:6px;margin-block:-6px;position:static}
   .toolbar > *{flex:none}
-  .toolbar .spacer{display:none}
-  .seg button{padding:5px 8px}
-  .sel{padding:5px 6px;font-size:12px}
-  #new-task-btn{padding:6px 10px}
+  .toolbar .vl{display:none}
+  .seg button{padding:6px 10px}
+  .toolbar .filters{display:none}
+  #fs-slot .filters{display:flex}
+  .filter-btn{display:inline-flex}
+  #new-task-btn{padding:7px 10px}
   .pane-tabs{margin-top:8px}
   .pane-tabs button{padding:7px 10px;font-size:13px}
   .client-tabs button{padding:6px 10px;font-size:13px}
@@ -572,8 +594,10 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .row .tmark{width:32px;height:32px}
   .row select.pill{font-size:11px;padding:2px 8px}
   .row-head{display:none}
-  .row > .c-status{grid-column:2/4;grid-row:2;justify-self:start}
-  .row > .c-due{grid-column:3;grid-row:1}
+  .row > .t-main{grid-column:2;grid-row:1/3}
+  .row > .c-status{grid-column:3;grid-row:1;justify-self:end}
+  .row > .c-due{grid-column:3;grid-row:2;justify-self:end}
+  .row .archive-btn{display:none}
   .row > .c-links{display:none}
   .t-meta{font-size:11.5px}
   .quick-add{padding:2px 10px}
@@ -592,6 +616,18 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .brand-cards{grid-template-columns:1fr 1fr}
   .d-body{padding:14px;gap:14px}
   .modal .m-body{padding:14px;gap:14px}
+  .cal-wrap{overflow:visible}
+  .cal{min-width:0;grid-template-columns:repeat(7,minmax(0,1fr));border-radius:10px}
+  .cal .dow{padding:4px 0;font-size:10px;text-align:center;letter-spacing:.02em}
+  .day{min-height:max(64px,calc((100vh - 330px) / 6));padding:3px 2px;gap:2px}
+  .day .dn{font-size:11px;justify-content:center}
+  .day .add-day,.busy-tag{display:none}
+  .day.today .dn b{padding:0 4px}
+  .ev{font-size:9.5px;font-weight:600;padding:1px 3px;border-left-width:2px;border-radius:3px;gap:0}
+  .more{font-size:9px;padding-left:1px}
+  .cal-bar{margin-bottom:6px;flex-wrap:wrap}
+  .cal-bar h2{font-size:16px}
+  .cal-bar .hint{display:none}
 }
 @media (max-width:420px){.work,.brand-cards{grid-template-columns:1fr}}
 </style>
@@ -603,15 +639,17 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   <main class="main" id="main">
     <div id="banner"></div>
     <div class="head-row"><div id="head"></div><div class="top-right"><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search tasks  ( / )" autocomplete="off"></label><div class="bell-wrap"><button type="button" class="icon-btn bell" id="bell" data-act="bell" aria-haspopup="true" aria-expanded="false" aria-controls="notes" title="Notifications"><svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bell-n" id="bell-n" hidden></span></button><div class="notes-pop" id="notes" hidden role="dialog" aria-label="Notifications"></div></div></div></div>
+    <div id="subnav"></div>
     <div id="stats"></div>
     <div id="jobcards"></div>
     <div class="toolbar" id="toolbar" hidden>
       <div class="seg" role="tablist" aria-label="View">
-        <button type="button" data-act="view" data-view="list" id="v-list"><svg class="i" viewBox="0 0 16 16"><path d="M5.5 4h8M5.5 8h8M5.5 12h8M2.5 4h.01M2.5 8h.01M2.5 12h.01"/></svg>List</button>
-        <button type="button" data-act="view" data-view="board" id="v-board"><svg class="i" viewBox="0 0 16 16"><rect x="2" y="2.5" width="3.4" height="11" rx="1"/><rect x="6.3" y="2.5" width="3.4" height="7" rx="1"/><rect x="10.6" y="2.5" width="3.4" height="9" rx="1"/></svg>Board</button>
-        <button type="button" data-act="view" data-view="calendar" id="v-calendar"><svg class="i" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg>Calendar</button>
+        <button type="button" data-act="view" data-view="list" id="v-list" aria-label="List view"><svg class="i" viewBox="0 0 16 16"><path d="M5.5 4h8M5.5 8h8M5.5 12h8M2.5 4h.01M2.5 8h.01M2.5 12h.01"/></svg><span class="vl">List</span></button>
+        <button type="button" data-act="view" data-view="board" id="v-board" aria-label="Board view"><svg class="i" viewBox="0 0 16 16"><rect x="2" y="2.5" width="3.4" height="11" rx="1"/><rect x="6.3" y="2.5" width="3.4" height="7" rx="1"/><rect x="10.6" y="2.5" width="3.4" height="9" rx="1"/></svg><span class="vl">Board</span></button>
+        <button type="button" data-act="view" data-view="calendar" id="v-calendar" aria-label="Calendar view"><svg class="i" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg><span class="vl">Calendar</span></button>
       </div>
-      <select class="sel" id="f-prio" aria-label="Priority filter">
+      <button type="button" class="btn filter-btn" id="filter-btn" data-act="filters" aria-label="Filter and sort" title="Filter and sort"><svg class="i" viewBox="0 0 16 16"><path d="M2.5 3.5h11L9.2 8.6v4l-2.4 1.1V8.6z"/></svg><span class="fdot" id="fdot" hidden></span></button>
+      <div class="filters" id="filters"><select class="sel" id="f-prio" aria-label="Priority filter">
         <option value="all">Any priority</option><option value="urgent">Urgent</option><option value="high">High</option><option value="normal">Normal</option><option value="low">Low</option>
       </select>
       <select class="sel" id="f-due" aria-label="Due date filter">
@@ -619,10 +657,11 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
       </select>
       <select class="sel" id="f-sort" aria-label="Sort">
         <option value="due">Sort: Due date</option><option value="start">Sort: Start date</option><option value="priority">Sort: Priority</option><option value="name">Sort: Name</option><option value="created">Sort: Newest</option>
-      </select>
+      </select></div>
       <span class="spacer"></span>
-      <button type="button" class="btn primary" data-act="new-task" id="new-task-btn"><svg class="i" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>New task</button>
+      <button type="button" class="btn primary" data-act="new-task" id="new-task-btn" aria-label="New task"><svg class="i" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg><span class="vl">New task</span></button>
     </div>
+    <div class="filter-sheet" id="filter-sheet" hidden data-act="filters-close"><div class="fs-card" role="dialog" aria-label="Filter and sort" data-stop><div class="fs-head"><b>Filter &amp; sort</b><button type="button" class="icon-btn" data-act="filters-close" aria-label="Close"><svg class="i" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div><div id="fs-slot"></div><div class="fs-foot"><button type="button" class="btn" data-act="reset-filters">Clear filters</button><button type="button" class="btn primary" data-act="filters-close">Done</button></div></div></div>
     <div id="view"></div>
   </main>
 </div>
@@ -642,18 +681,17 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 
 /* ================= constants ================= */
 const STATUSES=[
+  {id:'waiting_client',label:'Waiting on client'},
   {id:'not_started',label:'Not started'},
   {id:'in_progress',label:'In progress'},
   {id:'internal_review',label:'Internal review'},
-  {id:'client_review',label:'Client review'},
   {id:'revisions',label:'Revisions'},
-  {id:'waiting_client',label:'Waiting on client'},
-  {id:'done',label:'Done'},
-  {id:'dropped',label:'Dropped'}];
+  {id:'client_review',label:'Client review'},
+  {id:'done',label:'Done'}];
 const ST=Object.fromEntries(STATUSES.map(s=>[s.id,s]));
 const STATUS_VAR={not_started:'--st-not',in_progress:'--st-prog',internal_review:'--st-review',client_review:'--st-client',revisions:'--st-rev',waiting_client:'--st-wait',done:'--st-done',dropped:'--st-drop'};
 /* Done and Dropped are closed: no deadlines, counts, notifications or calendar events */
-const isClosed=t=>t.status==='done'||t.status==='dropped';
+const isClosed=t=>t.status==='done'||t.status==='dropped';  // 'dropped' was removed; old ones are moved to Done on load
 const PRIORITIES=[{id:'urgent',label:'Urgent'},{id:'high',label:'High'},{id:'normal',label:'Normal'},{id:'low',label:'Low'}];
 const PRIO_RANK={urgent:0,high:1,normal:2,low:3};
 const TOOL_ROLES=[
@@ -801,7 +839,7 @@ const safeUrl=u=>{u=String(u||'').trim();if(!u)return '';if(!/^[a-z][a-z0-9+.-]*
 
 /* ================= state ================= */
 const S={jobs:{},clients:{},tasks:{},settings:{},ready:false,
-  ui:{tab:'overview',client:'all',view:'list',q:'',prio:'all',due:'all',sort:'due',month:today().slice(0,7),collapsed:{done:true,dropped:true},openTask:null}};
+  ui:{tab:'overview',client:'all',view:'list',q:'',prio:'all',due:'all',sort:'due',month:today().slice(0,7),collapsed:{done:true},openTask:null}};
 const saved=lsGet(LS_UI); if(saved) S.ui=Object.assign(S.ui,saved,{q:'',openTask:null});
 const saveUi=()=>{const {q,aq,openTask,...rest}=S.ui;lsSet(LS_UI,rest)};
 
@@ -875,7 +913,7 @@ async function boot(){
         snap.docs.forEach(d=>{m[d.id]={...d.data(),id:d.id}});
         for(const key in pending){const [c,id]=key.split('/');if(c===col&&m[id])m[id]=merge(m[id],pending[key])}
         S[col]=m; loaded.add(col);
-        if(loaded.size===COLS.length) S.ready=true;
+        if(loaded.size===COLS.length){if(!S.ready){S.ready=true;setTimeout(migrateStatuses,0)}}
         scheduleRender(true);
       },err=>{console.error(err);toast('Lost the connection to your saved tasks. Reload the page to reconnect.')});
     });
@@ -885,7 +923,7 @@ function localBoot(){
   B.mode='local';
   const data=lsGet(LS_DATA)||buildSample(today());
   COLS.forEach(c=>{S[c]={};for(const id in (data[c]||{}))S[c][id]={...data[c][id],id}});
-  S.ready=true; render();
+  S.ready=true; migrateStatuses(); render();
 }
 
 /* ================= Supabase (hosted on Vercel) ================= */
@@ -923,7 +961,7 @@ async function cloudStart(session){
   $('#auth').hidden=true;$('#auth').innerHTML='';$('.app').hidden=false;
   render();
   try{await cloudLoad()}catch(e){console.error(e);toast("Couldn't load your tasks. Reload the page to try again.");return}
-  S.ready=true;render();
+  S.ready=true;migrateStatuses();render();
   setInterval(cloudRefresh,60000);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)cloudRefresh()});
   const back=new URLSearchParams(location.search).get('calendar');
@@ -1122,6 +1160,7 @@ function applyTheme(t){
   if(t==='light'||t==='dark') r.setAttribute('data-theme',t);
   else if(HOST_THEME) r.setAttribute('data-theme',HOST_THEME); else r.removeAttribute('data-theme');
 }
+function migrateStatuses(){for(const t of Object.values(S.tasks))if(t.status==='dropped')patch('tasks',t.id,{status:'done',doneAt:t.doneAt||today()})}
 function render(){
   const a=appSettings();
   applyTheme(SM?SM.theme:a.theme);
@@ -1153,6 +1192,7 @@ function renderSide(){
 
 function renderMain(){
   const u=S.ui;
+  $('#subnav').innerHTML='';
   if(!S.ready){$('#view').innerHTML='<div class="loading">Loading your tasks…</div>';$('#toolbar').hidden=true;return}
   if(u.tab!=='overview'&&u.tab!=='archived'&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
   if(u.client!=='all'&&!S.clients[u.client]) u.client='all';
@@ -1168,14 +1208,10 @@ function renderMain(){
       </div>`;
   }else{
     const cl=clientsOf(job.id);
-    const tools=TOOL_ROLES.map(r=>{
-      const name=job.tools?.[r.id]||'—';const url=safeUrl(job.toolLinks?.[r.id]);
-      return url?`<a class="tool" href="${esc(url)}" target="_blank" rel="noopener"><small>${r.label}</small><span>${esc(name)}${I.ext}</span></a>`:`<div class="tool"><small>${r.label}</small><span>${esc(name)}</span></div>`;
-    }).join('');
-    $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${jobMark(job,34)}${esc(job.name)}</h1>
-      <div class="sub"><span class="badge">${job.type==='agency'?I.briefcase+'Agency':I.user+'Direct client'}</span>${job.type==='agency'?`<span>${cl.length} client${cl.length===1?'':'s'}</span>`:''}</div></div>
-      <div class="tools">${tools}<button class="btn" data-act="edit-job" data-id="${job.id}" style="align-self:stretch">${I.pencil}Edit job</button></div></div>
-      <div class="pane-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${u.pane==='brand'||u.pane==='details'?'':'on'}" aria-selected="${u.pane!=='brand'&&u.pane!=='details'}" data-act="pane" data-pane="tasks">${I.task}Tasks</button><button role="tab" class="${u.pane==='details'?'on':''}" aria-selected="${u.pane==='details'}" data-act="pane" data-pane="details">${I.info}Details</button><button role="tab" class="${u.pane==='brand'?'on':''}" aria-selected="${u.pane==='brand'}" data-act="pane" data-pane="brand">${I.palette}Brand guide</button></div>
+
+    $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${jobMark(job,34)}<span>${esc(job.name)}</span><button class="icon-btn h1-edit" data-act="edit-job" data-id="${job.id}" title="Edit job" aria-label="Edit job">${I.pencil}</button></h1>
+      <div class="sub"><span class="badge">${job.type==='agency'?I.briefcase+'Agency':I.user+'Direct client'}</span>${job.type==='agency'?`<span>${cl.length} client${cl.length===1?'':'s'}</span>`:''}</div></div></div>`;
+    $('#subnav').innerHTML=`<div class="pane-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${u.pane==='brand'||u.pane==='details'?'':'on'}" aria-selected="${u.pane!=='brand'&&u.pane!=='details'}" data-act="pane" data-pane="tasks">${I.task}Tasks</button><button role="tab" class="${u.pane==='details'?'on':''}" aria-selected="${u.pane==='details'}" data-act="pane" data-pane="details">${I.info}Details</button><button role="tab" class="${u.pane==='brand'?'on':''}" aria-selected="${u.pane==='brand'}" data-act="pane" data-pane="brand">${I.palette}Brand guide</button></div>
       ${job.type==='agency'?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}`;
   }
 
@@ -1193,7 +1229,7 @@ function renderMain(){
   $('#jobcards').innerHTML=!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')}</div>`:'';
 
   const tb=$('#toolbar');tb.hidden=!Object.keys(S.jobs).length;
-  $('#top-search').hidden=tb.hidden;
+  $('#top-search').hidden=tb.hidden;$('#fdot').hidden=u.prio==='all'&&u.due==='all';
   ['list','board','calendar'].forEach(v=>{const b=$('#v-'+v);b.classList.toggle('on',u.view===v);b.setAttribute('aria-selected',u.view===v)});
   if(document.activeElement!==$('#q')) $('#q').value=u.q;
   $('#f-prio').value=u.prio;$('#f-due').value=u.due;$('#f-sort').value=u.sort;
@@ -1261,7 +1297,7 @@ function listView(list,job){
   for(const s of STATUSES){
     const rows=list.filter(t=>t.status===s.id);
     const open=!S.ui.collapsed[s.id];
-    html+=`<section class="group" id="grp-${s.id}"><div class="group-bar"><button class="group-head ${open?'open':''}" data-act="group" data-status="${s.id}" aria-expanded="${open}">${I.chev}<span class="pill st-${s.id}">${s.label}</span><span class="count">${rows.length}</span></button>${(s.id==='done'||s.id==='dropped')&&rows.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}">${I.archive}Archive all ${rows.length} ${s.id}</button>`:''}${rows.length?'':`<button class="btn sm ghost group-add" data-act="new-task" data-status="${s.id}" title="Add a ${esc(s.label)} task">${I.plus}Add</button>`}</div>`;
+    html+=`<section class="group" id="grp-${s.id}"><div class="group-bar"><button class="group-head ${open?'open':''}" data-act="group" data-status="${s.id}" aria-expanded="${open}">${I.chev}<span class="pill st-${s.id}">${s.label}</span><span class="count">${rows.length}</span></button>${s.id==='done'&&rows.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}">${I.archive}Archive all ${rows.length} done</button>`:''}${rows.length?'':`<button class="btn sm ghost group-add" data-act="new-task" data-status="${s.id}" title="Add a ${esc(s.label)} task">${I.plus}Add</button>`}</div>`;
     if(open&&rows.length){
       html+=`<div class="rows">${rows.length?ROW_HEAD:''}`;
       html+=rows.map(t=>rowHtml(t,job,showJob)).join('');
@@ -1276,7 +1312,7 @@ function listView(list,job){
 function boardView(list,job){
   return `<div class="board-wrap"><div class="board">${STATUSES.map(s=>{
     const cards=list.filter(t=>t.status===s.id);
-    return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill st-${s.id}">${s.label}</span>${(s.id==='done'||s.id==='dropped')&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
+    return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill st-${s.id}">${s.label}</span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
       ${cards.map(t=>`<div class="card" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="card-top">${taskMark(t)}<div class="t-name">${esc(t.name||'Untitled task')}</div></div>${metaLine(t,job,!job)}
         <div class="card-foot"><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):'No due date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
@@ -1995,10 +2031,17 @@ function backupSettingsHtml(){
     :`<p class="hint">Downloads every job, client, task, brand guide and setting as one file. Pictures and PDFs stay where they're stored; the backup keeps links to them.</p>`}</div>`;
 }
 /* Details tab on a job page */
+function toolsHtml(job){
+  return TOOL_ROLES.map(r=>{
+    const name=job.tools?.[r.id]||'—';const url=safeUrl(job.toolLinks?.[r.id]);
+    return url?`<a class="tool" href="${esc(url)}" target="_blank" rel="noopener" title="Open ${esc(name)}"><small>${r.label}</small><span>${esc(name)}${I.ext}</span></a>`:`<div class="tool"><small>${r.label}</small><span>${esc(name)}</span></div>`;
+  }).join('');
+}
 function detailsPane(job){
+  const tools=`<h3 class="d-h">Tools</h3><div class="tools">${toolsHtml(job)}</div>`;
   const w=workCard(job);
-  if(w.includes('work-empty'))return `<div class="empty"><h3>No details for ${esc(job.name)} yet</h3><p>Add the days you work for them, hours, pay, their location and time zone, and a contact person.</p><button class="btn primary" data-act="edit-job" data-id="${job.id}">${I.pencil}Add details</button></div>`;
-  return `<div class="details-head"><button class="btn sm" data-act="edit-job" data-id="${job.id}">${I.pencil}Edit details</button></div>${w}`;
+  if(w.includes('work-empty'))return `<div class="details-head"><button class="btn sm" data-act="edit-job" data-id="${job.id}">${I.pencil}Edit details</button></div>${tools}<h3 class="d-h">Work details</h3><div class="empty"><h3>No details for ${esc(job.name)} yet</h3><p>Add the days you work for them, hours, pay, their location and time zone, and a contact person.</p><button class="btn primary" data-act="edit-job" data-id="${job.id}">${I.pencil}Add details</button></div>`;
+  return `<div class="details-head"><button class="btn sm" data-act="edit-job" data-id="${job.id}">${I.pencil}Edit details</button></div>${tools}<h3 class="d-h">Work details</h3>${w}`;
 }
 /* ================= hover labels =================
    Any element with a title shows it as a label right away (the title moves to data-tip
@@ -2039,8 +2082,10 @@ function placeTopRight(){
   const tr=$('.top-right');if(!tr)return;
   const home=$('.head-row'),slot=$('#mtop-slot');
   if(narrow.matches){if(tr.parentNode!==slot)slot.append(tr)}else if(tr.parentNode!==home)home.append(tr);
-  if(!narrow.matches)closeSide();
+  if(!narrow.matches){closeSide();closeFilters()}
 }
+function openFilters(){$('#fs-slot').append($('#filters'));$('#filter-sheet').hidden=false}
+function closeFilters(){const f=$('#filters'),tb=$('#toolbar');if(f.parentNode!==tb)tb.insertBefore(f,$('#filter-btn').nextSibling);$('#filter-sheet').hidden=true}
 function openSide(){$('#side').classList.add('open');$('#side-scrim').hidden=false;$('#menu-btn').setAttribute('aria-expanded','true')}
 function closeSide(){$('#side').classList.remove('open');$('#side-scrim').hidden=true;$('#menu-btn')?.setAttribute('aria-expanded','false')}
 narrow.addEventListener?.('change',placeTopRight);
@@ -2089,6 +2134,8 @@ document.addEventListener('click',e=>{
     case 'backup-restore': runRestore();break;
     case 'menu': $('#side').classList.contains('open')?closeSide():openSide();break;
     case 'menu-close': closeSide();break;
+    case 'filters': openFilters();break;
+    case 'filters-close': if(el.id==='filter-sheet'&&e.target!==el)break;closeFilters();break;
     case 'toggle-jobs': u.jobsOpen=u.jobsOpen===false;saveUi();renderSide();break;
     case 'group': u.collapsed[el.dataset.status]=!u.collapsed[el.dataset.status];saveUi();render();break;
     case 'stat': u.due=u.due===el.dataset.due?'all':el.dataset.due;render();break;
@@ -2160,7 +2207,7 @@ document.addEventListener('click',e=>{
   if(a!=='delete-task'&&deleteArmed&&$('#drawer').contains(el)){deleteArmed=false;renderDrawer()}
 });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if($('#side').classList.contains('open')){closeSide();return}if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
+  if(e.key==='Escape'){if(!$('#filter-sheet').hidden){closeFilters();return}if($('#side').classList.contains('open')){closeSide();return}if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'');
   if(e.key==='Enter'&&!typing){const r=e.target.closest?.('[data-act="open"]');if(r){openTask(r.dataset.id);return}}
   if(typing||e.metaKey||e.ctrlKey||e.altKey)return;
