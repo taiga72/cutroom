@@ -93,7 +93,7 @@ svg.i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-widt
 a.tool:hover{border-color:var(--accent)}
 a.tool svg{color:var(--faint)}
 .client-tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin-top:-4px}
-.client-tabs button{border:0;background:none;padding:8px 12px;border-bottom:2px solid transparent;color:var(--muted);font-weight:500;white-space:nowrap}
+.client-tabs button{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:8px 12px;border-bottom:2px solid transparent;color:var(--muted);font-weight:500;white-space:nowrap}
 .client-tabs button.on{color:var(--text);border-bottom-color:var(--accent);font-weight:600}
 .client-tabs button:hover{color:var(--text)}
 .client-tabs .add{color:var(--accent)}
@@ -305,6 +305,13 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .client-list .cl{display:flex;gap:6px;align-items:center}
 .client-list input{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px;min-width:0}
 .hint{font-size:12px;color:var(--faint);margin:0}
+.logo{width:var(--s,18px);height:var(--s,18px);border-radius:calc(var(--s,18px) * .26);object-fit:cover;flex:none;background:var(--surface);border:1px solid var(--line);max-width:100%}
+.logo-field{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.logo-box{width:64px;height:64px;border-radius:14px;border:1px dashed var(--line-strong);background:var(--surface-2);display:grid;place-items:center;overflow:hidden;font:700 20px var(--display);color:#fff;padding:0;flex:none}
+.logo-box.has{border-style:solid;border-color:var(--line);background:var(--surface)}
+.logo-box img{width:100%;height:100%;object-fit:cover;display:block}
+.logo-box.sm{width:36px;height:36px;border-radius:9px;color:var(--muted)}
+.logo-box:hover{border-color:var(--accent)}
 
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:9px 14px;border-radius:9px;font-weight:600;font-size:13px;z-index:40;box-shadow:var(--shadow-lg);max-width:calc(100% - 32px)}
 .loading{padding:60px 0;text-align:center;color:var(--muted)}
@@ -380,6 +387,7 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 <div class="modal-wrap" id="modal" hidden></div>
 <div class="toast" id="toast" hidden role="status"></div>
 <input type="file" id="file-in" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+<input type="file" id="logo-in" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
 
 <script>
 (function(){
@@ -510,6 +518,10 @@ function merge(a,b){const o={...(a||{})};for(const k in b){o[k]=isObj(b[k])&&isO
 function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 const thumbSrc=t=>!t||!t.thumb?null:(String(t.thumb).startsWith('data:')?t.thumb:'/_blob/'+t.thumb);
+const imgSrc=v=>!v?null:(String(v).startsWith('data:')?v:'/_blob/'+v);
+const initials=n=>String(n||'').trim().split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?';
+const jobMark=(j,size)=>{const s=imgSrc(j?.logo);return s?`<img class="logo" style="--s:${size}px" src="${esc(s)}" alt="" onerror="this.remove()">`:`<span class="dot" style="background:${esc(j?.color)}"></span>`};
+const clientMark=(c,size)=>{const s=imgSrc(c?.logo);return s?`<img class="logo" style="--s:${size}px" src="${esc(s)}" alt="" onerror="this.remove()">`:''};
 const safeUrl=u=>{u=String(u||'').trim();if(!u)return '';if(!/^[a-z][a-z0-9+.-]*:/i.test(u))u='https://'+u;return /^https?:/i.test(u)?u:''};
 
 /* ================= state ================= */
@@ -653,10 +665,10 @@ function renderSide(){
   <nav class="nav jobs" aria-label="Jobs"><div class="nav-label">Jobs<button data-act="new-job" title="Add a job" aria-label="Add a job">${I.plus}</button></div>`;
   for(const j of jobsSorted()){
     const on=u.tab===j.id;
-    html+=`<button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}"><span class="dot" style="background:${esc(j.color)}"></span><span class="name">${esc(j.name)}</span><span class="count">${openCount(j.id)}</span></button>`;
+    html+=`<button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}">${jobMark(j,18)}<span class="name">${esc(j.name)}</span><span class="count">${openCount(j.id)}</span></button>`;
     if(j.type==='agency'){
       const cl=clientsOf(j.id);
-      if(cl.length) html+=`<div class="nav-sub">${cl.map(c=>`<button class="nav-item ${on&&u.client===c.id?'on':''}" data-act="nav" data-tab="${j.id}" data-client="${c.id}"><span class="name">${esc(c.name)}</span></button>`).join('')}</div>`;
+      if(cl.length) html+=`<div class="nav-sub">${cl.map(c=>`<button class="nav-item ${on&&u.client===c.id?'on':''}" data-act="nav" data-tab="${j.id}" data-client="${c.id}">${clientMark(c,16)}<span class="name">${esc(c.name)}</span></button>`).join('')}</div>`;
     }
   }
   html+=`<button class="nav-item nav-new" data-act="new-job">${I.plus}<span class="name">New job</span></button></nav>
@@ -684,10 +696,10 @@ function renderMain(){
       const name=job.tools?.[r.id]||'—';const url=safeUrl(job.toolLinks?.[r.id]);
       return url?`<a class="tool" href="${esc(url)}" target="_blank" rel="noopener"><small>${r.label}</small><span>${esc(name)}${I.ext}</span></a>`:`<div class="tool"><small>${r.label}</small><span>${esc(name)}</span></div>`;
     }).join('');
-    $('#head').innerHTML=`<div class="head"><div class="head-title"><h1><span class="dot" style="background:${esc(job.color)}"></span>${esc(job.name)}</h1>
+    $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${jobMark(job,34)}${esc(job.name)}</h1>
       <div class="sub"><span class="badge">${job.type==='agency'?I.briefcase+'Agency':I.user+'Direct client'}</span>${job.type==='agency'?`<span>${cl.length} client${cl.length===1?'':'s'}</span>`:''}<button class="btn sm ghost" data-act="edit-job" data-id="${job.id}">${I.gear}Edit job & tools</button></div></div>
       <div class="tools">${tools}</div></div>
-      ${job.type==='agency'?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}">${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}`;
+      ${job.type==='agency'?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}`;
   }
 
   const st=statsFor(scope);
@@ -720,7 +732,7 @@ function jobCard(j){
   const next=ts.filter(t=>t.status!=='done'&&t.due).sort((a,b)=>a.due.localeCompare(b.due))[0];
   const cl=clientsOf(j.id).length;
   return `<button class="job-card" data-act="nav" data-tab="${j.id}">
-    <h3><span class="dot" style="background:${esc(j.color)}"></span>${esc(j.name)}</h3>
+    <h3>${jobMark(j,24)}${esc(j.name)}</h3>
     <div class="meta">${j.type==='agency'?`Agency · ${cl} client${cl===1?'':'s'}`:'Direct client'} · ${esc(j.tools?.comms||'')} · ${esc(j.tools?.upload||'')}</div>
     <div class="stack">${bar}</div>
     <div class="meta">${st.open} open${st.overdue?` · <span style="color:var(--danger);font-weight:600">${st.overdue} overdue</span>`:''}${st.revisions?` · ${st.revisions} in revisions`:''}</div>
@@ -730,8 +742,8 @@ function jobCard(j){
 
 function metaLine(t,job,showJob){
   const bits=[];
-  if(showJob){const j=S.jobs[t.jobId];bits.push(`<span class="jobtag"><span class="dot" style="background:${esc(j?.color)}"></span>${esc(j?.name)}</span>`)}
-  const c=S.clients[t.clientId]; if(c&&!(S.ui.client===c.id&&!showJob)) bits.push(`<span>${esc(c.name)}</span>`);
+  if(showJob){const j=S.jobs[t.jobId];bits.push(`<span class="jobtag">${jobMark(j,14)}${esc(j?.name)}</span>`)}
+  const c=S.clients[t.clientId]; if(c&&!(S.ui.client===c.id&&!showJob)) bits.push(`<span class="jobtag">${clientMark(c,14)}${esc(c.name)}</span>`);
   if(t.format) bits.push(`<span class="chip">${esc(t.format)}</span>`);
   if(t.revision) bits.push(`<span class="chip rev" title="Revision round">R${t.revision}</span>`);
   const cl=t.checklist||[]; if(cl.length) bits.push(`<span class="mono">${cl.filter(x=>x.done).length}/${cl.length}</span>`);
@@ -818,7 +830,7 @@ function renderDrawer(){
   const linkRow=(kind,icon)=>{const u=safeUrl(t.links?.[kind]);const label=linkLabel(j,kind);return `<div class="link-row"><label><span>${icon}${esc(label)}</span><input type="url" data-field="links.${kind}" data-fk="d-link-${kind}" value="${esc(t.links?.[kind]||'')}" placeholder="Paste link"></label>
     <div class="acts"><a class="icon-btn ${u?'':'off'}" href="${esc(u||'#')}" target="_blank" rel="noopener" title="Open" aria-label="Open ${esc(label)}">${I.ext}</a><button class="icon-btn" data-act="copy" data-kind="${kind}" title="Copy link" aria-label="Copy ${esc(label)}">${I.copy}</button></div></div>`};
   withFocus(()=>{$('#drawer').innerHTML=`
-  <div class="d-top"><div class="crumb"><span class="dot" style="background:${esc(j?.color)}"></span>${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
+  <div class="d-top"><div class="crumb">${jobMark(j,18)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
     <button class="icon-btn" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
   <div class="d-body">
     <textarea class="d-name" rows="1" data-field="name" data-fk="d-name" aria-label="Task name" placeholder="Task name">${esc(t.name)}</textarea>
@@ -867,48 +879,48 @@ function newTask(opts={}){
 }
 
 /* ================= pictures ================= */
-function downscale(file,max){
+function downscale(file,max,type='image/jpeg'){
   return new Promise((res,rej)=>{
     const img=new Image();const url=URL.createObjectURL(file);
     img.onload=()=>{
       const r=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
-      const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*r);c.height=Math.round(img.naturalHeight*r);
-      const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);
-      URL.revokeObjectURL(url);c.toBlob(b=>b?res(b):rej(new Error('encode')),'image/jpeg',.86);
+      const c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.naturalWidth*r));c.height=Math.max(1,Math.round(img.naturalHeight*r));
+      const x=c.getContext('2d');if(type==='image/jpeg'){x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height)}x.drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url);c.toBlob(b=>b?res(b):rej(new Error('encode')),type,.86);
     };
     img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('decode'))};
     img.src=url;
   });
 }
 const toDataUrl=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
+const canUpload=()=>B.mode!=='db'||!!B.assets;
+/* Saves an image and returns what to store: an asset id (synced) or a data URL (this browser only). */
+async function storeImage(file,max,localMax,type){
+  if(!/^image\/(png|jpe?g|webp|gif)$/.test(file.type)) throw {code:'bad_type'};
+  if(B.mode==='db'){
+    if(!B.assets) throw {code:'not_granted'};
+    const blob=await downscale(file,max,type);
+    try{return (await B.assets.upload(blob,{type})).id}
+    catch(e){if(e&&e.code==='store_unavailable'){await new Promise(x=>setTimeout(x,1200));return (await B.assets.upload(blob,{type})).id}throw e}
+  }
+  return toDataUrl(await downscale(file,localMax,type));
+}
+function uploadError(e){
+  const c=e&&e.code;
+  return c==='bad_type'?'Choose a PNG, JPG, WebP or GIF image.':c==='not_granted'?"Pictures can't be uploaded from this view.":c==='too_large'?'That image is too large. Try one under 20 MB.':c==='quota_or_state'?'Picture storage is full. Remove pictures from old tasks to free space.':c==='rate_limited'?'Too many uploads at once. Wait a moment and try again.':"Couldn't upload that picture. Try again.";
+}
+function dropImage(v){if(B.mode==='db'&&B.assets&&v&&!String(v).startsWith('data:'))B.assets.delete(v).catch(()=>{})}
 async function setPicture(file,taskId){
   if(!file) return;
-  if(!/^image\/(png|jpe?g|webp|gif)$/.test(file.type)){toast('Choose a PNG, JPG, WebP or GIF image.');return}
   uploading=true;renderDrawer();
-  try{
-    const old=S.tasks[taskId]?.thumb;
-    if(B.mode==='db'){
-      if(!B.assets){toast("Pictures can't be uploaded from this view.");return}
-      const blob=await downscale(file,1280);
-      let r;
-      try{r=await B.assets.upload(blob,{type:'image/jpeg'})}
-      catch(e){if(e&&e.code==='store_unavailable'){await new Promise(x=>setTimeout(x,1200));r=await B.assets.upload(blob,{type:'image/jpeg'})}else throw e}
-      patch('tasks',taskId,{thumb:r.id});
-      if(old&&!String(old).startsWith('data:')) B.assets.delete(old).catch(()=>{});
-    }else{
-      const blob=await downscale(file,560);
-      patch('tasks',taskId,{thumb:await toDataUrl(blob)});
-    }
-  }catch(e){
-    console.error(e);
-    const c=e&&e.code;
-    toast(c==='too_large'?'That image is too large. Try one under 20 MB.':c==='quota_or_state'?'Picture storage is full. Remove pictures from old tasks to free space.':c==='rate_limited'?'Too many uploads at once. Wait a moment and try again.':"Couldn't upload that picture. Try again.");
-  }finally{uploading=false;renderDrawer()}
+  try{const old=S.tasks[taskId]?.thumb;const v=await storeImage(file,1280,560,'image/jpeg');patch('tasks',taskId,{thumb:v});dropImage(old)}
+  catch(e){console.error(e);toast(uploadError(e))}
+  finally{uploading=false;renderDrawer()}
 }
 function removePicture(taskId){
   const old=S.tasks[taskId]?.thumb;
   patch('tasks',taskId,{thumb:null});
-  if(B.mode==='db'&&B.assets&&old&&!String(old).startsWith('data:')) B.assets.delete(old).catch(()=>{});
+  dropImage(old);
   renderDrawer();
 }
 
@@ -919,17 +931,39 @@ function openJobModal(id){
   M={id:id||null,name:j?.name||'',type:j?.type||'agency',color:j?.color||COLORS[Object.keys(S.jobs).length%COLORS.length],
     tools:{comms:'Slack',tracker:'ClickUp',upload:'Frame.io',storage:'Google Drive',...(j?.tools||{})},
     toolLinks:{...(j?.toolLinks||{})},
-    clients:id?clientsOf(id).map(c=>({id:c.id,name:c.name})):[],removed:[],delArmed:false};
+    logo:j?.logo||null,
+    clients:id?clientsOf(id).map(c=>({id:c.id,name:c.name,logo:c.logo||null})):[],removed:[],delArmed:false,busy:false,uploaded:[]};
+  M.orig=[M.logo,...M.clients.map(c=>c.logo)].filter(Boolean);
   renderModal();$('#modal').hidden=false;
   setTimeout(()=>{const n=$('#m-name');if(n&&!M.id)n.focus()},0);
 }
-function closeModal(){M=null;$('#modal').hidden=true;$('#modal').innerHTML=''}
+function closeModal(discard=true){
+  if(discard&&M) M.uploaded.forEach(dropImage);
+  M=null;$('#modal').hidden=true;$('#modal').innerHTML='';
+}
+let logoTarget=null;
+function pickLogo(target){if(!canUpload()){toast("Pictures can't be uploaded from this view.");return}logoTarget=target;$('#logo-in').click()}
+async function setModalLogo(file){
+  const m=M,tgt=logoTarget;if(!m||!file||!tgt)return;
+  m.busy=true;renderModal();
+  try{
+    const v=await storeImage(file,320,160,'image/png');
+    if(M!==m){dropImage(v);return}
+    m.uploaded.push(v);
+    if(tgt.kind==='job') m.logo=v; else if(m.clients[tgt.i]) m.clients[tgt.i].logo=v;
+  }catch(e){console.error(e);toast(uploadError(e))}
+  finally{if(M===m){m.busy=false;renderModal()}}
+}
 function renderModal(){
   if(!M) return;
   withFocus(()=>{$('#modal').innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
   <header><h2 id="m-title">${M.id?'Edit job':'New job'}</h2><button class="icon-btn" data-act="modal-close" aria-label="Close">${I.x}</button></header>
   <form class="m-body" data-act="modal-save" id="m-form">
     <div class="field"><label for="m-name">Job name</label><input type="text" id="m-name" data-m="name" data-fk="m-name" value="${esc(M.name)}" placeholder="e.g. Northlight Media" required></div>
+    <div class="field"><span class="lbl">Logo or picture</span><div class="logo-field">
+      <button type="button" class="logo-box ${M.logo?'has':''}" data-act="m-logo-pick" style="${M.logo?'':`background:${esc(M.color)};border-color:transparent`}" aria-label="${M.logo?'Replace':'Upload'} job logo">${M.logo?`<img src="${esc(imgSrc(M.logo))}" alt="">`:esc(initials(M.name))}</button>
+      <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${canUpload()?`<button type="button" class="btn sm" data-act="m-logo-pick">${I.image}${M.logo?'Replace':'Upload'}</button>`:''}${M.logo?'<button type="button" class="btn sm" data-act="m-logo-remove">Remove</button>':''}${M.busy?'<span class="hint">Uploading…</span>':''}</div>
+      <p class="hint">Shows next to the job name in the sidebar, overview and tasks. A square logo works best.</p></div></div></div>
     <div class="field"><span class="lbl">Type</span><div class="type-pick">
       <button type="button" data-act="m-type" data-type="agency" class="${M.type==='agency'?'on':''}" aria-pressed="${M.type==='agency'}"><b>Agency</b><small>You edit for several of their clients</small></button>
       <button type="button" data-act="m-type" data-type="direct" class="${M.type==='direct'?'on':''}" aria-pressed="${M.type==='direct'}"><b>Direct client</b><small>You work straight with one client</small></button></div></div>
@@ -939,9 +973,9 @@ function renderModal(){
       ${v==='Other'||custom?`<input type="text" data-m-toolname="${r.id}" data-fk="m-tn-${r.id}" value="${custom?esc(v):''}" placeholder="Tool name">`:''}
       <input type="url" data-m-link="${r.id}" data-fk="m-tl-${r.id}" value="${esc(M.toolLinks[r.id]||'')}" placeholder="Workspace link (optional)"></div>`}).join('')}</div>
       <p class="hint">Workspace links show as buttons at the top of the job, so the Slack channel or Frame.io project is one click away.</p></div>
-    ${M.type==='agency'?`<div class="field"><span class="lbl">Clients</span><div class="client-list">${M.clients.map((c,i)=>`<div class="cl"><input type="text" data-m-client="${i}" data-fk="m-cl-${c.id||'n'+i}" value="${esc(c.name)}" placeholder="Client name" aria-label="Client name"><button type="button" class="icon-btn" data-act="m-del-client" data-i="${i}" aria-label="Remove client">${I.x}</button></div>`).join('')}
+    ${M.type==='agency'?`<div class="field"><span class="lbl">Clients</span><div class="client-list">${M.clients.map((c,i)=>`<div class="cl"><button type="button" class="logo-box sm ${c.logo?'has':''}" data-act="m-client-logo" data-i="${i}" title="${c.logo?'Replace':'Add'} picture for ${esc(c.name||'this client')}" aria-label="${c.logo?'Replace':'Add'} client picture">${c.logo?`<img src="${esc(imgSrc(c.logo))}" alt="">`:I.image}</button><input type="text" data-m-client="${i}" data-fk="m-cl-${c.id||'n'+i}" value="${esc(c.name)}" placeholder="Client name" aria-label="Client name">${c.logo?`<button type="button" class="btn sm ghost" data-act="m-client-logo-remove" data-i="${i}">Remove picture</button>`:''}<button type="button" class="icon-btn" data-act="m-del-client" data-i="${i}" aria-label="Remove client">${I.x}</button></div>`).join('')}
       <button type="button" class="btn sm" data-act="m-add-client" style="align-self:flex-start">${I.plus}Add client</button></div>
-      <p class="hint">Removing a client keeps its tasks in this job without a client.</p></div>`:''}
+      <p class="hint">Click the square next to a client to add their logo or picture. Removing a client keeps its tasks in this job without a client.</p></div>`:''}
   </form>
   <footer>${M.id?`<button type="button" class="btn danger ${M.delArmed?'armed':''}" data-act="m-delete">${I.trash}${M.delArmed?'Delete job and all its tasks':'Delete job'}</button>`:'<span></span>'}
     <div style="display:flex;gap:8px"><button type="button" class="btn" data-act="modal-close">Cancel</button><button type="submit" form="m-form" class="btn primary">${M.id?'Save':'Create job'}</button></div></footer></div>`});
@@ -949,30 +983,34 @@ function renderModal(){
 function saveModal(){
   const name=M.name.trim();if(!name){toast('Give the job a name.');$('#m-name')?.focus();return}
   const tools={...M.tools};
-  const data={name,type:M.type,color:M.color,tools,toolLinks:M.toolLinks};
+  const data={name,type:M.type,color:M.color,tools,toolLinks:M.toolLinks,logo:M.logo||null};
   let id=M.id;
   if(id){patch('jobs',id,data)}
   else{id=create('jobs',{...data,order:Math.max(-1,...Object.values(S.jobs).map(j=>j.order??0))+1})}
   if(M.type==='agency'){
     M.clients.forEach((c,i)=>{
       const n=c.name.trim();if(!n)return;
-      if(c.id&&S.clients[c.id]){if(S.clients[c.id].name!==n||S.clients[c.id].order!==i)patch('clients',c.id,{name:n,order:i})}
-      else create('clients',{jobId:id,name:n,order:i});
+      const logo=c.logo||null;
+      if(c.id&&S.clients[c.id]){const o=S.clients[c.id];if(o.name!==n||o.order!==i||(o.logo||null)!==logo)patch('clients',c.id,{name:n,order:i,logo})}
+      else create('clients',{jobId:id,name:n,order:i,logo});
     });
   }
   const gone=M.type==='agency'?M.removed:clientsOf(id).map(c=>c.id);
   gone.forEach(cid=>{if(!S.clients[cid])return;remove('clients',cid);Object.values(S.tasks).filter(t=>t.clientId===cid).forEach(t=>patch('tasks',t.id,{clientId:null}))});
-  closeModal();
+  const used=new Set([M.logo,...(M.type==='agency'?M.clients.filter(c=>c.name.trim()).map(c=>c.logo):[])].filter(Boolean));
+  new Set([...M.orig,...M.uploaded]).forEach(v=>{if(!used.has(v))dropImage(v)});
+  closeModal(false);
   S.ui.tab=id;S.ui.client='all';saveUi();render();
   toast(`Saved ${name}`);
 }
 function deleteJob(id){
   Object.values(S.tasks).filter(t=>t.jobId===id).forEach(t=>{dropTaskPicture(t);remove('tasks',t.id)});
-  clientsOf(id).forEach(c=>remove('clients',c.id));
+  clientsOf(id).forEach(c=>{dropImage(c.logo);remove('clients',c.id)});
+  dropImage(S.jobs[id]?.logo);
   const name=S.jobs[id]?.name;remove('jobs',id);
   S.ui.tab='overview';S.ui.client='all';saveUi();closeModal();render();toast(`Deleted ${name||'job'}`);
 }
-function dropTaskPicture(t){if(B.mode==='db'&&B.assets&&t.thumb&&!String(t.thumb).startsWith('data:'))B.assets.delete(t.thumb).catch(()=>{})}
+function dropTaskPicture(t){dropImage(t.thumb)}
 
 /* ================= toast ================= */
 let toastT;
@@ -1005,8 +1043,8 @@ document.addEventListener('click',e=>{
       if(!clearArmed){clearArmed=true;render();break}
       clearArmed=false;
       Object.values(S.tasks).filter(t=>t.example).forEach(t=>{dropTaskPicture(t);remove('tasks',t.id)});
-      Object.values(S.clients).filter(c=>c.example).forEach(c=>remove('clients',c.id));
-      Object.values(S.jobs).filter(j=>j.example).forEach(j=>remove('jobs',j.id));
+      Object.values(S.clients).filter(c=>c.example).forEach(c=>{dropImage(c.logo);remove('clients',c.id)});
+      Object.values(S.jobs).filter(j=>j.example).forEach(j=>{dropImage(j.logo);remove('jobs',j.id)});
       if(S.ui.openTask&&!S.tasks[S.ui.openTask])closeDrawer();
       u.tab='overview';u.client='all';saveUi();render();toast('Example data cleared');break;
     /* drawer */
@@ -1029,6 +1067,10 @@ document.addEventListener('click',e=>{
     case 'm-color': M.color=el.dataset.color;renderModal();break;
     case 'm-add-client': M.clients.push({id:null,name:''});renderModal();setTimeout(()=>{const ins=document.querySelectorAll('[data-m-client]');ins[ins.length-1]?.focus()},0);break;
     case 'm-del-client':{const c=M.clients.splice(+el.dataset.i,1)[0];if(c?.id)M.removed.push(c.id);renderModal();break}
+    case 'm-logo-pick': pickLogo({kind:'job'});break;
+    case 'm-logo-remove': M.logo=null;renderModal();break;
+    case 'm-client-logo': pickLogo({kind:'client',i:+el.dataset.i});break;
+    case 'm-client-logo-remove': if(M.clients[+el.dataset.i])M.clients[+el.dataset.i].logo=null;renderModal();break;
     case 'm-delete': if(!M.delArmed){M.delArmed=true;renderModal()}else deleteJob(M.id);break;
   }
   if(a!=='delete-task'&&deleteArmed&&$('#drawer').contains(el)){deleteArmed=false;renderDrawer()}
@@ -1046,6 +1088,7 @@ document.addEventListener('change',e=>{
   if(el.id==='f-prio'){u.prio=el.value;render();return}
   if(el.id==='f-due'){u.due=el.value;render();return}
   if(el.id==='f-sort'){u.sort=el.value;saveUi();render();return}
+  if(el.id==='logo-in'){const f=el.files[0];el.value='';setModalLogo(f);return}
   if(el.id==='file-in'){const f=el.files[0];el.value='';if(u.openTask)setPicture(f,u.openTask);return}
   const act=el.dataset.act;
   if(act==='row-status'){setStatus(el.dataset.id,el.value);if(u.openTask===el.dataset.id)renderDrawer();return}
