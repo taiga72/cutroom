@@ -154,6 +154,46 @@ button.stat:hover{border-color:var(--line-strong)}
 .search input{border:0;background:none;outline:none;padding:7px 0;width:100%;color:var(--text)}
 .sel{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:6px 8px;font-size:13px;font-weight:500;max-width:100%}
 .toolbar .spacer{flex:1}
+.im-steps{margin:0;padding-left:20px;line-height:1.7;font-size:13.5px}
+.im-drop{border:1.5px dashed var(--line-strong);border-radius:12px;padding:26px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;color:var(--muted);text-align:center}
+.im-drop:hover,.im-drop:focus-visible{border-color:var(--accent);color:var(--text)}
+.im-drop svg{width:24px;height:24px}
+.im-file{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0;font-size:13.5px}
+.im-dest{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.im-opt{display:flex;align-items:center;gap:8px;font-size:13.5px}
+.im-list{border:1px solid var(--line);border-radius:10px;max-height:300px;overflow:auto}
+.im-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto 64px;align-items:center;gap:10px;padding:7px 10px;border-top:1px solid var(--line);font-size:13px;cursor:pointer}
+.im-row:first-child{border-top:0}
+.im-row.off{opacity:.5;cursor:default}
+.im-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.im-name em{font-weight:400;color:var(--faint)}
+.btn[disabled]{opacity:.5;cursor:default}
+.nav-item .count.hot{color:var(--danger);font-weight:700}
+.load-warn{display:inline-flex;align-items:center;gap:6px;color:var(--warn);font-size:12.5px;font-weight:600;margin:0}
+.load-warn svg{flex:none}
+.week{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.week-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+.week-head h2{margin:0;font:700 15px var(--display)}
+.week-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.wday{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+.wday:hover{border-color:var(--line-strong)}
+.wday small{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.wday b{font:700 17px var(--display)}
+.wday .wbar{width:10px;height:34px;border-radius:4px;background:var(--surface-2);display:flex;align-items:flex-end;overflow:hidden}
+.wday .wbar i{display:block;width:100%;background:var(--st-prog);border-radius:4px}
+.wday .wn{font:500 11px var(--mono);color:var(--muted);white-space:nowrap}
+.wday.is-today{border-color:var(--accent)}
+.wday.busy{background:color-mix(in srgb,var(--warn) 10%,var(--surface));border-color:color-mix(in srgb,var(--warn) 50%,transparent)}
+.wday.busy .wbar i{background:var(--warn)}
+.wday.busy .wn{color:var(--warn);font-weight:700}
+.today-h{margin:0;font:700 15px var(--display);display:flex;align-items:center;gap:8px;padding:6px 2px}
+.today-h .count{font:500 12px var(--mono);color:var(--faint)}
+.today-group.over .today-h{color:var(--danger)}
+.day.busy{background:color-mix(in srgb,var(--warn) 8%,var(--surface))}
+.busy-tag{display:inline-flex;align-items:center;gap:2px;margin-left:auto;margin-right:4px;color:var(--warn);font:700 11px var(--mono)}
+.busy-tag svg{width:12px;height:12px}
+.limit-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13.5px}
+.limit-row input{width:64px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 8px}
 .head-row{display:flex;align-items:flex-start;gap:14px 20px}
 .head-row #head{flex:1;min-width:0}
 .top-search{flex:0 1 300px;min-width:200px;padding-block:1px}
@@ -370,6 +410,12 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .nav-label{display:none}
   .nav-sub{display:none}
   .nav-views{display:none}
+  .week-days{gap:4px}
+  .im-dest{grid-template-columns:1fr}
+  .im-row{grid-template-columns:auto minmax(0,1fr) auto}
+  .im-row .date{display:none}
+  .wday{padding:6px 2px}
+  .wday .wn{font-size:10px}
   .view-sel{display:inline-block}
   .head-row{flex-direction:column-reverse;gap:12px}
   .top-search{flex:none;width:100%;max-width:none}
@@ -477,6 +523,7 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 <div class="modal-wrap" id="modal" hidden></div>
 <div class="modal-wrap crop-wrap" id="crop" hidden></div>
 <div class="toast" id="toast" hidden role="status"></div>
+<input type="file" id="csv-in" accept=".csv,text/csv" hidden>
 <input type="file" id="logo-in" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
 
 <script>
@@ -524,6 +571,9 @@ const I={
   gear:'<svg class="i" viewBox="0 0 16 16"><path d="M6.9 1.8h2.2l.35 1.75 1.2.5 1.5-1 1.55 1.55-1 1.5.5 1.2 1.75.35v2.2l-1.75.35-.5 1.2 1 1.5-1.55 1.55-1.5-1-1.2.5-.35 1.75H6.9l-.35-1.75-1.2-.5-1.5 1-1.55-1.55 1-1.5-.5-1.2-1.75-.35V6.9l1.75-.35.5-1.2-1-1.5 1.55-1.55 1.5 1 1.2-.5z"/><circle cx="8" cy="8" r="2"/></svg>',
   list:'<svg class="i" viewBox="0 0 16 16"><path d="M5.5 4h8M5.5 8h8M5.5 12h8M2.5 4h.01M2.5 8h.01M2.5 12h.01"/></svg>',
   board:'<svg class="i" viewBox="0 0 16 16"><rect x="2" y="2.5" width="3.4" height="11" rx="1"/><rect x="6.3" y="2.5" width="3.4" height="7" rx="1"/><rect x="10.6" y="2.5" width="3.4" height="9" rx="1"/></svg>',
+  today:'<svg class="i" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/><circle cx="8" cy="10.2" r="1.6" fill="currentColor" stroke="none"/></svg>',
+  warn:'<svg class="i" viewBox="0 0 16 16"><path d="M8 2.2 14.3 13.3H1.7z"/><path d="M8 6.5v3M8 11.6h.01"/></svg>',
+  download:'<svg class="i" viewBox="0 0 16 16"><path d="M8 2.5v8M4.8 7.5 8 10.7l3.2-3.2M2.5 13.5h11"/></svg>',
   pencil:'<svg class="i" viewBox="0 0 16 16"><path d="M10.8 2.7a1.5 1.5 0 0 1 2.1 0l.4.4a1.5 1.5 0 0 1 0 2.1L5.6 12.9l-3.1.6.6-3.1z"/><path d="M9.5 4l2.5 2.5"/></svg>',
   grid:'<svg class="i" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><rect x="9" y="9" width="4.5" height="4.5" rx="1"/></svg>',
   building:'<svg class="i" viewBox="0 0 16 16"><path d="M3 14V3.2c0-.4.3-.7.7-.7h5.6c.4 0 .7.3.7.7V14M9 6.5h3.3c.4 0 .7.3.7.7V14M1.5 14h13M5 5h2M5 7.5h2M5 10h2M11 9h.01M11 11.5h.01"/></svg>',
@@ -625,7 +675,7 @@ const safeUrl=u=>{u=String(u||'').trim();if(!u)return '';if(!/^[a-z][a-z0-9+.-]*
 
 /* ================= state ================= */
 const S={jobs:{},clients:{},tasks:{},settings:{},ready:false,
-  ui:{tab:'overview',client:'all',view:'list',q:'',prio:'all',due:'all',sort:'due',month:today().slice(0,7),collapsed:{done:true},openTask:null}};
+  ui:{tab:'today',client:'all',view:'list',q:'',prio:'all',due:'all',sort:'due',month:today().slice(0,7),collapsed:{done:true},openTask:null}};
 const saved=lsGet(LS_UI); if(saved) S.ui=Object.assign(S.ui,saved,{q:'',openTask:null});
 const saveUi=()=>{const {q,aq,openTask,...rest}=S.ui;lsSet(LS_UI,rest)};
 
@@ -960,9 +1010,10 @@ function renderSide(){
   const u=S.ui,jobsOpen=u.jobsOpen!==false;
   const openCount=jid=>live().filter(t=>t.jobId===jid&&t.status!=='done').length;
   const allOpen=live().filter(t=>S.jobs[t.jobId]&&t.status!=='done').length;
+  const todayN=live().filter(t=>S.jobs[t.jobId]&&t.status!=='done'&&t.due&&t.due<=today()).length;
   const app=appSettings();const appLogo=imgSrc(app.logo);
   let html=`<div class="brand">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></div>
-  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button>${u.tab==='overview'&&S.ready&&jobsSorted().length?viewsNav():''}<button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button>
+  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='today'?'on':''}" data-act="nav" data-tab="today">${I.today}<span class="name">Today</span><span class="count ${todayN?'hot':''}">${S.ready&&todayN?todayN:''}</span></button><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button>${u.tab==='overview'&&S.ready&&jobsSorted().length?viewsNav():''}<button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button>
   <button class="nav-item jobs-toggle ${jobsOpen?'open':''}" data-act="toggle-jobs" aria-expanded="${jobsOpen}" aria-controls="nav-jobs">${I.briefcase}<span class="name">Jobs</span><span class="count">${S.ready?jobsSorted().length:''}</span>${I.chev}</button></nav>
   <nav class="nav jobs" id="nav-jobs" aria-label="Jobs" ${jobsOpen?'':'hidden'}>`;
   for(const j of jobsSorted()){
@@ -970,7 +1021,7 @@ function renderSide(){
     html+=`<div class="nav-row"><button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}">${jobMark(j,18)}<span class="name">${esc(j.name)}</span><span class="count">${openCount(j.id)}</span></button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.pencil}</button></div>`;
     if(on) html+=viewsNav();
   }
-  html+=`<button class="nav-item nav-new" data-act="new-job">${I.plus}<span class="name">New job</span></button></nav>
+  html+=`<button class="nav-item nav-new" data-act="new-job">${I.plus}<span class="name">New job</span></button>${jobsSorted().length?`<button class="nav-item nav-new" data-act="import-clickup">${I.download}<span class="name">Import from ClickUp</span></button>`:''}</nav>
   <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='db'||B.mode==='cloud'?'<span class="sync-dot"></span>Saved to your account':B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
     <button class="btn sm ghost foot-settings" data-act="open-settings" title="Settings">${I.gear}<span>Settings</span></button></div>`;
   $('#side').innerHTML=html;
@@ -979,7 +1030,7 @@ function renderSide(){
 function renderMain(){
   const u=S.ui;
   if(!S.ready){$('#view').innerHTML='<div class="loading">Loading your tasks…</div>';$('#toolbar').hidden=true;return}
-  if(u.tab!=='overview'&&u.tab!=='archived'&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
+  if(u.tab!=='overview'&&u.tab!=='archived'&&u.tab!=='today'&&!S.jobs[u.tab]){u.tab='today';u.client='all'}
   if(u.client!=='all'&&!S.clients[u.client]) u.client='all';
   const job=u.tab==='overview'?null:S.jobs[u.tab];
 
@@ -987,6 +1038,7 @@ function renderMain(){
   $('#banner').innerHTML=hasExamples?`<div class="banner"><p><b>You're looking at example jobs and tasks.</b> Poke around, then clear them and add your own jobs.</p><button class="btn sm ${clearArmed?'danger armed':''}" data-act="clear-examples">${clearArmed?'Delete all example data':'Clear examples'}</button></div>`:'';
 
   if(u.tab==='archived'){renderArchive();return}
+  if(u.tab==='today'){renderToday();return}
   const scope=tasksOfScope();
   if(!job){
     $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>Overview</h1><div class="sub">${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients · everything due across your work</div></div>
@@ -1064,6 +1116,15 @@ const taskMark=t=>{
 const prioHtml=p=>{p=p||'normal';return `<span class="prio ${p}">${p==='normal'?'':I.flag}${PRIORITIES.find(x=>x.id===p)?.label||''}</span>`};
 const statusSelect=(t,act)=>`<select class="pill st-${t.status}" data-act="${act}" data-id="${t.id}" aria-label="Status">${STATUSES.map(s=>`<option value="${s.id}" ${s.id===t.status?'selected':''}>${s.label}</option>`).join('')}</select>`;
 
+const ROW_HEAD=`<div class="row-head"><span></span><span>Task</span><span>Status</span><span class="c-prio">Priority</span><span class="c-start">Start</span><span>Due</span><span>Links</span></div>`;
+const rowHtml=(t,job,showJob)=>`<div class="row ${t.status==='done'?'done-row':''} ${S.ui.openTask===t.id?'focus':''}" data-act="open" data-id="${t.id}" tabindex="0">
+        ${taskMark(t)}
+        <div class="t-main"><div class="t-name">${esc(t.name||'Untitled task')}</div>${metaLine(t,job,showJob)}</div>
+        <div class="c-status" data-stop>${statusSelect(t,'row-status')}${t.status==='done'?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
+        <div class="c-prio">${prioHtml(t.priority)}</div>
+        <div class="c-start date ${t.start?'':'none'}">${t.start?fmtDate(t.start):'—'}</div>
+        <div class="c-due date ${dueClass(t)}">${t.due?fmtDate(t.due):'—'}</div>
+        <div class="c-links">${linkIcons(t)}</div></div>`;
 function listView(list,job){
   const showJob=!job;
   let html='';
@@ -1072,15 +1133,8 @@ function listView(list,job){
     const open=!S.ui.collapsed[s.id];
     html+=`<section class="group" id="grp-${s.id}"><div class="group-bar"><button class="group-head ${open?'open':''}" data-act="group" data-status="${s.id}" aria-expanded="${open}">${I.chev}<span class="pill st-${s.id}">${s.label}</span><span class="count">${rows.length}</span></button>${s.id==='done'&&rows.length?`<button class="btn sm ghost" data-act="archive-all">${I.archive}Archive all ${rows.length} done</button>`:''}</div>`;
     if(open){
-      html+=`<div class="rows">${rows.length?`<div class="row-head"><span></span><span>Task</span><span>Status</span><span class="c-prio">Priority</span><span class="c-start">Start</span><span>Due</span><span>Links</span></div>`:''}`;
-      html+=rows.map(t=>`<div class="row ${t.status==='done'?'done-row':''} ${S.ui.openTask===t.id?'focus':''}" data-act="open" data-id="${t.id}" tabindex="0">
-        ${taskMark(t)}
-        <div class="t-main"><div class="t-name">${esc(t.name||'Untitled task')}</div>${metaLine(t,job,showJob)}</div>
-        <div class="c-status" data-stop>${statusSelect(t,'row-status')}${t.status==='done'?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
-        <div class="c-prio">${prioHtml(t.priority)}</div>
-        <div class="c-start date ${t.start?'':'none'}">${t.start?fmtDate(t.start):'—'}</div>
-        <div class="c-due date ${dueClass(t)}">${t.due?fmtDate(t.due):'—'}</div>
-        <div class="c-links">${linkIcons(t)}</div></div>`).join('');
+      html+=`<div class="rows">${rows.length?ROW_HEAD:''}`;
+      html+=rows.map(t=>rowHtml(t,job,showJob)).join('');
       html+=`<form class="quick-add" data-act="quick-add" data-status="${s.id}">${I.plus}<input data-fk="qa-${s.id}" placeholder="Add a task${job?'':' to '+esc(jobsSorted()[0]?.name||'')}" aria-label="Add a task to ${s.label}"></form></div>`;
     }
     html+='</section>';
@@ -1107,11 +1161,13 @@ function calendarView(list){
   const start=new Date(y,m-1,1-startOffset);
   const t0=today();
   const byDay={};list.forEach(t=>{if(t.due)(byDay[t.due]=byDay[t.due]||[]).push(t)});
+  const load=dueLoad(),lim=dayLimit();
   let cells='';
   for(let i=0;i<42;i++){
     const d=new Date(start);d.setDate(start.getDate()+i);const k=ymd(d);
     const evs=byDay[k]||[];
-    cells+=`<div class="day ${d.getMonth()!==m-1?'out':''} ${k===t0?'today':''}"><div class="dn"><b>${d.getDate()}</b><button class="add-day" data-act="new-task" data-due="${k}" title="Add task due ${fmtDate(k)}" aria-label="Add task due ${k}">${I.plus}</button></div>
+    const heavy=(load[k]||0)>=lim;
+    cells+=`<div class="day ${d.getMonth()!==m-1?'out':''} ${k===t0?'today':''} ${heavy?'busy':''}"><div class="dn"><b>${d.getDate()}</b>${heavy?`<span class="busy-tag" title="${load[k]} tasks due across all jobs">${I.warn}${load[k]}</span>`:''}<button class="add-day" data-act="new-task" data-due="${k}" title="Add task due ${fmtDate(k)}" aria-label="Add task due ${k}">${I.plus}</button></div>
       ${evs.slice(0,4).map(t=>`<button class="ev ${t.status==='done'?'is-done':''}" style="--c:var(${STATUS_VAR[t.status]})" data-act="open" data-id="${t.id}" title="${esc(t.name)} · ${ST[t.status]?.label}"><span>${esc(t.name||'Untitled task')}</span></button>`).join('')}
       ${evs.length>4?`<span class="more">+${evs.length-4} more</span>`:''}</div>`;
   }
@@ -1119,6 +1175,43 @@ function calendarView(list){
   return `<div class="cal-bar"><h2>${MONTH_FULL[m-1]} ${y}</h2><button class="icon-btn" data-act="cal" data-step="-1" aria-label="Previous month">${I.left}</button><button class="btn sm" data-act="cal" data-step="0">Today</button><button class="icon-btn" data-act="cal" data-step="1" aria-label="Next month">${I.chev}</button>
     <span class="hint" style="margin-left:auto">Tasks show on their due date${noDate?` · ${noDate} open task${noDate===1?' has':'s have'} no due date`:''}</span></div>
     <div class="cal-wrap"><div class="cal">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="dow">${d}</div>`).join('')}${cells}</div></div>`;
+}
+
+/* ================= workload ================= */
+/* A day is busy when this many open tasks (any job) are due on it. Set in Settings. */
+const dayLimit=()=>Math.min(20,Math.max(1,parseInt(appSettings().dayLimit,10)||3));
+function dueLoad(exceptId){const m={};live().forEach(t=>{if(t.id!==exceptId&&t.due&&t.status!=='done'&&S.jobs[t.jobId])m[t.due]=(m[t.due]||0)+1});return m}
+const WEEKDAY=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const WEEKDAY_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+function weekStrip(){
+  const load=dueLoad(),lim=dayLimit(),t0=today();
+  const days=Array.from({length:7},(_,i)=>addDays(t0,i));
+  const max=Math.max(lim,...days.map(d=>load[d]||0));
+  const heavy=days.filter(d=>(load[d]||0)>=lim);
+  return `<section class="week"><div class="week-head"><h2>Next 7 days</h2>${heavy.length?`<span class="load-warn">${I.warn}${heavy.length===1?'1 busy day':heavy.length+' busy days'}: ${heavy.map(d=>`${d===t0?'today':WEEKDAY[parseD(d).getDay()]} (${load[d]} due)`).join(', ')}</span>`:`<span class="hint">No day has ${lim} or more tasks due.</span>`}</div>
+    <div class="week-days">${days.map(d=>{const n=load[d]||0,b=n>=lim,dt=parseD(d);return `<button class="wday ${b?'busy':''} ${d===t0?'is-today':''}" data-act="goto-day" data-day="${d}" title="${n} task${n===1?'':'s'} due ${fmtDate(d)}${b?' · busy day':''}">
+      <small>${d===t0?'Today':WEEKDAY[dt.getDay()]}</small><b>${dt.getDate()}</b><span class="wbar"><i style="height:${n?Math.max(12,n/max*100):0}%"></i></span><span class="wn">${n?n+' due':'—'}</span></button>`}).join('')}</div></section>`;
+}
+function renderToday(){
+  const t0=today(),dt=parseD(t0),open=live().filter(t=>S.jobs[t.jobId]&&t.status!=='done');
+  const seen=new Set(),take=f=>{const r=open.filter(t=>!seen.has(t.id)&&f(t)).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')||PRIO_RANK[a.priority||'normal']-PRIO_RANK[b.priority||'normal']);r.forEach(t=>seen.add(t.id));return r};
+  const groups=[
+    {id:'overdue',label:'Overdue',cls:'over',rows:take(t=>t.due&&t.due<t0)},
+    {id:'due',label:'Due today',cls:'due',rows:take(t=>t.due===t0)},
+    {id:'doing',label:'In progress',cls:'doing',rows:take(t=>t.status!=='not_started')},
+    {id:'start',label:'Starting today',cls:'start',rows:take(t=>t.start&&t.start<=t0)},
+    {id:'soon',label:'Due in the next 3 days',cls:'soon',rows:take(t=>t.due&&diffDays(t.due,t0)<=3)}];
+  const n=g=>groups.find(x=>x.id===g).rows.length;
+  $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${I.today.replace('class="i"','class="i" style="width:28px;height:28px"')}Today</h1>
+    <div class="sub"><span>${WEEKDAY_FULL[dt.getDay()]}, ${MONTH_FULL[dt.getMonth()]} ${dt.getDate()} · ${n('overdue')?`<b style="color:var(--danger);font-weight:600">${n('overdue')} overdue</b> · `:''}${n('due')} due today · ${n('doing')} in progress</span></div></div>
+    <div class="tools"><button class="btn primary" data-act="new-task" data-due="${t0}">${I.plus}New task due today</button></div></div>`;
+  $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
+  if(!Object.keys(S.jobs).length){$('#view').innerHTML=`<div class="empty"><h3>Add your first job</h3><p>Once you have jobs and tasks, this page shows what's overdue, due today and in progress.</p><button class="btn primary" data-act="new-job">${I.plus}New job</button></div>`;return}
+  let html=weekStrip();
+  const shown=groups.filter(g=>g.rows.length);
+  if(!shown.length) html+=`<div class="empty"><h3>Nothing due today</h3><p>No overdue tasks, nothing due in the next 3 days and nothing in progress.</p></div>`;
+  for(const g of shown) html+=`<section class="group today-group ${g.cls}"><div class="group-bar"><h3 class="today-h">${g.label}<span class="count">${g.rows.length}</span></h3></div><div class="rows">${ROW_HEAD}${g.rows.map(t=>rowHtml(t,null,true)).join('')}</div></section>`;
+  $('#view').innerHTML=html;
 }
 
 /* ================= archive ================= */
@@ -1183,6 +1276,7 @@ function renderDrawer(){
       <label for="d-job">${I.briefcase}Job</label><select id="d-job" data-field="jobId">${jobsSorted().map(x=>`<option value="${x.id}" ${x.id===t.jobId?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
       ${j?.type==='agency'?`<label for="d-client">${I.user}Client</label><select id="d-client" data-field="clientId"><option value="">No client</option>${cl.map(c=>`<option value="${c.id}" ${c.id===t.clientId?'selected':''}>${esc(c.name)}</option>`).join('')}</select>`:''}
       <span class="lbl">${I.cal}Dates</span><div class="pair"><input type="date" id="d-start" data-field="start" value="${esc(t.start||'')}" aria-label="Start date" title="Start date"><input type="date" id="d-due" data-field="due" value="${esc(t.due||'')}" aria-label="Due date" title="Due date"></div>
+      ${(()=>{if(!t.due||t.status==='done'||t.archived)return'';const n=dueLoad(t.id)[t.due]||0;return n+1>=dayLimit()?`<span></span><p class="load-warn">${I.warn}Busy day: ${n} other task${n===1?' is':'s are'} due ${(d=>/^(Today|Tomorrow|Yesterday)$/.test(d)?d.toLowerCase():'on '+d)(fmtDate(t.due))}.</p>`:''})()}
       <span class="lbl">${I.ratio}Format</span><div class="fmt-pick">${FORMATS.map(f=>`<button data-act="fmt" data-fmt="${f}" class="${t.format===f?'on':''}" aria-pressed="${t.format===f}">${f}</button>`).join('')}</div>
       <label for="d-len">${I.clock}Length</label><input type="text" id="d-len" data-field="length" data-fk="d-len" value="${esc(t.length||'')}" placeholder="e.g. 0:30 or 3 × 0:15">
       <span class="lbl">${I.loop}Revision round</span><div class="stepper"><button data-act="rev" data-step="-1" aria-label="Decrease revision round">−</button><output>R${t.revision||0}</output><button data-act="rev" data-step="1" aria-label="Increase revision round">+</button></div>
@@ -1275,13 +1369,14 @@ function openJobModal(id){
   setTimeout(()=>{const n=$('#m-name');if(n&&!M.id)n.focus()},0);
 }
 function closeModal(discard=true){
+  IM=null;
   if(discard&&M) M.uploaded.forEach(dropImage);
   M=null;$('#modal').hidden=true;$('#modal').innerHTML='';
 }
 let SM=null;
 function openSettings(){
   const a=appSettings();
-  SM={name:a.name||'',logo:a.logo||null,theme:a.theme||'system',orig:a.logo||null,uploaded:[],busy:false};
+  SM={name:a.name||'',logo:a.logo||null,theme:a.theme||'system',dayLimit:dayLimit(),orig:a.logo||null,uploaded:[],busy:false};
   CAL.disArmed=false;if(B.mode==='cloud'&&B.cfg.calendar)calStatus();
   renderSettings();$('#modal').hidden=false;render();
 }
@@ -1289,7 +1384,7 @@ function closeSettings(save){
   if(!SM)return;
   const sm=SM;SM=null;
   if(save){
-    const data={name:sm.name.trim(),logo:sm.logo||null,theme:sm.theme};
+    const data={name:sm.name.trim(),logo:sm.logo||null,theme:sm.theme,dayLimit:Math.min(20,Math.max(1,parseInt(sm.dayLimit,10)||3))};
     if(S.settings.app) patch('settings','app',data); else create('settings',data,'app');
     [sm.orig,...sm.uploaded].forEach(v=>{if(v&&v!==sm.logo)dropImage(v)});
     toast('Settings saved');
@@ -1311,6 +1406,7 @@ function renderSettings(){
       <button type="button" class="logo-box ${src?'has':''}" data-act="s-logo-pick" aria-label="${src?'Replace':'Upload'} app logo" style="${src?'':'background:var(--surface);border-style:solid;border-color:var(--line)'}">${src?`<img src="${esc(src)}" alt="">`:`<img src="${APP_LOGO}" alt="" style="object-fit:contain;padding:8px">`}</button>
       <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${canUpload()?`<button type="button" class="btn sm" data-act="s-logo-pick">${I.image}${src?'Replace':'Upload'}</button>`:''}${src?'<button type="button" class="btn sm" data-act="s-logo-remove">Remove</button>':''}${SM.busy?'<span class="hint">Uploading…</span>':''}</div>
       <p class="hint">Replaces the ${esc(APP_NAME)} logo next to the app name and in the browser tab. A square image works best.</p></div></div></div>
+    <div class="field"><label for="s-limit">Busy day warning</label><div class="limit-row"><span>Warn me when</span><input type="number" id="s-limit" data-fk="s-limit" min="1" max="20" value="${esc(SM.dayLimit)}"><span>or more tasks are due on the same day.</span></div><p class="hint">Busy days are flagged on Today, on the Calendar, and when you pick a due date.</p></div>
     ${accountSettingsHtml()}
   </form>
   <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="s-cancel">Cancel</button><button type="submit" form="s-form" class="btn primary">Save</button></div></footer></div>`});
@@ -1474,6 +1570,102 @@ function deleteJob(id){
 }
 function dropTaskPicture(t){dropImage(t.thumb)}
 
+/* ================= import from ClickUp (CSV export) ================= */
+let IM=null;
+function parseCsv(text){
+  const rows=[];let row=[],f='',q=false;
+  text=text.replace(/^﻿/,'');
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;
+    else if(c===','){row.push(f);f=''}
+    else if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n')i++;row.push(f);f='';if(row.some(x=>x!==''))rows.push(row);row=[]}
+    else f+=c;
+  }
+  row.push(f);if(row.some(x=>x!==''))rows.push(row);
+  return rows;
+}
+/* ClickUp dates come as epoch milliseconds, or as text like "Friday, October 3rd 2025". */
+function cuDate(v){
+  v=String(v||'').trim();if(!v)return '';
+  if(/^\d{10,13}$/.test(v)){const d=new Date(+v*(v.length===10?1000:1));return isNaN(d)?'':ymd(d)}
+  if(/^\d{4}-\d{2}-\d{2}/.test(v))return v.slice(0,10);
+  const d=new Date(v.replace(/^[A-Za-z]+,\s*/,'').replace(/(\d+)(st|nd|rd|th)\b/i,'$1').replace(/\sat\s/i,' '));
+  return isNaN(d)?'':ymd(d);
+}
+function cuStatus(v){
+  v=String(v||'').toLowerCase();
+  if(/complete|closed|done|delivered|approved|published|finished/.test(v))return 'done';
+  if(/revision|changes|feedback|fix/.test(v))return 'revisions';
+  if(/review|qa|approval|check/.test(v))return 'internal_review';
+  if(/progress|doing|editing|working|active|started|wip/.test(v))return 'in_progress';
+  return 'not_started';
+}
+const cuPrio=v=>({urgent:'urgent',high:'high',normal:'normal',low:'low','1':'urgent','2':'high','3':'normal','4':'low'})[String(v||'').trim().toLowerCase()]||'normal';
+function readClickUp(text){
+  const rows=parseCsv(text);if(rows.length<2)return {error:'That file has no tasks in it.'};
+  const head=rows[0].map(h=>h.trim().toLowerCase());
+  const col=(...names)=>{for(const n of names){const i=head.indexOf(n);if(i>=0)return i}return -1};
+  const c={name:col('task name','name','task'),id:col('task id','id'),status:col('status'),prio:col('priority'),
+    due:col('due date'),dueText:col('due date text'),start:col('start date'),startText:col('start date text'),
+    content:col('task content','description','content'),url:col('task url','url'),list:col('list name','list')};
+  if(c.name<0)return {error:"This doesn't look like a ClickUp export: there's no “Task Name” column."};
+  const have=new Set(Object.values(S.tasks).map(t=>t.clickupId).filter(Boolean));
+  const get=(r,i)=>i>=0?String(r[i]??'').trim():'';
+  const items=rows.slice(1).map((r,i)=>{
+    const id=get(r,c.id),name=get(r,c.name);if(!name)return null;
+    const raw=get(r,c.status);
+    return {key:'r'+i,cuId:id,name,rawStatus:raw,status:cuStatus(raw),priority:cuPrio(get(r,c.prio)),
+      due:cuDate(get(r,c.due))||cuDate(get(r,c.dueText)),start:cuDate(get(r,c.start))||cuDate(get(r,c.startText)),
+      notes:get(r,c.content).slice(0,5000),url:get(r,c.url)||(id?`https://app.clickup.com/t/${id}`:''),list:get(r,c.list),dup:!!id&&have.has(id)};
+  }).filter(Boolean);
+  if(!items.length)return {error:'That file has no tasks in it.'};
+  return {items};
+}
+function openImport(){
+  const u=S.ui,j=S.jobs[u.tab]||jobsSorted()[0];
+  IM={step:'pick',items:[],skip:{},jobId:j?.id||'',clientId:u.tab===j?.id&&u.client!=='all'?u.client:'',skipDone:true,error:'',file:''};
+  renderImport();$('#modal').hidden=false;
+}
+function importable(){return IM.items.filter(x=>!x.dup&&!(IM.skipDone&&x.status==='done')&&!IM.skip[x.key])}
+function renderImport(){
+  if(!IM)return;
+  const job=S.jobs[IM.jobId],cl=job?.type==='agency'?clientsOf(job.id):[];
+  const dup=IM.items.filter(x=>x.dup).length,done=IM.items.filter(x=>!x.dup&&x.status==='done').length,n=importable().length;
+  const body=IM.step==='pick'?`
+    <ol class="im-steps"><li>In ClickUp, open the List you want to bring over.</li><li>Click <b>•••</b> next to the List's name, choose <b>Export</b>, pick <b>CSV</b> and download it.</li><li>Choose that file here.</li></ol>
+    <div class="im-drop" data-act="im-pick" data-drop-csv tabindex="0" role="button">${I.download}<b>Choose a ClickUp CSV file</b><span class="hint">Or drop it here</span></div>
+    ${IM.error?`<p class="auth-err" role="alert">${esc(IM.error)}</p>`:''}`
+  :`<p class="im-file">${I.task}<b>${esc(IM.file)}</b> · ${IM.items.length} task${IM.items.length===1?'':'s'}${dup?` · ${dup} already imported`:''}<button type="button" class="btn sm ghost" data-act="im-restart">Choose another file</button></p>
+    <div class="im-dest"><div class="field"><label for="im-job">Add them to</label><select id="im-job">${jobsSorted().map(x=>`<option value="${x.id}" ${x.id===IM.jobId?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>
+      ${cl.length?`<div class="field"><label for="im-client">Client</label><select id="im-client"><option value="">No client</option>${cl.map(c=>`<option value="${c.id}" ${c.id===IM.clientId?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>`:''}</div>
+    <label class="im-opt"><input type="checkbox" id="im-skipdone" ${IM.skipDone?'checked':''}> Leave out tasks that are closed or complete in ClickUp${done?` (${done})`:''}</label>
+    <div class="im-list">${IM.items.map(x=>{const off=x.dup||(IM.skipDone&&x.status==='done');return `<label class="im-row ${off?'off':''}"><input type="checkbox" data-im-key="${x.key}" ${off?'disabled':''} ${!off&&!IM.skip[x.key]?'checked':''}>
+      <span class="im-name">${esc(x.name)}${x.dup?' <em>already imported</em>':''}</span><span class="pill st-${x.status}" title="ClickUp status: ${esc(x.rawStatus||'none')}">${ST[x.status].label}</span><span class="date ${x.due?'':'none'}">${x.due?fmtDate(x.due):'No date'}</span></label>`}).join('')}</div>
+    <p class="hint">Statuses are matched by name (for example “review” becomes Internal review and “complete” becomes Done). Each task keeps a link back to ClickUp, and importing the same file again skips tasks you already have.</p>`;
+  $('#modal').innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="im-title">
+  <header><h2 id="im-title">Import from ClickUp</h2><button class="icon-btn" data-act="modal-close" aria-label="Close">${I.x}</button></header>
+  <div class="m-body">${body}</div>
+  <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="modal-close">Cancel</button>${IM.step==='review'?`<button type="button" class="btn primary" data-act="im-import" ${n&&job?'':'disabled'}>Import ${n} task${n===1?'':'s'}</button>`:''}</div></footer></div>`;
+}
+async function importFile(file){
+  if(!IM||!file)return;
+  if(file.size>10*1024*1024){IM.error='That file is too large. Export one List at a time.';renderImport();return}
+  const r=readClickUp(await file.text());
+  if(r.error){IM.error=r.error;renderImport();return}
+  Object.assign(IM,{step:'review',items:r.items,skip:{},error:'',file:file.name});renderImport();
+}
+function runImport(){
+  const job=S.jobs[IM.jobId];if(!job)return;
+  const list=importable(),now=Date.now();
+  const clientId=job.type==='agency'&&S.clients[IM.clientId]?IM.clientId:null;
+  list.forEach((x,i)=>create('tasks',{jobId:job.id,clientId,name:x.name,status:x.status,priority:x.priority,start:x.start,due:x.due,format:'',length:'',revision:0,
+    links:{task:x.url,upload:'',file:''},thumb:null,notes:x.notes,checklist:[],created:now+i,clickupId:x.cuId||null,...(x.status==='done'?{doneAt:today()}:{})}));
+  closeModal();S.ui.tab=job.id;S.ui.client=clientId||'all';saveUi();render();
+  toast(`Imported ${list.length} task${list.length===1?'':'s'} into ${job.name}`);
+}
+
 /* ================= toast ================= */
 let toastT;
 function toast(msg,action){
@@ -1496,6 +1688,11 @@ document.addEventListener('click',e=>{
   switch(a){
     case 'nav': u.tab=el.dataset.tab;u.client=el.dataset.client||'all';saveUi();render();window.scrollTo({top:0});break;
     case 'view': u.view=el.dataset.view;saveUi();render();break;
+    case 'goto-day':{const d=el.dataset.day;u.tab='overview';u.client='all';u.view='calendar';u.month=d.slice(0,7);saveUi();render();window.scrollTo({top:0});break}
+    case 'import-clickup': openImport();break;
+    case 'im-pick': $('#csv-in').click();break;
+    case 'im-restart': Object.assign(IM,{step:'pick',items:[],error:''});renderImport();break;
+    case 'im-import': runImport();break;
     case 'toggle-jobs': u.jobsOpen=u.jobsOpen===false;saveUi();renderSide();break;
     case 'group': u.collapsed[el.dataset.status]=!u.collapsed[el.dataset.status];saveUi();render();break;
     case 'stat': u.due=u.due===el.dataset.due?'all':el.dataset.due;render();break;
@@ -1579,6 +1776,11 @@ document.addEventListener('change',e=>{
   if(el.id==='f-due'){u.due=el.value;render();return}
   if(el.id==='arch-job'){u.ajob=el.value;saveUi();render();return}
   if(el.id==='f-sort'){u.sort=el.value;saveUi();render();return}
+  if(el.id==='csv-in'){const f=el.files[0];el.value='';importFile(f);return}
+  if(IM&&el.id==='im-job'){IM.jobId=el.value;IM.clientId='';renderImport();return}
+  if(IM&&el.id==='im-client'){IM.clientId=el.value;return}
+  if(IM&&el.id==='im-skipdone'){IM.skipDone=el.checked;renderImport();return}
+  if(IM&&el.dataset.imKey){IM.skip[el.dataset.imKey]=!el.checked;renderImport();return}
   if(el.id==='f-view'){u.view=el.value;saveUi();render();return}
   if(el.id==='logo-in'){const f=el.files[0];el.value='';if(!f)return;const app=logoTarget?.kind==='app';openCrop(f,blob=>app?setAppLogo(blob):setModalLogo(blob));return}
   const act=el.dataset.act;
@@ -1599,6 +1801,7 @@ document.addEventListener('input',e=>{
   if(el.id==='q'){u.q=el.value;render();return}
   if(el.id==='arch-q'){u.aq=el.value;render();return}
   if(el.id==='s-name'&&SM){SM.name=el.value;return}
+  if(el.id==='s-limit'&&SM){SM.dayLimit=el.value;return}
   if(M&&$('#modal').contains(el)){
     if(el.dataset.m) M[el.dataset.m]=el.value;
     if(el.dataset.mLink) M.toolLinks[el.dataset.mLink]=el.value.trim();
@@ -1630,10 +1833,12 @@ let dragId=null;
 document.addEventListener('dragstart',e=>{const c=e.target.closest?.('.card');if(!c)return;dragId=c.dataset.id;c.classList.add('dragging');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',dragId)}catch(x){}});
 document.addEventListener('dragend',e=>{e.target.classList?.remove('dragging');document.querySelectorAll('.col.drag').forEach(c=>c.classList.remove('drag'));dragId=null});
 document.addEventListener('dragover',e=>{
+  if(e.target.closest?.('[data-drop-csv]')){e.preventDefault();return}
   const col=e.target.closest?.('[data-drop]');
   if(col&&dragId){e.preventDefault();document.querySelectorAll('.col.drag').forEach(c=>c!==col&&c.classList.remove('drag'));col.classList.add('drag')}
 });
 document.addEventListener('drop',e=>{
+  const csv=e.target.closest?.('[data-drop-csv]');if(csv){e.preventDefault();importFile(e.dataTransfer.files[0]);return}
   const col=e.target.closest?.('[data-drop]');
   if(col&&dragId){e.preventDefault();setStatus(dragId,col.dataset.drop);dragId=null}
 });
