@@ -154,6 +154,34 @@ button.stat:hover{border-color:var(--line-strong)}
 .search input{border:0;background:none;outline:none;padding:7px 0;width:100%;color:var(--text)}
 .sel{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:6px 8px;font-size:13px;font-weight:500;max-width:100%}
 .toolbar .spacer{flex:1}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:2px}
+.seg button{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:5px 10px;border-radius:7px;color:var(--muted);font-weight:600;font-size:13px}
+.seg button.on{background:var(--surface-3);color:var(--text)}
+.work{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:14px}
+.work-item{box-shadow:1px 0 0 var(--line),0 1px 0 var(--line)}
+.work-item{background:var(--surface);padding:10px 13px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.work-item small{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+.work-item b{font-weight:600;font-size:14px}
+.work-item span{font-size:12.5px;color:var(--muted)}
+.work-notes{grid-column:1/-1}
+.work-notes span{white-space:pre-wrap;color:var(--text);font-size:13px}
+.work-empty{margin-top:12px;border:1px dashed var(--line-strong);background:none;border-radius:10px;padding:9px 12px;color:var(--muted);display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:13px}
+.work-empty:hover{color:var(--text);border-color:var(--accent)}
+.job-card .when{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.work-form{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:12px}
+.wf-row{display:flex;flex-direction:column;gap:6px}
+.wf-lbl,.wf-grid label,.wf-notes{font-size:12px;font-weight:600;color:var(--muted)}
+.wf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.wf-grid label,.wf-notes{display:flex;flex-direction:column;gap:4px;min-width:0}
+.wf-grid input,.wf-grid select,.wf-notes textarea{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:6px 8px;font-size:13px;width:100%;font-weight:400;color:var(--text);min-width:0}
+.wf-notes textarea{resize:vertical;line-height:1.45}
+.wf-grid .hint{font-weight:400}
+.pay-row{display:flex;gap:6px}
+.work-form .pay-row select{width:auto;flex:none}
+.work-form .pay-row input{flex:1;width:auto}
+.day-pick{display:flex;gap:4px;flex-wrap:wrap}
+.day-pick button{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:5px 9px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.day-pick button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
 .im-steps{margin:0;padding-left:20px;line-height:1.7;font-size:13.5px}
 .im-drop{border:1.5px dashed var(--line-strong);border-radius:12px;padding:26px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;color:var(--muted);text-align:center}
 .im-drop:hover,.im-drop:focus-visible{border-color:var(--accent);color:var(--text)}
@@ -200,11 +228,6 @@ button.stat:hover{border-color:var(--line-strong)}
 .note.warn .note-main > svg{color:var(--warn)}
 .note .icon-btn{width:26px;height:26px;margin-top:8px;flex:none}
 .notes-empty{margin:0;padding:18px 14px;color:var(--muted);font-size:13px}
-.view-sel{display:none}
-.nav-views{display:flex;flex-direction:column;gap:1px;margin:1px 0 4px 18px;padding-left:10px;border-left:1px solid var(--line)}
-.nav-views .nav-item{padding:5px 10px;font-weight:500;color:var(--muted);font-size:13px}
-.nav-views .nav-item.on{color:var(--text);background:var(--surface-2);font-weight:600}
-.nav-views .nav-item svg{width:14px;height:14px}
 
 /* ---------- status pills ---------- */
 .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap;background:color-mix(in srgb,var(--c) 14%,transparent);color:color-mix(in srgb,var(--c) 80%,var(--text))}
@@ -412,11 +435,9 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .nav{flex-direction:row;gap:4px}
   .nav-label{display:none}
   .nav-sub{display:none}
-  .nav-views{display:none}
   .im-dest{grid-template-columns:1fr}
   .im-row{grid-template-columns:auto minmax(0,1fr) auto}
   .im-row .date{display:none}
-  .view-sel{display:inline-block}
   .head-row{flex-direction:column-reverse;gap:12px}
   .top-right{flex:none;width:100%}
   .top-search{flex:1;max-width:none}
@@ -500,9 +521,11 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
     <div id="stats"></div>
     <div id="jobcards"></div>
     <div class="toolbar" id="toolbar" hidden>
-      <select class="sel view-sel" id="f-view" aria-label="View">
-        <option value="list">List</option><option value="board">Board</option><option value="calendar">Calendar</option>
-      </select>
+      <div class="seg" role="tablist" aria-label="View">
+        <button type="button" data-act="view" data-view="list" id="v-list"><svg class="i" viewBox="0 0 16 16"><path d="M5.5 4h8M5.5 8h8M5.5 12h8M2.5 4h.01M2.5 8h.01M2.5 12h.01"/></svg>List</button>
+        <button type="button" data-act="view" data-view="board" id="v-board"><svg class="i" viewBox="0 0 16 16"><rect x="2" y="2.5" width="3.4" height="11" rx="1"/><rect x="6.3" y="2.5" width="3.4" height="7" rx="1"/><rect x="10.6" y="2.5" width="3.4" height="9" rx="1"/></svg>Board</button>
+        <button type="button" data-act="view" data-view="calendar" id="v-calendar"><svg class="i" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg>Calendar</button>
+      </div>
       <select class="sel" id="f-prio" aria-label="Priority filter">
         <option value="all">Any priority</option><option value="urgent">Urgent</option><option value="high">High</option><option value="normal">Normal</option><option value="low">Low</option>
       </select>
@@ -599,11 +622,13 @@ function buildSample(t){
   const ck=(items)=>items.map((x,i)=>({id:'c'+i,text:x[0],done:!!x[1]}));
   const jobs={
     'ex-northlight':{name:'Northlight Media',type:'agency',color:'#2f73e8',order:0,example:true,
+      work:{days:[1,2,3,4],hours:'3',pay:{amount:'1200',currency:'AUD',period:'month',payday:'on the 15th',method:'Payoneer'},location:'Sydney, Australia',tz:'Australia/Sydney'},
       tools:{comms:'Slack',tracker:'ClickUp',upload:'Frame.io',storage:'Google Drive'},
       toolLinks:{comms:'https://slack.com/',tracker:'https://app.clickup.com/',upload:'https://app.frame.io/',storage:'https://drive.google.com/'}},
     'ex-pulse':{name:'Pulse Social',type:'agency',color:'#8b5cf6',order:1,example:true,
       tools:{comms:'Slack',tracker:'Custom website',upload:'Frame.io',storage:'OneDrive'},toolLinks:{}},
     'ex-trailhead':{name:'Trailhead Podcast',type:'direct',color:'#e07b00',order:2,example:true,
+      work:{days:[1,2,3,4,5],hours:'4',shiftStart:'21:00',shiftEnd:'01:00',pay:{amount:'900',currency:'USD',period:'month',payday:'on the 30th',method:'Wise'},location:'Austin, Texas',tz:'America/Chicago',contact:{name:'Mike',reach:'mike@trailhead.fm'},since:'2025-03-01',notes:'Loudness -14 LUFS. Upload the master and a 1080p proxy to Frame.io.'},
       tools:{comms:'WhatsApp',tracker:'None',upload:'Frame.io',storage:'OneDrive'},toolLinks:{}}
   };
   const clients={
@@ -1005,21 +1030,18 @@ function render(){
   renderBell();
 }
 
-const VIEWS=[{id:'list',label:'List',icon:'list'},{id:'board',label:'Board',icon:'board'},{id:'calendar',label:'Calendar',icon:'cal'}];
-const viewsNav=()=>`<div class="nav-views" role="group" aria-label="View">${VIEWS.map(v=>`<button class="nav-item ${S.ui.view===v.id?'on':''}" data-act="view" data-view="${v.id}" aria-pressed="${S.ui.view===v.id}">${I[v.icon]}<span class="name">${v.label}</span></button>`).join('')}</div>`;
 function renderSide(){
   const u=S.ui,jobsOpen=u.jobsOpen!==false;
   const openCount=jid=>live().filter(t=>t.jobId===jid&&t.status!=='done').length;
   const allOpen=live().filter(t=>S.jobs[t.jobId]&&t.status!=='done').length;
   const app=appSettings();const appLogo=imgSrc(app.logo);
   let html=`<div class="brand">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></div>
-  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button>${u.tab==='overview'&&S.ready&&jobsSorted().length?viewsNav():''}<button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button>
+  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button>
   <button class="nav-item jobs-toggle ${jobsOpen?'open':''}" data-act="toggle-jobs" aria-expanded="${jobsOpen}" aria-controls="nav-jobs">${I.briefcase}<span class="name">Jobs</span><span class="count">${S.ready?jobsSorted().length:''}</span>${I.chev}</button></nav>
   <nav class="nav jobs" id="nav-jobs" aria-label="Jobs" ${jobsOpen?'':'hidden'}>`;
   for(const j of jobsSorted()){
     const on=u.tab===j.id;
     html+=`<div class="nav-row"><button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}">${jobMark(j,18)}<span class="name">${esc(j.name)}</span><span class="count">${openCount(j.id)}</span></button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.pencil}</button></div>`;
-    if(on) html+=viewsNav();
   }
   html+=`<button class="nav-item nav-new" data-act="new-job">${I.plus}<span class="name">New job</span></button>${jobsSorted().length?`<button class="nav-item nav-new" data-act="import-clickup">${I.download}<span class="name">Import from ClickUp</span></button>`:''}</nav>
   <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='db'||B.mode==='cloud'?'<span class="sync-dot"></span>Saved to your account':B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
@@ -1040,7 +1062,7 @@ function renderMain(){
   if(u.tab==='archived'){renderArchive();return}
   const scope=tasksOfScope();
   if(!job){
-    $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>Overview</h1><div class="sub">${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients · everything due across your work</div></div>
+    $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>Overview</h1><div class="sub">${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients${(()=>{const h=jobsSorted().reduce((a,j)=>a+weeklyHours(workOf(j)),0);return h?` · ${fmtNum(h)} h/week scheduled`:''})()} · everything due across your work</div></div>
       </div>`;
   }else{
     const cl=clientsOf(job.id);
@@ -1051,6 +1073,7 @@ function renderMain(){
     $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${jobMark(job,34)}${esc(job.name)}</h1>
       <div class="sub"><span class="badge">${job.type==='agency'?I.briefcase+'Agency':I.user+'Direct client'}</span>${job.type==='agency'?`<span>${cl.length} client${cl.length===1?'':'s'}</span>`:''}</div></div>
       <div class="tools">${tools}<button class="btn" data-act="edit-job" data-id="${job.id}" style="align-self:stretch">${I.pencil}Edit job</button></div></div>
+      ${workCard(job)}
       ${job.type==='agency'?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}`;
   }
 
@@ -1064,7 +1087,8 @@ function renderMain(){
   $('#jobcards').innerHTML=!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')}</div>`:'';
 
   const tb=$('#toolbar');tb.hidden=!Object.keys(S.jobs).length;
-  $('#top-search').hidden=tb.hidden;$('#f-view').value=u.view;
+  $('#top-search').hidden=tb.hidden;
+  ['list','board','calendar'].forEach(v=>{const b=$('#v-'+v);b.classList.toggle('on',u.view===v);b.setAttribute('aria-selected',u.view===v)});
   if(document.activeElement!==$('#q')) $('#q').value=u.q;
   $('#f-prio').value=u.prio;$('#f-due').value=u.due;$('#f-sort').value=u.sort;
 
@@ -1089,6 +1113,7 @@ function jobCard(j){
     <div class="stack">${bar}</div>
     <div class="meta">${st.open} open${st.overdue?` · <span style="color:var(--danger);font-weight:600">${st.overdue} overdue</span>`:''}${st.revisions?` · ${st.revisions} in revisions`:''}</div>
     <div class="next">${next?`Next due: <b>${esc(next.name)}</b> · ${fmtDate(next.due)}`:'Nothing due'}</div>
+    ${(()=>{const w=workOf(j),bits=[daysLabel(w.days),parseFloat(w.hours)?fmtNum(parseFloat(w.hours))+' h/day':'',w.tz?`${timeThere(w.tz)} there (${diffLabel(w.tz)})`:''].filter(Boolean);return bits.length?`<div class="when">${I.clock}${esc(bits.join(' · '))}</div>`:''})()}
   </button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.pencil}</button></div>`;
 }
 
@@ -1384,7 +1409,8 @@ function openJobModal(id){
     tools:{comms:'Slack',tracker:'ClickUp',upload:'Frame.io',storage:'Google Drive',...(j?.tools||{})},
     toolLinks:{...(j?.toolLinks||{})},
     logo:j?.logo||null,
-    clients:id?clientsOf(id).map(c=>({id:c.id,name:c.name,logo:c.logo||null})):[],removed:[],delArmed:false,busy:false,uploaded:[]};
+    clients:id?clientsOf(id).map(c=>({id:c.id,name:c.name,logo:c.logo||null})):[],removed:[],delArmed:false,busy:false,uploaded:[],
+    work:JSON.parse(JSON.stringify(workOf(j)))};
   M.orig=[M.logo,...M.clients.map(c=>c.logo)].filter(Boolean);
   renderModal();$('#modal').hidden=false;
   setTimeout(()=>{const n=$('#m-name');if(n&&!M.id)n.focus()},0);
@@ -1552,6 +1578,7 @@ function renderModal(){
       ${v==='Other'||custom?`<input type="text" data-m-toolname="${r.id}" data-fk="m-tn-${r.id}" value="${custom?esc(v):''}" placeholder="Tool name">`:''}
       <input type="url" data-m-link="${r.id}" data-fk="m-tl-${r.id}" value="${esc(M.toolLinks[r.id]||'')}" placeholder="Workspace link (optional)"></div>`}).join('')}</div>
       <p class="hint">Workspace links show as buttons at the top of the job, so the Slack channel or Frame.io project is one click away.</p></div>
+    ${workForm()}
     ${M.type==='agency'?`<div class="field"><span class="lbl">Clients</span><div class="client-list">${M.clients.map((c,i)=>`<div class="cl"><button type="button" class="logo-box sm ${c.logo?'has':''}" data-act="m-client-logo" data-i="${i}" title="${c.logo?'Replace':'Add'} picture for ${esc(c.name||'this client')}" aria-label="${c.logo?'Replace':'Add'} client picture">${c.logo?`<img src="${esc(imgSrc(c.logo))}" alt="">`:I.image}</button><input type="text" data-m-client="${i}" data-fk="m-cl-${c.id||'n'+i}" value="${esc(c.name)}" placeholder="Client name" aria-label="Client name">${c.logo?`<button type="button" class="btn sm ghost" data-act="m-client-logo-remove" data-i="${i}">Remove picture</button>`:''}<button type="button" class="icon-btn" data-act="m-del-client" data-i="${i}" aria-label="Remove client">${I.x}</button></div>`).join('')}
       <button type="button" class="btn sm" data-act="m-add-client" style="align-self:flex-start">${I.plus}Add client</button></div>
       <p class="hint">Click the square next to a client to add their logo or picture. Removing a client keeps its tasks in this job without a client.</p></div>`:''}
@@ -1562,7 +1589,7 @@ function renderModal(){
 function saveModal(){
   const name=M.name.trim();if(!name){toast('Give the job a name.');$('#m-name')?.focus();return}
   const tools={...M.tools};
-  const data={name,type:M.type,color:M.color,tools,toolLinks:M.toolLinks,logo:M.logo||null};
+  const data={name,type:M.type,color:M.color,tools,toolLinks:M.toolLinks,logo:M.logo||null,work:{...M.work,days:[...M.work.days].sort()}};
   let id=M.id;
   if(id){patch('jobs',id,data)}
   else{id=create('jobs',{...data,order:Math.max(-1,...Object.values(S.jobs).map(j=>j.order??0))+1})}
@@ -1687,6 +1714,99 @@ function runImport(){
   toast(`Imported ${list.length} task${list.length===1?'':'s'} into ${job.name}`);
 }
 
+/* ================= job work details (schedule, pay, location) ================= */
+const MY_TZ=(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC'}catch(e){return 'UTC'}})();
+const DAY_ORDER=[1,2,3,4,5,6,0];
+const CURRENCIES=['USD','AUD','CAD','GBP','EUR','NZD','SGD','AED','HKD','JPY','PHP'];
+const PERIODS=[{id:'month',label:'per month'},{id:'week',label:'per week'},{id:'day',label:'per day'},{id:'hour',label:'per hour'},{id:'project',label:'per project'},{id:'video',label:'per video'}];
+const emptyWork=()=>({days:[],hours:'',shiftStart:'',shiftEnd:'',pay:{amount:'',currency:'USD',period:'month',payday:'',method:''},location:'',tz:'',contact:{name:'',reach:''},since:'',notes:''});
+const workOf=j=>merge(emptyWork(),j?.work||{});
+/* minutes a time zone is ahead of UTC right now (null if the browser doesn't know it) */
+function tzOffset(tz,d=new Date()){
+  try{const p=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).formatToParts(d).map(x=>[x.type,x.value]));
+    return Math.round((Date.UTC(+p.year,p.month-1,+p.day,p.hour%24,+p.minute)-Math.floor(d.getTime()/60000)*60000)/60000)}catch(e){return null}
+}
+const tzDiff=tz=>{const a=tzOffset(tz),b=tzOffset(MY_TZ);return a==null||b==null?null:a-b};
+function diffLabel(tz){
+  const m=tzDiff(tz);if(m==null)return '';if(!m)return 'same time as you';
+  const h=Math.abs(m)/60,s=(Number.isInteger(h)?h:h.toFixed(1))+' h';
+  return m>0?`${s} ahead of you`:`${s} behind you`;
+}
+const timeThere=tz=>{try{return new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'short',hour:'numeric',minute:'2-digit'}).format(new Date())}catch(e){return ''}};
+const tzCity=tz=>String(tz||'').split('/').pop().replace(/_/g,' ');
+function fmtClock(hm,shift){
+  if(!/^\d{1,2}:\d{2}$/.test(hm||''))return '';
+  let [h,m]=hm.split(':').map(Number);let t=((h*60+m+(shift||0))%1440+1440)%1440;h=Math.floor(t/60);m=t%60;
+  return `${h%12||12}:${String(m).padStart(2,'0')} ${h<12?'AM':'PM'}`;
+}
+function daysLabel(days){
+  const set=DAY_ORDER.filter(d=>(days||[]).includes(d));if(!set.length)return '';
+  if(set.length===7)return 'Every day';
+  const idx=set.map(d=>DAY_ORDER.indexOf(d)),run=idx.every((v,i)=>!i||v===idx[i-1]+1);
+  return run&&set.length>2?`${WEEKDAY[set[0]]}–${WEEKDAY[set[set.length-1]]}`:set.map(d=>WEEKDAY[d]).join(', ');
+}
+const weeklyHours=w=>(parseFloat(w.hours)||0)*(w.days||[]).length;
+const fmtNum=n=>Number(n).toLocaleString(undefined,{maximumFractionDigits:2});
+function payLabel(p){if(!p||p.amount===''||p.amount==null||isNaN(parseFloat(p.amount)))return '';return `${p.currency||''} ${fmtNum(parseFloat(p.amount))} ${(PERIODS.find(x=>x.id===p.period)||PERIODS[0]).label}`.trim()}
+let TZ_OPTIONS=null;
+function tzOptions(sel){
+  if(!TZ_OPTIONS){
+    let zones=[];try{zones=Intl.supportedValuesOf('timeZone')}catch(e){}
+    if(!zones.length)zones=['UTC','Asia/Manila','America/New_York','America/Chicago','America/Denver','America/Los_Angeles','America/Toronto','Europe/London','Europe/Paris','Europe/Berlin','Asia/Dubai','Asia/Singapore','Asia/Hong_Kong','Asia/Tokyo','Australia/Sydney','Australia/Melbourne','Australia/Perth','Pacific/Auckland'];
+    TZ_OPTIONS=zones.map(z=>{const o=tzOffset(z);const sign=o<0?'−':'+',a=Math.abs(o||0);return {z,label:`${tzCity(z)} (${z.split('/')[0].replace(/_/g,' ')}) · UTC${sign}${Math.floor(a/60)}${a%60?':'+String(a%60).padStart(2,'0'):''}`,o:o||0}}).sort((a,b)=>a.o-b.o||a.label.localeCompare(b.label));
+  }
+  return `<option value="">Choose a time zone</option>${TZ_OPTIONS.map(x=>`<option value="${esc(x.z)}" ${x.z===sel?'selected':''}>${esc(x.label)}</option>`).join('')}`;
+}
+/* The "Work details" strip at the top of a job page */
+function workCard(job){
+  const w=workOf(job),items=[];
+  const d=daysLabel(w.days),h=parseFloat(w.hours);
+  if(d||h){
+    const shift=w.shiftStart&&w.shiftEnd?`${fmtClock(w.shiftStart)}–${fmtClock(w.shiftEnd)} your time`:'';
+    const diff=w.tz?tzDiff(w.tz):null;
+    const there=shift&&w.tz&&diff?` · ${fmtClock(w.shiftStart,diff)}–${fmtClock(w.shiftEnd,diff)} their time`:'';
+    items.push(['Schedule',[d,h?`${fmtNum(h)} h/day`:'',h&&w.days.length?`${fmtNum(weeklyHours(w))} h/week`:''].filter(Boolean).join(' · '),shift?shift+there:'']);
+  }
+  const pay=payLabel(w.pay);
+  if(pay||w.pay.payday||w.pay.method)items.push(['Pay',pay||'—',[w.pay.payday?`Paid ${w.pay.payday}`:'',w.pay.method?`via ${w.pay.method}`:''].filter(Boolean).join(' ')]);
+  if(w.location||w.tz)items.push(['Location',w.location||tzCity(w.tz),w.tz?`${timeThere(w.tz)} there · ${diffLabel(w.tz)}`:'']);
+  if(w.contact.name||w.contact.reach)items.push(['Contact',w.contact.name||w.contact.reach,w.contact.name?w.contact.reach:'']);
+  if(w.since)items.push(['Working together since',fmtLong(w.since),'']);
+  if(!items.length&&!w.notes)return `<button class="work-empty" data-act="edit-job" data-id="${job.id}">${I.plus}Add your schedule, pay and their location</button>`;
+  return `<section class="work">${items.map(([k,v,s])=>`<div class="work-item"><small>${k}</small><b>${esc(v)}</b>${s?`<span>${esc(s)}</span>`:''}</div>`).join('')}
+    ${w.notes?`<div class="work-item work-notes"><small>Notes</small><span>${esc(w.notes)}</span></div>`:''}</section>`;
+}
+const fmtLong=s=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(s||''))return s||'';const d=parseD(s);return `${MONTH_FULL[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`};
+/* Form section inside the job modal */
+function workForm(){
+  const w=M.work,p=w.pay,diff=w.tz?diffLabel(w.tz):'';
+  return `<div class="field"><span class="lbl">Work details</span><div class="work-form">
+    <div class="wf-row"><span class="wf-lbl">Days you work</span><div class="day-pick">${DAY_ORDER.map(d=>`<button type="button" data-act="m-day" data-day="${d}" class="${w.days.includes(d)?'on':''}" aria-pressed="${w.days.includes(d)}">${WEEKDAY[d]}</button>`).join('')}</div></div>
+    <div class="wf-grid">
+      <label>Hours per day<input type="number" min="0" max="24" step="0.5" data-mw="hours" data-fk="mw-hours" value="${esc(w.hours)}" placeholder="e.g. 4"></label>
+      <label>Shift starts (your time)<input type="time" data-mw="shiftStart" value="${esc(w.shiftStart)}"></label>
+      <label>Shift ends (your time)<input type="time" data-mw="shiftEnd" value="${esc(w.shiftEnd)}"></label>
+    </div>
+    <div class="wf-grid">
+      <label>Pay<span class="pay-row"><select data-mw="pay.currency" aria-label="Currency">${CURRENCIES.map(c=>`<option ${c===p.currency?'selected':''}>${c}</option>`).join('')}</select><input type="number" min="0" step="any" data-mw="pay.amount" data-fk="mw-amount" value="${esc(p.amount)}" placeholder="Amount"></span></label>
+      <label>How it's paid<select data-mw="pay.period">${PERIODS.map(x=>`<option value="${x.id}" ${x.id===p.period?'selected':''}>${x.label.replace('per ','Per ')}</option>`).join('')}</select></label>
+      <label>Payday<input type="text" data-mw="pay.payday" data-fk="mw-payday" value="${esc(p.payday)}" placeholder="e.g. on the 30th"></label>
+      <label>Payment method<input type="text" list="pay-methods" data-mw="pay.method" data-fk="mw-method" value="${esc(p.method)}" placeholder="e.g. Wise"></label>
+    </div>
+    <datalist id="pay-methods"><option>Wise</option><option>PayPal</option><option>Payoneer</option><option>Bank transfer</option><option>GCash</option><option>Deel</option><option>Upwork</option></datalist>
+    <div class="wf-grid">
+      <label>Their location<input type="text" data-mw="location" data-fk="mw-location" value="${esc(w.location)}" placeholder="e.g. Sydney, Australia"></label>
+      <label>Their time zone<select data-mw="tz">${tzOptions(w.tz)}</select>${diff?`<span class="hint">${esc(timeThere(w.tz))} there now · ${esc(diff)}</span>`:''}</label>
+    </div>
+    <div class="wf-grid">
+      <label>Contact person<input type="text" data-mw="contact.name" data-fk="mw-cname" value="${esc(w.contact.name)}" placeholder="Name"></label>
+      <label>Email or handle<input type="text" data-mw="contact.reach" data-fk="mw-creach" value="${esc(w.contact.reach)}" placeholder="e.g. anna@agency.com or @anna on Slack"></label>
+      <label>Working together since<input type="date" data-mw="since" value="${esc(w.since)}"></label>
+    </div>
+    <label class="wf-notes">Other important info<textarea data-mw="notes" data-fk="mw-notes" rows="3" placeholder="Brand rules, logins to remember, how they like files named…">${esc(w.notes)}</textarea></label>
+  </div><p class="hint">Only you see this. Your time zone is ${esc(tzCity(MY_TZ))}, from this device.</p></div>`;
+}
+
 /* ================= toast ================= */
 let toastT;
 function toast(msg,action){
@@ -1775,6 +1895,7 @@ document.addEventListener('click',e=>{
     case 's-theme': SM.theme=el.dataset.themeOpt;renderSettings();applyTheme(SM.theme);break;
     case 's-logo-pick': pickLogo({kind:'app'});break;
     case 's-logo-remove': SM.logo=null;renderSettings();break;
+    case 'm-day':{const d=+el.dataset.day,ds=M.work.days;M.work.days=ds.includes(d)?ds.filter(x=>x!==d):[...ds,d];renderModal();break}
     case 'm-type': M.type=el.dataset.type;renderModal();break;
     case 'm-color': M.color=el.dataset.color;renderModal();break;
     case 'm-add-client': M.clients.push({id:null,name:''});renderModal();setTimeout(()=>{const ins=document.querySelectorAll('[data-m-client]');ins[ins.length-1]?.focus()},0);break;
@@ -1806,7 +1927,6 @@ document.addEventListener('change',e=>{
   if(IM&&el.id==='im-client'){IM.clientId=el.value;return}
   if(IM&&el.id==='im-skipdone'){IM.skipDone=el.checked;renderImport();return}
   if(IM&&el.dataset.imKey){IM.skip[el.dataset.imKey]=!el.checked;renderImport();return}
-  if(el.id==='f-view'){u.view=el.value;saveUi();render();return}
   if(el.id==='logo-in'){const f=el.files[0];el.value='';if(!f)return;const app=logoTarget?.kind==='app';openCrop(f,blob=>app?setAppLogo(blob):setModalLogo(blob));return}
   const act=el.dataset.act;
   if(act==='row-status'){setStatus(el.dataset.id,el.value);if(u.openTask===el.dataset.id)renderDrawer();return}
@@ -1829,6 +1949,7 @@ document.addEventListener('input',e=>{
   if(el.id==='s-limit'&&SM){SM.dayLimit=el.value;return}
   if(M&&$('#modal').contains(el)){
     if(el.dataset.m) M[el.dataset.m]=el.value;
+    if(el.dataset.mw){const k=el.dataset.mw.split('.');if(k.length===2)M.work[k[0]][k[1]]=el.value;else M.work[k[0]]=el.value;if(el.dataset.mw==='tz')renderModal();}
     if(el.dataset.mLink) M.toolLinks[el.dataset.mLink]=el.value.trim();
     if(el.dataset.mToolname) M.tools[el.dataset.mToolname]=el.value.trim()||'Other';
     if(el.dataset.mClient!==undefined) M.clients[+el.dataset.mClient].name=el.value;
@@ -1868,6 +1989,7 @@ document.addEventListener('drop',e=>{
   if(col&&dragId){e.preventDefault();setStatus(dragId,col.dataset.drop);dragId=null}
 });
 
+setInterval(()=>{if(S.ready&&!document.hidden&&$('#modal').hidden)scheduleRender()},60000);
 boot();
 })();
 </script>
