@@ -57,7 +57,8 @@ svg.i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .brand{display:flex;align-items:center;gap:10px;padding:0 8px}
 .brand-mark{width:26px;height:26px;border-radius:7px;background:var(--text);display:grid;place-items:center}
 .brand-mark span{display:block;width:12px;height:12px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 3px color-mix(in srgb,var(--danger) 30%,transparent)}
-.brand b{font:700 19px/1 var(--display);letter-spacing:-.01em}
+.brand-logo{width:26px;height:26px;border-radius:7px;object-fit:cover;flex:none;border:1px solid var(--line);background:var(--surface)}
+.brand b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;font:700 19px/1 var(--display);letter-spacing:-.01em}
 .nav{display:flex;flex-direction:column;gap:2px}
 .nav-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:8px 10px 6px;display:flex;align-items:center;justify-content:space-between}
 .nav-label button{border:0;background:none;color:var(--muted);padding:2px;border-radius:5px;display:grid}
@@ -341,6 +342,11 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .arow:hover{background:var(--surface-2)}
 .arow .acts{display:flex;gap:6px}
 .arow .date small{display:block;font:600 10px var(--body);letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+.theme-pick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.theme-pick button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;font-weight:600;text-align:left}
+.theme-pick button.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset;background:var(--accent-soft)}
+.swatch-demo{width:100%;height:38px;border-radius:6px;border:1px solid var(--line);display:flex;overflow:hidden}
+.swatch-demo i{flex:1}
 .loading{padding:60px 0;text-align:center;color:var(--muted)}
 
 /* ---------- responsive ---------- */
@@ -442,7 +448,7 @@ const TOOL_ROLES=[
   {id:'storage',label:'File storage',opts:['Google Drive','OneDrive','Dropbox','Other']}];
 const FORMATS=['16:9','9:16','1:1','4:5'];
 const COLORS=['#2f73e8','#0b7f93','#2b9348','#e07b00','#d9362b','#c2417a','#8b5cf6','#6b7280'];
-const COLS=['jobs','clients','tasks'];
+const COLS=['jobs','clients','tasks','settings'];
 const LS_UI='cutroom.ui.v1', LS_DATA='cutroom.data.v1';
 
 const I={
@@ -557,7 +563,7 @@ const clientMark=(c,size)=>{const s=imgSrc(c?.logo);return s?`<img class="logo" 
 const safeUrl=u=>{u=String(u||'').trim();if(!u)return '';if(!/^[a-z][a-z0-9+.-]*:/i.test(u))u='https://'+u;return /^https?:/i.test(u)?u:''};
 
 /* ================= state ================= */
-const S={jobs:{},clients:{},tasks:{},ready:false,
+const S={jobs:{},clients:{},tasks:{},settings:{},ready:false,
   ui:{tab:'overview',client:'all',view:'list',q:'',prio:'all',due:'all',sort:'due',month:today().slice(0,7),collapsed:{done:true},openTask:null}};
 const saved=lsGet(LS_UI); if(saved) S.ui=Object.assign(S.ui,saved,{q:'',openTask:null});
 const saveUi=()=>{const {q,aq,openTask,...rest}=S.ui;lsSet(LS_UI,rest)};
@@ -567,7 +573,7 @@ const B={mode:'loading',db:null,assets:null};
 const pending={},timers={},chains={};
 function chain(key,fn){chains[key]=(chains[key]||Promise.resolve()).then(fn).catch(onWriteError);return chains[key]}
 function onWriteError(e){console.error(e);toast(e&&e.code==='quota_exceeded'?'Storage is full. Delete some old tasks to add new ones.':"Couldn't save that change. Check your connection and try again.")}
-function saveLocal(){lsSet(LS_DATA,{jobs:S.jobs,clients:S.clients,tasks:S.tasks})}
+function saveLocal(){lsSet(LS_DATA,{jobs:S.jobs,clients:S.clients,tasks:S.tasks,settings:S.settings})}
 const clean=o=>{const {id,...r}=o;return r};
 
 function create(col,data,id){
@@ -688,14 +694,27 @@ function withFocus(fn){
   fn();
   if(key){const n=document.querySelector(`[data-fk="${CSS.escape(key)}"]`);if(n&&n!==a){n.value=v;n.focus();try{n.setSelectionRange(s,e)}catch(x){}}}
 }
-function render(){withFocus(()=>{renderSide();renderMain()})}
+const appSettings=()=>S.settings.app||{};
+const HOST_THEME=document.documentElement.getAttribute('data-theme');
+function applyTheme(t){
+  const r=document.documentElement;
+  if(t==='light'||t==='dark') r.setAttribute('data-theme',t);
+  else if(HOST_THEME) r.setAttribute('data-theme',HOST_THEME); else r.removeAttribute('data-theme');
+}
+function render(){
+  const a=appSettings();
+  applyTheme(SM?SM.theme:a.theme);
+  document.title=(a.name||'').trim()||'Cutroom';
+  withFocus(()=>{renderSide();renderMain()});
+}
 
 function renderSide(){
   const u=S.ui;
   const openCount=jid=>live().filter(t=>t.jobId===jid&&t.status!=='done').length;
   const allOpen=live().filter(t=>S.jobs[t.jobId]&&t.status!=='done').length;
-  let html=`<div class="brand"><div class="brand-mark"><span></span></div><b>Cutroom</b></div>
-  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button></nav>
+  const app=appSettings();const appLogo=imgSrc(app.logo);
+  let html=`<div class="brand">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:'<div class="brand-mark"><span></span></div>'}<b>${esc((app.name||'').trim()||'Cutroom')}</b></div>
+  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item" data-act="open-settings">${I.gear}<span class="name">Settings</span></button></nav>
   <nav class="nav jobs" aria-label="Jobs"><div class="nav-label">Jobs<button data-act="new-job" title="Add a job" aria-label="Add a job">${I.plus}</button></div>`;
   for(const j of jobsSorted()){
     const on=u.tab===j.id;
@@ -1016,6 +1035,48 @@ function closeModal(discard=true){
   if(discard&&M) M.uploaded.forEach(dropImage);
   M=null;$('#modal').hidden=true;$('#modal').innerHTML='';
 }
+let SM=null;
+function openSettings(){
+  const a=appSettings();
+  SM={name:a.name||'',logo:a.logo||null,theme:a.theme||'system',orig:a.logo||null,uploaded:[],busy:false};
+  renderSettings();$('#modal').hidden=false;render();
+}
+function closeSettings(save){
+  if(!SM)return;
+  const sm=SM;SM=null;
+  if(save){
+    const data={name:sm.name.trim(),logo:sm.logo||null,theme:sm.theme};
+    if(S.settings.app) patch('settings','app',data); else create('settings',data,'app');
+    [sm.orig,...sm.uploaded].forEach(v=>{if(v&&v!==sm.logo)dropImage(v)});
+    toast('Settings saved');
+  }else sm.uploaded.forEach(dropImage);
+  $('#modal').hidden=true;$('#modal').innerHTML='';render();
+}
+function renderSettings(){
+  if(!SM)return;
+  const src=imgSrc(SM.logo);
+  const opt=(id,label,cols)=>`<button type="button" data-act="s-theme" data-theme-opt="${id}" class="${SM.theme===id?'on':''}" aria-pressed="${SM.theme===id}"><span class="swatch-demo">${cols.map(c=>`<i style="background:${c}"></i>`).join('')}</span>${label}</button>`;
+  withFocus(()=>{$('#modal').innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="s-title">
+  <header><h2 id="s-title">Settings</h2><button class="icon-btn" data-act="s-cancel" aria-label="Close">${I.x}</button></header>
+  <form class="m-body" data-act="s-save" id="s-form">
+    <div class="field"><span class="lbl">Appearance</span><div class="theme-pick">
+      ${opt('system','Match device',['#f3f4f7','#0e1015'])}${opt('light','Light',['#f3f4f7','#ffffff'])}${opt('dark','Dark',['#0e1015','#161920'])}</div>
+      <p class="hint">Changes show right away. Click Save to keep them.</p></div>
+    <div class="field"><label for="s-name">App name</label><input type="text" id="s-name" data-fk="s-name" value="${esc(SM.name)}" placeholder="Cutroom" maxlength="40"><p class="hint">Shown at the top of the sidebar and in the browser tab. Leave it empty to use “Cutroom”.</p></div>
+    <div class="field"><span class="lbl">App logo</span><div class="logo-field">
+      <button type="button" class="logo-box ${src?'has':''}" data-act="s-logo-pick" aria-label="${src?'Replace':'Upload'} app logo" style="${src?'':'background:var(--text);border-color:transparent'}">${src?`<img src="${esc(src)}" alt="">`:'<span style="width:22px;height:22px;border-radius:50%;background:var(--danger);display:block"></span>'}</button>
+      <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${canUpload()?`<button type="button" class="btn sm" data-act="s-logo-pick">${I.image}${src?'Replace':'Upload'}</button>`:''}${src?'<button type="button" class="btn sm" data-act="s-logo-remove">Remove</button>':''}${SM.busy?'<span class="hint">Uploading…</span>':''}</div>
+      <p class="hint">Replaces the record-dot mark next to the app name. A square image works best.</p></div></div></div>
+  </form>
+  <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="s-cancel">Cancel</button><button type="submit" form="s-form" class="btn primary">Save</button></div></footer></div>`});
+}
+async function setAppLogo(file){
+  const sm=SM;if(!sm||!file)return;
+  sm.busy=true;renderSettings();
+  try{const v=await storeImage(file,320,160,'image/png');if(SM!==sm){dropImage(v);return}sm.uploaded.push(v);sm.logo=v}
+  catch(e){console.error(e);toast(uploadError(e))}
+  finally{if(SM===sm){sm.busy=false;renderSettings()}}
+}
 let logoTarget=null;
 function pickLogo(target){if(!canUpload()){toast("Pictures can't be uploaded from this view.");return}logoTarget=target;$('#logo-in').click()}
 async function setModalLogo(file){
@@ -1150,6 +1211,11 @@ document.addEventListener('click',e=>{
       {const t=S.tasks[u.openTask];dropTaskPicture(t);const name=t.name;remove('tasks',t.id);closeDrawer();toast(`Deleted ${name||'task'}`)}break;
     /* modal */
     case 'modal-close': closeModal();break;
+    case 'open-settings': openSettings();break;
+    case 's-cancel': closeSettings(false);break;
+    case 's-theme': SM.theme=el.dataset.themeOpt;renderSettings();applyTheme(SM.theme);break;
+    case 's-logo-pick': pickLogo({kind:'app'});break;
+    case 's-logo-remove': SM.logo=null;renderSettings();break;
     case 'm-type': M.type=el.dataset.type;renderModal();break;
     case 'm-color': M.color=el.dataset.color;renderModal();break;
     case 'm-add-client': M.clients.push({id:null,name:''});renderModal();setTimeout(()=>{const ins=document.querySelectorAll('[data-m-client]');ins[ins.length-1]?.focus()},0);break;
@@ -1163,7 +1229,7 @@ document.addEventListener('click',e=>{
   if(a!=='delete-task'&&deleteArmed&&$('#drawer').contains(el)){deleteArmed=false;renderDrawer()}
 });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
+  if(e.key==='Escape'){if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'');
   if(e.key==='Enter'&&!typing){const r=e.target.closest?.('[data-act="open"]');if(r){openTask(r.dataset.id);return}}
   if(typing||e.metaKey||e.ctrlKey||e.altKey)return;
@@ -1176,7 +1242,7 @@ document.addEventListener('change',e=>{
   if(el.id==='f-due'){u.due=el.value;render();return}
   if(el.id==='arch-job'){u.ajob=el.value;saveUi();render();return}
   if(el.id==='f-sort'){u.sort=el.value;saveUi();render();return}
-  if(el.id==='logo-in'){const f=el.files[0];el.value='';setModalLogo(f);return}
+  if(el.id==='logo-in'){const f=el.files[0];el.value='';if(logoTarget?.kind==='app')setAppLogo(f);else setModalLogo(f);return}
   if(el.id==='file-in'){const f=el.files[0];el.value='';if(u.openTask)setPicture(f,u.openTask);return}
   const act=el.dataset.act;
   if(act==='row-status'){setStatus(el.dataset.id,el.value);if(u.openTask===el.dataset.id)renderDrawer();return}
@@ -1195,6 +1261,7 @@ document.addEventListener('input',e=>{
   const el=e.target,u=S.ui;
   if(el.id==='q'){u.q=el.value;render();return}
   if(el.id==='arch-q'){u.aq=el.value;render();return}
+  if(el.id==='s-name'&&SM){SM.name=el.value;return}
   if(M&&$('#modal').contains(el)){
     if(el.dataset.m) M[el.dataset.m]=el.value;
     if(el.dataset.mLink) M.toolLinks[el.dataset.mLink]=el.value.trim();
@@ -1218,6 +1285,7 @@ document.addEventListener('submit',e=>{
   if(a==='quick-add'){const inp=f.querySelector('input');const name=inp.value.trim();if(!name)return;newTask({name,status:f.dataset.status});inp.value='';render();$(`[data-fk="qa-${f.dataset.status}"]`)?.focus()}
   else if(a==='check-add'){const inp=f.querySelector('input');const text=inp.value.trim();if(!text)return;const t=S.tasks[S.ui.openTask];patch('tasks',t.id,{checklist:[...(t.checklist||[]),{id:uid().slice(0,12),text,done:false}]});inp.value='';renderDrawer();$('[data-fk="ck-new"]')?.focus()}
   else if(a==='modal-save'){saveModal()}
+  else if(a==='s-save'){closeSettings(true)}
 });
 /* drag & drop: board + picture */
 let dragId=null;
