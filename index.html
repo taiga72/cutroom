@@ -406,6 +406,8 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .auth-form input{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px 12px;font-size:15px;width:100%}
 .setup-list{margin:-4px 0 0;padding-left:20px;font-size:13px;line-height:1.7}
 .auth-card code,.hint code{font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.auth-foot{margin:4px 0 0;font-size:12px;text-align:center}
+.auth-foot a{color:var(--muted)}
 .auth-err{margin:0;color:var(--danger);font-size:13px}
 .acct-line{margin:0;font-size:13.5px;color:var(--text);line-height:1.5}
 .acct-warn{color:var(--danger);font-weight:600}
@@ -768,6 +770,7 @@ function showAuth(st){
         <input type="email" id="auth-email" data-fk="auth-email" autocomplete="email" required placeholder="you@example.com" value="${esc(s.email||'')}">
         <button type="submit" class="btn primary" ${s.busy?'disabled':''}>${s.busy==='email'?'Sending…':'Email me a sign-in link'}</button></form>`}
     ${s.error?`<p class="auth-err" role="alert">${esc(s.error)}</p>`:''}
+    <p class="auth-foot"><a href="/privacy.html">Privacy policy</a></p>
   </div>`});
 }
 async function authEmail(email){

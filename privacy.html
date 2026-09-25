@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy · Cutroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=Figtree:wght@400;600&display=swap">
+<style>
+:root{--bg:#f3f4f7;--surface:#fff;--line:#dadee6;--text:#161a22;--muted:#5b6272;--accent:#0b7f93;--danger:#d9362b}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#0e1015;--surface:#161920;--line:#282d38;--text:#e6e8ee;--muted:#9aa1b0;--accent:#2fb8cc;--danger:#ff6b5e}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.65 "Figtree",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:720px;margin:0 auto;padding:40px 16px 64px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:17px;color:var(--text);text-decoration:none;margin-bottom:28px}
+.mark{width:26px;height:26px;border-radius:7px;background:var(--text);display:grid;place-items:center}
+.mark span{width:11px;height:11px;border-radius:50%;background:var(--danger)}
+h1{font:700 32px/1.15 "Bricolage Grotesque","Figtree",system-ui,sans-serif;margin:0 0 6px}
+h2{font:700 19px/1.3 "Bricolage Grotesque","Figtree",system-ui,sans-serif;margin:32px 0 8px}
+.updated{color:var(--muted);margin:0 0 24px}
+p,li{color:var(--text)}
+ul{padding-left:22px}
+a{color:var(--accent)}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+</style>
+<main>
+  <a class="brand" href="/"><span class="mark"><span></span></span>Cutroom</a>
+  <h1>Privacy policy</h1>
+  <p class="updated">Last updated September 25, 2026</p>
+
+  <p>Cutroom is a task tracker for video editing work. This page explains what it stores, why, and how to remove it.</p>
+
+  <h2>What Cutroom stores</h2>
+  <ul>
+    <li><b>Your account:</b> your email address and a user ID, created when you sign in with Google or an emailed link. Signing in with Google shares only your name, email address and profile picture with Cutroom.</li>
+    <li><b>What you enter:</b> jobs, clients, tasks, notes, links, checklists, settings and any pictures you upload.</li>
+    <li><b>Google Calendar connection</b> (only if you turn it on): an access token that lets Cutroom keep its own “Cutroom” calendar up to date, and the email address of the Google account you connected.</li>
+  </ul>
+  <p>Cutroom doesn't use advertising, analytics or tracking cookies. Your browser keeps your sign-in session and view preferences (such as List or Board) in local storage on your device.</p>
+
+  <h2>How it's used</h2>
+  <p>Your data is used only to show you your tracker and, if you connect it, to keep your Google Calendar in step with your tasks. Each account can see only its own data. Cutroom doesn't sell or share your data, and doesn't use it for anything else.</p>
+
+  <h2>Google Calendar</h2>
+  <p>Cutroom asks for the narrowest Calendar permission Google offers: it can create its own calendars and manage events in them only. It can't see or change your other calendars or events. In the calendar it creates, Cutroom adds one all-day event for each open task with a due date, showing the job, client, task name, status, priority and task links. It updates and removes those events as your tasks change.</p>
+  <div class="box">Cutroom's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements.</div>
+
+  <h2>Where it's kept</h2>
+  <p>Data and pictures are stored with <a href="https://supabase.com">Supabase</a>. The site and its server functions run on <a href="https://vercel.com">Vercel</a>. Both act only as service providers for Cutroom. Pictures are stored under long random addresses that can't be guessed or listed.</p>
+
+  <h2>Removing your data</h2>
+  <ul>
+    <li><b>Google Calendar:</b> in Cutroom, open Settings and choose Disconnect. This deletes the stored access and the “Cutroom” calendar. You can also remove access at any time from <a href="https://myaccount.google.com/permissions">your Google Account</a>.</li>
+    <li><b>Jobs, tasks and pictures:</b> delete them in Cutroom, and they're removed right away.</li>
+    <li><b>Your whole account:</b> contact the app's owner using the support email shown on Google's sign-in screen for Cutroom. Your account and everything in it will be deleted.</li>
+  </ul>
+
+  <h2>Changes</h2>
+  <p>If this policy changes, the date at the top of this page will change too.</p>
+</main>
