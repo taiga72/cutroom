@@ -166,7 +166,7 @@ select.pill::before{display:none}
 .group-head.open svg{transform:rotate(90deg)}
 .group-head .count{font:500 12px var(--mono);color:var(--faint)}
 .rows{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
-.row,.row-head{display:grid;grid-template-columns:64px minmax(0,1fr) 150px 84px 84px 84px 92px;align-items:center;gap:12px;padding:8px 12px}
+.row,.row-head{display:grid;grid-template-columns:64px minmax(0,1fr) 180px 84px 84px 84px 92px;align-items:center;gap:12px;padding:8px 12px}
 .row-head{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);padding-block:6px;border-bottom:1px solid var(--line);background:var(--surface-2)}
 .row{border-top:1px solid var(--line);cursor:pointer}
 .row:first-of-type{border-top:0}
@@ -322,12 +322,30 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .logo-box.sm{width:36px;height:36px;border-radius:9px;color:var(--muted)}
 .logo-box:hover{border-color:var(--accent)}
 
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:9px 14px;border-radius:9px;font-weight:600;font-size:13px;z-index:40;box-shadow:var(--shadow-lg);max-width:calc(100% - 32px)}
+.toast{display:flex;align-items:center;gap:14px;position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:9px 14px;border-radius:9px;font-weight:600;font-size:13px;z-index:40;box-shadow:var(--shadow-lg);max-width:calc(100% - 32px)}
+.toast-btn{border:0;background:none;color:inherit;font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:0}
+.c-status{display:flex;align-items:center;gap:6px;min-width:0}
+.archive-btn{padding:3px 8px;font-size:12px}
+.group-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.card .archive-btn{align-self:flex-start}
+.d-archived{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:9px;background:var(--surface-2);color:var(--muted);font-size:13px}
+.d-archived b{color:var(--text)}
+.d-archived span{flex:1;min-width:160px}
+.arch-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+#banner:empty,#stats:empty,#jobcards:empty{display:none}
+.arch-group + .arch-group{margin-top:16px}
+.arch-group h3{margin:0 0 8px;font:700 15px var(--display);display:flex;align-items:center;gap:8px}
+.arch-group h3 .count{font:500 12px var(--mono);color:var(--faint)}
+.arow{display:grid;grid-template-columns:64px minmax(0,1fr) 100px 110px auto;align-items:center;gap:12px;padding:8px 12px;border-top:1px solid var(--line);cursor:pointer}
+.arow:first-child{border-top:0}
+.arow:hover{background:var(--surface-2)}
+.arow .acts{display:flex;gap:6px}
+.arow .date small{display:block;font:600 10px var(--body);letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
 .loading{padding:60px 0;text-align:center;color:var(--muted)}
 
 /* ---------- responsive ---------- */
 @media (max-width:1100px){
-  .row,.row-head{grid-template-columns:56px minmax(0,1fr) 140px 84px 92px}
+  .row,.row-head{grid-template-columns:56px minmax(0,1fr) 180px 84px 92px}
   .row > .c-start,.row-head > .c-start,.row > .c-prio,.row-head > .c-prio{display:none}
   .thumb{width:56px}
   .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -354,6 +372,9 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .row > .c-due{grid-column:3;grid-row:1}
   .row > .c-links{display:none}
   .thumb{width:48px}
+  .arow{grid-template-columns:48px minmax(0,1fr) auto}
+  .arow .c-done{display:none}
+  .arow .acts{grid-column:2/4;justify-self:start}
   .props{grid-template-columns:1fr}
   .props > label,.props > .lbl{margin-bottom:-4px}
   .tool-grid,.type-pick{grid-template-columns:1fr}
@@ -445,6 +466,7 @@ const I={
   user:'<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="5.5" r="2.5"/><path d="M3 13.5a5 5 0 0 1 10 0"/></svg>',
   ratio:'<svg class="i" viewBox="0 0 16 16"><rect x="2" y="4" width="12" height="8" rx="1.2"/></svg>',
   loop:'<svg class="i" viewBox="0 0 16 16"><path d="M12.5 6A5 5 0 0 0 3.2 5M3.5 10a5 5 0 0 0 9.3 1M3 2.5V5h2.5M13 13.5V11h-2.5"/></svg>',
+  archive:'<svg class="i" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="3" rx="1"/><path d="M3 6v6.5a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6M6.5 9h3"/></svg>',
   clock:'<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/></svg>'
 };
 
@@ -538,7 +560,7 @@ const safeUrl=u=>{u=String(u||'').trim();if(!u)return '';if(!/^[a-z][a-z0-9+.-]*
 const S={jobs:{},clients:{},tasks:{},ready:false,
   ui:{tab:'overview',client:'all',view:'list',q:'',prio:'all',due:'all',sort:'due',month:today().slice(0,7),collapsed:{done:true},openTask:null}};
 const saved=lsGet(LS_UI); if(saved) S.ui=Object.assign(S.ui,saved,{q:'',openTask:null});
-const saveUi=()=>{const {q,openTask,...rest}=S.ui;lsSet(LS_UI,rest)};
+const saveUi=()=>{const {q,aq,openTask,...rest}=S.ui;lsSet(LS_UI,rest)};
 
 /* ================= persistence ================= */
 const B={mode:'loading',db:null,assets:null};
@@ -614,7 +636,9 @@ async function boot(){
 /* ================= derived ================= */
 const jobsSorted=()=>Object.values(S.jobs).sort((a,b)=>(a.order??0)-(b.order??0)||a.name.localeCompare(b.name));
 const clientsOf=jid=>Object.values(S.clients).filter(c=>c.jobId===jid).sort((a,b)=>(a.order??0)-(b.order??0)||a.name.localeCompare(b.name));
-const tasksOfScope=()=>Object.values(S.tasks).filter(t=>S.jobs[t.jobId]&&(S.ui.tab==='overview'||t.jobId===S.ui.tab)&&(S.ui.tab==='overview'||S.ui.client==='all'||t.clientId===S.ui.client));
+const live=()=>Object.values(S.tasks).filter(t=>!t.archived);
+const archived=()=>Object.values(S.tasks).filter(t=>t.archived&&S.jobs[t.jobId]);
+const tasksOfScope=()=>live().filter(t=>S.jobs[t.jobId]&&(S.ui.tab==='overview'||t.jobId===S.ui.tab)&&(S.ui.tab==='overview'||S.ui.client==='all'||t.clientId===S.ui.client));
 function filtered(){
   const u=S.ui,t0=today(),q=u.q.trim().toLowerCase();
   let list=tasksOfScope();
@@ -668,10 +692,10 @@ function render(){withFocus(()=>{renderSide();renderMain()})}
 
 function renderSide(){
   const u=S.ui;
-  const openCount=jid=>Object.values(S.tasks).filter(t=>t.jobId===jid&&t.status!=='done').length;
-  const allOpen=Object.values(S.tasks).filter(t=>S.jobs[t.jobId]&&t.status!=='done').length;
+  const openCount=jid=>live().filter(t=>t.jobId===jid&&t.status!=='done').length;
+  const allOpen=live().filter(t=>S.jobs[t.jobId]&&t.status!=='done').length;
   let html=`<div class="brand"><div class="brand-mark"><span></span></div><b>Cutroom</b></div>
-  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button></nav>
+  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button></nav>
   <nav class="nav jobs" aria-label="Jobs"><div class="nav-label">Jobs<button data-act="new-job" title="Add a job" aria-label="Add a job">${I.plus}</button></div>`;
   for(const j of jobsSorted()){
     const on=u.tab===j.id;
@@ -689,13 +713,14 @@ function renderSide(){
 function renderMain(){
   const u=S.ui;
   if(!S.ready){$('#view').innerHTML='<div class="loading">Loading your tasks…</div>';$('#toolbar').hidden=true;return}
-  if(u.tab!=='overview'&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
+  if(u.tab!=='overview'&&u.tab!=='archived'&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
   if(u.client!=='all'&&!S.clients[u.client]) u.client='all';
   const job=u.tab==='overview'?null:S.jobs[u.tab];
 
   const hasExamples=[...Object.values(S.jobs),...Object.values(S.clients),...Object.values(S.tasks)].some(x=>x.example);
   $('#banner').innerHTML=hasExamples?`<div class="banner"><p><b>You're looking at example jobs and tasks.</b> Poke around, then clear them and add your own jobs.</p><button class="btn sm ${clearArmed?'danger armed':''}" data-act="clear-examples">${clearArmed?'Delete all example data':'Clear examples'}</button></div>`:'';
 
+  if(u.tab==='archived'){renderArchive();return}
   const scope=tasksOfScope();
   if(!job){
     $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>Overview</h1><div class="sub">${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients · everything due across your work</div></div>
@@ -735,7 +760,7 @@ function renderMain(){
 }
 
 function jobCard(j){
-  const ts=Object.values(S.tasks).filter(t=>t.jobId===j.id);
+  const ts=live().filter(t=>t.jobId===j.id);
   const st=statsFor(ts);
   const total=ts.length||1;
   const bar=STATUSES.map(s=>{const n=ts.filter(t=>t.status===s.id).length;return n?`<i style="width:${n/total*100}%;background:var(${STATUS_VAR[s.id]})" title="${s.label}: ${n}"></i>`:''}).join('');
@@ -774,13 +799,13 @@ function listView(list,job){
   for(const s of STATUSES){
     const rows=list.filter(t=>t.status===s.id);
     const open=!S.ui.collapsed[s.id];
-    html+=`<section class="group" id="grp-${s.id}"><button class="group-head ${open?'open':''}" data-act="group" data-status="${s.id}" aria-expanded="${open}">${I.chev}<span class="pill st-${s.id}">${s.label}</span><span class="count">${rows.length}</span></button>`;
+    html+=`<section class="group" id="grp-${s.id}"><div class="group-bar"><button class="group-head ${open?'open':''}" data-act="group" data-status="${s.id}" aria-expanded="${open}">${I.chev}<span class="pill st-${s.id}">${s.label}</span><span class="count">${rows.length}</span></button>${s.id==='done'&&rows.length?`<button class="btn sm ghost" data-act="archive-all">${I.archive}Archive all ${rows.length} done</button>`:''}</div>`;
     if(open){
       html+=`<div class="rows">${rows.length?`<div class="row-head"><span></span><span>Task</span><span>Status</span><span class="c-prio">Priority</span><span class="c-start">Start</span><span>Due</span><span>Links</span></div>`:''}`;
       html+=rows.map(t=>`<div class="row ${t.status==='done'?'done-row':''} ${S.ui.openTask===t.id?'focus':''}" data-act="open" data-id="${t.id}" tabindex="0">
         ${thumbHtml(t)}
         <div class="t-main"><div class="t-name">${esc(t.name||'Untitled task')}</div>${metaLine(t,job,showJob)}</div>
-        <div class="c-status" data-stop>${statusSelect(t,'row-status')}</div>
+        <div class="c-status" data-stop>${statusSelect(t,'row-status')}${t.status==='done'?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
         <div class="c-prio">${prioHtml(t.priority)}</div>
         <div class="c-start date ${t.start?'':'none'}">${t.start?fmtDate(t.start):'—'}</div>
         <div class="c-due date ${dueClass(t)}">${t.due?fmtDate(t.due):'—'}</div>
@@ -796,11 +821,11 @@ function listView(list,job){
 function boardView(list,job){
   return `<div class="board-wrap"><div class="board">${STATUSES.map(s=>{
     const cards=list.filter(t=>t.status===s.id);
-    return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill st-${s.id}">${s.label}</span><span class="count">${cards.length}</span></div>
+    return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill st-${s.id}">${s.label}</span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
       ${cards.map(t=>{const src=thumbSrc(t);return `<div class="card" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         ${src?`<div class="cover"><img src="${esc(src)}" alt="" loading="lazy" onerror="this.parentNode.remove()"></div>`:''}
         <div class="t-name">${esc(t.name||'Untitled task')}</div>${metaLine(t,job,!job)}
-        <div class="card-foot"><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):'No due date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div></div>`}).join('')}
+        <div class="card-foot"><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):'No due date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${t.status==='done'?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`}).join('')}
       <button class="add-card" data-act="new-task" data-status="${s.id}">${I.plus}Add task</button></div>`;
   }).join('')}</div></div>`;
 }
@@ -826,6 +851,45 @@ function calendarView(list){
     <div class="cal-wrap"><div class="cal">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="dow">${d}</div>`).join('')}${cells}</div></div>`;
 }
 
+/* ================= archive ================= */
+let archDelArmed=null;
+function archiveTasks(ids){
+  ids=ids.filter(id=>S.tasks[id]);if(!ids.length)return;
+  const d=today();
+  ids.forEach(id=>patch('tasks',id,{archived:true,archivedAt:d}));
+  if(ids.includes(S.ui.openTask))renderDrawer();
+  toast(ids.length===1?`Archived “${S.tasks[ids[0]].name||'task'}”`:`Archived ${ids.length} tasks`,{label:'Undo',fn:()=>restoreTasks(ids,true)});
+}
+function restoreTasks(ids,quiet){
+  ids=ids.filter(id=>S.tasks[id]);
+  ids.forEach(id=>patch('tasks',id,{archived:false,archivedAt:null}));
+  if(ids.includes(S.ui.openTask))renderDrawer();
+  if(!quiet)toast(ids.length===1?`Restored “${S.tasks[ids[0]].name||'task'}”`:`Restored ${ids.length} tasks`);
+}
+function renderArchive(){
+  const u=S.ui,q=(u.aq||'').trim().toLowerCase();
+  const all=archived();
+  $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${I.archive.replace('class="i"','class="i" style="width:28px;height:28px"')}Archived</h1><div class="sub">${all.length} task${all.length===1?'':'s'} · hidden from Overview, job tabs and counts. Restore one to bring it back.</div></div></div>`;
+  $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;
+  if(!all.length){$('#view').innerHTML=`<div class="empty"><h3>Nothing archived yet</h3><p>When a task is Done, click <b>Archive</b> on it to move it here and keep your lists clean.</p></div>`;return}
+  const list=all.filter(t=>(u.ajob||'all')==='all'||t.jobId===u.ajob).filter(t=>!q||[t.name,t.notes,S.clients[t.clientId]?.name,S.jobs[t.jobId]?.name].some(x=>String(x||'').toLowerCase().includes(q)))
+    .sort((a,b)=>(b.archivedAt||'').localeCompare(a.archivedAt||'')||(b.doneAt||'').localeCompare(a.doneAt||''));
+  const jobsWith=jobsSorted().filter(j=>all.some(t=>t.jobId===j.id));
+  let html=`<div class="arch-bar"><label class="search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="arch-q" data-fk="arch-q" type="search" placeholder="Search archived tasks" value="${esc(u.aq||'')}" autocomplete="off"></label>
+    <select class="sel" id="arch-job" aria-label="Filter by job"><option value="all">All jobs</option>${jobsWith.map(j=>`<option value="${j.id}" ${u.ajob===j.id?'selected':''}>${esc(j.name)}</option>`).join('')}</select></div>`;
+  for(const j of jobsWith){
+    const rows=list.filter(t=>t.jobId===j.id);if(!rows.length)continue;
+    html+=`<section class="arch-group"><h3>${jobMark(j,20)}${esc(j.name)}<span class="count">${rows.length}</span></h3><div class="rows">${rows.map(t=>`<div class="arow" data-act="open" data-id="${t.id}" tabindex="0">
+      ${thumbHtml(t)}
+      <div class="t-main"><div class="t-name">${esc(t.name||'Untitled task')}</div>${metaLine(t,j,false)}</div>
+      <div class="date c-done"><small>Done</small>${t.doneAt?fmtDate(t.doneAt):'—'}</div>
+      <div class="date c-done"><small>Archived</small>${t.archivedAt?fmtDate(t.archivedAt):'—'}</div>
+      <div class="acts"><button class="btn sm" data-act="restore" data-id="${t.id}">Restore</button><button class="btn sm danger ${archDelArmed===t.id?'armed':''}" data-act="arch-delete" data-id="${t.id}">${archDelArmed===t.id?'Delete for good':I.trash+'Delete'}</button></div></div>`).join('')}</div></section>`;
+  }
+  if(!list.length) html+=`<div class="empty"><h3>No archived tasks match</h3></div>`;
+  $('#view').innerHTML=html;
+}
+
 /* ================= drawer ================= */
 let deleteArmed=false, clearArmed=false, uploading=false;
 function openTask(id){S.ui.openTask=id;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;scheduleRender()}
@@ -843,6 +907,7 @@ function renderDrawer(){
   <div class="d-top"><div class="crumb">${jobMark(j,18)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
     <button class="icon-btn" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
   <div class="d-body">
+    ${t.archived?`<div class="d-archived">${I.archive}<span><b>Archived</b>${t.archivedAt?' '+fmtDate(t.archivedAt):''}. Hidden from Overview and job tabs.</span><button class="btn sm" data-act="restore" data-id="${t.id}">Restore</button></div>`:''}
     <textarea class="d-name" rows="1" data-field="name" data-fk="d-name" aria-label="Task name" placeholder="Task name">${esc(t.name)}</textarea>
     <div class="picture ${src?'has':''}" id="pic" data-drop-pic>
       ${src?`<img src="${esc(src)}" alt="Task picture">`:canPic?`<button class="pick" data-act="pick-pic">${I.image}<b>Add a picture</b><span class="hint">Thumbnail, frame grab or reference. Drop an image here or click to choose.</span></button>`:`<span class="hint">No picture</span>`}
@@ -866,7 +931,7 @@ function renderDrawer(){
       <form class="check-add" data-act="check-add">${I.plus}<input data-fk="ck-new" placeholder="Add a step (rough cut, captions, color…)" aria-label="Add checklist item"></form></div></div>
     <div><h4 class="section-title">Notes</h4><textarea class="notes" data-field="notes" data-fk="d-notes" placeholder="Brief, feedback, music choices, specs…">${esc(t.notes||'')}</textarea></div>
     <div class="d-foot"><span>${t.created?'Created '+fmtDate(ymd(new Date(t.created))):''}${t.doneAt?' · Done '+fmtDate(t.doneAt):''}</span>
-      <button class="btn sm danger ${deleteArmed?'armed':''}" data-act="delete-task">${I.trash}${deleteArmed?'Click again to delete':'Delete task'}</button></div>
+      <span style="display:flex;gap:6px">${t.status==='done'&&!t.archived?`<button class="btn sm" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}<button class="btn sm danger ${deleteArmed?'armed':''}" data-act="delete-task">${I.trash}${deleteArmed?'Click again to delete':'Delete task'}</button></span></div>
   </div>`});
   autosize($('.d-name'));
 }
@@ -881,7 +946,7 @@ function setStatus(id,st){
 }
 function newTask(opts={}){
   const u=S.ui;
-  const jobId=opts.jobId||(u.tab!=='overview'?u.tab:jobsSorted()[0]?.id);
+  const jobId=opts.jobId||(S.jobs[u.tab]?u.tab:jobsSorted()[0]?.id);
   if(!jobId){openJobModal();return null}
   const clientId=opts.clientId!==undefined?opts.clientId:(u.tab===jobId&&u.client!=='all'?u.client:null);
   const id=create('tasks',{jobId,clientId,name:opts.name||'',status:opts.status||'not_started',priority:'normal',start:opts.start||'',due:opts.due||'',format:'16:9',length:'',revision:0,links:{task:'',upload:'',file:''},thumb:null,notes:'',checklist:[],created:Date.now()});
@@ -1024,7 +1089,12 @@ function dropTaskPicture(t){dropImage(t.thumb)}
 
 /* ================= toast ================= */
 let toastT;
-function toast(msg){const el=$('#toast');el.textContent=msg;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true},3200)}
+function toast(msg,action){
+  const el=$('#toast');el.innerHTML='';
+  const sp=document.createElement('span');sp.textContent=msg;el.append(sp);
+  if(action){const b=document.createElement('button');b.className='toast-btn';b.textContent=action.label;b.onclick=()=>{el.hidden=true;action.fn()};el.append(b)}
+  el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true},action?6000:3200);
+}
 
 /* ================= events ================= */
 document.addEventListener('click',e=>{
@@ -1034,6 +1104,7 @@ document.addEventListener('click',e=>{
   if(stop&&el.contains(stop)&&stop!==el) return;
   const a=el.dataset.act,u=S.ui;
   if(a!=='clear-examples'&&clearArmed){clearArmed=false;render()}
+  if(a!=='arch-delete'&&archDelArmed){archDelArmed=null;render()}
   switch(a){
     case 'nav': u.tab=el.dataset.tab;u.client=el.dataset.client||'all';saveUi();render();window.scrollTo({top:0});break;
     case 'view': u.view=el.dataset.view;saveUi();render();break;
@@ -1068,6 +1139,12 @@ document.addEventListener('click',e=>{
       try{navigator.clipboard.writeText(v).then(()=>toast('Link copied'),()=>{inp?.select();toast('Press Ctrl/Cmd+C to copy')})}catch(x){inp?.select();toast('Press Ctrl/Cmd+C to copy')}
       break}
     case 'check-del':{const t=S.tasks[u.openTask];patch('tasks',t.id,{checklist:(t.checklist||[]).filter(c=>c.id!==el.dataset.cid)});renderDrawer();break}
+    case 'archive': archiveTasks([el.dataset.id]);break;
+    case 'archive-all': archiveTasks(filtered().filter(t=>t.status==='done').map(t=>t.id));break;
+    case 'restore': restoreTasks([el.dataset.id]);break;
+    case 'arch-delete':
+      if(archDelArmed!==el.dataset.id){archDelArmed=el.dataset.id;render();break}
+      {const t=S.tasks[el.dataset.id];archDelArmed=null;if(t){dropTaskPicture(t);if(u.openTask===t.id)closeDrawer();remove('tasks',t.id);toast(`Deleted “${t.name||'task'}”`)}}break;
     case 'delete-task':
       if(!deleteArmed){deleteArmed=true;renderDrawer();break}
       {const t=S.tasks[u.openTask];dropTaskPicture(t);const name=t.name;remove('tasks',t.id);closeDrawer();toast(`Deleted ${name||'task'}`)}break;
@@ -1097,6 +1174,7 @@ document.addEventListener('change',e=>{
   const el=e.target,u=S.ui;
   if(el.id==='f-prio'){u.prio=el.value;render();return}
   if(el.id==='f-due'){u.due=el.value;render();return}
+  if(el.id==='arch-job'){u.ajob=el.value;saveUi();render();return}
   if(el.id==='f-sort'){u.sort=el.value;saveUi();render();return}
   if(el.id==='logo-in'){const f=el.files[0];el.value='';setModalLogo(f);return}
   if(el.id==='file-in'){const f=el.files[0];el.value='';if(u.openTask)setPicture(f,u.openTask);return}
@@ -1116,6 +1194,7 @@ document.addEventListener('change',e=>{
 document.addEventListener('input',e=>{
   const el=e.target,u=S.ui;
   if(el.id==='q'){u.q=el.value;render();return}
+  if(el.id==='arch-q'){u.aq=el.value;render();return}
   if(M&&$('#modal').contains(el)){
     if(el.dataset.m) M[el.dataset.m]=el.value;
     if(el.dataset.mLink) M.toolLinks[el.dataset.mLink]=el.value.trim();
