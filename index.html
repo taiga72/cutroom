@@ -150,13 +150,18 @@ button.stat:hover{border-color:var(--line-strong)}
 
 /* ---------- toolbar ---------- */
 .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;margin-block:-8px}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:2px}
-.seg button{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:5px 10px;border-radius:7px;color:var(--muted);font-weight:600;font-size:13px}
-.seg button.on{background:var(--surface-3);color:var(--text)}
 .search{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:0 10px;flex:1;min-width:160px;max-width:340px;color:var(--faint)}
 .search input{border:0;background:none;outline:none;padding:7px 0;width:100%;color:var(--text)}
 .sel{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:6px 8px;font-size:13px;font-weight:500;max-width:100%}
 .toolbar .spacer{flex:1}
+.head-row{display:flex;align-items:flex-start;gap:14px 20px}
+.head-row #head{flex:1;min-width:0}
+.top-search{flex:0 1 300px;min-width:200px;padding-block:1px}
+.view-sel{display:none}
+.nav-views{display:flex;flex-direction:column;gap:1px;margin:1px 0 4px 18px;padding-left:10px;border-left:1px solid var(--line)}
+.nav-views .nav-item{padding:5px 10px;font-weight:500;color:var(--muted);font-size:13px}
+.nav-views .nav-item.on{color:var(--text);background:var(--surface-2);font-weight:600}
+.nav-views .nav-item svg{width:14px;height:14px}
 
 /* ---------- status pills ---------- */
 .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap;background:color-mix(in srgb,var(--c) 14%,transparent);color:color-mix(in srgb,var(--c) 80%,var(--text))}
@@ -364,6 +369,10 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .nav{flex-direction:row;gap:4px}
   .nav-label{display:none}
   .nav-sub{display:none}
+  .nav-views{display:none}
+  .view-sel{display:inline-block}
+  .head-row{flex-direction:column-reverse;gap:12px}
+  .top-search{flex:none;width:100%;max-width:none}
   .nav-row .edit{display:none}
   .nav-item{white-space:nowrap;width:auto;padding:6px 10px}
   .nav-item .count{display:none}
@@ -440,16 +449,13 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   <aside class="side" id="side"></aside>
   <main class="main" id="main">
     <div id="banner"></div>
-    <div id="head"></div>
+    <div class="head-row"><div id="head"></div><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search tasks  ( / )" autocomplete="off"></label></div>
     <div id="stats"></div>
     <div id="jobcards"></div>
     <div class="toolbar" id="toolbar" hidden>
-      <div class="seg" role="tablist" aria-label="View">
-        <button type="button" data-act="view" data-view="list" id="v-list"><svg class="i" viewBox="0 0 16 16"><path d="M5.5 4h8M5.5 8h8M5.5 12h8M2.5 4h.01M2.5 8h.01M2.5 12h.01"/></svg>List</button>
-        <button type="button" data-act="view" data-view="board" id="v-board"><svg class="i" viewBox="0 0 16 16"><rect x="2" y="2.5" width="3.4" height="11" rx="1"/><rect x="6.3" y="2.5" width="3.4" height="7" rx="1"/><rect x="10.6" y="2.5" width="3.4" height="9" rx="1"/></svg>Board</button>
-        <button type="button" data-act="view" data-view="calendar" id="v-calendar"><svg class="i" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg>Calendar</button>
-      </div>
-      <label class="search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search tasks  ( / )" autocomplete="off"></label>
+      <select class="sel view-sel" id="f-view" aria-label="View">
+        <option value="list">List</option><option value="board">Board</option><option value="calendar">Calendar</option>
+      </select>
       <select class="sel" id="f-prio" aria-label="Priority filter">
         <option value="all">Any priority</option><option value="urgent">Urgent</option><option value="high">High</option><option value="normal">Normal</option><option value="low">Low</option>
       </select>
@@ -516,6 +522,8 @@ const I={
   trash:'<svg class="i" viewBox="0 0 16 16"><path d="M2.5 4.5h11M6 4.5V3h4v1.5M4 4.5l.7 9h6.6l.7-9"/></svg>',
   image:'<svg class="i" viewBox="0 0 16 16"><rect x="2" y="2.5" width="12" height="11" rx="1.5"/><circle cx="6" cy="6.5" r="1.3"/><path d="m2.5 12 3.5-3.5 2.5 2.5 2-2 3 3"/></svg>',
   gear:'<svg class="i" viewBox="0 0 16 16"><path d="M6.9 1.8h2.2l.35 1.75 1.2.5 1.5-1 1.55 1.55-1 1.5.5 1.2 1.75.35v2.2l-1.75.35-.5 1.2 1 1.5-1.55 1.55-1.5-1-1.2.5-.35 1.75H6.9l-.35-1.75-1.2-.5-1.5 1-1.55-1.55 1-1.5-.5-1.2-1.75-.35V6.9l1.75-.35.5-1.2-1-1.5 1.55-1.55 1.5 1 1.2-.5z"/><circle cx="8" cy="8" r="2"/></svg>',
+  list:'<svg class="i" viewBox="0 0 16 16"><path d="M5.5 4h8M5.5 8h8M5.5 12h8M2.5 4h.01M2.5 8h.01M2.5 12h.01"/></svg>',
+  board:'<svg class="i" viewBox="0 0 16 16"><rect x="2" y="2.5" width="3.4" height="11" rx="1"/><rect x="6.3" y="2.5" width="3.4" height="7" rx="1"/><rect x="10.6" y="2.5" width="3.4" height="9" rx="1"/></svg>',
   pencil:'<svg class="i" viewBox="0 0 16 16"><path d="M10.8 2.7a1.5 1.5 0 0 1 2.1 0l.4.4a1.5 1.5 0 0 1 0 2.1L5.6 12.9l-3.1.6.6-3.1z"/><path d="M9.5 4l2.5 2.5"/></svg>',
   grid:'<svg class="i" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><rect x="9" y="9" width="4.5" height="4.5" rx="1"/></svg>',
   building:'<svg class="i" viewBox="0 0 16 16"><path d="M3 14V3.2c0-.4.3-.7.7-.7h5.6c.4 0 .7.3.7.7V14M9 6.5h3.3c.4 0 .7.3.7.7V14M1.5 14h13M5 5h2M5 7.5h2M5 10h2M11 9h.01M11 11.5h.01"/></svg>',
@@ -946,18 +954,21 @@ function render(){
   withFocus(()=>{renderSide();renderMain()});
 }
 
+const VIEWS=[{id:'list',label:'List',icon:'list'},{id:'board',label:'Board',icon:'board'},{id:'calendar',label:'Calendar',icon:'cal'}];
+const viewsNav=()=>`<div class="nav-views" role="group" aria-label="View">${VIEWS.map(v=>`<button class="nav-item ${S.ui.view===v.id?'on':''}" data-act="view" data-view="${v.id}" aria-pressed="${S.ui.view===v.id}">${I[v.icon]}<span class="name">${v.label}</span></button>`).join('')}</div>`;
 function renderSide(){
   const u=S.ui,jobsOpen=u.jobsOpen!==false;
   const openCount=jid=>live().filter(t=>t.jobId===jid&&t.status!=='done').length;
   const allOpen=live().filter(t=>S.jobs[t.jobId]&&t.status!=='done').length;
   const app=appSettings();const appLogo=imgSrc(app.logo);
   let html=`<div class="brand">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></div>
-  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button>
+  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button>${u.tab==='overview'&&S.ready&&jobsSorted().length?viewsNav():''}<button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button>
   <button class="nav-item jobs-toggle ${jobsOpen?'open':''}" data-act="toggle-jobs" aria-expanded="${jobsOpen}" aria-controls="nav-jobs">${I.briefcase}<span class="name">Jobs</span><span class="count">${S.ready?jobsSorted().length:''}</span>${I.chev}</button></nav>
   <nav class="nav jobs" id="nav-jobs" aria-label="Jobs" ${jobsOpen?'':'hidden'}>`;
   for(const j of jobsSorted()){
     const on=u.tab===j.id;
     html+=`<div class="nav-row"><button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}">${jobMark(j,18)}<span class="name">${esc(j.name)}</span><span class="count">${openCount(j.id)}</span></button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.pencil}</button></div>`;
+    if(on) html+=viewsNav();
   }
   html+=`<button class="nav-item nav-new" data-act="new-job">${I.plus}<span class="name">New job</span></button></nav>
   <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='db'||B.mode==='cloud'?'<span class="sync-dot"></span>Saved to your account':B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
@@ -979,7 +990,7 @@ function renderMain(){
   const scope=tasksOfScope();
   if(!job){
     $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>Overview</h1><div class="sub">${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients · everything due across your work</div></div>
-      <div class="tools"><button class="btn" data-act="new-job">${I.plus}New job</button></div></div>`;
+      </div>`;
   }else{
     const cl=clientsOf(job.id);
     const tools=TOOL_ROLES.map(r=>{
@@ -1002,7 +1013,7 @@ function renderMain(){
   $('#jobcards').innerHTML=!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')}</div>`:'';
 
   const tb=$('#toolbar');tb.hidden=!Object.keys(S.jobs).length;
-  ['list','board','calendar'].forEach(v=>{const b=$('#v-'+v);b.classList.toggle('on',u.view===v);b.setAttribute('aria-selected',u.view===v)});
+  $('#top-search').hidden=tb.hidden;$('#f-view').value=u.view;
   if(document.activeElement!==$('#q')) $('#q').value=u.q;
   $('#f-prio').value=u.prio;$('#f-due').value=u.due;$('#f-sort').value=u.sort;
 
@@ -1129,7 +1140,7 @@ function renderArchive(){
   const u=S.ui,q=(u.aq||'').trim().toLowerCase();
   const all=archived();
   $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${I.archive.replace('class="i"','class="i" style="width:28px;height:28px"')}Archived</h1><div class="sub">${all.length} task${all.length===1?'':'s'} · hidden from Overview, job tabs and counts. Restore one to bring it back.</div></div></div>`;
-  $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;
+  $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
   if(!all.length){$('#view').innerHTML=`<div class="empty"><h3>Nothing archived yet</h3><p>When a task is Done, click <b>Archive</b> on it to move it here and keep your lists clean.</p></div>`;return}
   const list=all.filter(t=>(u.ajob||'all')==='all'||t.jobId===u.ajob).filter(t=>!q||[t.name,t.notes,S.clients[t.clientId]?.name,S.jobs[t.jobId]?.name].some(x=>String(x||'').toLowerCase().includes(q)))
     .sort((a,b)=>(b.archivedAt||'').localeCompare(a.archivedAt||'')||(b.doneAt||'').localeCompare(a.doneAt||''));
@@ -1568,6 +1579,7 @@ document.addEventListener('change',e=>{
   if(el.id==='f-due'){u.due=el.value;render();return}
   if(el.id==='arch-job'){u.ajob=el.value;saveUi();render();return}
   if(el.id==='f-sort'){u.sort=el.value;saveUi();render();return}
+  if(el.id==='f-view'){u.view=el.value;saveUi();render();return}
   if(el.id==='logo-in'){const f=el.files[0];el.value='';if(!f)return;const app=logoTarget?.kind==='app';openCrop(f,blob=>app?setAppLogo(blob):setModalLogo(blob));return}
   const act=el.dataset.act;
   if(act==='row-status'){setStatus(el.dataset.id,el.value);if(u.openTask===el.dataset.id)renderDrawer();return}
