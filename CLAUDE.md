@@ -50,7 +50,7 @@ UI preferences (tab, view, collapsed groups, sort) are kept in localStorage (`cu
 
 ## Google Calendar (hosted only)
 
-- Each open, non-archived task with a `due` date becomes one all-day event in a "Cutroom" calendar created by the app (scope `calendar.app.created`). The title is `Job · Client · Task`. The event carries `extendedProperties.private.cutroomId`.
+- Each open, non-archived task with a `due` date becomes one all-day event in a "Cutroom" calendar created by the app (scope `calendar.app.created`). The title is `Job · Client · Task`, and the event color follows the job's color (`colorIdFor()` maps the job swatches to distinct Google event colors, other hex values to the nearest one). The event carries `extendedProperties.private.cutroomId`.
 - `api/_gcal.js` → `syncUser()` reconciles the calendar with the tasks: it creates, updates and deletes events, and recreates the calendar if the user deleted it. The page calls `POST /api/calendar?action=sync` 4s after any job, client or task write (`calSoon`). `/api/cron` runs it daily for everyone.
 - The refresh tokens live in `gcal_links`, which has RLS on and no policies, so only the service role can read it.
 - Other routes: `api/calendar.js` (`status | connect | sync | disconnect`, which needs the Supabase bearer token), `api/calendar-callback.js` (Google redirect, with signed `state`) and `api/config.js`.
@@ -67,6 +67,8 @@ UI preferences (tab, view, collapsed groups, sort) are kept in localStorage (`cu
 - **Events:** delegated `click / change / input / submit` handlers switch on `data-act`. Give re-rendered inputs a `data-fk` so `withFocus()` keeps focus while typing.
 
 ## Conventions
+
+- Git: the user wants every change shipped without asking. Commit to the working branch, push, open a pull request into `main` and merge it yourself (GitHub MCP tools), so Vercel deploys it. Keep the artifact in step as described above.
 
 - Keep the app a single HTML file, and keep the artifact viewer's frame limits in mind. `alert()`, `confirm()` and `prompt()` don't work, so build confirmations in the page (click twice to delete). Use `el.hidden`, not `style.display`.
 - The layout must work at phone width (about 400px, breakpoint at 820px).
