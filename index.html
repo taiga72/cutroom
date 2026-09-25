@@ -68,6 +68,14 @@ svg.i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .nav-item .name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nav-item .count{font:500 11px var(--mono);color:var(--faint)}
 .dot{width:9px;height:9px;border-radius:3px;flex:none}
+.nav-row{position:relative}
+.nav-row .edit{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:26px;height:26px;opacity:0}
+.nav-row:hover .edit,.nav-row .edit:focus-visible{opacity:1}
+.nav-row:hover .nav-item .count{visibility:hidden}
+.job-wrap{position:relative;display:flex;min-width:0}
+.job-wrap .job-card{flex:1}
+.job-wrap .edit{position:absolute;top:10px;right:10px}
+@media (hover:none){.nav-row .edit{opacity:1}.nav-row .nav-item .count{visibility:hidden}}
 .nav-sub{display:flex;flex-direction:column;gap:1px;margin:1px 0 4px 18px;padding-left:10px;border-left:1px solid var(--line)}
 .nav-sub .nav-item{padding:5px 10px;font-weight:400;color:var(--muted);font-size:13px}
 .nav-sub .nav-item.on{color:var(--text);font-weight:600}
@@ -123,6 +131,7 @@ button.stat:hover{border-color:var(--line-strong)}
 
 /* ---------- job cards ---------- */
 .jobs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.job-card h3{padding-right:30px}
 .job-card{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:10px;min-width:0}
 .job-card:hover{border-color:var(--line-strong);box-shadow:var(--shadow)}
 .job-card h3{margin:0;font:700 16px/1.2 var(--display);display:flex;align-items:center;gap:8px}
@@ -331,6 +340,7 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .nav{flex-direction:row;gap:4px}
   .nav-label{display:none}
   .nav-sub{display:none}
+  .nav-row .edit{display:none}
   .nav-item{white-space:nowrap;width:auto;padding:6px 10px}
   .nav-item .count{display:none}
   .side-foot{display:none}
@@ -665,7 +675,7 @@ function renderSide(){
   <nav class="nav jobs" aria-label="Jobs"><div class="nav-label">Jobs<button data-act="new-job" title="Add a job" aria-label="Add a job">${I.plus}</button></div>`;
   for(const j of jobsSorted()){
     const on=u.tab===j.id;
-    html+=`<button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}">${jobMark(j,18)}<span class="name">${esc(j.name)}</span><span class="count">${openCount(j.id)}</span></button>`;
+    html+=`<div class="nav-row"><button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}">${jobMark(j,18)}<span class="name">${esc(j.name)}</span><span class="count">${openCount(j.id)}</span></button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.gear}</button></div>`;
     if(j.type==='agency'){
       const cl=clientsOf(j.id);
       if(cl.length) html+=`<div class="nav-sub">${cl.map(c=>`<button class="nav-item ${on&&u.client===c.id?'on':''}" data-act="nav" data-tab="${j.id}" data-client="${c.id}">${clientMark(c,16)}<span class="name">${esc(c.name)}</span></button>`).join('')}</div>`;
@@ -697,8 +707,8 @@ function renderMain(){
       return url?`<a class="tool" href="${esc(url)}" target="_blank" rel="noopener"><small>${r.label}</small><span>${esc(name)}${I.ext}</span></a>`:`<div class="tool"><small>${r.label}</small><span>${esc(name)}</span></div>`;
     }).join('');
     $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${jobMark(job,34)}${esc(job.name)}</h1>
-      <div class="sub"><span class="badge">${job.type==='agency'?I.briefcase+'Agency':I.user+'Direct client'}</span>${job.type==='agency'?`<span>${cl.length} client${cl.length===1?'':'s'}</span>`:''}<button class="btn sm ghost" data-act="edit-job" data-id="${job.id}">${I.gear}Edit job & tools</button></div></div>
-      <div class="tools">${tools}</div></div>
+      <div class="sub"><span class="badge">${job.type==='agency'?I.briefcase+'Agency':I.user+'Direct client'}</span>${job.type==='agency'?`<span>${cl.length} client${cl.length===1?'':'s'}</span>`:''}</div></div>
+      <div class="tools">${tools}<button class="btn" data-act="edit-job" data-id="${job.id}" style="align-self:stretch">${I.gear}Edit job</button></div></div>
       ${job.type==='agency'?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}`;
   }
 
@@ -731,13 +741,13 @@ function jobCard(j){
   const bar=STATUSES.map(s=>{const n=ts.filter(t=>t.status===s.id).length;return n?`<i style="width:${n/total*100}%;background:var(${STATUS_VAR[s.id]})" title="${s.label}: ${n}"></i>`:''}).join('');
   const next=ts.filter(t=>t.status!=='done'&&t.due).sort((a,b)=>a.due.localeCompare(b.due))[0];
   const cl=clientsOf(j.id).length;
-  return `<button class="job-card" data-act="nav" data-tab="${j.id}">
+  return `<div class="job-wrap"><button class="job-card" data-act="nav" data-tab="${j.id}">
     <h3>${jobMark(j,24)}${esc(j.name)}</h3>
     <div class="meta">${j.type==='agency'?`Agency · ${cl} client${cl===1?'':'s'}`:'Direct client'} · ${esc(j.tools?.comms||'')} · ${esc(j.tools?.upload||'')}</div>
     <div class="stack">${bar}</div>
     <div class="meta">${st.open} open${st.overdue?` · <span style="color:var(--danger);font-weight:600">${st.overdue} overdue</span>`:''}${st.revisions?` · ${st.revisions} in revisions`:''}</div>
     <div class="next">${next?`Next due: <b>${esc(next.name)}</b> · ${fmtDate(next.due)}`:'Nothing due'}</div>
-  </button>`;
+  </button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.gear}</button></div>`;
 }
 
 function metaLine(t,job,showJob){
