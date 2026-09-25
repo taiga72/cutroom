@@ -404,6 +404,10 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .auth-form{display:flex;flex-direction:column;gap:8px}
 .auth-form label{font-size:12.5px;font-weight:600;color:var(--muted)}
 .auth-form input{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px 12px;font-size:15px;width:100%}
+.setup-list{margin:-4px 0 0;padding-left:20px;font-size:13px;line-height:1.7}
+.auth-card code,.hint code{font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.auth-foot{margin:4px 0 0;font-size:12px;text-align:center}
+.auth-foot a{color:var(--muted)}
 .auth-err{margin:0;color:var(--danger);font-size:13px}
 .acct-line{margin:0;font-size:13.5px;color:var(--text);line-height:1.5}
 .acct-warn{color:var(--danger);font-weight:600}
@@ -666,12 +670,13 @@ async function boot(){
         scheduleRender(true);
       },err=>{console.error(err);toast('Lost the connection to your saved tasks. Reload the page to reconnect.')});
     });
-  }else if(!(await cloudBoot())){
-    B.mode='local';
-    const data=lsGet(LS_DATA)||buildSample(today());
-    COLS.forEach(c=>{S[c]={};for(const id in (data[c]||{}))S[c][id]={...data[c][id],id}});
-    S.ready=true; render();
-  }
+  }else if(!(await cloudBoot())) localBoot();
+}
+function localBoot(){
+  B.mode='local';
+  const data=lsGet(LS_DATA)||buildSample(today());
+  COLS.forEach(c=>{S[c]={};for(const id in (data[c]||{}))S[c][id]={...data[c][id],id}});
+  S.ready=true; render();
 }
 
 /* ================= Supabase (hosted on Vercel) ================= */
@@ -681,7 +686,13 @@ const loadScript=src=>new Promise((res,rej)=>{const x=document.createElement('sc
 async function cloudBoot(){
   if(!/^https?:$/.test(location.protocol)) return false;
   let cfg;
-  try{const r=await fetch('/api/config',{cache:'no-store'});if(!r.ok)return false;cfg=await r.json()}catch(e){return false}
+  try{
+    const r=await fetch('/api/config',{cache:'no-store'});
+    cfg=await r.json().catch(()=>null);
+    /* our own route answered, but the Vercel keys aren't set: say so instead of quietly saving locally */
+    if(r.status===503&&cfg&&cfg.error){showSetup(cfg);return true}
+    if(!r.ok) return false;
+  }catch(e){return false}
   if(!cfg||!cfg.supabaseUrl||!cfg.supabaseAnonKey) return false;
   const hashErr=new URLSearchParams(location.hash.slice(1)).get('error_description');
   try{await loadScript(SB_JS)}catch(e){showAuth({error:"Couldn't load the sign-in service. Check your connection and reload the page."});return true}
@@ -729,6 +740,19 @@ async function cloudRefresh(){
   if(!S.ready||document.hidden||inflight||Object.keys(pending).length) return;
   try{await cloudLoad();if(!inflight)scheduleRender(true)}catch(e){console.error(e)}
 }
+function showSetup(cfg){
+  applyTheme('system');document.title='Finish setup · Cutroom';
+  $('.app').hidden=true;const a=$('#auth');a.hidden=false;
+  const miss=(cfg.missing||[]).map(k=>`<li><code>${esc(k)}</code></li>`).join('');
+  a.innerHTML=`<div class="auth-card">
+    <div class="brand"><div class="brand-mark"><span></span></div><b>Cutroom</b></div>
+    <h1>Almost there</h1>
+    ${cfg.error==='bad_url'?`<p class="auth-lead"><code>SUPABASE_URL</code> in Vercel doesn't look right. It should be your Supabase Project URL, like <code>https://abcd1234.supabase.co</code>, with nothing after it.</p>`
+    :`<p class="auth-lead">This site isn't connected to Supabase yet, so there's no sign-in. These are missing in Vercel:</p><ul class="setup-list">${miss}</ul>`}
+    <p class="auth-lead">In Vercel, open <b>Settings → Environment Variables</b> to add them. Then go to <b>Deployments</b>, open the <b>⋯</b> menu on the latest one and choose <b>Redeploy</b>. New keys only take effect after a redeploy. Step 5 of SETUP.md has the details.</p>
+    <button type="button" class="btn" data-act="setup-local">Use it in this browser for now</button>
+  </div>`;
+}
 let authState={};
 function showAuth(st){
   authState={...authState,...st};
@@ -746,6 +770,7 @@ function showAuth(st){
         <input type="email" id="auth-email" data-fk="auth-email" autocomplete="email" required placeholder="you@example.com" value="${esc(s.email||'')}">
         <button type="submit" class="btn primary" ${s.busy?'disabled':''}>${s.busy==='email'?'Sending…':'Email me a sign-in link'}</button></form>`}
     ${s.error?`<p class="auth-err" role="alert">${esc(s.error)}</p>`:''}
+    <p class="auth-foot"><a href="/privacy.html">Privacy policy</a></p>
   </div>`});
 }
 async function authEmail(email){
@@ -811,6 +836,7 @@ function calAgo(iso){
 function accountSettingsHtml(){
   if(B.mode!=='cloud') return '';
   let cal='';
+  if(!B.cfg.calendar) cal=`<div class="field"><span class="lbl">Google Calendar</span><p class="hint">Not set up yet. Add ${(B.cfg.missing||[]).filter(k=>/GOOGLE|SERVICE/.test(k)).map(k=>`<code>${esc(k)}</code>`).join(', ')||'the Google keys'} in Vercel and redeploy (SETUP.md, steps 3 and 5).</p></div>`;
   if(B.cfg.calendar){
     const c=CAL,busy=c.busy;
     cal=`<div class="field"><span class="lbl">Google Calendar</span>
@@ -1418,6 +1444,7 @@ document.addEventListener('click',e=>{
     case 'cal-sync': calSync(true);break;
     case 'cal-disconnect': if(CAL.disArmed)calDisconnect();else{CAL.disArmed=true;renderSettings()}break;
     case 'auth-google': authGoogle();break;
+    case 'setup-local': $('#auth').hidden=true;$('#auth').innerHTML='';$('.app').hidden=false;localBoot();break;
     case 'auth-reset': showAuth({sent:null,error:''});$('#auth-email')?.focus();break;
     case 's-theme': SM.theme=el.dataset.themeOpt;renderSettings();applyTheme(SM.theme);break;
     case 's-logo-pick': pickLogo({kind:'app'});break;

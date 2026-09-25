@@ -26,7 +26,10 @@ The page opens now, but it saves only in your browser until the steps below are 
 
 1. Go to [console.cloud.google.com](https://console.cloud.google.com) and create a project called **Cutroom**.
 2. **APIs & Services → Library**: search for **Google Calendar API** and click **Enable**.
-3. **Google Auth Platform → Branding** (older screens: *OAuth consent screen*): app name **Cutroom**, your email as support and developer contact. User type: **External**.
+3. **Google Auth Platform → Branding** (older screens: *OAuth consent screen*): app name **Cutroom**, your email as support and developer contact. User type: **External**. Also fill in:
+   - Application home page: `https://YOUR-SITE`
+   - Application privacy policy link: `https://YOUR-SITE/privacy.html`
+   - Authorized domains: `YOUR-SITE`
 4. **Data Access → Add or remove scopes**: add `https://www.googleapis.com/auth/calendar.app.created` and save.
 5. **Audience**: click **Publish app** so it's "In production". If you skip this, Google disconnects the calendar every 7 days. You don't need to submit it for verification.
 6. **Clients → Create client** (older screens: *Credentials → Create credentials → OAuth client ID*). Type: **Web application**. Under **Authorized redirect URIs**, add both:
