@@ -4,6 +4,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Splice &amp; Co.</title>
 <link rel="icon" id="favicon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20x%3D%220%22%20y%3D%22106%22%20width%3D%22512%22%20height%3D%22406%22%20rx%3D%2230%22%20fill%3D%22%23547580%22%2F%3E%3Cg%20fill%3D%22%2326b99a%22%3E%3Crect%20x%3D%2235%22%20y%3D%22150%22%20width%3D%22124%22%20height%3D%2270%22%20rx%3D%227%22%2F%3E%3Crect%20x%3D%22194%22%20y%3D%22150%22%20width%3D%22283%22%20height%3D%2270%22%20rx%3D%227%22%2F%3E%3Crect%20x%3D%2235%22%20y%3D%22265%22%20width%3D%22327%22%20height%3D%2288%22%20rx%3D%227%22%2F%3E%3Crect%20x%3D%22397%22%20y%3D%22265%22%20width%3D%2280%22%20height%3D%2288%22%20rx%3D%227%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22%23f29c1f%22%3E%3Crect%20x%3D%2235%22%20y%3D%22397%22%20width%3D%2280%22%20height%3D%2270%22%20rx%3D%227%22%2F%3E%3Crect%20x%3D%22150%22%20y%3D%22397%22%20width%3D%22327%22%20height%3D%2270%22%20rx%3D%227%22%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%22M256%2096V478%22%20stroke%3D%22%23e64c3c%22%20stroke-width%3D%2218%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M212%200h88a9%209%200%200%201%209%209v51L256%20104%20203%2060V9a9%209%200%200%201%209-9z%22%20fill%3D%22%23e64c3c%22%2F%3E%3Crect%20x%3D%22247%22%20y%3D%2225%22%20width%3D%2218%22%20height%3D%2237%22%20rx%3D%229%22%20fill%3D%22%23c03a2b%22%2F%3E%3C%2Fsvg%3E">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Splice &amp; Co.">
+<meta name="application-name" content="Splice &amp; Co.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f3f4f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e1015" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
@@ -353,7 +361,7 @@ select.pill::before{display:none}
 
 /* ---------- board ---------- */
 .board-wrap{overflow-x:auto;padding-bottom:6px}
-.board{display:grid;grid-template-columns:repeat(5,minmax(200px,1fr));gap:10px;min-width:min-content}
+.board{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(210px,1fr);gap:10px;min-width:min-content}
 .col{background:var(--surface-2);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:8px;min-height:180px;border:1px solid transparent}
 .col.drag{border-color:var(--accent);background:var(--accent-soft)}
 .col-head{display:flex;align-items:center;justify-content:space-between;padding:2px 4px}
