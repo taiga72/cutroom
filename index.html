@@ -2,7 +2,8 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cutroom</title>
+<title>Splice &amp; Co.</title>
+<link rel="icon" id="favicon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20x%3D%220%22%20y%3D%22106%22%20width%3D%22512%22%20height%3D%22406%22%20rx%3D%2230%22%20fill%3D%22%23547580%22%2F%3E%3Cg%20fill%3D%22%2326b99a%22%3E%3Crect%20x%3D%2235%22%20y%3D%22150%22%20width%3D%22124%22%20height%3D%2270%22%20rx%3D%227%22%2F%3E%3Crect%20x%3D%22194%22%20y%3D%22150%22%20width%3D%22283%22%20height%3D%2270%22%20rx%3D%227%22%2F%3E%3Crect%20x%3D%2235%22%20y%3D%22265%22%20width%3D%22327%22%20height%3D%2288%22%20rx%3D%227%22%2F%3E%3Crect%20x%3D%22397%22%20y%3D%22265%22%20width%3D%2280%22%20height%3D%2288%22%20rx%3D%227%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22%23f29c1f%22%3E%3Crect%20x%3D%2235%22%20y%3D%22397%22%20width%3D%2280%22%20height%3D%2270%22%20rx%3D%227%22%2F%3E%3Crect%20x%3D%22150%22%20y%3D%22397%22%20width%3D%22327%22%20height%3D%2270%22%20rx%3D%227%22%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%22M256%2096V478%22%20stroke%3D%22%23e64c3c%22%20stroke-width%3D%2218%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M212%200h88a9%209%200%200%201%209%209v51L256%20104%20203%2060V9a9%209%200%200%201%209-9z%22%20fill%3D%22%23e64c3c%22%2F%3E%3Crect%20x%3D%22247%22%20y%3D%2225%22%20width%3D%2218%22%20height%3D%2237%22%20rx%3D%229%22%20fill%3D%22%23c03a2b%22%2F%3E%3C%2Fsvg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
@@ -62,6 +63,7 @@ svg.i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .brand-mark{width:26px;height:26px;border-radius:7px;background:var(--text);display:grid;place-items:center}
 .brand-mark span{display:block;width:12px;height:12px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 3px color-mix(in srgb,var(--danger) 30%,transparent)}
 .brand-logo{width:26px;height:26px;border-radius:7px;object-fit:cover;flex:none;border:1px solid var(--line);background:var(--surface)}
+.brand-logo.def{border:0;background:none;border-radius:0;object-fit:contain}
 .brand b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;font:700 19px/1 var(--display);letter-spacing:-.01em}
 .nav{display:flex;flex-direction:column;gap:2px}
 .nav-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:8px 10px 6px;display:flex;align-items:center;justify-content:space-between}
@@ -484,6 +486,10 @@ const FORMATS=['16:9','9:16','1:1','4:5'];
 const COLORS=['#2f73e8','#0b7f93','#2b9348','#e07b00','#d9362b','#c2417a','#8b5cf6','#6b7280'];
 const COLS=['jobs','clients','tasks','settings'];
 const LS_UI='cutroom.ui.v1', LS_DATA='cutroom.data.v1';
+/* default app name and logo (Settings can override both) */
+const APP_NAME='Splice & Co.';
+const APP_LOGO="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20x%3D%220%22%20y%3D%22106%22%20width%3D%22512%22%20height%3D%22406%22%20rx%3D%2230%22%20fill%3D%22%23547580%22%2F%3E%3Cg%20fill%3D%22%2326b99a%22%3E%3Crect%20x%3D%2235%22%20y%3D%22150%22%20width%3D%22124%22%20height%3D%2270%22%20rx%3D%227%22%2F%3E%3Crect%20x%3D%22194%22%20y%3D%22150%22%20width%3D%22283%22%20height%3D%2270%22%20rx%3D%227%22%2F%3E%3Crect%20x%3D%2235%22%20y%3D%22265%22%20width%3D%22327%22%20height%3D%2288%22%20rx%3D%227%22%2F%3E%3Crect%20x%3D%22397%22%20y%3D%22265%22%20width%3D%2280%22%20height%3D%2288%22%20rx%3D%227%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22%23f29c1f%22%3E%3Crect%20x%3D%2235%22%20y%3D%22397%22%20width%3D%2280%22%20height%3D%2270%22%20rx%3D%227%22%2F%3E%3Crect%20x%3D%22150%22%20y%3D%22397%22%20width%3D%22327%22%20height%3D%2270%22%20rx%3D%227%22%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%22M256%2096V478%22%20stroke%3D%22%23e64c3c%22%20stroke-width%3D%2218%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M212%200h88a9%209%200%200%201%209%209v51L256%20104%20203%2060V9a9%209%200%200%201%209-9z%22%20fill%3D%22%23e64c3c%22%2F%3E%3Crect%20x%3D%22247%22%20y%3D%2225%22%20width%3D%2218%22%20height%3D%2237%22%20rx%3D%229%22%20fill%3D%22%23c03a2b%22%2F%3E%3C%2Fsvg%3E";
+const defaultMark=()=>`<img class="brand-logo def" src="${APP_LOGO}" alt="">`;
 
 const I={
   plus:'<svg class="i" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>',
@@ -726,7 +732,7 @@ async function cloudStart(session){
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)cloudRefresh()});
   const back=new URLSearchParams(location.search).get('calendar');
   if(back){
-    toast(back==='connected'?'Google Calendar connected. Your tasks are in the “Cutroom” calendar.':back==='cancelled'?"Google Calendar wasn't connected.":"Couldn't connect Google Calendar. Try again from Settings.");
+    toast(back==='connected'?'Google Calendar connected. Your tasks are in the “Splice & Co.” calendar.':back==='cancelled'?"Google Calendar wasn't connected.":"Couldn't connect Google Calendar. Try again from Settings.");
     history.replaceState(null,'',location.pathname);
   }
   if(B.cfg.calendar) calStatus();
@@ -748,11 +754,11 @@ async function cloudRefresh(){
   try{await cloudLoad();if(!inflight)scheduleRender(true)}catch(e){console.error(e)}
 }
 function showSetup(cfg){
-  applyTheme('system');document.title='Finish setup · Cutroom';
+  applyTheme('system');document.title='Finish setup · '+APP_NAME;
   $('.app').hidden=true;const a=$('#auth');a.hidden=false;
   const miss=(cfg.missing||[]).map(k=>`<li><code>${esc(k)}</code></li>`).join('');
   a.innerHTML=`<div class="auth-card">
-    <div class="brand"><div class="brand-mark"><span></span></div><b>Cutroom</b></div>
+    <div class="brand">${defaultMark()}<b>${esc(APP_NAME)}</b></div>
     <h1>Almost there</h1>
     ${cfg.error==='bad_url'?`<p class="auth-lead"><code>SUPABASE_URL</code> in Vercel doesn't look right. It should be your Supabase Project URL, like <code>https://abcd1234.supabase.co</code>, with nothing after it.</p>`
     :`<p class="auth-lead">This site isn't connected to Supabase yet, so there's no sign-in. These are missing in Vercel:</p><ul class="setup-list">${miss}</ul>`}
@@ -763,12 +769,12 @@ function showSetup(cfg){
 let authState={};
 function showAuth(st){
   authState={...authState,...st};
-  applyTheme('system');document.title='Sign in · Cutroom';
+  applyTheme('system');document.title='Sign in · '+APP_NAME;
   $('.app').hidden=true;const a=$('#auth');a.hidden=false;
   const s=authState;
   withFocus(()=>{a.innerHTML=`<div class="auth-card">
-    <div class="brand"><div class="brand-mark"><span></span></div><b>Cutroom</b></div>
-    ${s.sent?`<h1>Check your email</h1><p class="auth-lead">We sent a sign-in link to <b>${esc(s.sent)}</b>. Open it on this device to get into Cutroom. The link works once and expires after an hour.</p>
+    <div class="brand">${defaultMark()}<b>${esc(APP_NAME)}</b></div>
+    ${s.sent?`<h1>Check your email</h1><p class="auth-lead">We sent a sign-in link to <b>${esc(s.sent)}</b>. Open it on this device to get into ${esc(APP_NAME)}. The link works once and expires after an hour.</p>
       <button type="button" class="btn" data-act="auth-reset">Use a different email</button>`
     :`<h1>Sign in</h1><p class="auth-lead">New here? Signing in for the first time creates your account and an empty tracker.</p>
       <button type="button" class="btn auth-google" data-act="auth-google" ${s.busy?'disabled':''}><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92a8.78 8.78 0 0 0 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.33-1.58-5.04-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.96 10.72A5.4 5.4 0 0 1 3.68 9c0-.6.1-1.18.28-1.72V4.95H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.05l3-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A8.97 8.97 0 0 0 9 0 9 9 0 0 0 .96 4.95l3 2.33C4.67 5.16 6.66 3.58 9 3.58z"/></svg>Continue with Google</button>
@@ -832,7 +838,7 @@ async function calConnect(){
 }
 async function calDisconnect(){
   CAL.busy='disconnect';CAL.disArmed=false;renderSettings();
-  try{calSet(await calApi('disconnect'));toast('Google Calendar disconnected and the Cutroom calendar removed')}
+  try{calSet(await calApi('disconnect'));toast('Google Calendar disconnected and the Splice & Co. calendar removed')}
   catch(e){toast("Couldn't disconnect Google Calendar. Try again.")}
   CAL.busy=null;if(SM)renderSettings();
 }
@@ -847,12 +853,12 @@ function accountSettingsHtml(){
   if(B.cfg.calendar){
     const c=CAL,busy=c.busy;
     cal=`<div class="field"><span class="lbl">Google Calendar</span>
-    ${!c.loaded?'<p class="hint">Checking…</p>':!c.connected?`<p class="acct-line">Each open task with a due date shows up as an all-day event in a calendar called “Cutroom”. Done and archived tasks are left off.</p>
+    ${!c.loaded?'<p class="hint">Checking…</p>':!c.connected?`<p class="acct-line">Each open task with a due date shows up as an all-day event in a calendar called “Splice &amp; Co.”. Done and archived tasks are left off.</p>
       <div class="acct-btns"><button type="button" class="btn sm" data-act="cal-connect" ${busy?'disabled':''}>${I.cal}${busy==='connect'?'Opening Google…':'Connect Google Calendar'}</button></div>`
     :`<p class="acct-line">${c.error==='reconnect'?'<b class="acct-warn">Google access was removed. Reconnect to keep your calendar updated.</b>':`Connected${c.email?` to <b>${esc(c.email)}</b>`:''}. Updated ${esc(calAgo(c.lastSync))}.${c.error?' <b class="acct-warn">The last update failed.</b>':''}`}</p>
       <div class="acct-btns">${c.error==='reconnect'?`<button type="button" class="btn sm" data-act="cal-connect" ${busy?'disabled':''}>${busy==='connect'?'Opening Google…':'Reconnect'}</button>`:`<button type="button" class="btn sm" data-act="cal-sync" ${busy?'disabled':''}>${busy==='sync'?'Updating…':'Update now'}</button>`}
       <button type="button" class="btn sm ${c.disArmed?'danger armed':''}" data-act="cal-disconnect" ${busy?'disabled':''}>${busy==='disconnect'?'Disconnecting…':c.disArmed?'Click again to disconnect':'Disconnect'}</button></div>
-      <p class="hint">Changes reach Google Calendar a few seconds after you make them. Disconnecting deletes the “Cutroom” calendar from your Google account.</p>`}</div>`;
+      <p class="hint">Changes reach Google Calendar a few seconds after you make them. Disconnecting deletes the “Splice &amp; Co.” calendar from your Google account.</p>`}</div>`;
   }
   return `${cal}<div class="field"><span class="lbl">Account</span><p class="acct-line">Signed in as <b>${esc(B.email)}</b></p>
     <div class="acct-btns"><button type="button" class="btn sm" data-act="sign-out">Sign out</button></div></div>`;
@@ -923,7 +929,8 @@ function applyTheme(t){
 function render(){
   const a=appSettings();
   applyTheme(SM?SM.theme:a.theme);
-  document.title=(a.name||'').trim()||'Cutroom';
+  document.title=(a.name||'').trim()||APP_NAME;
+  const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
   withFocus(()=>{renderSide();renderMain()});
 }
 
@@ -932,7 +939,7 @@ function renderSide(){
   const openCount=jid=>live().filter(t=>t.jobId===jid&&t.status!=='done').length;
   const allOpen=live().filter(t=>S.jobs[t.jobId]&&t.status!=='done').length;
   const app=appSettings();const appLogo=imgSrc(app.logo);
-  let html=`<div class="brand">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:'<div class="brand-mark"><span></span></div>'}<b>${esc((app.name||'').trim()||'Cutroom')}</b></div>
+  let html=`<div class="brand">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></div>
   <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item" data-act="open-settings">${I.gear}<span class="name">Settings</span></button></nav>
   <nav class="nav jobs" aria-label="Jobs"><div class="nav-label">Jobs<button data-act="new-job" title="Add a job" aria-label="Add a job">${I.plus}</button></div>`;
   for(const j of jobsSorted()){
@@ -1278,11 +1285,11 @@ function renderSettings(){
     <div class="field"><span class="lbl">Appearance</span><div class="theme-pick">
       ${opt('system','Match device',['#f3f4f7','#0e1015'])}${opt('light','Light',['#f3f4f7','#ffffff'])}${opt('dark','Dark',['#0e1015','#161920'])}</div>
       <p class="hint">Changes show right away. Click Save to keep them.</p></div>
-    <div class="field"><label for="s-name">App name</label><input type="text" id="s-name" data-fk="s-name" value="${esc(SM.name)}" placeholder="Cutroom" maxlength="40"><p class="hint">Shown at the top of the sidebar and in the browser tab. Leave it empty to use “Cutroom”.</p></div>
+    <div class="field"><label for="s-name">App name</label><input type="text" id="s-name" data-fk="s-name" value="${esc(SM.name)}" placeholder="${esc(APP_NAME)}" maxlength="40"><p class="hint">Shown at the top of the sidebar and in the browser tab. Leave it empty to use “${esc(APP_NAME)}”.</p></div>
     <div class="field"><span class="lbl">App logo</span><div class="logo-field">
-      <button type="button" class="logo-box ${src?'has':''}" data-act="s-logo-pick" aria-label="${src?'Replace':'Upload'} app logo" style="${src?'':'background:var(--text);border-color:transparent'}">${src?`<img src="${esc(src)}" alt="">`:'<span style="width:22px;height:22px;border-radius:50%;background:var(--danger);display:block"></span>'}</button>
+      <button type="button" class="logo-box ${src?'has':''}" data-act="s-logo-pick" aria-label="${src?'Replace':'Upload'} app logo" style="${src?'':'background:var(--surface);border-style:solid;border-color:var(--line)'}">${src?`<img src="${esc(src)}" alt="">`:`<img src="${APP_LOGO}" alt="" style="object-fit:contain;padding:8px">`}</button>
       <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${canUpload()?`<button type="button" class="btn sm" data-act="s-logo-pick">${I.image}${src?'Replace':'Upload'}</button>`:''}${src?'<button type="button" class="btn sm" data-act="s-logo-remove">Remove</button>':''}${SM.busy?'<span class="hint">Uploading…</span>':''}</div>
-      <p class="hint">Replaces the record-dot mark next to the app name. A square image works best.</p></div></div></div>
+      <p class="hint">Replaces the ${esc(APP_NAME)} logo next to the app name and in the browser tab. A square image works best.</p></div></div></div>
     ${accountSettingsHtml()}
   </form>
   <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="s-cancel">Cancel</button><button type="submit" form="s-form" class="btn primary">Save</button></div></footer></div>`});

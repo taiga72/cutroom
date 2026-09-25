@@ -26,7 +26,7 @@ The page opens now, but it saves only in your browser until the steps below are 
 
 1. Go to [console.cloud.google.com](https://console.cloud.google.com) and create a project called **Cutroom**.
 2. **APIs & Services → Library**: search for **Google Calendar API** and click **Enable**.
-3. **Google Auth Platform → Branding** (older screens: *OAuth consent screen*): app name **Cutroom**, your email as support and developer contact. User type: **External**. Also fill in:
+3. **Google Auth Platform → Branding** (older screens: *OAuth consent screen*): app name **Splice & Co.**, your email as support and developer contact. User type: **External**. Also fill in:
    - Application home page: `https://YOUR-SITE`
    - Application privacy policy link: `https://YOUR-SITE/privacy.html`
    - Authorized domains: `YOUR-SITE`

@@ -1,6 +1,6 @@
-# Cutroom
+# Cutroom (shown to users as “Splice & Co.”)
 
-Cutroom is a task tracker for one video editor's work. Their jobs are either agencies (each with several clients) or direct clients. The app is one file, `index.html`, with no build step. Its only outside dependencies are Google Fonts and, on the hosted copy, supabase-js from jsDelivr. A few Vercel functions in `api/` sit next to it; they use plain `fetch` and no npm packages.
+Cutroom is the project name; the app itself is branded **Splice & Co.** (`APP_NAME` and the inline SVG `APP_LOGO` in `index.html`, also the tab icon; `APP_NAME` in `api/_gcal.js` names the Google calendar). Settings can override the name and logo per account. Storage keys and the repo keep the `cutroom` name. It is a task tracker for one video editor's work. Their jobs are either agencies (each with several clients) or direct clients. The app is one file, `index.html`, with no build step. Its only outside dependencies are Google Fonts and, on the hosted copy, supabase-js from jsDelivr. A few Vercel functions in `api/` sit next to it; they use plain `fetch` and no npm packages.
 
 ## Where it runs
 

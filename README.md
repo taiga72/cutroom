@@ -1,4 +1,4 @@
-# Cutroom
+# Cutroom (Splice & Co.)
 
 A task tracker for video editing work, built as one self-contained HTML file (`index.html`).
 
