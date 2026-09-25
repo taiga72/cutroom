@@ -901,7 +901,9 @@ const safeUrl=u=>{u=String(u||'').trim();if(!u)return '';if(!/^[a-z][a-z0-9+.-]*
 const OPEN_SHORTCUT='Splice Open';
 const IS_MAC=/Mac/.test(navigator.platform||navigator.userAgent)&&!(navigator.maxTouchPoints>1);
 const localPath=v=>{v=String(v||'').trim().replace(/^["']|["']$/g,'');if(/^file:\/\//i.test(v)){try{v=decodeURIComponent(v.replace(/^file:\/\/(localhost)?/i,''))}catch(e){return ''}}return /^(\/|~\/)/.test(v)?v:''};
-const pathOpenUrl=p=>`shortcuts://run-shortcut?name=${encodeURIComponent(OPEN_SHORTCUT)}&input=text&text=${encodeURIComponent(p)}`;
+// Full paths are sent as file:// URLs so the shortcut can use a plain "Open URLs" action (no scripts needed).
+const fileUrl=p=>p.startsWith('/')?'file://'+p.split('/').map(encodeURIComponent).join('/'):p;
+const pathOpenUrl=p=>`shortcuts://run-shortcut?name=${encodeURIComponent(OPEN_SHORTCUT)}&input=text&text=${encodeURIComponent(fileUrl(p))}`;
 const linkHref=v=>{const p=localPath(v);return p?(IS_MAC?pathOpenUrl(p):''):safeUrl(v)};
 const linkTarget=v=>localPath(v)?'':' target="_blank" rel="noopener"';
 const pathName=p=>p.replace(/\/+$/,'').split('/').pop()||p;
@@ -2162,14 +2164,14 @@ function finderSettingsHtml(){
   return `<details class="field finder-set"><summary class="lbl">Finder folders (Mac)</summary>
     <p class="hint" style="margin-top:6px">Paste a Finder path into a task's files field or a job's File storage, and clicking it opens that folder (or file) on your Mac. To copy a path in Finder, select the item and press <b>Option ⌥ + Command ⌘ + C</b>. Websites aren't allowed to open Finder by themselves, so it goes through a small shortcut you set up once:</p>
     <ol class="steps">
-      <li>Open the <b>Shortcuts</b> app. In its menu bar choose <b>Shortcuts → Settings → Advanced</b> and turn on <b>Allow Running Scripts</b>.</li>
-      <li>Click <b>+</b> to make a new shortcut and name it exactly <b>${esc(OPEN_SHORTCUT)}</b>.</li>
-      <li>Add the <b>Run Shell Script</b> action. Set <b>Input</b> to <b>Shortcut Input</b> and <b>Pass Input</b> to <b>as arguments</b>.</li>
-      <li>Replace the script with this line: <code class="copy-code">open "\${1/#\\~/$HOME}"</code> <button type="button" class="btn sm ghost" data-act="copy-path" data-path="open &quot;\${1/#\\~/$HOME}&quot;">${I.copy}Copy</button></li>
-      <li>If the shortcut shows “Receive … input”, set it to <b>Text</b>. Close the editor.</li>
+      <li>Open the <b>Shortcuts</b> app and click <b>+</b> to make a new shortcut.</li>
+      <li>Name it exactly <b>${esc(OPEN_SHORTCUT)}</b>: click “New Shortcut” at the top of the editor and type the name. (Or right-click it in All Shortcuts and choose Rename.)</li>
+      <li>In the action search on the right, find <b>Open URLs</b> and drag it in. Click its blue <b>URL</b> placeholder and choose <b>Shortcut Input</b>.</li>
+      <li>If it shows “Receive … input”, set it to <b>Text</b> (or Any). Close the editor.</li>
     </ol>
-    <p class="hint">The first time you click a path, the browser asks to open Shortcuts. Allow it (tick “Always allow” if offered).</p>
-    ${IS_MAC?`<div class="acct-btns"><a class="btn sm" href="${pathOpenUrl('~')}">${I.folder}Test: open my home folder</a></div>`:''}</details>`;
+    <p class="hint">The first time you click a path, the browser asks to open Shortcuts. Allow it (tick “Always allow” if offered). Use full paths (starting with /Users/…); Option ⌥ + Command ⌘ + C gives you one.</p>
+    <p class="hint">Nothing opens? Swap Open URLs for <b>Run Shell Script</b> with Input: Shortcut Input, Pass Input: as arguments, and the script <code class="copy-code">open "$1"</code>. That one needs <b>Allow Running Scripts</b>: in Shortcuts press <b>⌘ ,</b> (Shortcuts → Settings) and open the <b>Advanced</b> tab.</p>
+    ${IS_MAC?`<div class="acct-btns"><a class="btn sm" href="${pathOpenUrl('/Applications')}">${I.folder}Test: open Applications</a></div>`:''}</details>`;
 }
 function backupSettingsHtml(){
   const r=SM.restore;
