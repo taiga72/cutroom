@@ -154,17 +154,22 @@ button.stat:hover{border-color:var(--line-strong)}
 .search input{border:0;background:none;outline:none;padding:7px 0;width:100%;color:var(--text)}
 .sel{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:6px 8px;font-size:13px;font-weight:500;max-width:100%}
 .toolbar .spacer{flex:1}
-.brand-panel{border:1px solid var(--line);background:var(--surface);border-radius:12px;margin-top:14px;overflow:hidden}
-.bp-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px 8px 6px}
-.bp-toggle{display:flex;align-items:center;gap:8px;border:0;background:none;font-size:14px;padding:4px 6px;border-radius:7px;color:var(--text)}
-.bp-toggle > svg:first-child{color:var(--faint);transition:transform .15s}
-.bp-toggle.open > svg:first-child{transform:rotate(90deg)}
+.brand-panel{border:1px solid var(--line);background:var(--surface);border-radius:12px;overflow:hidden}
+.bp-head h2{margin:0;font:700 17px var(--display);display:flex;align-items:center;gap:8px}
+.pane-tabs{display:flex;gap:4px;margin-top:14px;border-bottom:1px solid var(--line)}
+.pane-tabs button{display:inline-flex;align-items:center;gap:7px;border:0;background:none;padding:9px 14px;border-bottom:2px solid transparent;color:var(--muted);font-weight:600;font-size:14px}
+.pane-tabs button.on{color:var(--text);border-bottom-color:var(--accent)}
+.pane-tabs button:hover{color:var(--text)}
+.pane-tabs + .client-tabs{margin-top:6px;border-bottom:0}
+.brand-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.brand-card{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.bc-top{display:flex;align-items:center;gap:9px;font-size:15px}
+.bc-sw{display:flex;gap:4px}
+.bc-sw i{width:22px;height:22px;border-radius:5px;border:1px solid var(--line)}
+.brand-card small{color:var(--faint);font-size:12px}
+.bc-acts{display:flex;gap:6px;margin-top:auto}
+.bp-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px}
 .brand-panel .bv{border-top:1px solid var(--line);padding:14px}
-.brand-chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px;font-size:13px;color:var(--muted)}
-.brand-chips > span{display:inline-flex;align-items:center;gap:6px;font-weight:600}
-.chip-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;font-size:12.5px;font-weight:600}
-.chip-btn.empty{color:var(--faint);border-style:dashed}
-.chip-btn:hover{border-color:var(--accent)}
 .bv{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px 18px}
 .bv.compact{grid-template-columns:1fr;gap:10px;padding-top:8px}
 .bv-sec h5{margin:0 0 5px;font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
@@ -492,7 +497,7 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .bm-color input[data-bm-cname]{grid-column:2/3}
   .im-row{grid-template-columns:auto minmax(0,1fr) auto}
   .im-row .date{display:none}
-  .head-row{flex-direction:column-reverse;gap:12px}
+  .head-row{flex-direction:column-reverse;gap:12px;align-items:stretch}
   .top-right{flex:none;width:100%}
   .top-search{flex:1;max-width:none}
   .nav-row .edit{display:none}
@@ -1136,10 +1141,14 @@ function renderMain(){
       <div class="sub"><span class="badge">${job.type==='agency'?I.briefcase+'Agency':I.user+'Direct client'}</span>${job.type==='agency'?`<span>${cl.length} client${cl.length===1?'':'s'}</span>`:''}</div></div>
       <div class="tools">${tools}<button class="btn" data-act="edit-job" data-id="${job.id}" style="align-self:stretch">${I.pencil}Edit job</button></div></div>
       ${workCard(job)}
-      ${job.type==='agency'?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}
-      ${brandPanel(job)}`;
+      <div class="pane-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${u.pane==='brand'?'':'on'}" aria-selected="${u.pane!=='brand'}" data-act="pane" data-pane="tasks">${I.task}Tasks</button><button role="tab" class="${u.pane==='brand'?'on':''}" aria-selected="${u.pane==='brand'}" data-act="pane" data-pane="brand">${I.palette}Brand guide</button></div>
+      ${job.type==='agency'?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}`;
   }
 
+  if(job&&u.pane==='brand'){
+    $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
+    $('#view').innerHTML=brandPane(job);return;
+  }
   const st=statsFor(scope);
   const stat=(key,label,val,cls='')=>`<button class="stat ${cls} ${u.due===key?'on':''}" data-act="stat" data-due="${key}"><small>${label}</small><b>${val}</b></button>`;
   $('#stats').innerHTML=Object.keys(S.jobs).length?`<div class="stats">
@@ -1907,19 +1916,21 @@ function brandView(b,home,compact){
   </div>`;
 }
 /* job page: the guide for the direct client, the selected agency client, or a list of clients */
-function brandPanel(job){
-  const u=S.ui;let home=null;
-  if(job.type!=='agency')home={col:'jobs',id:job.id,name:job.name,doc:job};
-  else if(u.client!=='all'&&S.clients[u.client]){const c=S.clients[u.client];home={col:'clients',id:c.id,name:c.name,doc:c}}
-  if(!home){
-    const cl=clientsOf(job.id);if(!cl.length)return '';
-    return `<div class="brand-chips"><span>${I.palette}Brand guides:</span>${cl.map(c=>{const has=hasBrand(brandOf(c));return `<button class="chip-btn ${has?'':'empty'}" data-act="nav" data-tab="${job.id}" data-client="${c.id}">${clientMark(c,16)}${esc(c.name)}${has?'':' · not set'}</button>`}).join('')}</div>`;
-  }
-  const b=brandOf(home.doc),open=!(u.brandClosed||{})[home.id];
-  if(!hasBrand(b))return `<button class="work-empty" data-act="brand-edit" data-col="${home.col}" data-id="${home.id}">${I.palette}Add ${esc(home.name)}'s brand guide</button>`;
-  return `<section class="brand-panel"><div class="bp-head"><button class="bp-toggle ${open?'open':''}" data-act="brand-toggle" data-id="${home.id}" aria-expanded="${open}">${I.chev}${I.palette}<b>${esc(home.name)} brand guide</b></button>
-    <button class="btn sm" data-act="brand-edit" data-col="${home.col}" data-id="${home.id}">${I.pencil}Edit</button></div>
-    ${open?brandView(b,home,false):''}</section>`;
+/* job page "Brand guide" tab: the direct client's guide, the selected agency client's, or one card per client */
+function brandPane(job){
+  const u=S.ui,one=home=>{
+    const b=brandOf(home.doc);
+    if(!hasBrand(b))return `<div class="empty"><h3>No brand guide for ${esc(home.name)} yet</h3><p>Add their colors, fonts, caption style, do's and don'ts, links and PDFs. Tasks for ${esc(home.name)} will show it in their panel.</p><button class="btn primary" data-act="brand-edit" data-col="${home.col}" data-id="${home.id}">${I.plus}Add brand guide</button></div>`;
+    return `<section class="brand-panel"><div class="bp-head"><h2>${home.col==='clients'?clientMark(home.doc,22):''}${esc(home.name)}</h2><button class="btn sm" data-act="brand-edit" data-col="${home.col}" data-id="${home.id}">${I.pencil}Edit guide</button></div>${brandView(b,home,false)}</section>`;
+  };
+  if(job.type!=='agency')return one({col:'jobs',id:job.id,name:job.name,doc:job});
+  if(u.client!=='all'&&S.clients[u.client]){const c=S.clients[u.client];return one({col:'clients',id:c.id,name:c.name,doc:c})}
+  const cl=clientsOf(job.id);
+  if(!cl.length)return `<div class="empty"><h3>No clients yet</h3><p>Brand guides belong to clients. Add clients to ${esc(job.name)} first.</p><button class="btn" data-act="edit-job" data-id="${job.id}">${I.pencil}Edit job</button></div>`;
+  return `<div class="brand-cards">${cl.map(c=>{const b=brandOf(c),has=hasBrand(b);return `<div class="brand-card">
+    <div class="bc-top">${clientMark(c,28)||`<span class="tmark">${I.building}</span>`}<b>${esc(c.name)}</b></div>
+    ${has?`<div class="bc-sw">${b.colors.slice(0,6).map(x=>`<i style="background:${esc(x.hex)}" title="${esc(x.name||x.hex)}"></i>`).join('')}</div><small>${b.updated?'Last updated '+esc(fmtDate(b.updated)):'Brand guide added'}</small>`:'<small>No brand guide yet</small>'}
+    <div class="bc-acts">${has?`<button class="btn sm" data-act="nav" data-tab="${job.id}" data-client="${c.id}">Open</button>`:''}<button class="btn sm ${has?'ghost':''}" data-act="brand-edit" data-col="clients" data-id="${c.id}">${has?I.pencil+'Edit':I.plus+'Add'}</button></div></div>`}).join('')}</div>`;
 }
 /* task panel section */
 function brandForTask(t){
@@ -2031,7 +2042,7 @@ document.addEventListener('click',e=>{
   if(a!=='arch-delete'&&archDelArmed){archDelArmed=null;render()}
   if(a!=='cal-disconnect'&&CAL.disArmed){CAL.disArmed=false;if(SM)renderSettings()}
   switch(a){
-    case 'nav': u.tab=el.dataset.tab;u.client=el.dataset.client||'all';saveUi();render();window.scrollTo({top:0});break;
+    case 'nav': if(el.dataset.tab!==u.tab)u.pane='tasks';u.tab=el.dataset.tab;u.client=el.dataset.client||'all';saveUi();render();window.scrollTo({top:0});break;
     case 'view': u.view=el.dataset.view;saveUi();render();break;
     case 'import-clickup': openImport();break;
     case 'im-pick': $('#csv-in').click();break;
@@ -2044,7 +2055,7 @@ document.addEventListener('click',e=>{
     case 'brand-edit': openBrand(el.dataset.col,el.dataset.id);break;
     case 'brand-cancel': closeBrand();break;
     case 'brand-save': saveBrand();break;
-    case 'brand-toggle':{const m=u.brandClosed||(u.brandClosed={});m[el.dataset.id]=!m[el.dataset.id];saveUi();render();break}
+    case 'pane': u.pane=el.dataset.pane;saveUi();render();break;
     case 'brand-to-checklist': brandToChecklist();break;
     case 'bm-add-color': BM.b.colors.push({hex:'#000000',name:''});renderBrand();break;
     case 'bm-del-color': BM.b.colors.splice(+el.dataset.i,1);renderBrand();break;
