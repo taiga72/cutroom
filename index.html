@@ -2164,13 +2164,13 @@ function finderSettingsHtml(){
   return `<details class="field finder-set"><summary class="lbl">Finder folders (Mac)</summary>
     <p class="hint" style="margin-top:6px">Paste a Finder path into a task's files field or a job's File storage, and clicking it opens that folder (or file) on your Mac. To copy a path in Finder, select the item and press <b>Option ⌥ + Command ⌘ + C</b>. Websites aren't allowed to open Finder by themselves, so it goes through a small shortcut you set up once:</p>
     <ol class="steps">
-      <li>Open the <b>Shortcuts</b> app and click <b>+</b> to make a new shortcut.</li>
-      <li>Name it exactly <b>${esc(OPEN_SHORTCUT)}</b>: click “New Shortcut” at the top of the editor and type the name. (Or right-click it in All Shortcuts and choose Rename.)</li>
-      <li>In the action search on the right, find <b>Open URLs</b> and drag it in. Click its blue <b>URL</b> placeholder and choose <b>Shortcut Input</b>.</li>
+      <li>Open the <b>Shortcuts</b> app. In the menu bar at the very top of the screen, click <b>Shortcuts</b> (next to the Apple logo) → <b>Settings…</b> (or press <b>⌘ ,</b>). Open the <b>Advanced</b> tab and tick <b>Allow Running Scripts</b>.</li>
+      <li>Make a new shortcut with <b>+</b> and name it exactly <b>${esc(OPEN_SHORTCUT)}</b> (click the name at the top of the editor to rename it).</li>
+      <li>Search the actions on the right for <b>Run Shell Script</b> and drag it in. Remove any other action (like Open URLs).</li>
+      <li>In Run Shell Script, set <b>Input</b> to <b>Shortcut Input</b> and <b>Pass Input</b> to <b>as arguments</b>. Replace the script with: <code class="copy-code">open "$1"</code> <button type="button" class="btn sm ghost" data-act="copy-path" data-path="open &quot;$1&quot;">${I.copy}Copy</button></li>
       <li>If it shows “Receive … input”, set it to <b>Text</b> (or Any). Close the editor.</li>
     </ol>
-    <p class="hint">The first time you click a path, the browser asks to open Shortcuts. Allow it (tick “Always allow” if offered). Use full paths (starting with /Users/…); Option ⌥ + Command ⌘ + C gives you one.</p>
-    <p class="hint">Nothing opens? Swap Open URLs for <b>Run Shell Script</b> with Input: Shortcut Input, Pass Input: as arguments, and the script <code class="copy-code">open "$1"</code>. That one needs <b>Allow Running Scripts</b>: in Shortcuts press <b>⌘ ,</b> (Shortcuts → Settings) and open the <b>Advanced</b> tab.</p>
+    <p class="hint">Test it with the button below, not the ▶ button in Shortcuts (that runs it with no path). The first time, the browser asks to open Shortcuts, and macOS may ask to allow the script: allow both. Use full paths (starting with /Users/…); Option ⌥ + Command ⌘ + C in Finder gives you one.</p>
     ${IS_MAC?`<div class="acct-btns"><a class="btn sm" href="${pathOpenUrl('/Applications')}">${I.folder}Test: open Applications</a></div>`:''}</details>`;
 }
 function backupSettingsHtml(){
