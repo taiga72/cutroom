@@ -1,6 +1,6 @@
 # Cutroom
 
-A task tracker for video editing work, built as one self-contained HTML file (`index.html`). It is separate from the Pantry-pal app and is not part of its build.
+A task tracker for video editing work, built as one self-contained HTML file (`index.html`).
 
 - **Jobs**: an agency (with its own clients) or a direct client. Each job records its own tools for communication, task tracking, review/upload and file storage, plus optional workspace links.
 - **Tasks**: status (Not started, In progress, Internal review, Revisions, Done), priority, start and due dates, picture, format (16:9, 9:16, 1:1, 4:5), length, revision round, links (task tracker, upload/review, files), checklist and notes.
