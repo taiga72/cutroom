@@ -8,6 +8,26 @@ const PRIO = { urgent: 'Urgent', high: 'High', normal: 'Normal', low: 'Low' };
 
 class NeedsReconnect extends Error {}
 
+// Google only allows its 11 event colors, so each job color maps to the closest one.
+// The job swatches in Cutroom map to distinct Google colors.
+const GCOLORS = { 1: '#7986cb', 2: '#33b679', 3: '#8e24aa', 4: '#e67c73', 5: '#f6bf26', 6: '#f4511e', 7: '#039be5', 8: '#616161', 9: '#3f51b5', 10: '#0b8043', 11: '#d50000' };
+const SWATCH = { '#2f73e8': '9', '#0b7f93': '7', '#2b9348': '10', '#e07b00': '6', '#d9362b': '11', '#c2417a': '4', '#8b5cf6': '3', '#6b7280': '8' };
+function colorIdFor(hex) {
+  hex = String(hex || '').toLowerCase();
+  if (SWATCH[hex]) return SWATCH[hex];
+  const m = /^#([0-9a-f]{6})$/.exec(hex);
+  if (!m) return undefined;
+  const rgb = h => [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16));
+  const [r, g, b] = rgb(m[1]);
+  let best, bestD = Infinity;
+  for (const [id, c] of Object.entries(GCOLORS)) {
+    const [R, G, B] = rgb(c.slice(1));
+    const d = (r - R) ** 2 + (g - G) ** 2 + (b - B) ** 2;
+    if (d < bestD) { bestD = d; best = id; }
+  }
+  return best;
+}
+
 async function tokenRequest(params) {
   const r = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
@@ -60,6 +80,7 @@ function eventFor(t, jobs, clients, appUrl) {
     start: { date: t.due },
     end: { date: nextDay(t.due) },
     transparency: 'transparent',
+    ...(colorIdFor(job.color) ? { colorId: colorIdFor(job.color) } : {}),
     extendedProperties: { private: { cutroomId: t.id } }
   };
 }
@@ -115,7 +136,7 @@ async function syncUser(uid, appUrl) {
       const w = id && want[id];
       if (!w || seen.has(id)) { ops.push(() => g('DELETE', `/calendars/${encodeURIComponent(cal)}/events/${ev.id}`)); continue; }
       seen.add(id);
-      if (ev.summary !== w.summary || (ev.description || '') !== w.description || ev.start?.date !== w.start.date || ev.end?.date !== w.end.date)
+      if (ev.summary !== w.summary || (ev.description || '') !== w.description || ev.start?.date !== w.start.date || ev.end?.date !== w.end.date || (ev.colorId || undefined) !== w.colorId)
         ops.push(() => g('PUT', `/calendars/${encodeURIComponent(cal)}/events/${ev.id}`, w));
     }
     for (const id in want) if (!seen.has(id)) ops.push(() => g('POST', `/calendars/${encodeURIComponent(cal)}/events`, want[id]));
@@ -131,4 +152,4 @@ async function syncUser(uid, appUrl) {
   }
 }
 
-module.exports = { SCOPES, tokenRequest, client, createCalendar, syncUser, NeedsReconnect };
+module.exports = { colorIdFor, SCOPES, tokenRequest, client, createCalendar, syncUser, NeedsReconnect };
