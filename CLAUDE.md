@@ -63,7 +63,7 @@ UI preferences (tab, view, collapsed groups, sort) are kept in localStorage (`cu
 - **Persistence:** `create / patch / remove / flush`. Writes are optimistic and queued per document. Text fields are debounced with `patch(col, id, p, 600)`.
 - **Rendering:** `render()` calls `renderSide()` and `renderMain()`. `renderMain` branches to overview, job tab, or `renderArchive()`. The views are `listView / boardView / calendarView`. The task panel is `renderDrawer()`.
 - **Modals:** jobs use `openJobModal / renderModal / saveModal` with state in `M`. Settings use `openSettings / renderSettings / closeSettings` with state in `SM`.
-- **Images:** `storeImage()` resizes and uploads, `dropImage()` deletes a replaced asset, and `jobMark() / clientMark()` show a logo, or the color dot when there is none.
+- **Images:** logo picks (job, client, app) first go through the crop dialog (`openCrop / renderCrop / useCrop`, state in `CR`, layer `#crop` above `#modal`), which outputs a square PNG. `storeImage()` resizes and uploads, `dropImage()` deletes a replaced asset, and `jobMark() / clientMark()` show a logo, or the color dot when there is none.
 - **Events:** delegated `click / change / input / submit` handlers switch on `data-act`. Give re-rendered inputs a `data-fk` so `withFocus()` keeps focus while typing.
 
 ## Conventions
