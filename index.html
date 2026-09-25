@@ -329,7 +329,7 @@ select.pill::before{display:none}
 .group-head.open svg{transform:rotate(90deg)}
 .group-head .count{font:500 calc(12px*var(--ts)) var(--mono);color:var(--faint)}
 .rows{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
-.row,.row-head{display:grid;grid-template-columns:36px minmax(0,1fr) 180px 84px 84px 84px 92px;align-items:center;gap:12px;padding:8px 12px}
+.row,.row-head{display:grid;grid-template-columns:36px minmax(0,1fr) 180px 84px 84px 84px 120px;align-items:center;gap:12px;padding:8px 12px}
 .row-head{font-size:calc(11px*var(--ts));font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);padding-block:6px;border-bottom:1px solid var(--line);background:var(--surface-2)}
 .row{border-top:1px solid var(--line);cursor:pointer}
 .row:first-of-type{border-top:0}
@@ -510,7 +510,7 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 
 /* ---------- responsive ---------- */
 @media (max-width:1100px){
-  .row,.row-head{grid-template-columns:36px minmax(0,1fr) 180px 84px 92px}
+  .row,.row-head{grid-template-columns:36px minmax(0,1fr) 180px 84px 120px}
   .row > .c-start,.row-head > .c-start,.row > .c-prio,.row-head > .c-prio{display:none}
   .stat small{font-size:calc(10px*var(--ts))}
 }
@@ -672,7 +672,8 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 :root[data-density="compact"] .main{gap:12px;padding-top:14px}
 :root[data-density="compact"] .row{padding-block:3px}
 :root[data-density="compact"] .row .tmark{width:28px;height:28px}
-:root[data-density="compact"] .row,:root[data-density="compact"] .row-head{grid-template-columns:28px minmax(0,1fr) 180px 84px 84px 84px 92px}
+:root[data-density="compact"] .row,:root[data-density="compact"] .row-head{grid-template-columns:28px minmax(0,1fr) 180px 84px 84px 84px 120px}
+@media (max-width:1100px){:root[data-density="compact"] .row,:root[data-density="compact"] .row-head{grid-template-columns:28px minmax(0,1fr) 180px 84px 120px}}
 :root[data-density="compact"] .group-head{padding-block:3px}
 :root[data-density="compact"] .card{padding:7px;gap:4px}
 :root[data-density="compact"] .card-top .tmark{width:24px;height:24px}
@@ -774,6 +775,7 @@ const I={
   chev:'<svg class="i" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4"/></svg>',
   left:'<svg class="i" viewBox="0 0 16 16"><path d="M10 4 6 8l4 4"/></svg>',
   task:'<svg class="i" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="11" height="11" rx="2"/><path d="M5.5 8l2 2 3-4"/></svg>',
+  mac:'<svg class="i" viewBox="0 0 16 16"><rect x="2.5" y="3" width="11" height="7.5" rx="1"/><path d="M1 13h14"/></svg>',
   film:'<svg class="i" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M6.8 6.2v3.6L9.8 8z"/></svg>',
   folder:'<svg class="i" viewBox="0 0 16 16"><path d="M2 4.5A1.5 1.5 0 0 1 3.5 3h2.8l1.5 1.5h4.7A1.5 1.5 0 0 1 14 6v5.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 11.5z"/></svg>',
   flag:'<svg class="i" viewBox="0 0 16 16"><path d="M3.5 14V2.5M3.5 3h8.5l-2 3 2 3H3.5"/></svg>',
@@ -1213,6 +1215,7 @@ const linkLabel=(job,kind)=>{
   const tl=job?.tools||{};
   if(kind==='task') return tl.tracker&&tl.tracker!=='None'?`${tl.tracker} task`:'Task link';
   if(kind==='upload') return `${tl.upload||'Upload'} link`;
+  if(kind==='project') return 'Project folder (Mac)';
   return `${tl.storage||'Files'} folder`;
 };
 
@@ -1272,7 +1275,14 @@ function applyLook(o){
   if(ts===1) r.style.removeProperty('--ts'); else r.style.setProperty('--ts',ts);
   if(o.density==='compact') r.setAttribute('data-density','compact'); else r.removeAttribute('data-density');
 }
-function migrateStatuses(){for(const t of Object.values(S.tasks))if(t.status==='dropped')patch('tasks',t.id,{status:'done',doneAt:t.doneAt||today()})}
+function migrateStatuses(){
+  for(const t of Object.values(S.tasks)){
+    if(t.status==='dropped')patch('tasks',t.id,{status:'done',doneAt:t.doneAt||today()});
+    // Finder paths briefly went into the files link; they belong in the project folder now
+    if(localPath(t.links?.file)&&!t.links?.project)patch('tasks',t.id,{links:{project:t.links.file,file:''}});
+  }
+  for(const j of Object.values(S.jobs))if(localPath(j.toolLinks?.storage)&&!j.folder)patch('jobs',j.id,{folder:j.toolLinks.storage,toolLinks:{storage:''}});
+}
 function render(){
   const a=appSettings();
   applyLook(SM||a);
@@ -1385,7 +1395,7 @@ function linkIcons(t){
   const one=(kind,icon)=>{const v=t.links?.[kind],u=linkHref(v),p=localPath(v),label=linkLabel(j,kind);
     if(p&&!u)return `<button type="button" class="lbtn" data-act="copy-path" data-path="${esc(p)}" title="Copy Finder path (opens on your Mac)" aria-label="Copy ${esc(label)} path" data-stop>${icon}</button>`;
     return u?`<a href="${esc(u)}"${linkTarget(v)} title="${p?`Open “${esc(pathName(p))}” in Finder`:`Open ${esc(label)}`}" aria-label="Open ${esc(label)}" data-stop>${icon}</a>`:`<span title="No ${esc(label)} yet">${icon}</span>`};
-  return `<div class="links">${one('task',I.task)}${one('upload',I.film)}${one('file',I.folder)}</div>`;
+  return `<div class="links">${one('task',I.task)}${one('upload',I.film)}${one('file',I.folder)}${one('project',I.mac)}</div>`;
 }
 /* A task shows its client's logo, else its job's logo, else a plain company icon. */
 const taskMark=t=>{
@@ -1564,8 +1574,8 @@ function renderDrawer(){
   if(!t){if(S.ui.openTask)closeDrawer();return}
   const j=S.jobs[t.jobId];const cl=j?clientsOf(j.id):[];
   const checklist=t.checklist||[];const doneN=checklist.filter(x=>x.done).length;
-  const linkRow=(kind,icon)=>{const v=t.links?.[kind],u=linkHref(v);const label=linkLabel(j,kind);return `<div class="link-row"><label><span>${icon}${esc(label)}</span><input type="${kind==='file'?'text':'url'}" data-field="links.${kind}" data-fk="d-link-${kind}" value="${esc(v||'')}" placeholder="${kind==='file'?'Paste a link or a Finder path':'Paste link'}" ${kind==='file'?'autocapitalize="off" spellcheck="false"':''}></label>
-    <div class="acts"><a class="icon-btn ${u?'':'off'}" href="${esc(u||'#')}"${linkTarget(v)} title="${localPath(v)?'Open in Finder':'Open'}" aria-label="Open ${esc(label)}">${I.ext}</a><button class="icon-btn" data-act="copy" data-kind="${kind}" title="Copy" aria-label="Copy ${esc(label)}">${I.copy}</button></div>${kind==='file'?`<p class="hint path-hint" ${localPath(v)?'':'hidden'}>${pathHint()}</p>`:''}</div>`};
+  const linkRow=(kind,icon)=>{const v=t.links?.[kind],u=linkHref(v);const label=linkLabel(j,kind);return `<div class="link-row"><label><span>${icon}${esc(label)}</span><input type="${kind==='project'?'text':'url'}" data-field="links.${kind}" data-fk="d-link-${kind}" value="${esc(v||'')}" placeholder="${kind==='project'?'Paste the Finder path (⌥⌘C in Finder)':'Paste link'}" ${kind==='project'?'autocapitalize="off" spellcheck="false"':''}></label>
+    <div class="acts"><a class="icon-btn ${u?'':'off'}" href="${esc(u||'#')}"${linkTarget(v)} title="${localPath(v)?'Open in Finder':'Open'}" aria-label="Open ${esc(label)}">${I.ext}</a><button class="icon-btn" data-act="copy" data-kind="${kind}" title="Copy" aria-label="Copy ${esc(label)}">${I.copy}</button></div>${kind==='project'?`<p class="hint path-hint" ${localPath(v)?'':'hidden'}>${pathHint()}</p>`:''}</div>`};
   withFocus(()=>{$('#drawer').innerHTML=`
   ${t._draft?`<div class="d-draft">${I.plus}<b>New task</b><span>Not saved yet</span></div>`:''}
   <div class="d-top"><div class="crumb">${taskMark(t)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
@@ -1585,7 +1595,7 @@ function renderDrawer(){
       <span class="lbl">${I.loop}Revision round</span><div class="stepper"><button data-act="rev" data-step="-1" aria-label="Decrease revision round">−</button><output>R${t.revision||0}</output><button data-act="rev" data-step="1" aria-label="Increase revision round">+</button></div>
     </div>
     ${brandForTask(t)}
-    <div><h4 class="section-title">Links</h4>${linkRow('task',I.task)}${linkRow('upload',I.film)}${linkRow('file',I.folder)}</div>
+    <div><h4 class="section-title">Links</h4>${linkRow('task',I.task)}${linkRow('upload',I.film)}${linkRow('file',I.folder)}${linkRow('project',I.mac)}</div>
     <div><h4 class="section-title">Checklist<span class="mono">${checklist.length?`${doneN}/${checklist.length}`:''}</span></h4>
       ${checklist.length?`<div class="progress"><i style="width:${doneN/checklist.length*100}%"></i></div>`:''}
       <div class="checklist">${checklist.map(c=>`<div class="check ${c.done?'done':''}"><input type="checkbox" data-act="check" data-cid="${esc(c.id)}" ${c.done?'checked':''} aria-label="Done"><input class="txt" data-act="check-text" data-cid="${esc(c.id)}" data-fk="ck-${esc(c.id)}" value="${esc(c.text)}" aria-label="Checklist item"><button class="icon-btn" data-act="check-del" data-cid="${esc(c.id)}" aria-label="Remove item">${I.x}</button></div>`).join('')}
@@ -1678,7 +1688,7 @@ function openJobModal(id){
   const j=id?S.jobs[id]:null;
   M={id:id||null,name:j?.name||'',type:j?.type||'agency',color:j?.color||COLORS[Object.keys(S.jobs).length%COLORS.length],
     tools:{comms:'Slack',tracker:'ClickUp',upload:'Frame.io',storage:'Google Drive',...(j?.tools||{})},
-    toolLinks:{...(j?.toolLinks||{})},
+    toolLinks:{...(j?.toolLinks||{})},folder:j?.folder||'',
     logo:j?.logo||null,
     clients:id?clientsOf(id).map(c=>({id:c.id,name:c.name,logo:c.logo||null})):[],removed:[],delArmed:false,busy:false,uploaded:[],
     work:JSON.parse(JSON.stringify(workOf(j)))};
@@ -1857,8 +1867,9 @@ function renderModal(){
     <div class="field"><span class="lbl">Tools for this job</span><div class="tool-grid">${TOOL_ROLES.map(r=>{const v=M.tools[r.id];const custom=v&&!r.opts.includes(v);return `<div class="tool-cell"><span class="lbl">${r.label}</span>
       <select data-m-tool="${r.id}" aria-label="${r.label}">${r.opts.map(o=>`<option ${o===v||(custom&&o==='Other')?'selected':''}>${o}</option>`).join('')}</select>
       ${v==='Other'||custom?`<input type="text" data-m-toolname="${r.id}" data-fk="m-tn-${r.id}" value="${custom?esc(v):''}" placeholder="Tool name">`:''}
-      <input type="${r.id==='storage'?'text':'url'}" data-m-link="${r.id}" data-fk="m-tl-${r.id}" value="${esc(M.toolLinks[r.id]||'')}" placeholder="${r.id==='storage'?'Link or Finder path (optional)':'Workspace link (optional)'}" ${r.id==='storage'?'autocapitalize="off" spellcheck="false"':''}></div>`}).join('')}</div>
-      <p class="hint">Workspace links show as buttons at the top of the job, so the Slack channel or Frame.io project is one click away.</p></div>
+      <input type="url" data-m-link="${r.id}" data-fk="m-tl-${r.id}" value="${esc(M.toolLinks[r.id]||'')}" placeholder="Workspace link (optional)"></div>`}).join('')}</div>
+      <p class="hint">Workspace links show as buttons in the job's Details tab, so the Slack channel or Frame.io project is one click away.</p></div>
+    <div class="field"><label for="m-folder">Project folder on your Mac</label><input type="text" id="m-folder" data-fk="m-folder" value="${esc(M.folder||'')}" placeholder="/Users/you/Projects/${esc(M.name||'Job')}" autocapitalize="off" spellcheck="false"><p class="hint">Where you keep this job's assets and project files. Paste the path (select the folder in Finder and press ⌥⌘C). It opens in Finder from the job's Details tab. Tasks can have their own project folder too.</p></div>
     ${workForm()}
     ${M.type==='agency'?`<div class="field"><span class="lbl">Clients</span><div class="client-list">${M.clients.map((c,i)=>`<div class="cl"><button type="button" class="logo-box sm ${c.logo?'has':''}" data-act="m-client-logo" data-i="${i}" title="${c.logo?'Replace':'Add'} picture for ${esc(c.name||'this client')}" aria-label="${c.logo?'Replace':'Add'} client picture">${c.logo?`<img src="${esc(imgSrc(c.logo))}" alt="">`:I.image}</button><input type="text" data-m-client="${i}" data-fk="m-cl-${c.id||'n'+i}" value="${esc(c.name)}" placeholder="Client name" aria-label="Client name">${c.logo?`<button type="button" class="btn sm ghost" data-act="m-client-logo-remove" data-i="${i}">Remove picture</button>`:''}<button type="button" class="icon-btn" data-act="m-del-client" data-i="${i}" aria-label="Remove client">${I.x}</button></div>`).join('')}
       <button type="button" class="btn sm" data-act="m-add-client" style="align-self:flex-start">${I.plus}Add client</button></div>
@@ -1870,7 +1881,7 @@ function renderModal(){
 function saveModal(){
   const name=M.name.trim();if(!name){toast('Give the job a name.');$('#m-name')?.focus();return}
   const tools={...M.tools};
-  const data={name,type:M.type,color:M.color,tools,toolLinks:M.toolLinks,logo:M.logo||null,work:{...M.work,days:[...M.work.days].sort()}};
+  const data={name,type:M.type,color:M.color,tools,toolLinks:M.toolLinks,folder:(M.folder||'').trim(),logo:M.logo||null,work:{...M.work,days:[...M.work.days].sort()}};
   let id=M.id;
   if(id){patch('jobs',id,data)}
   else{id=create('jobs',{...data,order:Math.max(-1,...Object.values(S.jobs).map(j=>j.order??0))+1})}
@@ -2162,7 +2173,7 @@ function runRestore(){
 function pathHint(){return IS_MAC?`Opens in Finder through your “${esc(OPEN_SHORTCUT)}” shortcut. First time? Set it up in Settings → Finder folders.`:'Finder paths open only on your Mac. On this device the button copies the path.'}
 function finderSettingsHtml(){
   return `<details class="field finder-set"><summary class="lbl">Finder folders (Mac)</summary>
-    <p class="hint" style="margin-top:6px">Paste a Finder path into a task's files field or a job's File storage, and clicking it opens that folder (or file) on your Mac. To copy a path in Finder, select the item and press <b>Option ⌥ + Command ⌘ + C</b>. Websites aren't allowed to open Finder by themselves, so it goes through a small shortcut you set up once:</p>
+    <p class="hint" style="margin-top:6px">Paste a Finder path into a task's <b>Project folder (Mac)</b> or a job's <b>Project folder on your Mac</b> (in Edit job), and clicking it opens that folder (or file) on your Mac. To copy a path in Finder, select the item and press <b>Option ⌥ + Command ⌘ + C</b>. Websites aren't allowed to open Finder by themselves, so it goes through a small shortcut you set up once:</p>
     <ol class="steps">
       <li>Open the <b>Shortcuts</b> app. In the menu bar at the very top of the screen, click <b>Shortcuts</b> (next to the Apple logo) → <b>Settings…</b> (or press <b>⌘ ,</b>). Open the <b>Advanced</b> tab and tick <b>Allow Running Scripts</b>.</li>
       <li>Make a new shortcut with <b>+</b> and name it exactly <b>${esc(OPEN_SHORTCUT)}</b> (click the name at the top of the editor to rename it).</li>
@@ -2183,11 +2194,15 @@ function backupSettingsHtml(){
 }
 /* Details tab on a job page */
 function toolsHtml(job){
+  const f=localPath(job.folder),fu=f&&linkHref(f);
+  const folder=!f?`<button type="button" class="tool" data-act="edit-job" data-id="${job.id}" title="Add the project folder"><small>Project folder (Mac)</small><span style="color:var(--muted)">${I.plus}Add</span></button>`
+    :fu?`<a class="tool" href="${esc(fu)}" title="Open “${esc(pathName(f))}” in Finder"><small>Project folder (Mac)</small><span>${esc(pathName(f))}${I.ext}</span></a>`
+    :`<button type="button" class="tool" data-act="copy-path" data-path="${esc(f)}" title="Copy Finder path (opens on your Mac)"><small>Project folder (Mac)</small><span>${esc(pathName(f))}${I.copy}</span></button>`;
   return TOOL_ROLES.map(r=>{
     const name=job.tools?.[r.id]||'—',v=job.toolLinks?.[r.id],url=linkHref(v),lp=localPath(v);
     if(lp&&!url)return `<button type="button" class="tool" data-act="copy-path" data-path="${esc(lp)}" title="Copy Finder path (opens on your Mac)"><small>${r.label}</small><span>${esc(name)}${I.copy}</span></button>`;
     return url?`<a class="tool" href="${esc(url)}"${linkTarget(v)} title="${lp?`Open “${esc(pathName(lp))}” in Finder`:`Open ${esc(name)}`}"><small>${r.label}</small><span>${esc(name)}${I.ext}</span></a>`:`<div class="tool"><small>${r.label}</small><span>${esc(name)}</span></div>`;
-  }).join('');
+  }).join('')+folder;
 }
 function detailsPane(job){
   const tools=`<h3 class="d-h">Tools</h3><div class="tools">${toolsHtml(job)}</div>`;
@@ -2415,6 +2430,7 @@ document.addEventListener('input',e=>{
     if(el.dataset.m) M[el.dataset.m]=el.value;
     if(el.dataset.mw){const k=el.dataset.mw.split('.');if(k.length===2)M.work[k[0]][k[1]]=el.value;else M.work[k[0]]=el.value;if(el.dataset.mw==='tz')renderModal();}
     if(el.dataset.mLink) M.toolLinks[el.dataset.mLink]=el.value.trim();
+    if(el.id==='m-folder') M.folder=el.value;
     if(el.dataset.mToolname) M.tools[el.dataset.mToolname]=el.value.trim()||'Other';
     if(el.dataset.mClient!==undefined) M.clients[+el.dataset.mClient].name=el.value;
     return;
