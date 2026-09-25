@@ -168,27 +168,8 @@ button.stat:hover{border-color:var(--line-strong)}
 .im-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
 .im-name em{font-weight:400;color:var(--faint)}
 .btn[disabled]{opacity:.5;cursor:default}
-.nav-item .count.hot{color:var(--danger);font-weight:700}
 .load-warn{display:inline-flex;align-items:center;gap:6px;color:var(--warn);font-size:12.5px;font-weight:600;margin:0}
 .load-warn svg{flex:none}
-.week{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
-.week-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
-.week-head h2{margin:0;font:700 15px var(--display)}
-.week-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
-.wday{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
-.wday:hover{border-color:var(--line-strong)}
-.wday small{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.wday b{font:700 17px var(--display)}
-.wday .wbar{width:10px;height:34px;border-radius:4px;background:var(--surface-2);display:flex;align-items:flex-end;overflow:hidden}
-.wday .wbar i{display:block;width:100%;background:var(--st-prog);border-radius:4px}
-.wday .wn{font:500 11px var(--mono);color:var(--muted);white-space:nowrap}
-.wday.is-today{border-color:var(--accent)}
-.wday.busy{background:color-mix(in srgb,var(--warn) 10%,var(--surface));border-color:color-mix(in srgb,var(--warn) 50%,transparent)}
-.wday.busy .wbar i{background:var(--warn)}
-.wday.busy .wn{color:var(--warn);font-weight:700}
-.today-h{margin:0;font:700 15px var(--display);display:flex;align-items:center;gap:8px;padding:6px 2px}
-.today-h .count{font:500 12px var(--mono);color:var(--faint)}
-.today-group.over .today-h{color:var(--danger)}
 .day.busy{background:color-mix(in srgb,var(--warn) 8%,var(--surface))}
 .busy-tag{display:inline-flex;align-items:center;gap:2px;margin-left:auto;margin-right:4px;color:var(--warn);font:700 11px var(--mono)}
 .busy-tag svg{width:12px;height:12px}
@@ -196,7 +177,29 @@ button.stat:hover{border-color:var(--line-strong)}
 .limit-row input{width:64px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 8px}
 .head-row{display:flex;align-items:flex-start;gap:14px 20px}
 .head-row #head{flex:1;min-width:0}
-.top-search{flex:0 1 300px;min-width:200px;padding-block:1px}
+.top-right{display:flex;align-items:center;gap:8px;flex:0 1 350px;justify-content:flex-end;min-width:0}
+.top-search{flex:1 1 300px;min-width:180px;padding-block:1px}
+.bell-wrap{position:relative;flex:none}
+.bell{width:38px;height:38px;border:1px solid var(--line);background:var(--surface);border-radius:9px;position:relative}
+.bell.has{color:var(--text)}
+.bell-n{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--danger);color:#fff;font:700 11px/18px var(--body);text-align:center}
+.notes-pop{position:absolute;right:0;top:calc(100% + 8px);width:min(380px,calc(100vw - 32px));max-height:min(520px,70vh);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lg);z-index:25}
+.notes-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface)}
+.notes-head b{font:700 15px var(--display)}
+.note{display:flex;align-items:flex-start;gap:4px;border-top:1px solid var(--line);padding-right:6px}
+.note:first-child{border-top:0}
+.note-main{flex:1;min-width:0;display:flex;gap:10px;align-items:flex-start;border:0;background:none;text-align:left;padding:10px 6px 10px 12px}
+.note-main:hover{background:var(--surface-2)}
+.note-main > svg{margin-top:2px;color:var(--faint)}
+.note-main > span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.note-main b{font-weight:600;font-size:13px;line-height:1.35}
+.note-main span span{font-size:12.5px;color:var(--muted)}
+.note-main small{font-size:11.5px;color:var(--faint)}
+.note.unread .note-main b::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-left:6px;vertical-align:middle}
+.note.danger .note-main > svg{color:var(--danger)}
+.note.warn .note-main > svg{color:var(--warn)}
+.note .icon-btn{width:26px;height:26px;margin-top:8px;flex:none}
+.notes-empty{margin:0;padding:18px 14px;color:var(--muted);font-size:13px}
 .view-sel{display:none}
 .nav-views{display:flex;flex-direction:column;gap:1px;margin:1px 0 4px 18px;padding-left:10px;border-left:1px solid var(--line)}
 .nav-views .nav-item{padding:5px 10px;font-weight:500;color:var(--muted);font-size:13px}
@@ -410,15 +413,13 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .nav-label{display:none}
   .nav-sub{display:none}
   .nav-views{display:none}
-  .week-days{gap:4px}
   .im-dest{grid-template-columns:1fr}
   .im-row{grid-template-columns:auto minmax(0,1fr) auto}
   .im-row .date{display:none}
-  .wday{padding:6px 2px}
-  .wday .wn{font-size:10px}
   .view-sel{display:inline-block}
   .head-row{flex-direction:column-reverse;gap:12px}
-  .top-search{flex:none;width:100%;max-width:none}
+  .top-right{flex:none;width:100%}
+  .top-search{flex:1;max-width:none}
   .nav-row .edit{display:none}
   .nav-item{white-space:nowrap;width:auto;padding:6px 10px}
   .nav-item .count{display:none}
@@ -495,7 +496,7 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   <aside class="side" id="side"></aside>
   <main class="main" id="main">
     <div id="banner"></div>
-    <div class="head-row"><div id="head"></div><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search tasks  ( / )" autocomplete="off"></label></div>
+    <div class="head-row"><div id="head"></div><div class="top-right"><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search tasks  ( / )" autocomplete="off"></label><div class="bell-wrap"><button type="button" class="icon-btn bell" id="bell" data-act="bell" aria-haspopup="true" aria-expanded="false" aria-controls="notes" title="Notifications"><svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bell-n" id="bell-n" hidden></span></button><div class="notes-pop" id="notes" hidden role="dialog" aria-label="Notifications"></div></div></div></div>
     <div id="stats"></div>
     <div id="jobcards"></div>
     <div class="toolbar" id="toolbar" hidden>
@@ -571,7 +572,6 @@ const I={
   gear:'<svg class="i" viewBox="0 0 16 16"><path d="M6.9 1.8h2.2l.35 1.75 1.2.5 1.5-1 1.55 1.55-1 1.5.5 1.2 1.75.35v2.2l-1.75.35-.5 1.2 1 1.5-1.55 1.55-1.5-1-1.2.5-.35 1.75H6.9l-.35-1.75-1.2-.5-1.5 1-1.55-1.55 1-1.5-.5-1.2-1.75-.35V6.9l1.75-.35.5-1.2-1-1.5 1.55-1.55 1.5 1 1.2-.5z"/><circle cx="8" cy="8" r="2"/></svg>',
   list:'<svg class="i" viewBox="0 0 16 16"><path d="M5.5 4h8M5.5 8h8M5.5 12h8M2.5 4h.01M2.5 8h.01M2.5 12h.01"/></svg>',
   board:'<svg class="i" viewBox="0 0 16 16"><rect x="2" y="2.5" width="3.4" height="11" rx="1"/><rect x="6.3" y="2.5" width="3.4" height="7" rx="1"/><rect x="10.6" y="2.5" width="3.4" height="9" rx="1"/></svg>',
-  today:'<svg class="i" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/><circle cx="8" cy="10.2" r="1.6" fill="currentColor" stroke="none"/></svg>',
   warn:'<svg class="i" viewBox="0 0 16 16"><path d="M8 2.2 14.3 13.3H1.7z"/><path d="M8 6.5v3M8 11.6h.01"/></svg>',
   download:'<svg class="i" viewBox="0 0 16 16"><path d="M8 2.5v8M4.8 7.5 8 10.7l3.2-3.2M2.5 13.5h11"/></svg>',
   pencil:'<svg class="i" viewBox="0 0 16 16"><path d="M10.8 2.7a1.5 1.5 0 0 1 2.1 0l.4.4a1.5 1.5 0 0 1 0 2.1L5.6 12.9l-3.1.6.6-3.1z"/><path d="M9.5 4l2.5 2.5"/></svg>',
@@ -675,7 +675,7 @@ const safeUrl=u=>{u=String(u||'').trim();if(!u)return '';if(!/^[a-z][a-z0-9+.-]*
 
 /* ================= state ================= */
 const S={jobs:{},clients:{},tasks:{},settings:{},ready:false,
-  ui:{tab:'today',client:'all',view:'list',q:'',prio:'all',due:'all',sort:'due',month:today().slice(0,7),collapsed:{done:true},openTask:null}};
+  ui:{tab:'overview',client:'all',view:'list',q:'',prio:'all',due:'all',sort:'due',month:today().slice(0,7),collapsed:{done:true},openTask:null}};
 const saved=lsGet(LS_UI); if(saved) S.ui=Object.assign(S.ui,saved,{q:'',openTask:null});
 const saveUi=()=>{const {q,aq,openTask,...rest}=S.ui;lsSet(LS_UI,rest)};
 
@@ -1002,6 +1002,7 @@ function render(){
   document.title=(a.name||'').trim()||APP_NAME;
   const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
   withFocus(()=>{renderSide();renderMain()});
+  renderBell();
 }
 
 const VIEWS=[{id:'list',label:'List',icon:'list'},{id:'board',label:'Board',icon:'board'},{id:'calendar',label:'Calendar',icon:'cal'}];
@@ -1010,10 +1011,9 @@ function renderSide(){
   const u=S.ui,jobsOpen=u.jobsOpen!==false;
   const openCount=jid=>live().filter(t=>t.jobId===jid&&t.status!=='done').length;
   const allOpen=live().filter(t=>S.jobs[t.jobId]&&t.status!=='done').length;
-  const todayN=live().filter(t=>S.jobs[t.jobId]&&t.status!=='done'&&t.due&&t.due<=today()).length;
   const app=appSettings();const appLogo=imgSrc(app.logo);
   let html=`<div class="brand">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></div>
-  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='today'?'on':''}" data-act="nav" data-tab="today">${I.today}<span class="name">Today</span><span class="count ${todayN?'hot':''}">${S.ready&&todayN?todayN:''}</span></button><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button>${u.tab==='overview'&&S.ready&&jobsSorted().length?viewsNav():''}<button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button>
+  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button>${u.tab==='overview'&&S.ready&&jobsSorted().length?viewsNav():''}<button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button>
   <button class="nav-item jobs-toggle ${jobsOpen?'open':''}" data-act="toggle-jobs" aria-expanded="${jobsOpen}" aria-controls="nav-jobs">${I.briefcase}<span class="name">Jobs</span><span class="count">${S.ready?jobsSorted().length:''}</span>${I.chev}</button></nav>
   <nav class="nav jobs" id="nav-jobs" aria-label="Jobs" ${jobsOpen?'':'hidden'}>`;
   for(const j of jobsSorted()){
@@ -1030,7 +1030,7 @@ function renderSide(){
 function renderMain(){
   const u=S.ui;
   if(!S.ready){$('#view').innerHTML='<div class="loading">Loading your tasks…</div>';$('#toolbar').hidden=true;return}
-  if(u.tab!=='overview'&&u.tab!=='archived'&&u.tab!=='today'&&!S.jobs[u.tab]){u.tab='today';u.client='all'}
+  if(u.tab!=='overview'&&u.tab!=='archived'&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
   if(u.client!=='all'&&!S.clients[u.client]) u.client='all';
   const job=u.tab==='overview'?null:S.jobs[u.tab];
 
@@ -1038,7 +1038,6 @@ function renderMain(){
   $('#banner').innerHTML=hasExamples?`<div class="banner"><p><b>You're looking at example jobs and tasks.</b> Poke around, then clear them and add your own jobs.</p><button class="btn sm ${clearArmed?'danger armed':''}" data-act="clear-examples">${clearArmed?'Delete all example data':'Clear examples'}</button></div>`:'';
 
   if(u.tab==='archived'){renderArchive();return}
-  if(u.tab==='today'){renderToday();return}
   const scope=tasksOfScope();
   if(!job){
     $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>Overview</h1><div class="sub">${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients · everything due across your work</div></div>
@@ -1182,36 +1181,58 @@ function calendarView(list){
 const dayLimit=()=>Math.min(20,Math.max(1,parseInt(appSettings().dayLimit,10)||3));
 function dueLoad(exceptId){const m={};live().forEach(t=>{if(t.id!==exceptId&&t.due&&t.status!=='done'&&S.jobs[t.jobId])m[t.due]=(m[t.due]||0)+1});return m}
 const WEEKDAY=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const WEEKDAY_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-function weekStrip(){
-  const load=dueLoad(),lim=dayLimit(),t0=today();
-  const days=Array.from({length:7},(_,i)=>addDays(t0,i));
-  const max=Math.max(lim,...days.map(d=>load[d]||0));
-  const heavy=days.filter(d=>(load[d]||0)>=lim);
-  return `<section class="week"><div class="week-head"><h2>Next 7 days</h2>${heavy.length?`<span class="load-warn">${I.warn}${heavy.length===1?'1 busy day':heavy.length+' busy days'}: ${heavy.map(d=>`${d===t0?'today':WEEKDAY[parseD(d).getDay()]} (${load[d]} due)`).join(', ')}</span>`:`<span class="hint">No day has ${lim} or more tasks due.</span>`}</div>
-    <div class="week-days">${days.map(d=>{const n=load[d]||0,b=n>=lim,dt=parseD(d);return `<button class="wday ${b?'busy':''} ${d===t0?'is-today':''}" data-act="goto-day" data-day="${d}" title="${n} task${n===1?'':'s'} due ${fmtDate(d)}${b?' · busy day':''}">
-      <small>${d===t0?'Today':WEEKDAY[dt.getDay()]}</small><b>${dt.getDate()}</b><span class="wbar"><i style="height:${n?Math.max(12,n/max*100):0}%"></i></span><span class="wn">${n?n+' due':'—'}</span></button>`}).join('')}</div></section>`;
+/* ================= notifications =================
+   Built from the tasks every time the page draws, so they are always current.
+   Read / dismissed state is kept per device (localStorage). Keys include the
+   date they refer to, so a task that moves to a new due date notifies again. */
+const LS_NOTES='cutroom.notes.v1';
+const NS=Object.assign({read:{},hidden:{}},lsGet(LS_NOTES)||{});
+let notesOpen=false;
+function saveNotes(){
+  const keep=new Set(notifications(true).map(n=>n.key));  // forget keys that no longer apply
+  for(const m of [NS.read,NS.hidden])for(const k in m)if(!keep.has(k))delete m[k];
+  lsSet(LS_NOTES,NS);
 }
-function renderToday(){
-  const t0=today(),dt=parseD(t0),open=live().filter(t=>S.jobs[t.jobId]&&t.status!=='done');
-  const seen=new Set(),take=f=>{const r=open.filter(t=>!seen.has(t.id)&&f(t)).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')||PRIO_RANK[a.priority||'normal']-PRIO_RANK[b.priority||'normal']);r.forEach(t=>seen.add(t.id));return r};
-  const groups=[
-    {id:'overdue',label:'Overdue',cls:'over',rows:take(t=>t.due&&t.due<t0)},
-    {id:'due',label:'Due today',cls:'due',rows:take(t=>t.due===t0)},
-    {id:'doing',label:'In progress',cls:'doing',rows:take(t=>t.status!=='not_started')},
-    {id:'start',label:'Starting today',cls:'start',rows:take(t=>t.start&&t.start<=t0)},
-    {id:'soon',label:'Due in the next 3 days',cls:'soon',rows:take(t=>t.due&&diffDays(t.due,t0)<=3)}];
-  const n=g=>groups.find(x=>x.id===g).rows.length;
-  $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${I.today.replace('class="i"','class="i" style="width:28px;height:28px"')}Today</h1>
-    <div class="sub"><span>${WEEKDAY_FULL[dt.getDay()]}, ${MONTH_FULL[dt.getMonth()]} ${dt.getDate()} · ${n('overdue')?`<b style="color:var(--danger);font-weight:600">${n('overdue')} overdue</b> · `:''}${n('due')} due today · ${n('doing')} in progress</span></div></div>
-    <div class="tools"><button class="btn primary" data-act="new-task" data-due="${t0}">${I.plus}New task due today</button></div></div>`;
-  $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
-  if(!Object.keys(S.jobs).length){$('#view').innerHTML=`<div class="empty"><h3>Add your first job</h3><p>Once you have jobs and tasks, this page shows what's overdue, due today and in progress.</p><button class="btn primary" data-act="new-job">${I.plus}New job</button></div>`;return}
-  let html=weekStrip();
-  const shown=groups.filter(g=>g.rows.length);
-  if(!shown.length) html+=`<div class="empty"><h3>Nothing due today</h3><p>No overdue tasks, nothing due in the next 3 days and nothing in progress.</p></div>`;
-  for(const g of shown) html+=`<section class="group today-group ${g.cls}"><div class="group-bar"><h3 class="today-h">${g.label}<span class="count">${g.rows.length}</span></h3></div><div class="rows">${ROW_HEAD}${g.rows.map(t=>rowHtml(t,null,true)).join('')}</div></section>`;
-  $('#view').innerHTML=html;
+function notifications(all){
+  const t0=today(),out=[],lim=dayLimit();
+  const open=live().filter(t=>S.jobs[t.jobId]&&t.status!=='done');
+  const who=t=>{const c=S.clients[t.clientId],j=S.jobs[t.jobId];return c?`${j.name} · ${c.name}`:j.name};
+  const steps=t=>{const c=t.checklist||[],left=c.filter(x=>!x.done).length;return left?`${left} of ${c.length} checklist step${c.length===1?'':'s'} left.`:''};
+  for(const t of open){
+    const nm=`“${t.name||'Untitled task'}”`;
+    if(t.due&&t.due<t0){const d=-diffDays(t.due,t0);out.push({key:`over:${t.id}:${t.due}`,rank:0,kind:'danger',icon:'warn',task:t,title:`${nm} is overdue`,body:`It was due ${d===1?'yesterday':d+' days ago'}.`})}
+    else if(t.due===t0)out.push({key:`today:${t.id}:${t.due}`,rank:1,kind:'warn',icon:'clock',task:t,title:`${nm} is due today`,body:steps(t)});
+    else if(t.due&&diffDays(t.due,t0)===1)out.push({key:`tmrw:${t.id}:${t.due}`,rank:2,kind:'warn',icon:'clock',task:t,title:`${nm} is due tomorrow`,body:steps(t)});
+    if(t.start===t0&&t.status==='not_started')out.push({key:`start:${t.id}:${t.start}`,rank:3,kind:'info',icon:'flag',task:t,title:`${nm} starts today`,body:"It's still Not started."});
+    if((t.status==='internal_review'||t.status==='revisions')&&t.updated&&Date.now()-t.updated>=3*86400000){
+      const d=Math.floor((Date.now()-t.updated)/86400000);
+      out.push({key:`stale:${t.id}:${ymd(new Date(t.updated))}`,rank:4,kind:'info',icon:'loop',task:t,title:`${nm} has been in ${ST[t.status].label} for ${d} days`,body:'No changes since. Worth a follow-up?'});
+    }
+    if((t.revision||0)>=3)out.push({key:`rev:${t.id}:${t.revision}`,rank:5,kind:'info',icon:'loop',task:t,title:`${nm} is on revision round ${t.revision}`,body:'Might be time to agree the remaining changes in one go.'});
+    if(!t.due&&(t.priority==='urgent'||t.priority==='high'))out.push({key:`nodate:${t.id}`,rank:6,kind:'info',icon:'cal',task:t,title:`${nm} is ${t.priority==='urgent'?'urgent':'high priority'} but has no due date`,body:''});
+  }
+  const load=dueLoad();
+  for(let i=0;i<7;i++){const d=addDays(t0,i),n=load[d]||0;if(n>=lim)out.push({key:`busy:${d}:${n}`,rank:2.5,kind:'warn',icon:'warn',day:d,title:`${i===0?'Today':i===1?'Tomorrow':WEEKDAY[parseD(d).getDay()]+' '+fmtDate(d)} is a busy day`,body:`${n} tasks are due.`})}
+  out.forEach(n=>{n.sub=n.task?who(n.task):'All jobs'});
+  const list=out.sort((a,b)=>a.rank-b.rank||(a.task?.due||a.day||'').localeCompare(b.task?.due||b.day||''));
+  return all?list:list.filter(n=>!NS.hidden[n.key]);
+}
+function renderBell(){
+  const b=$('#bell');if(!b)return;
+  const list=S.ready?notifications():[],unread=list.filter(n=>!NS.read[n.key]).length;
+  const c=$('#bell-n');c.hidden=!unread;c.textContent=unread>9?'9+':unread;
+  b.classList.toggle('has',!!unread);b.setAttribute('aria-expanded',notesOpen);
+  b.setAttribute('aria-label',unread?`Notifications, ${unread} unread`:'Notifications');
+  const pop=$('#notes');pop.hidden=!notesOpen;if(!notesOpen)return;
+  pop.innerHTML=`<div class="notes-head"><b>Notifications</b>${unread?'<button type="button" class="btn sm ghost" data-act="notes-read">Mark all as read</button>':''}</div>
+    ${list.length?`<div class="notes-list">${list.map(n=>`<div class="note ${n.kind} ${NS.read[n.key]?'':'unread'}"><button type="button" class="note-main" data-act="note-open" data-key="${esc(n.key)}">${I[n.icon]}<span><b>${esc(n.title)}</b>${n.body?`<span>${esc(n.body)}</span>`:''}<small>${esc(n.sub)}</small></span></button><button type="button" class="icon-btn" data-act="note-hide" data-key="${esc(n.key)}" aria-label="Dismiss" title="Dismiss">${I.x}</button></div>`).join('')}</div>`
+    :`<p class="notes-empty">You're all caught up. Deadlines, busy days and tasks that need a nudge will show up here.</p>`}`;
+}
+function openNote(key){
+  const n=notifications(true).find(x=>x.key===key);if(!n)return;
+  NS.read[key]=1;saveNotes();notesOpen=false;renderBell();
+  if(n.task)openTask(n.task.id);
+  else if(n.day){const u=S.ui;u.tab='overview';u.client='all';u.view='calendar';u.month=n.day.slice(0,7);saveUi();render()}
 }
 
 /* ================= archive ================= */
@@ -1677,6 +1698,7 @@ function toast(msg,action){
 
 /* ================= events ================= */
 document.addEventListener('click',e=>{
+  if(notesOpen&&!e.target.closest('.bell-wrap')){notesOpen=false;renderBell()}
   const stop=e.target.closest('[data-stop]');
   const el=e.target.closest('[data-act]');
   if(!el) return;
@@ -1688,11 +1710,14 @@ document.addEventListener('click',e=>{
   switch(a){
     case 'nav': u.tab=el.dataset.tab;u.client=el.dataset.client||'all';saveUi();render();window.scrollTo({top:0});break;
     case 'view': u.view=el.dataset.view;saveUi();render();break;
-    case 'goto-day':{const d=el.dataset.day;u.tab='overview';u.client='all';u.view='calendar';u.month=d.slice(0,7);saveUi();render();window.scrollTo({top:0});break}
     case 'import-clickup': openImport();break;
     case 'im-pick': $('#csv-in').click();break;
     case 'im-restart': Object.assign(IM,{step:'pick',items:[],error:''});renderImport();break;
     case 'im-import': runImport();break;
+    case 'bell': notesOpen=!notesOpen;if(notesOpen)saveNotes();renderBell();break;
+    case 'notes-read': notifications().forEach(n=>NS.read[n.key]=1);saveNotes();renderBell();break;
+    case 'note-open': openNote(el.dataset.key);break;
+    case 'note-hide': NS.hidden[el.dataset.key]=1;NS.read[el.dataset.key]=1;saveNotes();renderBell();break;
     case 'toggle-jobs': u.jobsOpen=u.jobsOpen===false;saveUi();renderSide();break;
     case 'group': u.collapsed[el.dataset.status]=!u.collapsed[el.dataset.status];saveUi();render();break;
     case 'stat': u.due=u.due===el.dataset.due?'all':el.dataset.due;render();break;
@@ -1763,7 +1788,7 @@ document.addEventListener('click',e=>{
   if(a!=='delete-task'&&deleteArmed&&$('#drawer').contains(el)){deleteArmed=false;renderDrawer()}
 });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
+  if(e.key==='Escape'){if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'');
   if(e.key==='Enter'&&!typing){const r=e.target.closest?.('[data-act="open"]');if(r){openTask(r.dataset.id);return}}
   if(typing||e.metaKey||e.ctrlKey||e.altKey)return;
