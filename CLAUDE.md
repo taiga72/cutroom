@@ -6,7 +6,7 @@ Cutroom is a task tracker for one video editor's work. Their jobs are either age
 
 **Vercel + Supabase (the user's chosen home).** Vercel serves `index.html` and `api/`, and Supabase holds data, pictures and sign-in (Google or an emailed link). Anyone can sign up and gets their own empty tracker. The setup steps for the user are in `SETUP.md`, and the database setup is in `supabase/schema.sql`. Vercel env vars: `SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, CRON_SECRET` (optional `APP_URL`, `STATE_SECRET`).
 
-**claude.ai artifact (the earlier home, still live with the user's old data).** The user chose to start fresh on Supabase and leave the artifact as it is, so don't republish it unless they ask. It is:
+**claude.ai artifact (the earlier home, still live with the user's old data).** The user started fresh on Supabase, but still uses the artifact to try changes and leave comments, so keep it in step: after changing `index.html`, republish it there too (steps below). The same file runs in both places; in the artifact, `boot()` picks the `db` mode and the Supabase code stays unused. It is:
 
 - https://claude.ai/artifact/5F6f4sKQL5g76faB281jVg
   (the same artifact is also reachable at https://claude.ai/code/artifact/225c7408-57c3-4ab8-8bad-2a170308b077)
