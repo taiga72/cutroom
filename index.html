@@ -171,15 +171,21 @@ select.pill::before{display:none}
 .group-head.open svg{transform:rotate(90deg)}
 .group-head .count{font:500 12px var(--mono);color:var(--faint)}
 .rows{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
-.row,.row-head{display:grid;grid-template-columns:64px minmax(0,1fr) 180px 84px 84px 84px 92px;align-items:center;gap:12px;padding:8px 12px}
+.row,.row-head{display:grid;grid-template-columns:36px minmax(0,1fr) 180px 84px 84px 84px 92px;align-items:center;gap:12px;padding:8px 12px}
 .row-head{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);padding-block:6px;border-bottom:1px solid var(--line);background:var(--surface-2)}
 .row{border-top:1px solid var(--line);cursor:pointer}
 .row:first-of-type{border-top:0}
 .row-head + .row{border-top:0}
 .row:hover{background:var(--surface-2)}
 .row.focus{background:var(--accent-soft)}
-.thumb{width:64px;aspect-ratio:16/9;border-radius:5px;background:var(--surface-3);overflow:hidden;display:grid;place-items:center;color:var(--faint);font:500 10px var(--mono);max-width:100%}
-.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.tmark{position:relative;width:36px;height:36px;border-radius:26%;background:var(--surface-2);border:1px solid var(--line);overflow:hidden;display:grid;place-items:center;color:var(--faint);flex:none}
+.tmark .i{width:18px;height:18px}
+.tmark img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:var(--surface)}
+.crumb .tmark{width:22px;height:22px}
+.crumb .tmark .i{width:13px;height:13px}
+.card-top{display:flex;align-items:flex-start;gap:9px}
+.card-top .tmark{width:30px;height:30px}
+.card-top .tmark .i{width:15px;height:15px}
 .t-main{min-width:0;display:flex;flex-direction:column;gap:2px}
 .t-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .done-row .t-name{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--faint)}
@@ -214,8 +220,6 @@ select.pill::before{display:none}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:7px;cursor:grab;text-align:left}
 .card:hover{border-color:var(--line-strong);box-shadow:var(--shadow)}
 .card.dragging{opacity:.4}
-.card .cover{aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:var(--surface-3);max-width:100%}
-.card .cover img{width:100%;height:100%;object-fit:cover;display:block}
 .card .t-name{white-space:normal}
 .card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .col .add-card{border:0;background:none;color:var(--muted);text-align:left;padding:6px 6px;border-radius:7px;display:flex;align-items:center;gap:6px;font-weight:500}
@@ -249,15 +253,6 @@ select.pill::before{display:none}
 .d-name{width:100%;border:1px solid transparent;background:none;font:700 22px/1.25 var(--display);letter-spacing:-.01em;padding:4px 6px;margin:-4px -6px;border-radius:7px;resize:none;overflow:hidden}
 .d-name:hover{border-color:var(--line)}
 .d-name:focus{outline:none;border-color:var(--accent);background:var(--surface-2)}
-.picture{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:var(--surface-2);border:1px dashed var(--line-strong);display:grid;place-items:center;max-width:100%}
-.picture.has{border-style:solid;border-color:var(--line)}
-.picture img{width:100%;height:100%;object-fit:cover;display:block}
-.picture.drag{border-color:var(--accent);background:var(--accent-soft)}
-.picture .pick{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);padding:20px;text-align:center;width:100%;height:100%;justify-content:center}
-.picture .pick svg{width:24px;height:24px}
-.picture .pic-actions{position:absolute;right:8px;bottom:8px;display:flex;gap:6px}
-.picture .pic-actions .btn{background:color-mix(in srgb,var(--surface) 92%,transparent)}
-.picture .busy{position:absolute;inset:0;display:grid;place-items:center;background:color-mix(in srgb,var(--surface) 70%,transparent);font-weight:600}
 .props{display:grid;grid-template-columns:120px minmax(0,1fr);gap:8px 12px;align-items:center}
 .props > label,.props > .lbl{color:var(--muted);font-size:13px;display:flex;align-items:center;gap:7px}
 .props select,.props input[type=date],.props input[type=text]{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 8px;font-size:13px;width:100%;max-width:260px}
@@ -341,7 +336,7 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .arch-group + .arch-group{margin-top:16px}
 .arch-group h3{margin:0 0 8px;font:700 15px var(--display);display:flex;align-items:center;gap:8px}
 .arch-group h3 .count{font:500 12px var(--mono);color:var(--faint)}
-.arow{display:grid;grid-template-columns:64px minmax(0,1fr) 100px 110px auto;align-items:center;gap:12px;padding:8px 12px;border-top:1px solid var(--line);cursor:pointer}
+.arow{display:grid;grid-template-columns:36px minmax(0,1fr) 100px 110px auto;align-items:center;gap:12px;padding:8px 12px;border-top:1px solid var(--line);cursor:pointer}
 .arow:first-child{border-top:0}
 .arow:hover{background:var(--surface-2)}
 .arow .acts{display:flex;gap:6px}
@@ -355,9 +350,8 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 
 /* ---------- responsive ---------- */
 @media (max-width:1100px){
-  .row,.row-head{grid-template-columns:56px minmax(0,1fr) 180px 84px 92px}
+  .row,.row-head{grid-template-columns:36px minmax(0,1fr) 180px 84px 92px}
   .row > .c-start,.row-head > .c-start,.row > .c-prio,.row-head > .c-prio{display:none}
-  .thumb{width:56px}
   .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media (max-width:820px){
@@ -376,13 +370,12 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .main{padding:16px 16px 60px}
   .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .stats .stat:first-child{grid-column:1/-1}
-  .row,.row-head{grid-template-columns:48px minmax(0,1fr) auto;gap:10px}
+  .row,.row-head{grid-template-columns:36px minmax(0,1fr) auto;gap:10px}
   .row-head{display:none}
   .row > .c-status{grid-column:2/4;grid-row:2;justify-self:start}
   .row > .c-due{grid-column:3;grid-row:1}
   .row > .c-links{display:none}
-  .thumb{width:48px}
-  .arow{grid-template-columns:48px minmax(0,1fr) auto}
+  .arow{grid-template-columns:36px minmax(0,1fr) auto}
   .arow .c-done{display:none}
   .arow .acts{grid-column:2/4;justify-self:start}
   .props{grid-template-columns:1fr}
@@ -465,7 +458,6 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 <div class="modal-wrap" id="modal" hidden></div>
 <div class="modal-wrap crop-wrap" id="crop" hidden></div>
 <div class="toast" id="toast" hidden role="status"></div>
-<input type="file" id="file-in" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
 <input type="file" id="logo-in" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
 
 <script>
@@ -508,6 +500,7 @@ const I={
   image:'<svg class="i" viewBox="0 0 16 16"><rect x="2" y="2.5" width="12" height="11" rx="1.5"/><circle cx="6" cy="6.5" r="1.3"/><path d="m2.5 12 3.5-3.5 2.5 2.5 2-2 3 3"/></svg>',
   gear:'<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.7M8 12.5v1.7M1.8 8h1.7M12.5 8h1.7M3.6 3.6l1.2 1.2M11.2 11.2l1.2 1.2M3.6 12.4l1.2-1.2M11.2 4.8l1.2-1.2"/></svg>',
   grid:'<svg class="i" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><rect x="9" y="9" width="4.5" height="4.5" rx="1"/></svg>',
+  building:'<svg class="i" viewBox="0 0 16 16"><path d="M3 14V3.2c0-.4.3-.7.7-.7h5.6c.4 0 .7.3.7.7V14M9 6.5h3.3c.4 0 .7.3.7.7V14M1.5 14h13M5 5h2M5 7.5h2M5 10h2M11 9h.01M11 11.5h.01"/></svg>',
   cal:'<svg class="i" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg>',
   status:'<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5a5.5 5.5 0 0 1 0 11z" fill="currentColor"/></svg>',
   briefcase:'<svg class="i" viewBox="0 0 16 16"><rect x="2" y="5" width="12" height="8.5" rx="1.5"/><path d="M5.5 5V3.5h5V5"/></svg>',
@@ -599,7 +592,6 @@ function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 /* Stored picture values: a data URL (this browser only), "sb:<path>" (Supabase Storage) or an artifact asset id. */
 const imgSrc=v=>{if(!v)return null;v=String(v);if(v.startsWith('data:'))return v;if(v.startsWith('sb:'))return B.cfg?`${B.cfg.supabaseUrl}/storage/v1/object/public/pictures/${v.slice(3).split('/').map(encodeURIComponent).join('/')}`:null;return '/_blob/'+v};
-const thumbSrc=t=>imgSrc(t&&t.thumb);
 const initials=n=>String(n||'').trim().split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?';
 const jobMark=(j,size)=>{const s=imgSrc(j?.logo);return s?`<img class="logo" style="--s:${size}px" src="${esc(s)}" alt="" onerror="this.remove()">`:`<span class="dot" style="background:${esc(j?.color)}"></span>`};
 const clientMark=(c,size)=>{const s=imgSrc(c?.logo);return s?`<img class="logo" style="--s:${size}px" src="${esc(s)}" alt="" onerror="this.remove()">`:''};
@@ -1035,7 +1027,12 @@ function linkIcons(t){
   const one=(kind,icon)=>{const u=safeUrl(t.links?.[kind]);const label=linkLabel(j,kind);return u?`<a href="${esc(u)}" target="_blank" rel="noopener" title="Open ${esc(label)}" aria-label="Open ${esc(label)}" data-stop>${icon}</a>`:`<span title="No ${esc(label)} yet">${icon}</span>`};
   return `<div class="links">${one('task',I.task)}${one('upload',I.film)}${one('file',I.folder)}</div>`;
 }
-const thumbHtml=t=>{const s=thumbSrc(t);return `<div class="thumb">${s?`<img src="${esc(s)}" alt="" loading="lazy" onerror="this.remove()">`:esc(t.format||'')}</div>`};
+/* A task shows its client's logo, else its job's logo, else a plain company icon. */
+const taskMark=t=>{
+  const c=t.clientId&&S.clients[t.clientId],j=S.jobs[t.jobId],src=imgSrc(c?.logo)||imgSrc(j?.logo);
+  const who=c?c.name:j?.name||'';
+  return `<div class="tmark" title="${esc(who)}">${src?`<img src="${esc(src)}" alt="" loading="lazy" onerror="this.remove()">`:''}${I.building}</div>`;
+};
 const prioHtml=p=>{p=p||'normal';return `<span class="prio ${p}">${p==='normal'?'':I.flag}${PRIORITIES.find(x=>x.id===p)?.label||''}</span>`};
 const statusSelect=(t,act)=>`<select class="pill st-${t.status}" data-act="${act}" data-id="${t.id}" aria-label="Status">${STATUSES.map(s=>`<option value="${s.id}" ${s.id===t.status?'selected':''}>${s.label}</option>`).join('')}</select>`;
 
@@ -1049,7 +1046,7 @@ function listView(list,job){
     if(open){
       html+=`<div class="rows">${rows.length?`<div class="row-head"><span></span><span>Task</span><span>Status</span><span class="c-prio">Priority</span><span class="c-start">Start</span><span>Due</span><span>Links</span></div>`:''}`;
       html+=rows.map(t=>`<div class="row ${t.status==='done'?'done-row':''} ${S.ui.openTask===t.id?'focus':''}" data-act="open" data-id="${t.id}" tabindex="0">
-        ${thumbHtml(t)}
+        ${taskMark(t)}
         <div class="t-main"><div class="t-name">${esc(t.name||'Untitled task')}</div>${metaLine(t,job,showJob)}</div>
         <div class="c-status" data-stop>${statusSelect(t,'row-status')}${t.status==='done'?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
         <div class="c-prio">${prioHtml(t.priority)}</div>
@@ -1068,10 +1065,9 @@ function boardView(list,job){
   return `<div class="board-wrap"><div class="board">${STATUSES.map(s=>{
     const cards=list.filter(t=>t.status===s.id);
     return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill st-${s.id}">${s.label}</span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
-      ${cards.map(t=>{const src=thumbSrc(t);return `<div class="card" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
-        ${src?`<div class="cover"><img src="${esc(src)}" alt="" loading="lazy" onerror="this.parentNode.remove()"></div>`:''}
-        <div class="t-name">${esc(t.name||'Untitled task')}</div>${metaLine(t,job,!job)}
-        <div class="card-foot"><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):'No due date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${t.status==='done'?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`}).join('')}
+      ${cards.map(t=>`<div class="card" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
+        <div class="card-top">${taskMark(t)}<div class="t-name">${esc(t.name||'Untitled task')}</div></div>${metaLine(t,job,!job)}
+        <div class="card-foot"><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):'No due date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${t.status==='done'?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
       <button class="add-card" data-act="new-task" data-status="${s.id}">${I.plus}Add task</button></div>`;
   }).join('')}</div></div>`;
 }
@@ -1126,7 +1122,7 @@ function renderArchive(){
   for(const j of jobsWith){
     const rows=list.filter(t=>t.jobId===j.id);if(!rows.length)continue;
     html+=`<section class="arch-group"><h3>${jobMark(j,20)}${esc(j.name)}<span class="count">${rows.length}</span></h3><div class="rows">${rows.map(t=>`<div class="arow" data-act="open" data-id="${t.id}" tabindex="0">
-      ${thumbHtml(t)}
+      ${taskMark(t)}
       <div class="t-main"><div class="t-name">${esc(t.name||'Untitled task')}</div>${metaLine(t,j,false)}</div>
       <div class="date c-done"><small>Done</small>${t.doneAt?fmtDate(t.doneAt):'—'}</div>
       <div class="date c-done"><small>Archived</small>${t.archivedAt?fmtDate(t.archivedAt):'—'}</div>
@@ -1137,29 +1133,22 @@ function renderArchive(){
 }
 
 /* ================= drawer ================= */
-let deleteArmed=false, clearArmed=false, uploading=false;
-function openTask(id){S.ui.openTask=id;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;scheduleRender()}
+let deleteArmed=false, clearArmed=false;
+function openTask(id){S.ui.openTask=id;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender()}
 function closeDrawer(){flushAll();S.ui.openTask=null;$('#drawer').hidden=true;$('#scrim').hidden=true;scheduleRender()}
 function renderDrawer(){
   const t=S.tasks[S.ui.openTask];
   if(!t){if(S.ui.openTask)closeDrawer();return}
   const j=S.jobs[t.jobId];const cl=j?clientsOf(j.id):[];
-  const src=thumbSrc(t);
-  const canPic=B.mode!=='db'||!!B.assets;
   const checklist=t.checklist||[];const doneN=checklist.filter(x=>x.done).length;
   const linkRow=(kind,icon)=>{const u=safeUrl(t.links?.[kind]);const label=linkLabel(j,kind);return `<div class="link-row"><label><span>${icon}${esc(label)}</span><input type="url" data-field="links.${kind}" data-fk="d-link-${kind}" value="${esc(t.links?.[kind]||'')}" placeholder="Paste link"></label>
     <div class="acts"><a class="icon-btn ${u?'':'off'}" href="${esc(u||'#')}" target="_blank" rel="noopener" title="Open" aria-label="Open ${esc(label)}">${I.ext}</a><button class="icon-btn" data-act="copy" data-kind="${kind}" title="Copy link" aria-label="Copy ${esc(label)}">${I.copy}</button></div></div>`};
   withFocus(()=>{$('#drawer').innerHTML=`
-  <div class="d-top"><div class="crumb">${jobMark(j,18)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
+  <div class="d-top"><div class="crumb">${taskMark(t)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
     <button class="icon-btn" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
   <div class="d-body">
     ${t.archived?`<div class="d-archived">${I.archive}<span><b>Archived</b>${t.archivedAt?' '+fmtDate(t.archivedAt):''}. Hidden from Overview and job tabs.</span><button class="btn sm" data-act="restore" data-id="${t.id}">Restore</button></div>`:''}
     <textarea class="d-name" rows="1" data-field="name" data-fk="d-name" aria-label="Task name" placeholder="Task name">${esc(t.name)}</textarea>
-    <div class="picture ${src?'has':''}" id="pic" data-drop-pic>
-      ${src?`<img src="${esc(src)}" alt="Task picture">`:canPic?`<button class="pick" data-act="pick-pic">${I.image}<b>Add a picture</b><span class="hint">Thumbnail, frame grab or reference. Drop an image here or click to choose.</span></button>`:`<span class="hint">No picture</span>`}
-      ${src&&canPic?`<div class="pic-actions"><button class="btn sm" data-act="pick-pic">Replace</button><button class="btn sm" data-act="remove-pic">Remove</button></div>`:''}
-      ${uploading?'<div class="busy">Uploading…</div>':''}
-    </div>
     <div class="props">
       <span class="lbl">${I.status}Status</span><div>${statusSelect(t,'d-status')}</div>
       <label for="d-prio">${I.flag}Priority</label><select id="d-prio" data-field="priority">${PRIORITIES.map(p=>`<option value="${p.id}" ${(t.priority||'normal')===p.id?'selected':''}>${p.label}</option>`).join('')}</select>
@@ -1181,7 +1170,8 @@ function renderDrawer(){
   </div>`});
   autosize($('.d-name'));
 }
-function autosize(el){if(!el)return;el.style.height='auto';el.style.height=el.scrollHeight+'px'}
+/* a hidden element measures 0, so leave the height alone until it can be measured */
+function autosize(el){if(!el||!el.offsetParent)return;el.style.height='auto';el.style.height=el.scrollHeight+'px'}
 
 function setStatus(id,st){
   const t=S.tasks[id];if(!t||t.status===st)return;
@@ -1241,19 +1231,6 @@ function dropImage(v){
   if(!v)return;v=String(v);
   if(B.mode==='cloud'&&v.startsWith('sb:'))B.sb.storage.from('pictures').remove([v.slice(3)]).catch(()=>{});
   else if(B.mode==='db'&&B.assets&&!v.startsWith('data:'))B.assets.delete(v).catch(()=>{});
-}
-async function setPicture(file,taskId){
-  if(!file) return;
-  uploading=true;renderDrawer();
-  try{const old=S.tasks[taskId]?.thumb;const v=await storeImage(file,1280,560,'image/jpeg');patch('tasks',taskId,{thumb:v});dropImage(old)}
-  catch(e){console.error(e);toast(uploadError(e))}
-  finally{uploading=false;renderDrawer()}
-}
-function removePicture(taskId){
-  const old=S.tasks[taskId]?.thumb;
-  patch('tasks',taskId,{thumb:null});
-  dropImage(old);
-  renderDrawer();
 }
 
 /* ================= job modal ================= */
@@ -1512,8 +1489,6 @@ document.addEventListener('click',e=>{
       if(S.ui.openTask&&!S.tasks[S.ui.openTask])closeDrawer();
       u.tab='overview';u.client='all';saveUi();render();toast('Example data cleared');break;
     /* drawer */
-    case 'pick-pic': $('#file-in').click();break;
-    case 'remove-pic': removePicture(u.openTask);break;
     case 'fmt':{const t=S.tasks[u.openTask];patch('tasks',u.openTask,{format:t.format===el.dataset.fmt?'':el.dataset.fmt});renderDrawer();break}
     case 'rev':{const t=S.tasks[u.openTask];patch('tasks',u.openTask,{revision:Math.max(0,(t.revision||0)+(+el.dataset.step))});renderDrawer();break}
     case 'copy':{
@@ -1576,7 +1551,6 @@ document.addEventListener('change',e=>{
   if(el.id==='arch-job'){u.ajob=el.value;saveUi();render();return}
   if(el.id==='f-sort'){u.sort=el.value;saveUi();render();return}
   if(el.id==='logo-in'){const f=el.files[0];el.value='';if(!f)return;const app=logoTarget?.kind==='app';openCrop(f,blob=>app?setAppLogo(blob):setModalLogo(blob));return}
-  if(el.id==='file-in'){const f=el.files[0];el.value='';if(u.openTask)setPicture(f,u.openTask);return}
   const act=el.dataset.act;
   if(act==='row-status'){setStatus(el.dataset.id,el.value);if(u.openTask===el.dataset.id)renderDrawer();return}
   if(act==='d-status'){setStatus(u.openTask,el.value);renderDrawer();return}
@@ -1626,20 +1600,12 @@ let dragId=null;
 document.addEventListener('dragstart',e=>{const c=e.target.closest?.('.card');if(!c)return;dragId=c.dataset.id;c.classList.add('dragging');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',dragId)}catch(x){}});
 document.addEventListener('dragend',e=>{e.target.classList?.remove('dragging');document.querySelectorAll('.col.drag').forEach(c=>c.classList.remove('drag'));dragId=null});
 document.addEventListener('dragover',e=>{
-  const col=e.target.closest?.('[data-drop]');const pic=e.target.closest?.('[data-drop-pic]');
+  const col=e.target.closest?.('[data-drop]');
   if(col&&dragId){e.preventDefault();document.querySelectorAll('.col.drag').forEach(c=>c!==col&&c.classList.remove('drag'));col.classList.add('drag')}
-  else if(pic&&e.dataTransfer.types.includes('Files')){e.preventDefault();pic.classList.add('drag')}
 });
-document.addEventListener('dragleave',e=>{const pic=e.target.closest?.('[data-drop-pic]');if(pic&&!pic.contains(e.relatedTarget))pic.classList.remove('drag')});
 document.addEventListener('drop',e=>{
-  const col=e.target.closest?.('[data-drop]');const pic=e.target.closest?.('[data-drop-pic]');
-  if(col&&dragId){e.preventDefault();setStatus(dragId,col.dataset.drop);dragId=null;return}
-  if(pic){e.preventDefault();pic.classList.remove('drag');const f=e.dataTransfer.files[0];if(f&&S.ui.openTask&&(B.mode!=='db'||B.assets))setPicture(f,S.ui.openTask)}
-});
-document.addEventListener('paste',e=>{
-  if($('#drawer').hidden||!S.ui.openTask)return;
-  const f=[...(e.clipboardData?.files||[])].find(x=>x.type.startsWith('image/'));
-  if(f&&(B.mode!=='db'||B.assets)){e.preventDefault();setPicture(f,S.ui.openTask)}
+  const col=e.target.closest?.('[data-drop]');
+  if(col&&dragId){e.preventDefault();setStatus(dragId,col.dataset.drop);dragId=null}
 });
 
 boot();

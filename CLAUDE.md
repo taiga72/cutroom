@@ -37,7 +37,7 @@ Collections (document fields):
 
 - `jobs`: `name, type ('agency'|'direct'), color, logo, order, tools{comms,tracker,upload,storage}, toolLinks{same keys}`
 - `clients`: `jobId, name, logo, order` (only agency jobs have clients)
-- `tasks`: `jobId, clientId, name, status, priority, start, due (YYYY-MM-DD), format, length, revision, links{task,upload,file}, thumb, notes, checklist[{id,text,done}], created, updated, doneAt, archived, archivedAt`
+- `tasks`: `jobId, clientId, name, status, priority, start, due (YYYY-MM-DD), format, length, revision, links{task,upload,file}, thumb (legacy: no longer shown or set; still deleted with the task), notes, checklist[{id,text,done}], created, updated, doneAt, archived, archivedAt`
 - `settings/app`: `name, logo, theme ('system'|'light'|'dark')`
 
 Allowed values:
@@ -63,7 +63,7 @@ UI preferences (tab, view, collapsed groups, sort) are kept in localStorage (`cu
 - **Persistence:** `create / patch / remove / flush`. Writes are optimistic and queued per document. Text fields are debounced with `patch(col, id, p, 600)`.
 - **Rendering:** `render()` calls `renderSide()` and `renderMain()`. `renderMain` branches to overview, job tab, or `renderArchive()`. The views are `listView / boardView / calendarView`. The task panel is `renderDrawer()`.
 - **Modals:** jobs use `openJobModal / renderModal / saveModal` with state in `M`. Settings use `openSettings / renderSettings / closeSettings` with state in `SM`.
-- **Images:** logo picks (job, client, app) first go through the crop dialog (`openCrop / renderCrop / useCrop`, state in `CR`, layer `#crop` above `#modal`), which outputs a square PNG. `storeImage()` resizes and uploads, `dropImage()` deletes a replaced asset, and `jobMark() / clientMark()` show a logo, or the color dot when there is none.
+- **Images:** logo picks (job, client, app) first go through the crop dialog (`openCrop / renderCrop / useCrop`, state in `CR`, layer `#crop` above `#modal`), which outputs a square PNG. `storeImage()` resizes and uploads, `dropImage()` deletes a replaced asset, and `jobMark() / clientMark()` show a logo, or the color dot when there is none. Tasks have no picture of their own: `taskMark()` shows the client's logo, else the job's logo, else a building icon (lists, board cards, archive and the task panel).
 - **Events:** delegated `click / change / input / submit` handlers switch on `data-act`. Give re-rendered inputs a `data-fk` so `withFocus()` keeps focus while typing.
 
 ## Conventions
