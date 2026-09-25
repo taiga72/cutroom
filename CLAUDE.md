@@ -35,7 +35,7 @@ There are three storage modes, chosen at startup in `boot()`, in this order:
 
 Collections (document fields):
 
-- `jobs`: `name, type ('agency'|'direct'), color, logo, order, tools{comms,tracker,upload,storage}, toolLinks{same keys}`
+- `jobs`: `name, type ('agency'|'direct'), color, logo, order, tools{comms,tracker,upload,storage}, toolLinks{same keys}, work{days[0-6], hours, shiftStart, shiftEnd (HH:MM, the user's time), pay{amount, currency, period, payday, method}, location, tz (IANA), contact{name, reach}, since, notes}`
 - `clients`: `jobId, name, logo, order` (only agency jobs have clients)
 - `tasks`: `jobId, clientId, clickupId (set by the ClickUp import), name, status, priority, start, due (YYYY-MM-DD), format, length, revision, links{task,upload,file}, thumb (legacy: no longer shown or set; still deleted with the task), notes, checklist[{id,text,done}], created, updated, doneAt, archived, archivedAt`
 - `settings/app`: `name, logo, theme ('system'|'light'|'dark'), dayLimit`
@@ -61,9 +61,10 @@ UI preferences (tab, view, collapsed groups, sort) are kept in localStorage (`cu
 - **CSS:** color tokens on `:root` for light, redefined for dark under both `prefers-color-scheme` and `[data-theme="dark"]`. Always style through the tokens. Status colors use `--st-*`.
 - **Sample data:** `/*SAMPLE-START*/ … /*SAMPLE-END*/` holds the date helpers plus `buildSample()`.
 - **Persistence:** `create / patch / remove / flush`. Writes are optimistic and queued per document. Text fields are debounced with `patch(col, id, p, 600)`.
-- **Sidebar (`renderSide`):** Overview, Archived, then a **Jobs** item that folds the job list open or closed (`S.ui.jobsOpen`, remembered). Clients aren't listed in the sidebar; they're tabs on the job page. The open page (Overview, or the current job) drops down List / Board / Calendar (`viewsNav()`); on phones, where the sidebar is a row, the toolbar's `#f-view` select does this instead. Task search (`#q`) sits top-right of the page header (`#top-search`); the toolbar holds the priority, due-date and sort filters plus New task. Settings sits in the footer next to the save status. Edit buttons use `I.pencil`; `I.gear` is the Settings cog.
+- **Sidebar (`renderSide`):** Overview, Archived, then a **Jobs** item that folds the job list open or closed (`S.ui.jobsOpen`, remembered). Clients aren't listed in the sidebar; they're tabs on the job page. Task search (`#q`) sits top-right of the page header (`#top-search`). The toolbar holds the List / Board / Calendar switch (`.seg`, back in the toolbar at the user's request; don't move it to the sidebar), the priority, due-date and sort filters, and New task. Settings sits in the footer next to the save status. Edit buttons use `I.pencil`; `I.gear` is the Settings cog.
 - **Workload:** `dueLoad()` counts open tasks due per day across all jobs; a day is busy at `dayLimit()` or more (`settings/app.dayLimit`, default 3, set in Settings). Busy days are flagged on the Calendar (`.busy-tag`), in the task panel under Dates, and in notifications.
 - **Notifications (`notifications / renderBell / openNote`):** the bell top-right, next to search (`#bell`, panel `#notes`). The list is rebuilt from the tasks on every render: overdue, due today, due tomorrow (with checklist steps left), busy days in the next 7, starting today but not started, stuck in Internal review or Revisions for 3 or more days (by `updated`), revision round 3 or more, and urgent or high priority with no due date. Clicking one opens its task (a busy day opens the Calendar). Read and dismissed keys are kept per device in localStorage (`cutroom.notes.v1`). Keys include the date they refer to, so a moved deadline notifies again. The user removed the earlier Today page; don't bring it back.
+- **Work details (`workOf / workForm / workCard`):** per-job schedule, pay, location and contact, edited in the job modal ("Work details", inputs use `data-mw="path"`) and shown as a strip at the top of the job page. Overview job cards show days, hours and the client's local time, and the Overview header totals scheduled hours per week. Time differences come from `Intl` (`tzOffset`, `tzDiff`) against this device's time zone (`MY_TZ`). A 60-second timer re-renders so the "time there" stays current. The user is paid a fixed monthly amount, so pay is information only: no invoicing or time tracking.
 - **ClickUp import (`openImport / renderImport / readClickUp / runImport`, state in `IM`):** reads a ClickUp List CSV export in the browser (no API key). Status names are mapped by keyword (`cuStatus`), priorities 1–4 or by name (`cuPrio`), dates from epoch ms or text (`cuDate`). Imported tasks keep `clickupId` and a ClickUp link in `links.task`; re-importing skips ids already present.
 - **Rendering:** `render()` calls `renderSide()` and `renderMain()`. `renderMain` branches to overview, job tab, or `renderArchive()`. The views are `listView / boardView / calendarView`. The task panel is `renderDrawer()`.
 - **Modals:** jobs use `openJobModal / renderModal / saveModal` with state in `M`. Settings use `openSettings / renderSettings / closeSettings` with state in `SM`.
@@ -85,8 +86,6 @@ Open the file locally with Playwright to check a change. Chromium is at `/opt/pw
 ## Ideas the user may ask for next
 
 - Separate tool links per agency client.
-- Rates and invoice/paid status per job, with a monthly "owed" view.
-- Time tracking per task.
 - Repeating tasks.
 - A checklist of assets received from the client.
 - Importing from ClickUp directly through its API (today's import reads a CSV export).
