@@ -154,6 +154,57 @@ button.stat:hover{border-color:var(--line-strong)}
 .search input{border:0;background:none;outline:none;padding:7px 0;width:100%;color:var(--text)}
 .sel{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:6px 8px;font-size:13px;font-weight:500;max-width:100%}
 .toolbar .spacer{flex:1}
+.brand-panel{border:1px solid var(--line);background:var(--surface);border-radius:12px;margin-top:14px;overflow:hidden}
+.bp-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px 8px 6px}
+.bp-toggle{display:flex;align-items:center;gap:8px;border:0;background:none;font-size:14px;padding:4px 6px;border-radius:7px;color:var(--text)}
+.bp-toggle > svg:first-child{color:var(--faint);transition:transform .15s}
+.bp-toggle.open > svg:first-child{transform:rotate(90deg)}
+.brand-panel .bv{border-top:1px solid var(--line);padding:14px}
+.brand-chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px;font-size:13px;color:var(--muted)}
+.brand-chips > span{display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.chip-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;font-size:12.5px;font-weight:600}
+.chip-btn.empty{color:var(--faint);border-style:dashed}
+.chip-btn:hover{border-color:var(--accent)}
+.bv{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px 18px}
+.bv.compact{grid-template-columns:1fr;gap:10px;padding-top:8px}
+.bv-sec h5{margin:0 0 5px;font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+.bv-sec p{margin:0;font-size:13.5px;line-height:1.5}
+.bv-colors{display:flex;flex-wrap:wrap;gap:6px}
+.swatch{display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 9px 4px 4px;text-align:left}
+.swatch:hover{border-color:var(--accent)}
+.swatch i{width:24px;height:24px;border-radius:5px;border:1px solid var(--line);flex:none}
+.swatch span{display:flex;flex-direction:column;line-height:1.2}
+.swatch b{font-size:12.5px}
+.swatch small{font:500 11px var(--mono);color:var(--muted)}
+.bv-fonts{display:flex;flex-direction:column;gap:4px;font-size:13.5px;font-weight:600}
+.bv-fonts small{display:block;font-size:11px;font-weight:500;color:var(--muted)}
+.bv-dd{display:grid;grid-template-columns:1fr 1fr;gap:14px;grid-column:1/-1}
+.bv.compact .bv-dd{grid-template-columns:1fr}
+.bv-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;font-size:13.5px}
+.bv-list li{padding-left:22px;position:relative;line-height:1.4}
+.bv-list li::before{position:absolute;left:0;top:0;font-weight:700}
+.bv-list.do li::before{content:"✓";color:var(--st-done)}
+.bv-list.dont li::before{content:"✕";color:var(--danger)}
+.bv-links{display:flex;flex-wrap:wrap;gap:6px}
+.bv-links .btn{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.bv-foot{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:flex-start;gap:6px 14px;font-size:12px;color:var(--faint)}
+.bv-log summary{cursor:pointer;color:var(--muted);font-weight:600}
+.bv-log ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px;color:var(--muted)}
+.bv-log b{color:var(--text);font-weight:600;margin-right:4px}
+.d-brand{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.d-brand summary{cursor:pointer;margin:0;list-style:revert}
+.d-brand-acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.brand-modal{width:min(760px,100%)}
+.brand-modal h2{display:flex;align-items:center;gap:8px}
+.brand-modal label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted);min-width:0}
+.brand-modal input[type=text],.brand-modal input[type=url],.brand-modal textarea{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:7px 9px;font-size:13px;font-weight:400;color:var(--text);width:100%}
+.brand-modal textarea{resize:vertical;line-height:1.45}
+.bm-colors,.bm-pdfs{display:flex;flex-direction:column;gap:6px}
+.bm-color{display:grid;grid-template-columns:40px 110px minmax(0,1fr) auto;gap:6px;align-items:center}
+.bm-color input[type=color]{width:40px;height:34px;border:1px solid var(--line);border-radius:7px;padding:2px;background:var(--surface)}
+.bm-pdf{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:13px}
+.bm-pdf span{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bm-pdf small{color:var(--faint);font-size:11.5px}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:2px}
 .seg button{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:5px 10px;border-radius:7px;color:var(--muted);font-weight:600;font-size:13px}
 .seg button.on{background:var(--surface-3);color:var(--text)}
@@ -436,6 +487,9 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .nav-label{display:none}
   .nav-sub{display:none}
   .im-dest{grid-template-columns:1fr}
+  .bv-dd{grid-template-columns:1fr}
+  .bm-color{grid-template-columns:40px minmax(0,1fr) auto}
+  .bm-color input[data-bm-cname]{grid-column:2/3}
   .im-row{grid-template-columns:auto minmax(0,1fr) auto}
   .im-row .date{display:none}
   .head-row{flex-direction:column-reverse;gap:12px}
@@ -547,6 +601,7 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 <div class="modal-wrap" id="modal" hidden></div>
 <div class="modal-wrap crop-wrap" id="crop" hidden></div>
 <div class="toast" id="toast" hidden role="status"></div>
+<input type="file" id="pdf-in" accept="application/pdf,.pdf" hidden>
 <input type="file" id="csv-in" accept=".csv,text/csv" hidden>
 <input type="file" id="logo-in" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
 
@@ -597,6 +652,8 @@ const I={
   board:'<svg class="i" viewBox="0 0 16 16"><rect x="2" y="2.5" width="3.4" height="11" rx="1"/><rect x="6.3" y="2.5" width="3.4" height="7" rx="1"/><rect x="10.6" y="2.5" width="3.4" height="9" rx="1"/></svg>',
   warn:'<svg class="i" viewBox="0 0 16 16"><path d="M8 2.2 14.3 13.3H1.7z"/><path d="M8 6.5v3M8 11.6h.01"/></svg>',
   download:'<svg class="i" viewBox="0 0 16 16"><path d="M8 2.5v8M4.8 7.5 8 10.7l3.2-3.2M2.5 13.5h11"/></svg>',
+  palette:'<svg class="i" viewBox="0 0 16 16"><path d="M8 2a6 6 0 1 0 0 12c.9 0 1.3-.6 1.3-1.2 0-.8-.7-1-.7-1.7 0-.6.5-1 1.1-1h1.6A2.7 2.7 0 0 0 14 7.4C14 4.4 11.3 2 8 2z"/><circle cx="5.2" cy="7.3" r=".8" fill="currentColor"/><circle cx="7.4" cy="4.9" r=".8" fill="currentColor"/><circle cx="10.4" cy="5.3" r=".8" fill="currentColor"/></svg>',
+  file:'<svg class="i" viewBox="0 0 16 16"><path d="M9.5 1.8H4.5A1.5 1.5 0 0 0 3 3.3v9.4a1.5 1.5 0 0 0 1.5 1.5h7a1.5 1.5 0 0 0 1.5-1.5V5.3z"/><path d="M9.5 1.8v3.5H13M5.5 9h5M5.5 11.5h3.5"/></svg>',
   pencil:'<svg class="i" viewBox="0 0 16 16"><path d="M10.8 2.7a1.5 1.5 0 0 1 2.1 0l.4.4a1.5 1.5 0 0 1 0 2.1L5.6 12.9l-3.1.6.6-3.1z"/><path d="M9.5 4l2.5 2.5"/></svg>',
   grid:'<svg class="i" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><rect x="9" y="9" width="4.5" height="4.5" rx="1"/></svg>',
   building:'<svg class="i" viewBox="0 0 16 16"><path d="M3 14V3.2c0-.4.3-.7.7-.7h5.6c.4 0 .7.3.7.7V14M9 6.5h3.3c.4 0 .7.3.7.7V14M1.5 14h13M5 5h2M5 7.5h2M5 10h2M11 9h.01M11 11.5h.01"/></svg>',
@@ -633,7 +690,12 @@ function buildSample(t){
   };
   const clients={
     'ex-brightside':{jobId:'ex-northlight',name:'Brightside Fitness',order:0,example:true},
-    'ex-kora':{jobId:'ex-northlight',name:'Kora Skincare',order:1,example:true},
+    'ex-kora':{jobId:'ex-northlight',name:'Kora Skincare',order:1,example:true,brand:{colors:[{hex:'#1f3b2d',name:'Forest'},{hex:'#f4efe6',name:'Cream'},{hex:'#d98e73',name:'Clay'}],
+      fonts:{head:'Canela Medium',body:'Inter Medium'},captions:'Inter Medium, sentence case, cream on a 60% forest box, lower third. Highlight product names in Clay.',
+      logo:'Wordmark only, top-left, never on busy footage.',endcard:'2 s end card: logo on cream, product shot, CTA underneath.',cta:'Shop now at kora.com',
+      music:'Soft acoustic or lo-fi, no vocals. Artlist "Calm" playlist.',loudness:'-14 LUFS',
+      dos:'Show the product in the first 3 seconds\nUse natural light footage\nKeep skin texture real, no heavy retouching',donts:'No competitor products in frame\nNo "anti-aging" wording\nNo fast glitch transitions',
+      tone:'Calm, honest, a little playful. Unhurried cuts.',links:{guide:'https://drive.google.com/',assets:'https://drive.google.com/',refs:''},pdfs:[],updated:addDays(t,-12),log:[{date:addDays(t,-12),text:'Added new end card rules'}]}},
     'ex-vela':{jobId:'ex-northlight',name:'Vela Coffee',order:2,example:true},
     'ex-harbor':{jobId:'ex-pulse',name:'Harbor Realty',order:0,example:true},
     'ex-ember':{jobId:'ex-pulse',name:'Ember Eats',order:1,example:true}
@@ -1074,7 +1136,8 @@ function renderMain(){
       <div class="sub"><span class="badge">${job.type==='agency'?I.briefcase+'Agency':I.user+'Direct client'}</span>${job.type==='agency'?`<span>${cl.length} client${cl.length===1?'':'s'}</span>`:''}</div></div>
       <div class="tools">${tools}<button class="btn" data-act="edit-job" data-id="${job.id}" style="align-self:stretch">${I.pencil}Edit job</button></div></div>
       ${workCard(job)}
-      ${job.type==='agency'?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}`;
+      ${job.type==='agency'?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}
+      ${brandPanel(job)}`;
   }
 
   const st=statsFor(scope);
@@ -1327,6 +1390,7 @@ function renderDrawer(){
       <label for="d-len">${I.clock}Length</label><input type="text" id="d-len" data-field="length" data-fk="d-len" value="${esc(t.length||'')}" placeholder="e.g. 0:30 or 3 × 0:15">
       <span class="lbl">${I.loop}Revision round</span><div class="stepper"><button data-act="rev" data-step="-1" aria-label="Decrease revision round">−</button><output>R${t.revision||0}</output><button data-act="rev" data-step="1" aria-label="Increase revision round">+</button></div>
     </div>
+    ${brandForTask(t)}
     <div><h4 class="section-title">Links</h4>${linkRow('task',I.task)}${linkRow('upload',I.film)}${linkRow('file',I.folder)}</div>
     <div><h4 class="section-title">Checklist<span class="mono">${checklist.length?`${doneN}/${checklist.length}`:''}</span></h4>
       ${checklist.length?`<div class="progress"><i style="width:${doneN/checklist.length*100}%"></i></div>`:''}
@@ -1416,7 +1480,7 @@ function openJobModal(id){
   setTimeout(()=>{const n=$('#m-name');if(n&&!M.id)n.focus()},0);
 }
 function closeModal(discard=true){
-  IM=null;
+  IM=null;if(BM){closeBrand();return}
   if(discard&&M) M.uploaded.forEach(dropImage);
   M=null;$('#modal').hidden=true;$('#modal').innerHTML='';
 }
@@ -1807,6 +1871,145 @@ function workForm(){
   </div><p class="hint">Only you see this. Your time zone is ${esc(tzCity(MY_TZ))}, from this device.</p></div>`;
 }
 
+/* ================= brand guides =================
+   Agency jobs: one guide per client (clients/<id>.brand). Direct-client jobs: on the job (jobs/<id>.brand).
+   A task uses its client's guide, or its job's guide when it has no client. */
+const emptyBrand=()=>({colors:[],fonts:{head:'',body:''},captions:'',logo:'',endcard:'',cta:'',music:'',loudness:'',dos:'',donts:'',tone:'',links:{guide:'',assets:'',refs:''},pdfs:[],updated:'',log:[]});
+const brandOf=doc=>merge(emptyBrand(),doc?.brand||{});
+const BRAND_TEXT=[['captions','Captions'],['logo','Logo'],['endcard','Intro, outro & end card'],['cta','Call to action'],['music','Music'],['loudness','Loudness'],['tone','Tone & pacing']];
+const lines=v=>String(v||'').split('\n').map(x=>x.trim().replace(/^[-•*]\s*/,'')).filter(Boolean);
+const hasBrand=b=>!!(b.colors.length||b.fonts.head||b.fonts.body||BRAND_TEXT.some(([k])=>b[k])||b.dos||b.donts||b.links.guide||b.links.assets||b.links.refs||b.pdfs.length);
+/* where a task's guide comes from */
+function brandHome(t){
+  const c=t&&S.clients[t.clientId],j=t&&S.jobs[t.jobId];
+  if(c)return {col:'clients',id:c.id,name:c.name,doc:c};
+  if(j&&j.type!=='agency')return {col:'jobs',id:j.id,name:j.name,doc:j};
+  return null;
+}
+const fileSrc=imgSrc;
+const fmtSize=n=>n>1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB';
+function brandView(b,home,compact){
+  const sec=(label,body)=>body?`<div class="bv-sec"><h5>${label}</h5>${body}</div>`:'';
+  const text=v=>v?`<p>${esc(v).replace(/\n/g,'<br>')}</p>`:'';
+  const list=(v,cls)=>{const l=lines(v);return l.length?`<ul class="bv-list ${cls}">${l.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''};
+  const link=(u,label)=>{const s=safeUrl(u);return s?`<a class="btn sm" href="${esc(s)}" target="_blank" rel="noopener">${I.ext}${label}</a>`:''};
+  const links=[link(b.links.guide,'Brand guidelines'),link(b.links.assets,'Logo & asset folder'),link(b.links.refs,'Reference videos')].join('')+
+    b.pdfs.map(p=>`<a class="btn sm" href="${esc(fileSrc(p.v)||'#')}" target="_blank" rel="noopener" ${String(p.v).startsWith('data:')?`download="${esc(p.name)}"`:''}>${I.file}${esc(p.name)}</a>`).join('');
+  const fonts=[b.fonts.head&&`<span><small>Headlines</small>${esc(b.fonts.head)}</span>`,b.fonts.body&&`<span><small>Body & captions</small>${esc(b.fonts.body)}</span>`].filter(Boolean).join('');
+  return `<div class="bv ${compact?'compact':''}">
+    ${b.colors.length?sec('Colors',`<div class="bv-colors">${b.colors.map(c=>`<button type="button" class="swatch" data-act="copy-hex" data-hex="${esc(c.hex)}" title="Copy ${esc(c.hex)}"><i style="background:${esc(c.hex)}"></i><span><b>${esc(c.name||c.hex)}</b>${c.name?`<small>${esc(c.hex)}</small>`:''}</span></button>`).join('')}</div>`):''}
+    ${sec('Fonts',fonts?`<div class="bv-fonts">${fonts}</div>`:'')}
+    ${BRAND_TEXT.map(([k,l])=>sec(l,text(b[k]))).join('')}
+    ${(b.dos||b.donts)?`<div class="bv-dd">${sec('Do',list(b.dos,'do'))}${sec("Don't",list(b.donts,'dont'))}</div>`:''}
+    ${sec('Links & files',links?`<div class="bv-links">${links}</div>`:'')}
+    <div class="bv-foot">${b.updated?`<span>Last updated ${esc(fmtDate(b.updated))}</span>`:''}
+      ${b.log.length?`<details class="bv-log"><summary>Change log (${b.log.length})</summary><ul>${b.log.map(e=>`<li><b>${esc(fmtDate(e.date))}</b> ${esc(e.text)}</li>`).join('')}</ul></details>`:''}</div>
+  </div>`;
+}
+/* job page: the guide for the direct client, the selected agency client, or a list of clients */
+function brandPanel(job){
+  const u=S.ui;let home=null;
+  if(job.type!=='agency')home={col:'jobs',id:job.id,name:job.name,doc:job};
+  else if(u.client!=='all'&&S.clients[u.client]){const c=S.clients[u.client];home={col:'clients',id:c.id,name:c.name,doc:c}}
+  if(!home){
+    const cl=clientsOf(job.id);if(!cl.length)return '';
+    return `<div class="brand-chips"><span>${I.palette}Brand guides:</span>${cl.map(c=>{const has=hasBrand(brandOf(c));return `<button class="chip-btn ${has?'':'empty'}" data-act="nav" data-tab="${job.id}" data-client="${c.id}">${clientMark(c,16)}${esc(c.name)}${has?'':' · not set'}</button>`}).join('')}</div>`;
+  }
+  const b=brandOf(home.doc),open=!(u.brandClosed||{})[home.id];
+  if(!hasBrand(b))return `<button class="work-empty" data-act="brand-edit" data-col="${home.col}" data-id="${home.id}">${I.palette}Add ${esc(home.name)}'s brand guide</button>`;
+  return `<section class="brand-panel"><div class="bp-head"><button class="bp-toggle ${open?'open':''}" data-act="brand-toggle" data-id="${home.id}" aria-expanded="${open}">${I.chev}${I.palette}<b>${esc(home.name)} brand guide</b></button>
+    <button class="btn sm" data-act="brand-edit" data-col="${home.col}" data-id="${home.id}">${I.pencil}Edit</button></div>
+    ${open?brandView(b,home,false):''}</section>`;
+}
+/* task panel section */
+function brandForTask(t){
+  const home=brandHome(t);if(!home)return '';
+  const b=brandOf(home.doc);
+  if(!hasBrand(b))return `<div><h4 class="section-title">Brand guide</h4><button class="btn sm" data-act="brand-edit" data-col="${home.col}" data-id="${home.id}">${I.palette}Add ${esc(home.name)}'s brand guide</button></div>`;
+  const n=lines(b.dos).length+lines(b.donts).length;
+  return `<details class="d-brand" ${S.ui.brandTaskOpen?'open':''}><summary class="section-title">Brand guide · ${esc(home.name)}</summary>
+    <div class="d-brand-acts">${n?`<button class="btn sm" data-act="brand-to-checklist">${I.task}Add do's & don'ts to checklist</button>`:''}<button class="btn sm ghost" data-act="brand-edit" data-col="${home.col}" data-id="${home.id}">${I.pencil}Edit guide</button></div>
+    ${brandView(b,home,true)}</details>`;
+}
+function brandToChecklist(){
+  const t=S.tasks[S.ui.openTask];const home=brandHome(t);if(!t||!home)return;
+  const b=brandOf(home.doc),have=new Set((t.checklist||[]).map(c=>c.text));
+  const add=[...lines(b.dos).map(x=>'Brand: '+x),...lines(b.donts).map(x=>'Brand, avoid: '+x)].filter(x=>!have.has(x));
+  if(!add.length){toast('These brand steps are already in the checklist');return}
+  patch('tasks',t.id,{checklist:[...(t.checklist||[]),...add.map(text=>({id:uid().slice(0,12),text,done:false}))]});
+  renderDrawer();toast(`Added ${add.length} brand step${add.length===1?'':'s'} to the checklist`);
+}
+/* ---- editor (modal) ---- */
+let BM=null;
+function openBrand(col,id){
+  const doc=S[col][id];if(!doc)return;
+  const b=brandOf(doc);
+  BM={col,id,name:doc.name,b:JSON.parse(JSON.stringify(b)),orig:JSON.stringify(b),origPdfs:b.pdfs.map(p=>p.v),uploaded:[],note:'',busy:false};
+  if(!BM.b.colors.length)BM.b.colors=[];
+  renderBrand();$('#modal').hidden=false;
+}
+function renderBrand(){
+  if(!BM)return;const b=BM.b;
+  const inp=(path,label,ph,type='text')=>`<label>${label}<input type="${type}" data-bm="${path}" data-fk="bm-${path}" value="${esc(path.split('.').reduce((o,k)=>o?.[k],b)||'')}" placeholder="${esc(ph)}"></label>`;
+  const area=(path,label,ph,rows=2)=>`<label>${label}<textarea data-bm="${path}" data-fk="bm-${path}" rows="${rows}" placeholder="${esc(ph)}">${esc(b[path]||'')}</textarea></label>`;
+  withFocus(()=>{$('#modal').innerHTML=`<div class="modal brand-modal" role="dialog" aria-modal="true" aria-labelledby="bm-title">
+  <header><h2 id="bm-title">${I.palette}${esc(BM.name)} brand guide</h2><button class="icon-btn" data-act="brand-cancel" aria-label="Close">${I.x}</button></header>
+  <div class="m-body">
+    <div class="field"><span class="lbl">Colors</span><div class="bm-colors">${b.colors.map((c,i)=>`<div class="bm-color"><input type="color" data-bm-color="${i}" value="${/^#[0-9a-f]{6}$/i.test(c.hex)?esc(c.hex):'#000000'}" aria-label="Pick color"><input type="text" data-bm-hex="${i}" data-fk="bm-hex-${i}" value="${esc(c.hex)}" placeholder="#000000" aria-label="Hex code"><input type="text" data-bm-cname="${i}" data-fk="bm-cn-${i}" value="${esc(c.name||'')}" placeholder="Name, e.g. Primary blue" aria-label="Color name"><button type="button" class="icon-btn" data-act="bm-del-color" data-i="${i}" aria-label="Remove color">${I.x}</button></div>`).join('')}
+      <button type="button" class="btn sm" data-act="bm-add-color" style="align-self:flex-start">${I.plus}Add color</button></div></div>
+    <div class="wf-grid">${inp('fonts.head','Headline font','e.g. Montserrat Bold')}${inp('fonts.body','Body & caption font','e.g. Inter Medium')}</div>
+    <div class="wf-grid">${area('captions','Captions','Font, case, color, position, highlight words…')}${area('logo','Logo','Which version, where, minimum size, clear space…')}</div>
+    <div class="wf-grid">${area('endcard','Intro, outro & end card','Length, animation, what goes on the end card…')}${area('cta','Call to action','Exact wording, e.g. “Shop now at kora.com”')}</div>
+    <div class="wf-grid">${area('music','Music','Style, approved library or track list…')}${inp('loudness','Loudness target','e.g. -14 LUFS')}</div>
+    <div class="wf-grid">${area('dos','Do (one per line)','Show the product in the first 3 seconds\nUse brand colors on text',4)}${area('donts',"Don't (one per line)",'No competitor products\nNo stock music with vocals',4)}</div>
+    ${area('tone','Tone & pacing','e.g. Warm, upbeat, quick cuts, no hard sell')}
+    <div class="wf-grid">${inp('links.guide','Brand guidelines link','Drive or Dropbox link','url')}${inp('links.assets','Logo & asset folder','Link','url')}${inp('links.refs','Reference videos','Link','url')}</div>
+    <div class="field"><span class="lbl">PDF files</span><div class="bm-pdfs">${b.pdfs.map((p,i)=>`<div class="bm-pdf">${I.file}<span>${esc(p.name)}<small>${fmtSize(p.size||0)}</small></span><button type="button" class="btn sm ghost" data-act="bm-del-pdf" data-i="${i}">Remove</button></div>`).join('')}
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${canUpload()?`<button type="button" class="btn sm" data-act="bm-add-pdf">${I.plus}Upload PDF</button>`:''}${BM.busy?'<span class="hint">Uploading…</span>':''}<span class="hint">PDF only, up to 20 MB.</span></div></div></div>
+    <label class="bm-note">What changed? (optional, goes in the change log)<input type="text" data-bm-note data-fk="bm-note" value="${esc(BM.note)}" placeholder="e.g. New end card from October"></label>
+  </div>
+  <footer><span class="hint">${b.updated?`Last updated ${esc(fmtDate(b.updated))}`:''}</span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="brand-cancel">Cancel</button><button type="button" class="btn primary" data-act="brand-save" ${BM.busy?'disabled':''}>Save guide</button></div></footer></div>`});
+}
+const BRAND_PARTS=[['colors','colors'],['fonts','fonts'],['captions','captions'],['logo','logo'],['endcard','end card'],['cta','call to action'],['music','music'],['loudness','loudness'],['dos',"do's"],['donts',"don'ts"],['tone','tone'],['links','links'],['pdfs','PDFs']];
+function saveBrand(){
+  const bm=BM;if(!bm||bm.busy)return;
+  const b=bm.b;b.colors=b.colors.filter(c=>/^#?[0-9a-f]{3,8}$/i.test(c.hex.trim())).map(c=>({hex:c.hex.trim().startsWith('#')?c.hex.trim():'#'+c.hex.trim(),name:c.name.trim()}));
+  const old=JSON.parse(bm.orig),changed=BRAND_PARTS.filter(([k])=>JSON.stringify(old[k])!==JSON.stringify(b[k])).map(([,l])=>l);
+  if(!changed.length&&!bm.note.trim()){closeBrand(false);return}
+  const d=today();b.updated=d;
+  const text=bm.note.trim()||('Updated '+(changed.length>3?changed.slice(0,3).join(', ')+' and more':changed.join(', ').replace(/, ([^,]*)$/,' and $1')));
+  b.log=[{date:d,text},...(b.log||[])].slice(0,30);
+  patch(bm.col,bm.id,{brand:b});
+  const keep=new Set(b.pdfs.map(p=>p.v));[...bm.origPdfs,...bm.uploaded].forEach(v=>{if(!keep.has(v))dropImage(v)});
+  BM=null;$('#modal').hidden=true;$('#modal').innerHTML='';render();if(S.ui.openTask)renderDrawer();toast('Brand guide saved');
+}
+function closeBrand(){if(!BM)return;BM.uploaded.forEach(dropImage);BM=null;$('#modal').hidden=true;$('#modal').innerHTML=''}
+async function storeFile(file){
+  if(file.type!=='application/pdf'&&!/\.pdf$/i.test(file.name))throw {code:'bad_pdf'};
+  if(file.size>20*1024*1024)throw {code:'too_large_pdf'};
+  const type='application/pdf';
+  if(B.mode==='db'){
+    if(!B.assets)throw {code:'not_granted'};
+    try{return (await B.assets.upload(file,{type})).id}
+    catch(e){if(e&&e.code==='store_unavailable'){await new Promise(x=>setTimeout(x,1200));return (await B.assets.upload(file,{type})).id}throw e}
+  }
+  if(B.mode==='cloud'){
+    const path=`${B.uid}/${uid()}.pdf`;
+    const {error}=await B.sb.storage.from('pictures').upload(path,file,{contentType:type,cacheControl:'31536000'});
+    if(error)throw {code:/mime|type|not allowed/i.test(error.message||'')?'pdf_setup':/exceed|size/i.test(error.message||'')?'too_large_pdf':'upload'};
+    return 'sb:'+path;
+  }
+  if(file.size>2.5*1024*1024)throw {code:'local_pdf'};
+  return toDataUrl(file);
+}
+async function addBrandPdf(file){
+  const bm=BM;if(!bm||!file)return;
+  bm.busy=true;renderBrand();
+  try{const v=await storeFile(file);if(BM!==bm){dropImage(v);return}bm.uploaded.push(v);bm.b.pdfs.push({v,name:file.name,size:file.size,added:today()})}
+  catch(e){console.error(e);const c=e&&e.code;toast(c==='bad_pdf'?'Choose a PDF file.':c==='too_large_pdf'?'That PDF is over 20 MB. Link to it instead.':c==='pdf_setup'?'PDF uploads need a one-time database update. See step 2 of SETUP.md.':c==='local_pdf'?'Files over 2.5 MB can only be stored when signed in. Link to it instead.':uploadError(e))}
+  finally{if(BM===bm){bm.busy=false;renderBrand()}}
+}
+
 /* ================= toast ================= */
 let toastT;
 function toast(msg,action){
@@ -1838,6 +2041,16 @@ document.addEventListener('click',e=>{
     case 'notes-read': notifications().forEach(n=>NS.read[n.key]=1);saveNotes();renderBell();break;
     case 'note-open': openNote(el.dataset.key);break;
     case 'note-hide': NS.hidden[el.dataset.key]=1;NS.read[el.dataset.key]=1;saveNotes();renderBell();break;
+    case 'brand-edit': openBrand(el.dataset.col,el.dataset.id);break;
+    case 'brand-cancel': closeBrand();break;
+    case 'brand-save': saveBrand();break;
+    case 'brand-toggle':{const m=u.brandClosed||(u.brandClosed={});m[el.dataset.id]=!m[el.dataset.id];saveUi();render();break}
+    case 'brand-to-checklist': brandToChecklist();break;
+    case 'bm-add-color': BM.b.colors.push({hex:'#000000',name:''});renderBrand();break;
+    case 'bm-del-color': BM.b.colors.splice(+el.dataset.i,1);renderBrand();break;
+    case 'bm-add-pdf': $('#pdf-in').click();break;
+    case 'bm-del-pdf': BM.b.pdfs.splice(+el.dataset.i,1);renderBrand();break;
+    case 'copy-hex':{const h=el.dataset.hex;try{navigator.clipboard.writeText(h).then(()=>toast(`Copied ${h}`),()=>toast(h))}catch(x){toast(h)}break}
     case 'toggle-jobs': u.jobsOpen=u.jobsOpen===false;saveUi();renderSide();break;
     case 'group': u.collapsed[el.dataset.status]=!u.collapsed[el.dataset.status];saveUi();render();break;
     case 'stat': u.due=u.due===el.dataset.due?'all':el.dataset.due;render();break;
@@ -1909,7 +2122,7 @@ document.addEventListener('click',e=>{
   if(a!=='delete-task'&&deleteArmed&&$('#drawer').contains(el)){deleteArmed=false;renderDrawer()}
 });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
+  if(e.key==='Escape'){if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'');
   if(e.key==='Enter'&&!typing){const r=e.target.closest?.('[data-act="open"]');if(r){openTask(r.dataset.id);return}}
   if(typing||e.metaKey||e.ctrlKey||e.altKey)return;
@@ -1922,6 +2135,8 @@ document.addEventListener('change',e=>{
   if(el.id==='f-due'){u.due=el.value;render();return}
   if(el.id==='arch-job'){u.ajob=el.value;saveUi();render();return}
   if(el.id==='f-sort'){u.sort=el.value;saveUi();render();return}
+  if(el.id==='pdf-in'){const f=el.files[0];el.value='';addBrandPdf(f);return}
+  if(BM&&el.dataset.bmColor!==undefined){const c=BM.b.colors[+el.dataset.bmColor];if(c){c.hex=el.value;renderBrand()}return}
   if(el.id==='csv-in'){const f=el.files[0];el.value='';importFile(f);return}
   if(IM&&el.id==='im-job'){IM.jobId=el.value;IM.clientId='';renderImport();return}
   if(IM&&el.id==='im-client'){IM.clientId=el.value;return}
@@ -1947,6 +2162,13 @@ document.addEventListener('input',e=>{
   if(el.id==='arch-q'){u.aq=el.value;render();return}
   if(el.id==='s-name'&&SM){SM.name=el.value;return}
   if(el.id==='s-limit'&&SM){SM.dayLimit=el.value;return}
+  if(BM&&$('#modal').contains(el)){
+    if(el.dataset.bm){const k=el.dataset.bm.split('.');if(k.length===2)BM.b[k[0]][k[1]]=el.value;else BM.b[k[0]]=el.value}
+    else if(el.dataset.bmHex!==undefined){const c=BM.b.colors[+el.dataset.bmHex];if(c){c.hex=el.value.trim();const sw=el.previousElementSibling;if(/^#[0-9a-f]{6}$/i.test(c.hex)&&sw)sw.value=c.hex}}
+    else if(el.dataset.bmCname!==undefined){const c=BM.b.colors[+el.dataset.bmCname];if(c)c.name=el.value}
+    else if(el.dataset.bmNote!==undefined)BM.note=el.value;
+    return;
+  }
   if(M&&$('#modal').contains(el)){
     if(el.dataset.m) M[el.dataset.m]=el.value;
     if(el.dataset.mw){const k=el.dataset.mw.split('.');if(k.length===2)M.work[k[0]][k[1]]=el.value;else M.work[k[0]]=el.value;if(el.dataset.mw==='tz')renderModal();}
@@ -1990,6 +2212,7 @@ document.addEventListener('drop',e=>{
 });
 
 setInterval(()=>{if(S.ready&&!document.hidden&&$('#modal').hidden)scheduleRender()},60000);
+document.addEventListener('toggle',e=>{if(e.target.classList?.contains('d-brand')){S.ui.brandTaskOpen=e.target.open;saveUi()}},true);
 boot();
 })();
 </script>
