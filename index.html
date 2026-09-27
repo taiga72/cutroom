@@ -877,6 +877,27 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .bulk-date input{border:0;background:none;color:var(--text);font-size:calc(13px*var(--ts))}
 .sel-btn.on,.selecting .sel-btn{border-color:var(--accent);color:var(--accent)}
 @media (max-width:820px){.bulk{bottom:10px;border-radius:12px;gap:6px;padding:8px}.bulk b{width:100%;text-align:center}.jump-wrap{padding-top:10vh}.js{max-width:120px}}
+/* search dropdown */
+.top-search{position:relative}
+.q-kbd{flex:none}
+.top-search:focus-within .q-kbd{display:none}
+.q-drop{position:absolute;top:calc(100% + 6px);right:0;width:max(100%,440px);max-width:calc(100vw - 24px);z-index:30;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lg);padding:6px;max-height:60vh;overflow:auto}
+.q-drop .jump-item{grid-template-columns:24px minmax(0,1fr);row-gap:1px}
+.q-drop .jic{grid-row:span 2}
+.q-drop .js{grid-column:2;max-width:none}
+.q-foot{padding:6px 10px 2px;color:var(--faint);font-size:calc(11.5px*var(--ts))}
+/* shortcut sheet */
+.keys{max-width:460px}
+.keys-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.keys-head b{font:700 calc(16px*var(--ts)) var(--display)}
+.keys-head .hint{flex:1;margin:0}
+.keys-list{padding:8px 14px 14px;overflow:auto}
+.key-row{display:grid;grid-template-columns:130px minmax(0,1fr);align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--line)}
+.key-row:first-child{border-top:0}
+.key-row i{font-style:normal;color:var(--faint)}
+.keys-hint{display:block;border:0;background:none;padding:4px 0 0;color:var(--faint);font-size:calc(12px*var(--ts));text-align:left}
+.keys-hint:hover{color:var(--text)}
+@media (hover:none){.keys-hint,.q-kbd{display:none}}
 </style>
 
 <div class="app">
@@ -885,7 +906,7 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
   <aside class="side" id="side"></aside>
   <main class="main" id="main">
     <div id="banner"></div>
-    <div class="head-row"><div id="head"></div><div class="top-right"><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search tasks  ( / )" autocomplete="off"></label><div class="bell-wrap"><button type="button" class="icon-btn bell" id="bell" data-act="bell" aria-haspopup="true" aria-expanded="false" aria-controls="notes" title="Notifications"><svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bell-n" id="bell-n" hidden></span></button><div class="notes-pop" id="notes" hidden role="dialog" aria-label="Notifications"></div></div></div></div>
+    <div class="head-row"><div id="head"></div><div class="top-right"><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" role="combobox" aria-expanded="false" aria-controls="q-drop" placeholder="Search tasks, jobs, clients" autocomplete="off"><kbd class="q-kbd" id="q-kbd"></kbd><div class="q-drop" id="q-drop" role="listbox" hidden></div></label><div class="bell-wrap"><button type="button" class="icon-btn bell" id="bell" data-act="bell" aria-haspopup="true" aria-expanded="false" aria-controls="notes" title="Notifications"><svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bell-n" id="bell-n" hidden></span></button><div class="notes-pop" id="notes" hidden role="dialog" aria-label="Notifications"></div></div></div></div>
     <div id="subnav"></div>
     <div id="stats"></div>
     <div id="jobcards"></div>
@@ -1529,7 +1550,7 @@ function renderSide(){
   const allOpen=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)).length;
   const app=appSettings();const appLogo=imgSrc(app.logo);
   let html=`<button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Overview">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
-  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item ${u.tab==='activity'?'on':''}" data-act="nav" data-tab="activity">${I.clock}<span class="name">Activity</span></button><button class="nav-item" data-act="jump"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><span class="name">Jump to…</span><kbd class="count">${MODKEY}</kbd></button>
+  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item ${u.tab==='activity'?'on':''}" data-act="nav" data-tab="activity">${I.clock}<span class="name">Activity</span></button>
   <button class="nav-item jobs-toggle ${jobsOpen?'open':''}" data-act="toggle-jobs" aria-expanded="${jobsOpen}" aria-controls="nav-jobs">${I.briefcase}<span class="name">Jobs</span><span class="count">${S.ready?jobsSorted().length:''}</span>${I.chev}</button></nav>
   <nav class="nav jobs" id="nav-jobs" aria-label="Jobs" ${jobsOpen?'':'hidden'}>`;
   for(const j of jobsSorted()){
@@ -1915,6 +1936,48 @@ function jumpItems(q){
   if(q)for(const t of Object.values(S.tasks)){if(t._draft)continue;const sc=Math.max(score(t.name),score(S.clients[t.clientId]?.name)*.6);if(sc)out.push({sc:sc+(t.archived?0:isClosed(t)?.05:.2),icon:`<span class="jdot" ${pillStyle(stOf(t))}></span>`,label:t.name||'Untitled task',sub:[S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name,t.archived?'Archived':stLabel(stOf(t))].filter(Boolean).join(' · '),act:'open',id:t.id})}
   return out.sort((a,b)=>b.sc-a.sc).slice(0,12);
 }
+/* The top search box: typing filters the list below as before, and a dropdown under it lists matching
+   tasks (archived too), jobs, clients and pages to open straight away. / and ⌘K / Ctrl+K focus it. */
+let QD={items:[],i:0};
+function renderQDrop(){
+  const box=$('#q-drop'),q=$('#q');if(!box||!q)return;
+  const v=q.value.trim();
+  if(!v||document.activeElement!==q){box.hidden=true;q.setAttribute('aria-expanded','false');return}
+  QD.items=jumpItems(v).slice(0,8);QD.i=Math.min(QD.i,Math.max(0,QD.items.length-1));
+  box.innerHTML=QD.items.length?QD.items.map((x,k)=>`<button type="button" class="jump-item ${k===QD.i?'on':''}" data-act="qd-go" data-k="${k}" tabindex="-1"><span class="jic">${x.icon}</span><span class="jl">${esc(x.label)}</span><span class="js">${esc(x.sub)}</span></button>`).join('')+`<div class="q-foot">↑↓ Enter to open · Esc to close</div>`:`<p class="hint" style="padding:10px 12px;margin:0">No task, job or client matches.</p>`;
+  box.hidden=false;q.setAttribute('aria-expanded','true');
+}
+function qdGo(k){const x=QD.items[k];if(!x)return;const q=$('#q');JUMP={items:QD.items};S.ui.q='';if(q){q.value='';q.blur()}$('#q-drop').hidden=true;jumpGo(k);render()}
+function focusSearch(){const q=$('#q'),ts=$('#top-search');if(q&&ts&&!ts.hidden&&q.offsetParent){q.focus();q.select();renderQDrop()}else openJump()}
+/* Keyboard shortcuts for the open task (never while typing in a field). ? shows the list. */
+const TASK_KEYS=[['S','Move to the next status'],['Shift S','Move back one status'],['D','Mark Done'],['1 2 3 4','Priority: Urgent, High, Normal, Low'],['T','Open the task link'],['F','Open the Frame.io / review link'],['O','Open the storage folder'],['P','Open the Mac project folder'],['J / K','Next / previous task in the list'],['A','Switch Details / Activity'],['E','Rename the task'],['Esc','Close the task'],['N','New task'],['/ or '+MODKEY,'Search']];
+let KEYS_OPEN=false;
+function openKeys(){KEYS_OPEN=true;let e=$('#keys');if(!e){e=document.createElement('div');e.id='keys';e.className='jump-wrap';document.body.appendChild(e)}
+  e.hidden=false;e.innerHTML=`<div class="jump keys" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts"><div class="keys-head"><b>Keyboard shortcuts</b><span class="hint">With a task open</span><button class="icon-btn" data-act="keys-close" aria-label="Close">${I.x}</button></div><div class="keys-list">${TASK_KEYS.map(([k,d])=>`<div class="key-row"><span>${k.split(' ').map(x=>x==='/'||x==='or'?`<i>${x}</i>`:`<kbd>${x}</kbd>`).join(' ')}</span><span>${esc(d)}</span></div>`).join('')}</div></div>`}
+function closeKeys(){KEYS_OPEN=false;const e=$('#keys');if(e){e.hidden=true;e.innerHTML=''}}
+function openTaskLink(t,kind){
+  const j=S.jobs[t.jobId],v=t.links?.[kind],u=linkHref(v,j),label=kind==='project'?'project folder':linkLabel(j,kind);
+  if(!v){toast(`No ${label} on this task yet`);return}
+  if(!u){toast(localPath(v)?'Finder folders open on your Mac only':`That ${label} isn't a web link`);return}
+  if(linkTarget(v,j))window.open(u,'_blank','noopener');else location.href=u;
+}
+function taskKey(e){
+  const t=S.tasks[S.ui.openTask];if(!t)return false;
+  const k=e.key,u=S.ui;
+  if(k==='?'){e.preventDefault();openKeys();return true}
+  if(t._draft)return false;
+  const move=d=>{const i=STATUSES.findIndex(x=>x.id===stOf(t)),n=STATUSES[i+d];if(n){setStatus(t.id,n.id);render();renderDrawer()}};
+  const pr={'1':'urgent','2':'high','3':'normal','4':'low'}[k];
+  if(k==='s'||k==='S'){e.preventDefault();move(e.shiftKey?-1:1);return true}
+  if(k==='d'){e.preventDefault();if(stOf(t)!=='done'){setStatus(t.id,'done');render();renderDrawer()}return true}
+  if(pr){e.preventDefault();if((t.priority||'normal')!==pr){const old=t.priority||'normal';patch('tasks',t.id,{priority:pr});logAct('edit',`Priority set to ${(PRIORITIES.find(x=>x.id===pr)||{}).label}`,{task:t});render();renderDrawer();toast(`Priority: ${(PRIORITIES.find(x=>x.id===pr)||{}).label}`,{label:'Undo',fn:()=>{patch('tasks',t.id,{priority:old});render();renderDrawer()}})}return true}
+  const lk={t:'task',f:'upload',o:'file',p:'project'}[k];
+  if(lk){e.preventDefault();openTaskLink(t,lk);return true}
+  if(k==='j'||k==='k'){e.preventDefault();const ids=[...new Set([...document.querySelectorAll('#view [data-act="open"][data-id]')].map(x=>x.dataset.id))],i=ids.indexOf(t.id),n=ids[i+(k==='j'?1:-1)];if(n){openTask(n,u.dtab);document.querySelector(`#view [data-id="${CSS.escape(n)}"]`)?.scrollIntoView({block:'nearest'})}return true}
+  if(k==='a'){e.preventDefault();u.dtab=u.dtab==='activity'?'details':'activity';renderDrawer();return true}
+  if(k==='e'){e.preventDefault();if(u.dtab==='activity'){u.dtab='details';renderDrawer()}const n=$('.d-name');if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}return true}
+  return false;
+}
 function openJump(){JUMP={q:'',i:0};renderJump();$('#jump-q')?.focus()}
 function closeJump(){JUMP=null;const e=$('#jump');if(e){e.hidden=true;e.innerHTML=''}}
 function renderJump(){
@@ -1973,7 +2036,7 @@ function renderDrawer(){
       <div class="checklist">${checklist.map(c=>`<div class="check ${c.done?'done':''}"><input type="checkbox" data-act="check" data-cid="${esc(c.id)}" ${c.done?'checked':''} aria-label="Done"><input class="txt" data-act="check-text" data-cid="${esc(c.id)}" data-fk="ck-${esc(c.id)}" value="${esc(c.text)}" aria-label="Checklist item"><button class="icon-btn" data-act="check-del" data-cid="${esc(c.id)}" aria-label="Remove item">${I.x}</button></div>`).join('')}
       <form class="check-add" data-act="check-add">${I.plus}<input data-fk="ck-new" placeholder="Add a step (rough cut, captions, color…)" aria-label="Add checklist item"></form></div></div>
     <div><h4 class="section-title">Notes</h4><textarea class="notes" data-field="notes" data-fk="d-notes" placeholder="Brief, feedback, music choices, specs…">${esc(t.notes||'')}</textarea></div>
-    ${t._draft?`<div class="d-foot d-save"><button class="btn" data-act="drawer-close">Cancel</button><button class="btn primary" data-act="save-draft">${I.plus}Save task</button></div>`:`<div class="d-foot"><span>${t.created?'Created '+fmtDate(ymd(new Date(t.created))):''}${t.doneAt?' · Done '+fmtDate(t.doneAt):''}</span>
+    ${t._draft?`<div class="d-foot d-save"><button class="btn" data-act="drawer-close">Cancel</button><button class="btn primary" data-act="save-draft">${I.plus}Save task</button></div>`:`<div class="d-foot"><span>${t.created?'Created '+fmtDate(ymd(new Date(t.created))):''}${t.doneAt?' · Done '+fmtDate(t.doneAt):''}<button type="button" class="keys-hint" data-act="keys-open">Press <kbd>?</kbd> for keyboard shortcuts</button></span>
       <span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" data-act="d-duplicate">${I.copy}Duplicate</button>${isClosed(t)&&!t.archived?`<button class="btn sm" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}<button class="btn sm danger ${deleteArmed?'armed':''}" data-act="delete-task">${I.trash}${deleteArmed?'Click again to delete':'Delete task'}</button></span></div>`}
   </div>`}`});
   autosize($('.d-name'));
@@ -1981,13 +2044,30 @@ function renderDrawer(){
 /* a hidden element measures 0, so leave the height alone until it can be measured */
 function autosize(el){if(!el||!el.offsetParent)return;el.style.height='auto';el.style.height=el.scrollHeight+'px'}
 
-function setStatus(id,st){
-  const t=S.tasks[id];if(!t||t.status===st)return;
+/* Every status change can be undone from its toast; bulk changes pass quiet and show one toast for all. */
+function setStatus(id,st,o={}){
+  const t=S.tasks[id];if(!t||t.status===st)return null;
+  const prev={status:t.status,revision:t.revision||0,doneAt:t.doneAt||null};
   const p={status:st};
-  if(st==='revisions'&&t.status!=='revisions'){p.revision=(t.revision||0)+1;toast(`Moved to revisions · round R${p.revision}`)}
+  if(st==='revisions'&&t.status!=='revisions')p.revision=(t.revision||0)+1;
   logAct('status',`${stLabel(t.status)} → ${stLabel(st)}${p.revision?` (round R${p.revision})`:''}`,{task:t});
   if(st==='done') p.doneAt=today(); else if(t.doneAt) p.doneAt=null;
   patch('tasks',id,p);
+  if(!o.quiet&&!t._draft)toast(`${t.name?`“${t.name.length>40?t.name.slice(0,39)+'…':t.name}” → `:'Moved to '}${stLabel(st)}${p.revision?` · round R${p.revision}`:''}`,{label:'Undo',fn:()=>undoStatus([[id,prev]])});
+  return prev;
+}
+function undoStatus(list){
+  for(const [id,prev] of list){const t=S.tasks[id];if(!t)continue;logAct('status',`${stLabel(t.status)} → ${stLabel(prev.status)} (undone)`,{task:t});patch('tasks',id,{status:prev.status,revision:prev.revision,doneAt:prev.doneAt})}
+  render();if(S.ui.openTask)renderDrawer();
+}
+/* Deletes can be undone too: the task comes back whole, with the same id. */
+function deleteTasks(ids){
+  const snaps=ids.map(id=>S.tasks[id]).filter(t=>t&&!t._draft).map(t=>JSON.parse(JSON.stringify(t)));if(!snaps.length)return;
+  for(const t of snaps){logAct('delete','Deleted',{task:t});if(S.ui.openTask===t.id)closeDrawer();SEL.delete(t.id);remove('tasks',t.id)}
+  render();
+  let undone=false;
+  toast(snaps.length===1?`Deleted “${snaps[0].name||'task'}”`:`Deleted ${snaps.length} tasks`,{label:'Undo',fn:()=>{undone=true;for(const t of snaps){const {id,...data}=t;create('tasks',data,id);logAct('restore','Restored after delete',{task:t})}render()}});
+  setTimeout(()=>{if(!undone)snaps.forEach(dropTaskPicture)},8000);
 }
 function newTask(opts={}){
   const u=S.ui;
@@ -2716,6 +2796,8 @@ document.addEventListener('click',e=>{
   if(narrow.matches&&$('#side').classList.contains('open')&&e.target.closest('#side [data-act]:not([data-act=toggle-jobs])'))setTimeout(closeSide,0);
   if(notesOpen&&!e.target.closest('.bell-wrap')){notesOpen=false;renderBell()}
   if(JUMP&&e.target.id==='jump'){closeJump();return}
+  if(KEYS_OPEN&&e.target.id==='keys'){closeKeys();return}
+  if(!e.target.closest('#top-search')){const d=$('#q-drop');if(d)d.hidden=true}
   const stop=e.target.closest('[data-stop]');
   const el=e.target.closest('[data-act]');
   if(!el) return;
@@ -2771,8 +2853,11 @@ document.addEventListener('click',e=>{
     case 'sel-mode': if(SELMODE||SEL.size)clearSel();else{SELMODE=true;render()}break;
     case 'bulk-clear': clearSel();break;
     case 'bulk-archive':{const ids=[...SEL];SEL.clear();SELMODE=false;archiveTasks(ids);render();break}
-    case 'bulk-delete':{if(!bulkDelArmed){bulkDelArmed=true;renderBulk();break}const ids=[...SEL];for(const id of ids){const t=S.tasks[id];if(!t)continue;logAct('delete','Deleted',{task:t});dropTaskPicture(t);if(u.openTask===id)closeDrawer();remove('tasks',id)}SEL.clear();SELMODE=false;bulkDelArmed=false;render();toast(`Deleted ${ids.length} task${ids.length===1?'':'s'}`);break}
+    case 'bulk-delete':{if(!bulkDelArmed){bulkDelArmed=true;renderBulk();break}const ids=[...SEL];SEL.clear();SELMODE=false;bulkDelArmed=false;deleteTasks(ids);break}
     case 'jump-go': jumpGo(+el.dataset.k);break;
+    case 'qd-go': qdGo(+el.dataset.k);break;
+    case 'keys-close': closeKeys();break;
+    case 'keys-open': openKeys();break;
     case 'tpl-toggle': TPL={open:!TPL.open,naming:false,del:null};renderDrawer();break;
     case 'tpl-new': TPL.naming=true;renderDrawer();$('#tpl-name')?.focus();break;
     case 'tpl-cancel': TPL.naming=false;renderDrawer();break;
@@ -2783,7 +2868,7 @@ document.addEventListener('click',e=>{
     case 'tpl-del':{const t=S.tasks[u.openTask],h=tplHome(t);if(!h)break;if(TPL.del!==el.dataset.tid){TPL.del=el.dataset.tid;renderDrawer();break}
       patch(h.col,h.id,{templates:(h.doc.templates||[]).filter(y=>y.id!==el.dataset.tid)});TPL.del=null;renderDrawer();toast('Template deleted');break}
     case 'd-next':{const t=S.tasks[u.openTask];if(!t)break;const i=STATUSES.findIndex(x=>x.id===stOf(t)),n=STATUSES[i+1];if(n){setStatus(t.id,n.id);render();renderDrawer()}break}
-    case 'd-done':{const t=S.tasks[u.openTask];if(!t)break;setStatus(t.id,'done');render();renderDrawer();toast(`Marked ${stLabel('done')}`);break}
+    case 'd-done':{const t=S.tasks[u.openTask];if(!t)break;setStatus(t.id,'done');render();renderDrawer();break}
     case 'note-del': if(noteDelArmed===el.dataset.at)deleteNote(el.dataset.at);else{noteDelArmed=el.dataset.at;renderDrawer()}break;
     case 'new-task':{const id=newTask({status:el.dataset.status,due:el.dataset.due});if(id){openTask(id);setTimeout(()=>$('.d-name')?.focus(),30)}break}
     case 'new-job': openJobModal();break;
@@ -2817,10 +2902,10 @@ document.addEventListener('click',e=>{
     case 'restore': restoreTasks([el.dataset.id]);break;
     case 'arch-delete':
       if(archDelArmed!==el.dataset.id){archDelArmed=el.dataset.id;render();break}
-      {const t=S.tasks[el.dataset.id];archDelArmed=null;if(t){logAct('delete','Deleted',{task:t});dropTaskPicture(t);if(u.openTask===t.id)closeDrawer();remove('tasks',t.id);toast(`Deleted “${t.name||'task'}”`)}}break;
+      archDelArmed=null;deleteTasks([el.dataset.id]);break;
     case 'delete-task':
       if(!deleteArmed){deleteArmed=true;renderDrawer();break}
-      {const t=S.tasks[u.openTask];logAct('delete','Deleted',{task:t});dropTaskPicture(t);const name=t.name;remove('tasks',t.id);closeDrawer();toast(`Deleted ${name||'task'}`)}break;
+      deleteArmed=false;deleteTasks([u.openTask]);break;
     /* modal */
     case 'modal-close': closeModal();break;
     case 'open-settings': openSettings();break;
@@ -2870,7 +2955,14 @@ document.addEventListener('click',e=>{
   if(a!=='bulk-delete'&&bulkDelArmed){bulkDelArmed=false;renderBulk()}
 });
 document.addEventListener('keydown',e=>{
-  if((e.metaKey||e.ctrlKey)&&!e.altKey&&e.key.toLowerCase()==='k'&&S.ready){e.preventDefault();JUMP?closeJump():openJump();return}
+  if((e.metaKey||e.ctrlKey)&&!e.altKey&&e.key.toLowerCase()==='k'&&S.ready){e.preventDefault();if(JUMP)closeJump();else focusSearch();return}
+  if(e.target.id==='q'&&!$('#q-drop').hidden){
+    const n=QD.items.length;
+    if((e.key==='ArrowDown'||e.key==='ArrowUp')&&n){e.preventDefault();QD.i=(QD.i+(e.key==='ArrowDown'?1:-1)+n)%n;renderQDrop();return}
+    if(e.key==='Enter'&&n){e.preventDefault();qdGo(QD.i);return}
+    if(e.key==='Escape'){e.preventDefault();$('#q-drop').hidden=true;return}
+  }
+  if(KEYS_OPEN){if(e.key==='Escape'||e.key==='?'){e.preventDefault();closeKeys()}return}
   if(JUMP){
     if(e.key==='Escape'){e.preventDefault();closeJump();return}
     if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();const n=JUMP.items.length;if(n){JUMP.i=(JUMP.i+(e.key==='ArrowDown'?1:-1)+n)%n;renderJump()}return}
@@ -2882,7 +2974,8 @@ document.addEventListener('keydown',e=>{
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'');
   if(e.key==='Enter'&&!typing){const r=e.target.closest?.('[data-act="open"]');if(r){openTask(r.dataset.id);return}}
   if(typing||e.metaKey||e.ctrlKey||e.altKey)return;
-  if(e.key==='/'){e.preventDefault();$('#q').focus()}
+  if(!$('#drawer').hidden&&$('#modal').hidden&&taskKey(e))return;
+  if(e.key==='/'){e.preventDefault();focusSearch()}
   else if(e.key==='n'&&$('#modal').hidden&&S.ready){e.preventDefault();const id=newTask();if(id){openTask(id);setTimeout(()=>$('.d-name')?.focus(),30)}}
 });
 document.addEventListener('change',e=>{
@@ -2890,7 +2983,7 @@ document.addEventListener('change',e=>{
   if(el.id==='f-prio'){u.prio=el.value;render();return}
   if(el.id==='f-due'){u.due=el.value;render();return}
   if(el.id==='arch-job'){u.ajob=el.value;saveUi();render();return}
-  if(el.id==='bulk-status'&&el.value){const v=el.value;[...SEL].forEach(id=>setStatus(id,v));render();toast(`Moved ${SEL.size} task${SEL.size===1?'':'s'} to ${stLabel(v)}`);return}
+  if(el.id==='bulk-status'&&el.value){const v=el.value,undo=[];[...SEL].forEach(id=>{const prev=setStatus(id,v,{quiet:true});if(prev)undo.push([id,prev])});render();toast(`Moved ${undo.length} task${undo.length===1?'':'s'} to ${stLabel(v)}`,undo.length?{label:'Undo',fn:()=>undoStatus(undo)}:null);return}
   if(el.id==='bulk-prio'&&el.value){const v=el.value;[...SEL].forEach(id=>{const t=S.tasks[id];if(t&&(t.priority||'normal')!==v){patch('tasks',id,{priority:v});logAct('edit',`Priority set to ${(PRIORITIES.find(x=>x.id===v)||{}).label}`,{task:t})}});render();toast(`Priority set for ${SEL.size} task${SEL.size===1?'':'s'}`);return}
   if(el.id==='bulk-due'&&el.value){const v=el.value;[...SEL].forEach(id=>{const t=S.tasks[id];if(t&&t.due!==v){patch('tasks',id,{due:v});logAct('date',`Due date set to ${fmtDate(v)}`,{task:t})}});render();toast(`Due date set for ${SEL.size} task${SEL.size===1?'':'s'}`);return}
   if(el.id==='log-job'){u.ljob=el.value;u.lmore=0;saveUi();render();return}
@@ -2919,7 +3012,7 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('input',e=>{
   const el=e.target,u=S.ui;
-  if(el.id==='q'){u.q=el.value;render();return}
+  if(el.id==='q'){u.q=el.value;QD.i=0;render();renderQDrop();return}
   if(el.id==='arch-q'){u.aq=el.value;render();return}
   if(el.id==='log-q'){u.lq=el.value;render();return}
   if(el.id==='jump-q'&&JUMP){JUMP.q=el.value;JUMP.i=0;renderJump();return}
@@ -2975,6 +3068,7 @@ document.addEventListener('dragover',e=>{
   if(col&&dragId){e.preventDefault();document.querySelectorAll('.col.drag').forEach(c=>c!==col&&c.classList.remove('drag'));col.classList.add('drag')}
 });
 document.addEventListener('keydown',e=>{if(e.target.id==='note-in'&&e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();postNote()}});
+document.addEventListener('focusin',e=>{if(e.target.id==='q')renderQDrop()});
 document.addEventListener('drop',e=>{
   const col=e.target.closest?.('[data-drop]');
   if(col&&dragId){e.preventDefault();setStatus(dragId,col.dataset.drop);dragId=null}
@@ -2983,6 +3077,7 @@ document.addEventListener('drop',e=>{
 setInterval(()=>{if(S.ready&&!document.hidden&&$('#modal').hidden)scheduleRender()},60000);
 document.addEventListener('toggle',e=>{if(e.target.classList?.contains('d-brand')){S.ui.brandTaskOpen=e.target.open;saveUi()}},true);
 placeTopRight();
+{const k=$('#q-kbd');if(k)k.textContent=MODKEY}
 boot();
 })();
 </script>
