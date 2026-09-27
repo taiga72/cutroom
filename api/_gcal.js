@@ -134,7 +134,7 @@ async function syncUser(uid, appUrl) {
     const labels = Object.fromEntries((settings.app?.statuses || []).filter(x => x && x.id).map(x => [x.id, x.label]));
     const want = {};
     for (const t of Object.values(tasks)) {
-      if (t.archived || t.status === 'done' || t.status === 'dropped' || !/^\d{4}-\d{2}-\d{2}$/.test(t.due || '') || !jobs[t.jobId]) continue;
+      if (t.archived || t.deleted || t.status === 'done' || t.status === 'dropped' || !/^\d{4}-\d{2}-\d{2}$/.test(t.due || '') || !jobs[t.jobId]) continue;
       want[t.id] = eventFor(t, jobs, clients, appUrl, labels);
     }
     const seen = new Set(), ops = [];
