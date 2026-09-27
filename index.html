@@ -338,7 +338,9 @@ select.pill::before{display:none}
 .group-head.open svg{transform:rotate(90deg)}
 .group-head .count{font:500 calc(12px*var(--ts)) var(--mono);color:var(--faint)}
 .rows{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
-.row,.row-head{display:grid;grid-template-columns:36px minmax(0,1fr) 180px 84px 84px 84px 120px;align-items:center;gap:12px;padding:8px 12px}
+.rows{--w0:36px}
+.row,.row-head{display:grid;grid-template-columns:var(--cols,var(--w0) minmax(0,1fr) 180px 84px 84px 84px 120px);align-items:center;gap:12px;padding:8px 12px}
+.rows.h-prio .c-prio,.rows.h-start .c-start,.rows.h-links .c-links{display:none}
 .row-head{font-size:calc(11px*var(--ts));font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);padding-block:6px;border-bottom:1px solid var(--line);background:var(--surface-2)}
 .row{border-top:1px solid var(--line);cursor:pointer}
 .row:first-of-type{border-top:0}
@@ -477,6 +479,24 @@ button.tool svg{color:var(--faint)}
 .notes-view li{margin:1px 0}
 .notes-view h5{margin:6px 0 2px;font-size:calc(14px*var(--ts));font-weight:700}
 .notes-view a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+/* search hits, link add buttons, service icons, list options */
+.t-name mark,.t-hit mark{background:color-mix(in srgb,#ffd400 45%,transparent);color:inherit;border-radius:2px;padding:0 1px}
+.t-hit{margin-top:3px;font-size:calc(12px*var(--ts));color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-hit b{font-weight:600;color:var(--faint);margin-right:6px}
+.link-add{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.link-row + .link-add{margin-top:12px}
+svg.svc{width:16px;height:16px;flex:none;display:block}
+.vopt-wrap{position:relative}
+#f-sort{max-width:165px}
+@media (min-width:821px) and (max-width:1500px){#sel-btn .vl{display:none}}
+.vopt-btn.on{border-color:var(--accent);color:var(--accent)}
+.vopt{position:absolute;top:calc(100% + 6px);right:0;z-index:30;width:250px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lg);padding:12px;display:flex;flex-direction:column;gap:8px}
+.vopt b{font-size:calc(11px*var(--ts));letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+.vopt label{display:flex;align-items:center;gap:8px;font-size:calc(14px*var(--ts))}
+.vopt input{accent-color:var(--accent);width:16px;height:16px}
+.vopt .hint{margin:0}
+.vopt-btns{display:flex;gap:6px}
+.vopt-btns .btn{flex:1;justify-content:center}
 /* checklist drag handle */
 .ck-grip{flex:none;width:14px;height:22px;display:flex;align-items:center;justify-content:center;color:var(--faint);cursor:grab;touch-action:none;opacity:0;margin-left:-4px}
 .ck-grip svg{width:12px;height:12px}
@@ -553,7 +573,7 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 
 /* ---------- responsive ---------- */
 @media (max-width:1100px){
-  .row,.row-head{grid-template-columns:36px minmax(0,1fr) 180px 84px 120px}
+  .row,.row-head{grid-template-columns:var(--cols-mid,var(--w0) minmax(0,1fr) 180px 84px 120px)}
   .row > .c-start,.row-head > .c-start,.row > .c-prio,.row-head > .c-prio{display:none}
   .stat small{font-size:calc(10px*var(--ts))}
 }
@@ -748,8 +768,7 @@ body.side-mini .synced{display:none}
 :root[data-density="compact"] .main{gap:12px;padding-top:14px}
 :root[data-density="compact"] .row{padding-block:3px}
 :root[data-density="compact"] .row .tmark{width:28px;height:28px}
-:root[data-density="compact"] .row,:root[data-density="compact"] .row-head{grid-template-columns:28px minmax(0,1fr) 180px 84px 84px 84px 120px}
-@media (max-width:1100px){:root[data-density="compact"] .row,:root[data-density="compact"] .row-head{grid-template-columns:28px minmax(0,1fr) 180px 84px 120px}}
+:root[data-density="compact"] .rows{--w0:28px}
 :root[data-density="compact"] .group-head{padding-block:3px}
 :root[data-density="compact"] .card{padding:7px;gap:4px}
 :root[data-density="compact"] .card-top .tmark{width:24px;height:24px}
@@ -1079,11 +1098,13 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
       </select>
       <select class="sel" id="f-due" aria-label="Due date filter">
         <option value="all">Any due date</option><option value="overdue">Overdue</option><option value="week">Due in 7 days</option><option value="nodate">No due date</option>
+        <optgroup label="Missing"><option value="miss-any">Missing a link</option><option value="miss-upload">No review link</option><option value="miss-file">No storage link</option><option value="miss-task">No task link</option></optgroup>
       </select>
       <select class="sel" id="f-sort" aria-label="Sort">
-        <option value="due">Sort: Due date</option><option value="start">Sort: Start date</option><option value="priority">Sort: Priority</option><option value="name">Sort: Name</option><option value="created">Sort: Newest</option><option value="manual">Sort: My order (drag)</option>
+        <option value="due">Sort: Due date</option><option value="start">Sort: Start date</option><option value="priority">Sort: Priority</option><option value="name">Sort: Name</option><option value="created">Sort: Newest</option><option value="updated">Sort: Recently updated</option><option value="age">Sort: Oldest assigned</option><option value="revision">Sort: Most revisions</option><option value="client">Sort: Client</option><option value="manual">Sort: My order (drag)</option>
       </select></div>
       <span class="spacer"></span>
+      <div class="vopt-wrap" id="vopt-wrap"><button type="button" class="btn vopt-btn" id="vopt-btn" data-act="vopt" aria-label="List options" title="Columns and groups" aria-expanded="false"><svg class="i" viewBox="0 0 16 16"><path d="M2.5 4.5h6M11.5 4.5h2M2.5 11.5h2M7.5 11.5h6"/><circle cx="10" cy="4.5" r="1.5"/><circle cx="6" cy="11.5" r="1.5"/></svg></button><div class="vopt" id="vopt" hidden></div></div>
       <button type="button" class="btn sel-btn" id="sel-btn" data-act="sel-mode" aria-label="Select tasks" title="Select several tasks"><svg class="i" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="11" height="11" rx="2.5"/><path d="M5.5 8.2l1.8 1.8 3.3-3.8"/></svg><span class="vl">Select</span></button>
       <button type="button" class="btn primary" data-act="new-task" id="new-task-btn" aria-label="New task"><svg class="i" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg><span class="vl">New task</span></button>
     </div>
@@ -1640,6 +1661,33 @@ const archived=()=>Object.values(S.tasks).filter(t=>t.archived&&!t.deleted&&S.jo
 const trashed=()=>Object.values(S.tasks).filter(t=>t.deleted&&S.jobs[t.jobId]);
 const TRASH_DAYS=30;
 const tasksOfScope=()=>live().filter(t=>S.jobs[t.jobId]&&(S.ui.tab==='overview'||t.jobId===S.ui.tab)&&(S.ui.tab==='overview'||S.ui.client==='all'||t.clientId===S.ui.client));
+const whoName=t=>(S.clients[t.clientId]?.name||S.jobs[t.jobId]?.name||'').toLowerCase();
+/* "Missing info" filter: open tasks without a due date or a given link */
+function missing(t,k){
+  const no=x=>!String(t.links?.[x]||'').trim();
+  return k==='due'?!t.due:k==='upload'||k==='file'||k==='task'?no(k):k==='any'?no('upload')||no('file')||no('task'):true;
+}
+const qNow=()=>(S.ui.q||'').trim().toLowerCase();
+/* text with every match of q wrapped in <mark> (escaped) */
+function hlText(str,q){
+  str=String(str||'');if(!q)return esc(str);
+  let out='',i=0;const low=str.toLowerCase();
+  for(let j=low.indexOf(q);j>=0;j=low.indexOf(q,i)){out+=esc(str.slice(i,j))+'<mark>'+esc(str.slice(j,j+q.length))+'</mark>';i=j+q.length}
+  return out+esc(str.slice(i));
+}
+/* when the search matched inside notes, a checklist step or a link (not the name), show where */
+function searchHit(t){
+  const q=qNow();if(!q)return '';
+  if([t.name,S.clients[t.clientId]?.name,S.jobs[t.jobId]?.name].some(x=>String(x||'').toLowerCase().includes(q)))return '';
+  const snip=(txt)=>{const i=txt.toLowerCase().indexOf(q),a=Math.max(0,i-30),b=Math.min(txt.length,i+q.length+50);return (a?'…':'')+hlText(txt.slice(a,b),q)+(b<txt.length?'…':'')};
+  const line=(t.notes||'').split('\n').find(l=>l.toLowerCase().includes(q));
+  if(line)return `<div class="t-hit"><b>Notes</b>${snip(line.replace(/[*#]/g,''))}</div>`;
+  const c=(t.checklist||[]).find(c=>(c.text||'').toLowerCase().includes(q));
+  if(c)return `<div class="t-hit"><b>Checklist</b>${snip(c.text)}</div>`;
+  const k=Object.keys(t.links||{}).find(k=>String(t.links[k]||'').toLowerCase().includes(q));
+  if(k)return `<div class="t-hit"><b>${esc(linkLabel(S.jobs[t.jobId],k))}</b>${snip(t.links[k])}</div>`;
+  return '';
+}
 function filtered(){
   const u=S.ui,t0=today(),q=u.q.trim().toLowerCase();
   let list=tasksOfScope();
@@ -1647,13 +1695,18 @@ function filtered(){
   if(u.due==='overdue') list=list.filter(t=>t.due&&t.due<t0&&!isClosed(t));
   if(u.due==='week') list=list.filter(t=>t.due&&!isClosed(t)&&diffDays(t.due,t0)>=0&&diffDays(t.due,t0)<=7);
   if(u.due==='nodate') list=list.filter(t=>!t.due);
-  if(q) list=list.filter(t=>[t.name,t.notes,S.clients[t.clientId]?.name,S.jobs[t.jobId]?.name].some(x=>String(x||'').toLowerCase().includes(q)));
+  if(q) list=list.filter(t=>[t.name,t.notes,S.clients[t.clientId]?.name,S.jobs[t.jobId]?.name,...(t.checklist||[]).map(c=>c.text),...Object.values(t.links||{})].some(x=>String(x||'').toLowerCase().includes(q)));
+  if(u.due.startsWith('miss-')) list=list.filter(t=>!isClosed(t)&&missing(t,u.due.slice(5)));
   const by={
     due:(a,b)=>(a.due||'9999').localeCompare(b.due||'9999')||PRIO_RANK[a.priority||'normal']-PRIO_RANK[b.priority||'normal'],
     start:(a,b)=>(a.start||'9999').localeCompare(b.start||'9999'),
     priority:(a,b)=>PRIO_RANK[a.priority||'normal']-PRIO_RANK[b.priority||'normal']||(a.due||'9999').localeCompare(b.due||'9999'),
     name:(a,b)=>a.name.localeCompare(b.name),
     created:(a,b)=>(b.created||0)-(a.created||0),
+    age:(a,b)=>(assignedOn(a)||'9999').localeCompare(assignedOn(b)||'9999')||(a.due||'9999').localeCompare(b.due||'9999'),
+    revision:(a,b)=>(b.revision||0)-(a.revision||0)||(a.due||'9999').localeCompare(b.due||'9999'),
+    client:(a,b)=>whoName(a).localeCompare(whoName(b))||(a.due||'9999').localeCompare(b.due||'9999'),
+    updated:(a,b)=>(b.updated||b.created||0)-(a.updated||a.created||0),
     manual:(a,b)=>(a.order??9e15)-(b.order??9e15)||(a.due||'9999').localeCompare(b.due||'9999')
   }[u.sort]||(()=>0);
   return list.sort(by);
@@ -1765,7 +1818,7 @@ function render(){
   document.title=(a.name||'').trim()||APP_NAME;
   const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
   withFocus(()=>{renderSide();renderMain()});
-  renderBell();renderBulk();applyDrawerW();
+  renderBell();renderBulk();applyDrawerW();syncUrl();
 }
 
 function renderSide(){
@@ -1843,6 +1896,7 @@ function renderMain(){
   ['list','board','calendar'].forEach(v=>{const b=$('#v-'+v);b.classList.toggle('on',u.view===v);b.setAttribute('aria-selected',u.view===v)});
   if(document.activeElement!==$('#q')) $('#q').value=u.q;
   $('#f-prio').value=u.prio;$('#f-due').value=u.due;$('#f-sort').value=u.sort;
+  $('#vopt-wrap').hidden=u.view!=='list';if(u.view!=='list')VOPT=false;renderVopt();
 
   if(!Object.keys(S.jobs).length){
     $('#view').innerHTML=`<div class="empty"><h3>Add your first job</h3><p>A job is an agency you edit for (with its own clients) or a direct client. Each job keeps its own tools: where you talk, where tasks are assigned, where you upload, and where files live.</p><button class="btn primary" data-act="new-job">${I.plus}New job</button></div>`;
@@ -1852,7 +1906,70 @@ function renderMain(){
   $('#view').innerHTML=u.view==='board'?boardView(list,job):u.view==='calendar'?calendarView(list):listView(list,job);
 }
 
+/* ================= address bar: Back button and task links =================
+   The page's place is kept in the URL hash (#/overview, #/job/<id>/client/<id>/pane/brand, …/task/<id>), so the
+   browser's Back closes the task panel or returns to the previous page, and a task link opens that task. */
+const PAGES=['overview','archived','activity','trash'];
+let URL_READY=false,URL_LAST=null,URL_TASK_PUSHED=false,URL_APPLYING=false;
+const LINK_IC='<svg class="i" viewBox="0 0 16 16"><path d="M6.8 9.2a2.8 2.8 0 0 0 4 0l2.2-2.2a2.8 2.8 0 0 0-4-4l-.9.9"/><path d="M9.2 6.8a2.8 2.8 0 0 0-4 0L3 9a2.8 2.8 0 0 0 4 4l.9-.9"/></svg>';
+function urlOf(){
+  const u=S.ui,p=[];
+  if(S.jobs[u.tab]){p.push('job',u.tab);if(u.client&&u.client!=='all'&&S.clients[u.client])p.push('client',u.client);if(u.pane&&u.pane!=='tasks')p.push('pane',u.pane)}
+  else p.push(PAGES.includes(u.tab)?u.tab:'overview');
+  const t=u.openTask&&S.tasks[u.openTask];if(t&&!t._draft)p.push('task',t.id);
+  return '#/'+p.map(encodeURIComponent).join('/');
+}
+function parseUrl(h){
+  if(!/^#\/./.test(h||''))return null;
+  const a=h.slice(2).split('/').map(x=>{try{return decodeURIComponent(x)}catch(e){return x}}),o={};let i=0;
+  if(PAGES.includes(a[0])){o.tab=a[0];i=1}
+  for(;i<a.length;i+=2){const k=a[i],v=a[i+1];if(k==='job')o.tab=v;else if(k==='client')o.client=v;else if(k==='pane')o.pane=v;else if(k==='task')o.task=v}
+  return o;
+}
+function applyUrl(o,first){
+  const u=S.ui;URL_APPLYING=true;
+  try{
+    const task=o.task&&S.tasks[o.task]&&!S.tasks[o.task].deleted?S.tasks[o.task]:null;
+    let tab=o.tab;if(!tab&&task)tab=task.archived?'archived':task.jobId;
+    if(tab&&(PAGES.includes(tab)||S.jobs[tab])){
+      if(tab!==u.tab){u.tab=tab;const v=u.views?.[tab];if(v)u.view=v}
+      u.client=o.client&&S.clients[o.client]?o.client:'all';u.pane=o.pane||'tasks';
+    }
+    if(task){if(u.openTask!==task.id)openTask(task.id)}
+    else if(u.openTask&&!(DRAFT&&DRAFT.id===u.openTask))closeDrawer();
+    saveUi();render();
+  }finally{URL_APPLYING=false}
+  URL_LAST=urlOf();
+  if(first)history.replaceState(null,'',URL_LAST);
+}
+function syncUrl(){
+  if(!S.ready)return;
+  if(!URL_READY){URL_READY=true;const o=parseUrl(location.hash);if(o){setTimeout(()=>applyUrl(o,true),0);return}URL_LAST=urlOf();history.replaceState(null,'',URL_LAST);return}
+  if(URL_APPLYING)return;
+  const k=urlOf();if(k===URL_LAST)return;
+  const base=x=>(x||'').replace(/\/task\/[^/]+$/,''),same=base(k)===base(URL_LAST),hadTask=/\/task\//.test(URL_LAST||''),hasTask=/\/task\//.test(k);
+  if(same&&hadTask&&!hasTask&&URL_TASK_PUSHED){URL_TASK_PUSHED=false;URL_LAST=k;history.back();return}
+  if(same&&hadTask&&hasTask)history.replaceState(null,'',k);
+  else{history.pushState(null,'',k);URL_TASK_PUSHED=same&&!hadTask&&hasTask}
+  URL_LAST=k;
+}
+window.addEventListener('popstate',()=>{if(!URL_READY||!S.ready)return;URL_TASK_PUSHED=false;applyUrl(parseUrl(location.hash)||{tab:'overview'})});
+function copyTaskLink(id){
+  const t=S.tasks[id];if(!t||t._draft)return;
+  const url=location.origin+location.pathname+location.search+'#/task/'+encodeURIComponent(id);
+  try{navigator.clipboard.writeText(url).then(()=>toast('Link to this task copied'),()=>toast(url))}catch(x){toast(url)}
+}
 /* Pinned tasks: a strip above the toolbar on the Overview (all jobs) and on a job page (that job / client). */
+/* List options pop-up: which columns show, and fold or unfold every status group */
+let VOPT=false;
+function renderVopt(){
+  const b=$('#vopt-btn'),p=$('#vopt');if(!b||!p)return;
+  b.setAttribute('aria-expanded',VOPT);b.classList.toggle('on',VOPT);p.hidden=!VOPT;if(!VOPT){p.innerHTML='';return}
+  const h=S.ui.hideCols||{};
+  p.innerHTML=`<b>Columns</b>${[['prio','Priority'],['start','Start date'],['links','Links']].map(([k,l])=>`<label><input type="checkbox" data-col="${k}" ${h[k]?'':'checked'}>${l}</label>`).join('')}
+    <p class="hint">Status and due date always show. On narrow screens Priority and Start are hidden anyway.</p>
+    <b>Groups</b><div class="vopt-btns"><button type="button" class="btn sm" data-act="groups-all" data-open="1">Expand all</button><button type="button" class="btn sm" data-act="groups-all" data-open="0">Collapse all</button></div>`;
+}
 function pinnedStrip(scope){
   const pins=scope.filter(t=>t.pinned&&!t._draft).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));if(!pins.length)return '';
   return `<section class="pins"><h3>${I.pin}Pinned<span class="count">${pins.length}</span></h3><div class="pin-list">${pins.map(t=>`<div class="pin-card" data-act="open" data-id="${t.id}" tabindex="0">${taskMark(t)}<div class="pc-main"><b>${esc(t.name||'Untitled task')}</b><small>${esc([S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '))}</small></div><span class="pill" ${pillStyle(stOf(t))}><span class="pl">${esc(stLabel(stOf(t)))}</span></span><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):''}</span><button class="icon-btn" data-act="unpin" data-id="${t.id}" data-stop title="Unpin" aria-label="Unpin">${I.x}</button></div>`).join('')}</div></section>`;
@@ -1884,9 +2001,24 @@ function metaLine(t,job,showJob){
   if(!isClosed(t)&&!t.archived){const a=ageDays(t);if(a!==null&&a>=AGE_SHOW)bits.push(`<span class="chip age ${a>=AGE_OLD?'old':''}" title="Assigned ${a} days ago">${a}d</span>`)}
   return `<div class="t-meta">${bits.join('')}</div>`;
 }
+/* Brand icons for common services, picked from the link's address (list rows, board cards, task panel) */
+const SVC=[
+  [/(^|\.)(frame\.io|f\.io)$/,'<svg class="svc" viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" rx="3.5" fill="#5b53ff"/><path d="M5.2 4.2h5.6L6.3 8.1h4.5l-5.6 3.7 1.8-3.7H4.6z" fill="#fff"/></svg>'],
+  [/(^|\.)(drive|docs)\.google\.com$/,'<svg class="svc" viewBox="0 0 16 16"><path d="M5.4 1.8 .7 10l2.4 4.1 4.7-8.2z" fill="#1fa463"/><path d="M5.4 1.8h5.2l4.7 8.2h-5.2z" fill="#ffd04b"/><path d="M3.1 14.1h9.8l2.4-4.1H5.5z" fill="#4687f4"/></svg>'],
+  [/(^|\.)(onedrive\.live\.com|1drv\.ms|sharepoint\.com|onedrive\.com)$/,'<svg class="svc" viewBox="0 0 16 16"><path d="M4.3 12.6a3.1 3.1 0 0 1-.5-6.2 4.2 4.2 0 0 1 7.9-1.3 3.4 3.4 0 0 1 .8 7.5z" fill="#0f78d4"/></svg>'],
+  [/(^|\.)clickup\.com$|(^|\.)sharing\.clickup\.com$/,'<svg class="svc" viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"><path d="M3 9.6 8 5.4l5 4.2" stroke="#ff02f0"/><path d="M3.4 12.2c2.6 2.2 6.6 2.2 9.2 0" stroke="#8930fd"/></svg>'],
+  [/(^|\.)lucidlink\.com$|(^|\.)lucidlink\.app$/,'<svg class="svc" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#5b2ee8"/><path d="M6 4.5v6.8h4.4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'],
+  [/(^|\.)dropbox\.com$|(^|\.)db\.tt$/,'<svg class="svc" viewBox="0 0 16 16"><path d="M4.6 1.8 1 4.1l3.6 2.3L8 4.1zM11.4 1.8 8 4.1l3.4 2.3L15 4.1zM1 8.7l3.6 2.3L8 8.7 4.6 6.4zM11.4 6.4 8 8.7l3.4 2.3L15 8.7zM4.7 11.8 8 14l3.3-2.2L8 9.6z" fill="#0061ff"/></svg>'],
+  [/(^|\.)vimeo\.com$/,'<svg class="svc" viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" rx="3.5" fill="#1ab7ea"/><path d="M4.3 6.4 5 7c.5-.4.9-.6 1.1-.1l1.3 4.1c.6 1.2 1.2 1.3 2.1.2 1.4-1.8 2.3-3.2 2.4-4.4.1-1.6-1.3-1.7-2.5-.9.5-1.6 2.5-1.9 2.5-1.9" fill="none" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'],
+  [/(^|\.)(youtube\.com|youtu\.be)$/,'<svg class="svc" viewBox="0 0 16 16"><rect x="1" y="3" width="14" height="10" rx="3" fill="#ff0000"/><path d="M6.6 5.7v4.6L10.4 8z" fill="#fff"/></svg>']];
+function svcIcon(v){
+  v=String(v||'').trim();if(!v||localPath(v))return '';
+  let host='';try{host=new URL(/^[a-z][a-z0-9+.-]*:/i.test(v)?v:'https://'+v).hostname.toLowerCase()}catch(e){return ''}
+  const hit=SVC.find(([re])=>re.test(host));return hit?hit[1]:'';
+}
 function linkIcons(t){
   const j=S.jobs[t.jobId];
-  const one=(kind,icon)=>{const v=t.links?.[kind],u=linkHref(v,j),p=localPath(v),label=linkLabel(j,kind);
+  const one=(kind,icon)=>{const v=t.links?.[kind],u=linkHref(v,j),p=localPath(v),label=linkLabel(j,kind);icon=svcIcon(v)||icon;
     if(p&&!u)return `<button type="button" class="lbtn" data-act="copy-path" data-path="${esc(p)}" title="Copy Finder path (opens on your Mac)" aria-label="Copy ${esc(label)} path" data-stop>${icon}</button>`;
     return u?`<a href="${esc(u)}"${linkTarget(v,j)} title="${p?`Open “${esc(pathName(p))}” in Finder`:`Open ${esc(label)}${viaProfile(j)?` in Chrome profile “${esc(j.chromeProfile.trim())}”`:''}`}" aria-label="Open ${esc(label)}" data-stop>${icon}</a>`:`<span title="No ${esc(label)} yet">${icon}</span>`};
   return `<div class="links">${one('task',I.task)}${one('upload',I.film)}${one('file',I.folder)}${one('project',I.mac)}</div>`;
@@ -1900,10 +2032,17 @@ const taskMark=t=>{
 const prioHtml=p=>{p=p||'normal';return `<span class="prio ${p}">${p==='normal'?'':I.flag}${PRIORITIES.find(x=>x.id===p)?.label||''}</span>`};
 const statusSelect=(t,act)=>`<select class="pill" ${pillStyle(stOf(t))} data-act="${act}" data-id="${t.id}" aria-label="Status">${STATUSES.map(s=>`<option value="${s.id}" ${s.id===stOf(t)?'selected':''}>${s.label}</option>`).join('')}</select>`;
 
-const ROW_HEAD=`<div class="row-head"><span></span><span>Task</span><span>Status</span><span class="c-prio">Priority</span><span class="c-start">Start</span><span>Due</span><span>Links</span></div>`;
+const ROW_HEAD=`<div class="row-head"><span></span><span>Task</span><span>Status</span><span class="c-prio">Priority</span><span class="c-start">Start</span><span>Due</span><span class="c-links">Links</span></div>`;
+/* List columns the user hid (View options), per device: S.ui.hideCols {prio,start,links} */
+function rowsAttrs(){
+  const h=S.ui.hideCols||{},on=k=>!h[k];
+  const wide=['var(--w0)','minmax(0,1fr)','180px',on('prio')&&'84px',on('start')&&'84px','84px',on('links')&&'120px'].filter(Boolean).join(' ');
+  const mid=['var(--w0)','minmax(0,1fr)','180px','84px',on('links')&&'120px'].filter(Boolean).join(' ');
+  return `class="rows ${['prio','start','links'].filter(k=>h[k]).map(k=>'h-'+k).join(' ')}" style="--cols:${wide};--cols-mid:${mid}"`;
+}
 const rowHtml=(t,job,showJob)=>`<div class="row ${isClosed(t)?'done-row':''} ${S.ui.openTask===t.id?'focus':''} ${SEL.has(t.id)?'picked':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="mark-wrap">${taskMark(t)}${selBox(t)}</div>
-        <div class="t-main"><div class="t-name" title="Double-click to rename">${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${esc(t.name||'Untitled task')}</div>${metaLine(t,job,showJob)}</div>
+        <div class="t-main"><div class="t-name" title="Double-click to rename">${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${hlText(t.name||'Untitled task',qNow())}</div>${metaLine(t,job,showJob)}${searchHit(t)}</div>
         <div class="c-status" data-stop>${statusSelect(t,'row-status')}${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
         <div class="c-prio">${prioHtml(t.priority)}</div>
         <div class="c-start date ${t.start?'':'none'}"${relTitle(t.start)}>${t.start?fmtRel(t.start):'—'}</div>
@@ -1917,7 +2056,7 @@ function listView(list,job){
     const open=!S.ui.collapsed[s.id];
     html+=`<section class="group" id="grp-${s.id}" data-drop="${s.id}"><div class="group-bar"><button class="group-head ${open?'open':''}" data-act="group" data-status="${s.id}" aria-expanded="${open}">${I.chev}<span class="pill" ${pillStyle(s.id)}><span class="pl">${esc(s.label)}</span></span><span class="count">${rows.length}</span></button>${s.id==='done'&&rows.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}">${I.archive}Archive all ${rows.length} done</button>`:''}</div>`;
     if(open&&rows.length){
-      html+=`<div class="rows">${rows.length?ROW_HEAD:''}`;
+      html+=`<div ${rowsAttrs()}>${rows.length?ROW_HEAD:''}`;
       html+=rows.map(t=>rowHtml(t,job,showJob)).join('');
       html+=`</div>`;
     }
@@ -1932,7 +2071,7 @@ function boardView(list,job){
     const cards=list.filter(t=>stOf(t)===s.id);
     return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill" ${pillStyle(s.id)}><span class="pl">${esc(s.label)}</span></span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
       ${cards.map(t=>`<div class="card ${SEL.has(t.id)?'picked':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
-        <div class="card-top"><div class="mark-wrap">${taskMark(t)}${selBox(t)}</div><div class="t-name" title="Double-click to rename">${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${esc(t.name||'Untitled task')}</div></div>${metaLine(t,job,!job)}
+        <div class="card-top"><div class="mark-wrap">${taskMark(t)}${selBox(t)}</div><div class="t-name" title="Double-click to rename">${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${hlText(t.name||'Untitled task',qNow())}</div></div>${metaLine(t,job,!job)}${searchHit(t)}
         <div class="card-foot"><span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,!isClosed(t)):'No date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
       </div>`;
   }).join('')}</div></div>`;
@@ -2155,8 +2294,9 @@ function renderArchive(){
 
 /* ================= drawer ================= */
 let deleteArmed=false, clearArmed=false;
-function openTask(id,tab){seenTask(id);if(NOTES_EDIT!==id)NOTES_EDIT=null;if(S.tasks[id]&&!S.tasks[id]._draft){S.ui.recent=[id,...(S.ui.recent||[]).filter(x=>x!==id)].slice(0,8);saveUi()}if(S.ui.openTask!==id)TPL={open:false,naming:false,del:null};if(DRAFT&&DRAFT.id!==id)discardDraft();if(S.ui.openTask!==id||tab)S.ui.dtab=tab||'details';S.ui.openTask=id;noteDelArmed=null;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender()}
-function closeDrawer(){flushAll();discardDraft();S.ui.openTask=null;$('#drawer').hidden=true;$('#scrim').hidden=true;scheduleRender()}
+function openTask(id,tab){seenTask(id);if(NOTES_EDIT!==id)NOTES_EDIT=null;if(S.tasks[id]&&!S.tasks[id]._draft){S.ui.recent=[id,...(S.ui.recent||[]).filter(x=>x!==id)].slice(0,8);saveUi()}if(S.ui.openTask!==id)TPL={open:false,naming:false,del:null};if(DRAFT&&DRAFT.id!==id)discardDraft();if(S.ui.openTask!==id||tab)S.ui.dtab=tab||'details';S.ui.openTask=id;noteDelArmed=null;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender();syncUrl()}
+function closeDrawer(){flushAll();discardDraft();S.ui.openTask=null;$('#drawer').hidden=true;$('#scrim').hidden=true;scheduleRender();syncUrl()}
+let LSHOW=new Set();
 /* Task activity: the task's log entries plus your own posted updates (kind 'note'), newest first */
 function taskActivity(t){
   const h=logItems().filter(e=>e.taskId===t.id);
@@ -2282,12 +2422,12 @@ function renderDrawer(){
   if(!t){if(S.ui.openTask)closeDrawer();return}
   const j=S.jobs[t.jobId];const cl=j?clientsOf(j.id):[];
   const checklist=t.checklist||[];const doneN=checklist.filter(x=>x.done).length;
-  const linkRow=(kind,icon)=>{const v=t.links?.[kind],u=linkHref(v,j);const label=linkLabel(j,kind);return `<div class="link-row"><label><span>${icon}${esc(label)}</span><input type="${kind==='project'?'text':'url'}" data-field="links.${kind}" data-fk="d-link-${kind}" value="${esc(v||'')}" placeholder="${kind==='project'?'Paste the Finder path (⌥⌘C in Finder)':'Paste link'}" ${kind==='project'?'autocapitalize="off" spellcheck="false"':''}></label>
+  const linkRow=(kind,icon)=>{const v=t.links?.[kind],u=linkHref(v,j);const label=linkLabel(j,kind);return `<div class="link-row"><label><span>${svcIcon(v)||icon}${esc(label)}</span><input type="${kind==='project'?'text':'url'}" data-field="links.${kind}" data-fk="d-link-${kind}" value="${esc(v||'')}" placeholder="${kind==='project'?'Paste the Finder path (⌥⌘C in Finder)':'Paste link'}" ${kind==='project'?'autocapitalize="off" spellcheck="false"':''}></label>
     <div class="acts"><a class="icon-btn ${u?'':'off'}" href="${esc(u||'#')}"${linkTarget(v,j)} title="${localPath(v)?'Open in Finder':'Open'}" aria-label="Open ${esc(label)}">${I.ext}</a><button class="icon-btn" data-act="copy" data-kind="${kind}" title="Copy" aria-label="Copy ${esc(label)}">${I.copy}</button></div>${kind==='project'?`<p class="hint path-hint" ${localPath(v)?'':'hidden'}>${pathHint()}</p>`:''}</div>`};
   withFocus(()=>{$('#drawer').innerHTML=`
   ${t._draft?`<div class="d-draft">${t.copiedFrom?I.copy:I.plus}<b>${t.copiedFrom?'Copy of a task':'New task'}</b><span>Not saved yet</span></div>`:''}
   <div class="d-top"><div class="crumb">${taskMark(t)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
-    ${t._draft?'':`<button class="icon-btn ${t.pinned?'pin-on':''}" data-act="d-pin" aria-pressed="${!!t.pinned}" aria-label="${t.pinned?'Unpin':'Pin to the top'}" title="${t.pinned?'Unpin':'Pin to the top of the Overview'}">${I.pin}</button><button class="icon-btn" data-act="d-duplicate" aria-label="Duplicate task" title="Duplicate (make a copy to edit)">${I.copy}</button>`}<button class="icon-btn" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
+    ${t._draft?'':`<button class="icon-btn ${t.pinned?'pin-on':''}" data-act="d-pin" aria-pressed="${!!t.pinned}" aria-label="${t.pinned?'Unpin':'Pin to the top'}" title="${t.pinned?'Unpin':'Pin to the top of the Overview'}">${I.pin}</button><button class="icon-btn" data-act="d-link" aria-label="Copy link to this task" title="Copy link to this task">${LINK_IC}</button><button class="icon-btn" data-act="d-duplicate" aria-label="Duplicate task" title="Duplicate (make a copy to edit)">${I.copy}</button>`}<button class="icon-btn" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
   ${t._draft?'':`<div class="d-tabs" role="tablist"><button role="tab" data-act="d-tab" data-tab="details" class="${S.ui.dtab!=='activity'?'on':''}" aria-selected="${S.ui.dtab!=='activity'}">${I.info}Details</button><button role="tab" data-act="d-tab" data-tab="activity" class="${S.ui.dtab==='activity'?'on':''}" aria-selected="${S.ui.dtab==='activity'}">${I.clock}Activity<span class="mono">${taskActivity(t).length}</span></button></div>`}
   ${!t._draft&&S.ui.dtab==='activity'?activityPane(t):`  <div class="d-body">
     ${t.deleted?`<div class="d-archived">${I.trash}<span><b>In Trash</b> since ${fmtDate(t.deletedAt)}. It's deleted for good after ${TRASH_DAYS} days.</span><button class="btn sm" data-act="trash-restore" data-id="${t.id}">Restore</button></div>`:''}
@@ -2311,7 +2451,9 @@ function renderDrawer(){
       ${client?f(I.ratio,'Format',`<div class="fmt-pick">${FORMATS.map(x=>`<button data-act="fmt" data-fmt="${x}" class="${t.format===x?'on':''}" aria-pressed="${t.format===x}">${x}</button>`).join('')}</div>`):''}
     </div>`})()}
     ${brandForTask(t)}
-    <div><h4 class="section-title">Links</h4>${linkRow('task',I.task)}${linkRow('upload',I.film)}${linkRow('file',I.folder)}${linkRow('project',I.mac)}</div>
+    ${(()=>{const kinds=[['task',I.task],['upload',I.film],['file',I.folder],['project',I.mac]];
+      const shown=kinds.filter(([k])=>String(t.links?.[k]||'').trim()||LSHOW.has(t.id+':'+k)),empty=kinds.filter(x=>!shown.includes(x));
+      return `<div><h4 class="section-title">Links</h4>${shown.map(([k,ic])=>linkRow(k,ic)).join('')}${empty.length?`<div class="link-add">${empty.map(([k,ic])=>`<button type="button" class="btn sm ghost" data-act="link-add" data-kind="${k}">${I.plus}${esc(linkLabel(j,k))}</button>`).join('')}</div>`:''}</div>`})()}
     <div><h4 class="section-title">Checklist<span class="mono">${checklist.length?`${doneN}/${checklist.length}`:''}</span>${!tplHome(t)?'':`<button type="button" class="tpl-btn ${TPL.open?'on':''}" data-act="tpl-toggle" aria-expanded="${TPL.open}">${I.task}Templates</button>`}</h4>
       ${TPL.open?tplMenu(t):''}
       ${checklist.length?`<div class="progress"><i style="width:${doneN/checklist.length*100}%"></i></div>`:''}
@@ -3356,6 +3498,7 @@ function toast(msg,action){
 document.addEventListener('click',e=>{
   if(narrow.matches&&$('#side').classList.contains('open')&&e.target.closest('#side [data-act]:not([data-act=toggle-jobs])'))setTimeout(closeSide,0);
   if(notesOpen&&!e.target.closest('.bell-wrap')){notesOpen=false;renderBell()}
+  if(VOPT&&!e.target.closest('#vopt-wrap')){VOPT=false;renderVopt()}
   if(JUMP&&e.target.id==='jump'){closeJump();return}
   const stop=e.target.closest('[data-stop]');
   const el=e.target.closest('[data-act]');
@@ -3367,8 +3510,12 @@ document.addEventListener('click',e=>{
   if(a!=='cal-disconnect'&&CAL.disArmed){CAL.disArmed=false;if(SM)renderSettings()}
   if(SM&&SM.stArm&&!/^st-(del|del-go)$/.test(a)&&!el.closest('.st-del-box')){SM.stArm=null;renderSettings()}
   switch(a){
-    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';saveUi();render();window.scrollTo({top:0});break;
-    case 'view': u.view=el.dataset.view;saveUi();render();break;
+    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';{const v=u.views?.[u.tab];if(v)u.view=v}saveUi();render();window.scrollTo({top:0});break;
+    case 'view': u.view=el.dataset.view;(u.views=u.views||{})[u.tab]=u.view;saveUi();render();break;
+    case 'vopt': VOPT=!VOPT;renderVopt();break;
+    case 'groups-all': {const open=el.dataset.open==='1';u.collapsed=u.collapsed||{};STATUSES.forEach(x=>{u.collapsed[x.id]=!open});saveUi();render();break}
+    case 'd-link': copyTaskLink(u.openTask);break;
+    case 'link-add': LSHOW.add(u.openTask+':'+el.dataset.kind);renderDrawer();$(`#drawer [data-field="links.${el.dataset.kind}"]`)?.focus();break;
     case 'log-more': u.lmore=(u.lmore||200)+200;render();break;
     case 'bell': notesOpen=!notesOpen;if(notesOpen)saveNotes();renderBell();break;
     case 'notes-read': notifications().forEach(n=>NS.read[n.key]=1);saveNotes();renderBell();break;
@@ -3551,6 +3698,7 @@ document.addEventListener('change',e=>{
   const el=e.target,u=S.ui;
   if(el.id==='f-prio'){u.prio=el.value;render();return}
   if(el.id==='f-due'){u.due=el.value;render();return}
+  if(el.dataset.col&&el.closest('#vopt')){(u.hideCols=u.hideCols||{})[el.dataset.col]=!el.checked;saveUi();render();return}
   if(el.id==='arch-job'){u.ajob=el.value;saveUi();render();return}
   if(el.id==='bulk-move'&&el.value){moveTasks([...SEL],el.value);return}
   if(el.id==='bulk-status'&&el.value){const v=el.value,undo=[];[...SEL].forEach(id=>{const prev=setStatus(id,v,{quiet:true});if(prev)undo.push([id,prev])});if(v==='done'&&undo.length)celebrate();render();toast(`Moved ${undo.length} task${undo.length===1?'':'s'} to ${stLabel(v)}`,undo.length?{label:'Undo',fn:()=>undoStatus(undo)}:null);return}
@@ -3634,7 +3782,7 @@ document.addEventListener('keydown',e=>{
 });
 /* toolbar buttons keep the textarea focused */
 document.addEventListener('mousedown',e=>{if(e.target.closest?.('.notes-tools button'))e.preventDefault()});
-document.addEventListener('focusin',e=>{if(e.target.matches?.('#drawer textarea.notes')&&S.ui.openTask)NOTES_EDIT=S.ui.openTask});
+document.addEventListener('focusin',e=>{if(e.target.matches?.('#drawer textarea.notes')&&S.ui.openTask)NOTES_EDIT=S.ui.openTask;const f=e.target.dataset?.field;if(f&&f.startsWith('links.')&&S.ui.openTask)LSHOW.add(S.ui.openTask+':'+f.slice(6))});
 /* leaving the notes shows them formatted again (not when only the window lost focus) */
 document.addEventListener('focusout',e=>{
   if(!e.target.matches?.('#drawer textarea.notes')||e.relatedTarget?.closest?.('.notes-tools'))return;
