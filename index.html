@@ -766,19 +766,35 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .lrow.link:hover{background:var(--surface-2)}
 .l-ic{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:var(--surface-2);color:var(--muted)}
 .l-ic .i{width:14px;height:14px}
-.l-ic.k-status{color:var(--st-prog)} .l-ic.k-create{color:var(--st-done)} .l-ic.k-delete{color:var(--danger)} .l-ic.k-check{color:var(--st-done)} .l-ic.k-date{color:var(--st-rev)} .l-ic.k-brand{color:var(--st-review)}
+.l-ic.k-note{color:var(--accent)} .l-ic.k-status{color:var(--st-prog)} .l-ic.k-create{color:var(--st-done)} .l-ic.k-delete{color:var(--danger)} .l-ic.k-check{color:var(--st-done)} .l-ic.k-date{color:var(--st-rev)} .l-ic.k-brand{color:var(--st-review)}
 .l-main{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;min-width:0}
 .l-main b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .l-main span{color:var(--muted)}
 .l-main small{display:inline-flex;align-items:center;gap:5px;color:var(--faint);font-size:calc(12px*var(--ts))}
 .lrow time{font:500 calc(12px*var(--ts)) var(--mono);color:var(--faint);white-space:nowrap}
-.d-hist summary{cursor:pointer;list-style:none}
-.d-hist summary::-webkit-details-marker{display:none}
-.d-hist summary h4{display:flex;align-items:center;justify-content:flex-start;gap:8px}
-.d-hist summary h4::after{content:"▸";color:var(--faint);font-size:calc(11px*var(--ts))}
-.d-hist[open] summary h4::after{content:"▾"}
-.hist{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:6px}
-.hist .lrow{padding:6px 10px;font-size:calc(13px*var(--ts))}
+/* task panel tabs + activity */
+.d-tabs{display:flex;gap:4px;padding:0 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+.d-tabs button{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:10px 10px;border-bottom:2px solid transparent;color:var(--muted);font-weight:600;margin-bottom:-1px}
+.d-tabs button.on{color:var(--text);border-bottom-color:var(--accent)}
+.d-tabs .mono{font-size:calc(11px*var(--ts));color:var(--faint)}
+.d-act-title{margin:0;font:700 calc(20px*var(--ts))/1.25 var(--display)}
+.composer{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
+.composer:focus-within{border-color:var(--accent)}
+.composer textarea{width:100%;border:0;background:none;padding:10px 12px;resize:vertical;min-height:60px;outline:none;line-height:1.45}
+.composer-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px 8px 12px}
+.timeline{display:flex;flex-direction:column;gap:2px;position:relative}
+.tl-day{font:600 calc(11px*var(--ts)) var(--body);letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:10px 0 4px}
+.tl-day:first-child{margin-top:0}
+.tl-item{display:grid;grid-template-columns:26px minmax(0,1fr) auto;align-items:center;gap:10px;padding:5px 0}
+.tl-text{color:var(--muted)}
+.tl-item time,.tl-note time{font:500 calc(12px*var(--ts)) var(--mono);color:var(--faint);white-space:nowrap}
+.tl-note{border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:8px 10px 10px;margin:4px 0}
+.tl-note-head{display:flex;align-items:center;gap:6px;color:var(--accent)}
+.tl-note-head b{color:var(--text);font-weight:600;flex:1}
+.tl-note-head .icon-btn{width:24px;height:24px;opacity:.6}
+.tl-note-head .icon-btn:hover,.tl-note-head .icon-btn.danger{opacity:1}
+.tl-note-head .icon-btn.danger{color:var(--danger);background:var(--danger-soft)}
+.tl-note p{margin:4px 0 0;white-space:normal;line-height:1.5}
 @media (max-width:820px){.lrow{padding:7px 10px;gap:8px}.lrow time{font-size:calc(11px*var(--ts))}}
 </style>
 
@@ -874,6 +890,7 @@ const defaultMark=()=>`<img class="brand-logo def" src="${APP_LOGO}" alt="">`;
 
 const I={
   plus:'<svg class="i" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>',
+  chat:'<svg class="i" viewBox="0 0 16 16"><path d="M3 3.5h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H7l-3 2.5v-2.5H3a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z"/></svg>',
   x:'<svg class="i" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg>',
   chev:'<svg class="i" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4"/></svg>',
   left:'<svg class="i" viewBox="0 0 16 16"><path d="M10 4 6 8l4 4"/></svg>',
@@ -1680,12 +1697,12 @@ function restoreTasks(ids,quiet){
   if(ids.includes(S.ui.openTask))renderDrawer();
   if(!quiet)toast(ids.length===1?`Restored “${S.tasks[ids[0]].name||'task'}”`:`Restored ${ids.length} tasks`);
 }
-const LOG_ICON={create:I.plus,status:I.status,date:I.cal,edit:I.pencil,check:I.task,archive:I.archive,restore:I.loop,delete:I.trash,job:I.briefcase,brand:I.palette};
+const LOG_ICON={note:I.chat,create:I.plus,status:I.status,date:I.cal,edit:I.pencil,check:I.task,archive:I.archive,restore:I.loop,delete:I.trash,job:I.briefcase,brand:I.palette};
 const fmtTime=iso=>new Date(iso).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
 function dayHeading(iso){const d=ymd(new Date(iso)),t=today(),y=ymd(new Date(Date.now()-864e5));return d===t?'Today':d===y?'Yesterday':fmtLong(d)}
 function logRow(e,showTask=true){
   const t=e.taskId&&S.tasks[e.taskId],j=S.jobs[e.jobId];
-  return `<div class="lrow ${t?'link':''}" ${t?`data-act="open" data-id="${t.id}" tabindex="0"`:''}>
+  return `<div class="lrow ${t?'link':''}" ${t?`data-act="open" data-id="${t.id}" data-dtab="activity" tabindex="0"`:''}>
     <span class="l-ic k-${e.kind}">${LOG_ICON[e.kind]||I.info}</span>
     <div class="l-main">${showTask&&e.task?`<b>${esc(e.task)}</b>`:''}<span>${esc(e.text)}</span>${showTask&&j?`<small>${jobMark(j,12)}${esc(j.name)}</small>`:''}</div>
     <time datetime="${esc(e.at)}">${fmtTime(e.at)}</time></div>`;
@@ -1695,7 +1712,7 @@ function renderActivity(){
   $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${I.clock.replace('class="i"','class="i" style="width:28px;height:28px"')}Activity</h1><div class="sub">What changed in your tracker, newest first. Kept for ${LOG_MONTHS} months.</div></div></div>`;
   $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
   if(!all.length){$('#view').innerHTML=`<div class="empty"><h3>No activity yet</h3><p>Changes show up here as you work: new tasks, status moves, due dates, checklist steps, archiving and more.</p></div>`;return}
-  const kinds=[['all','Everything'],['status','Status'],['create','New tasks'],['date','Dates'],['check','Checklist'],['archive','Archive'],['delete','Deleted'],['job','Jobs & brand']];
+  const kinds=[['all','Everything'],['note','Updates'],['status','Status'],['create','New tasks'],['date','Dates'],['check','Checklist'],['archive','Archive'],['delete','Deleted'],['job','Jobs & brand']];
   const list=all.filter(e=>(u.ljob||'all')==='all'||e.jobId===u.ljob).filter(e=>{const k=u.lkind||'all';return k==='all'||e.kind===k||(k==='archive'&&e.kind==='restore')||(k==='job'&&e.kind==='brand')})
     .filter(e=>!q||[e.task,e.text,S.jobs[e.jobId]?.name].some(x=>String(x||'').toLowerCase().includes(q)));
   const shown=list.slice(0,u.lmore||200);
@@ -1735,8 +1752,40 @@ function renderArchive(){
 
 /* ================= drawer ================= */
 let deleteArmed=false, clearArmed=false;
-function openTask(id){if(DRAFT&&DRAFT.id!==id)discardDraft();S.ui.openTask=id;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender()}
+function openTask(id,tab){if(DRAFT&&DRAFT.id!==id)discardDraft();if(S.ui.openTask!==id||tab)S.ui.dtab=tab||'details';S.ui.openTask=id;noteDelArmed=null;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender()}
 function closeDrawer(){flushAll();discardDraft();S.ui.openTask=null;$('#drawer').hidden=true;$('#scrim').hidden=true;scheduleRender()}
+/* Task activity: the task's log entries plus your own posted updates (kind 'note'), newest first */
+function taskActivity(t){
+  const h=logItems().filter(e=>e.taskId===t.id);
+  if(t.created&&!h.some(e=>e.kind==='create'))h.push({at:new Date(t.created).toISOString(),kind:'create',text:'Created',taskId:t.id,synthetic:true});
+  return h;
+}
+let noteDelArmed=null;
+function activityPane(t){
+  const h=taskActivity(t);let day='',rows='';
+  for(const e of h){
+    const d=dayHeading(e.at);if(d!==day){day=d;rows+=`<div class="tl-day">${esc(d)}</div>`}
+    rows+=e.kind==='note'?`<div class="tl-note"><div class="tl-note-head">${I.chat}<b>Update</b><time datetime="${esc(e.at)}">${fmtTime(e.at)}</time><button class="icon-btn ${noteDelArmed===e.at?'danger':''}" data-act="note-del" data-at="${esc(e.at)}" title="${noteDelArmed===e.at?'Click again to delete':'Delete update'}" aria-label="Delete update">${I.trash}</button></div><p>${esc(e.text).replace(/\n/g,'<br>')}</p></div>`
+      :`<div class="tl-item"><span class="l-ic k-${e.kind}">${LOG_ICON[e.kind]||I.info}</span><span class="tl-text">${esc(e.text)}</span><time datetime="${esc(e.at)}">${fmtTime(e.at)}</time></div>`;
+  }
+  return `<div class="d-body d-activity">
+    <h2 class="d-act-title">${esc(t.name||'Untitled task')}</h2>
+    <div class="composer"><textarea id="note-in" data-fk="note-in" rows="2" placeholder="Post an update: what you sent, what the client said, what's next…"></textarea>
+      <div class="composer-foot"><span class="hint">⌘/Ctrl + Enter to post</span><button class="btn sm primary" data-act="note-post">Post update</button></div></div>
+    <div class="timeline">${rows||'<p class="hint">Nothing yet. Changes to this task will show up here.</p>'}</div>
+    ${h.length&&!logItems().some(e=>e.taskId===t.id&&e.kind!=='note')?'<p class="hint">Status, date and checklist changes are recorded from now on.</p>':''}
+  </div>`;
+}
+function postNote(){
+  const t=S.tasks[S.ui.openTask],el=$('#note-in');if(!t||!el)return;
+  const v=el.value.trim();if(!v){el.focus();return}
+  logAct('note',v,{task:t});el.value='';renderDrawer();$('#note-in')?.focus();
+}
+function deleteNote(at){
+  const t=S.tasks[S.ui.openTask];
+  for(const k of Object.keys(S.settings))if(k.startsWith('log-')){const items=S.settings[k].items||[],i=items.findIndex(e=>e.at===at&&e.kind==='note'&&e.taskId===t?.id);if(i>=0){patch('settings',k,{items:items.filter((_,x)=>x!==i)});break}}
+  noteDelArmed=null;renderDrawer();
+}
 function renderDrawer(){
   const t=S.tasks[S.ui.openTask];
   if(!t){if(S.ui.openTask)closeDrawer();return}
@@ -1748,7 +1797,8 @@ function renderDrawer(){
   ${t._draft?`<div class="d-draft">${I.plus}<b>New task</b><span>Not saved yet</span></div>`:''}
   <div class="d-top"><div class="crumb">${taskMark(t)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
     <button class="icon-btn" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
-  <div class="d-body">
+  ${t._draft?'':`<div class="d-tabs" role="tablist"><button role="tab" data-act="d-tab" data-tab="details" class="${S.ui.dtab!=='activity'?'on':''}" aria-selected="${S.ui.dtab!=='activity'}">${I.info}Details</button><button role="tab" data-act="d-tab" data-tab="activity" class="${S.ui.dtab==='activity'?'on':''}" aria-selected="${S.ui.dtab==='activity'}">${I.clock}Activity<span class="mono">${taskActivity(t).length}</span></button></div>`}
+  ${!t._draft&&S.ui.dtab==='activity'?activityPane(t):`  <div class="d-body">
     ${t.archived?`<div class="d-archived">${I.archive}<span><b>Archived</b>${t.archivedAt?' '+fmtDate(t.archivedAt):''}. Hidden from Overview and job tabs.</span><button class="btn sm" data-act="restore" data-id="${t.id}">Restore</button></div>`:''}
     <textarea class="d-name" rows="1" data-field="name" data-fk="d-name" aria-label="Task name" placeholder="Task name">${esc(t.name)}</textarea>
     <div class="props">
@@ -1768,11 +1818,10 @@ function renderDrawer(){
       ${checklist.length?`<div class="progress"><i style="width:${doneN/checklist.length*100}%"></i></div>`:''}
       <div class="checklist">${checklist.map(c=>`<div class="check ${c.done?'done':''}"><input type="checkbox" data-act="check" data-cid="${esc(c.id)}" ${c.done?'checked':''} aria-label="Done"><input class="txt" data-act="check-text" data-cid="${esc(c.id)}" data-fk="ck-${esc(c.id)}" value="${esc(c.text)}" aria-label="Checklist item"><button class="icon-btn" data-act="check-del" data-cid="${esc(c.id)}" aria-label="Remove item">${I.x}</button></div>`).join('')}
       <form class="check-add" data-act="check-add">${I.plus}<input data-fk="ck-new" placeholder="Add a step (rough cut, captions, color…)" aria-label="Add checklist item"></form></div></div>
-    ${(()=>{if(t._draft)return '';const h=logItems().filter(e=>e.taskId===t.id);return h.length?`<details class="d-hist"><summary><h4 class="section-title">History<span class="mono">${h.length}</span></h4></summary><div class="hist">${h.slice(0,30).map(e=>`<div class="lrow"><span class="l-ic k-${e.kind}">${LOG_ICON[e.kind]||I.info}</span><div class="l-main"><span>${esc(e.text)}</span></div><time datetime="${esc(e.at)}">${esc(dayHeading(e.at))}, ${fmtTime(e.at)}</time></div>`).join('')}</div></details>`:''})()}
     <div><h4 class="section-title">Notes</h4><textarea class="notes" data-field="notes" data-fk="d-notes" placeholder="Brief, feedback, music choices, specs…">${esc(t.notes||'')}</textarea></div>
     ${t._draft?`<div class="d-foot d-save"><button class="btn" data-act="drawer-close">Cancel</button><button class="btn primary" data-act="save-draft">${I.plus}Save task</button></div>`:`<div class="d-foot"><span>${t.created?'Created '+fmtDate(ymd(new Date(t.created))):''}${t.doneAt?' · Done '+fmtDate(t.doneAt):''}</span>
       <span style="display:flex;gap:6px">${isClosed(t)&&!t.archived?`<button class="btn sm" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}<button class="btn sm danger ${deleteArmed?'armed':''}" data-act="delete-task">${I.trash}${deleteArmed?'Click again to delete':'Delete task'}</button></span></div>`}
-  </div>`});
+  </div>`}`});
   autosize($('.d-name'));
 }
 /* a hidden element measures 0, so leave the height alone until it can be measured */
@@ -2546,7 +2595,10 @@ document.addEventListener('click',e=>{
       u.view='list';u.collapsed[el.dataset.status]=false;u.due='all';saveUi();render();
       $('#grp-'+el.dataset.status)?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'});break}
     case 'reset-filters': u.q='';u.prio='all';u.due='all';$('#q').value='';render();break;
-    case 'open': if(e.target.closest('select,a,input'))return; openTask(el.dataset.id);break;
+    case 'open': if(e.target.closest('select,a,input'))return; openTask(el.dataset.id,el.dataset.dtab);break;
+    case 'd-tab': S.ui.dtab=el.dataset.tab;noteDelArmed=null;renderDrawer();$('#drawer').scrollTop=0;if(S.ui.dtab==='details')autosize($('.d-name'));break;
+    case 'note-post': postNote();break;
+    case 'note-del': if(noteDelArmed===el.dataset.at)deleteNote(el.dataset.at);else{noteDelArmed=el.dataset.at;renderDrawer()}break;
     case 'new-task':{const id=newTask({status:el.dataset.status,due:el.dataset.due});if(id){openTask(id);setTimeout(()=>$('.d-name')?.focus(),30)}break}
     case 'new-job': openJobModal();break;
     case 'edit-job': openJobModal(el.dataset.id);break;
@@ -2720,6 +2772,7 @@ document.addEventListener('dragover',e=>{
   const col=e.target.closest?.('[data-drop]');
   if(col&&dragId){e.preventDefault();document.querySelectorAll('.col.drag').forEach(c=>c!==col&&c.classList.remove('drag'));col.classList.add('drag')}
 });
+document.addEventListener('keydown',e=>{if(e.target.id==='note-in'&&e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();postNote()}});
 document.addEventListener('drop',e=>{
   const col=e.target.closest?.('[data-drop]');
   if(col&&dragId){e.preventDefault();setStatus(dragId,col.dataset.drop);dragId=null}
