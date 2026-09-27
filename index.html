@@ -376,7 +376,9 @@ select.pill::before{display:none}
 .card:hover{border-color:var(--line-strong);box-shadow:var(--shadow)}
 .card.dragging{opacity:.4}
 .card .t-name{white-space:normal}
-.card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 8px;min-width:0}
+.card-foot .date{white-space:nowrap}
+.card-foot .links{margin-left:auto}
 
 /* ---------- calendar ---------- */
 .cal-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px}
@@ -1439,7 +1441,7 @@ function boardView(list,job){
     return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill st-${s.id}">${s.label}</span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
       ${cards.map(t=>`<div class="card" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="card-top">${taskMark(t)}<div class="t-name">${esc(t.name||'Untitled task')}</div></div>${metaLine(t,job,!job)}
-        <div class="card-foot"><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):'No due date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
+        <div class="card-foot"><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):'No date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
       </div>`;
   }).join('')}</div></div>`;
 }
