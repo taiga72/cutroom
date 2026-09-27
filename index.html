@@ -809,12 +809,13 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .pf-v select:hover,.pf-v input:hover{background:var(--surface-2)}
 .pf-v select:focus,.pf-v input:focus{outline:none;border-color:var(--accent);background:var(--surface)}
 .pf-v input::placeholder{color:var(--faint)}
-.st-ctl{display:inline-flex;align-items:stretch;border-radius:7px;overflow:hidden;background:color-mix(in srgb,var(--c) 90%,#000);min-width:0}
-.st-ctl select.pill{background:none;color:#fff;border:0;border-radius:0;padding:7px 12px;font:700 calc(12.5px*var(--ts))/1 var(--body);letter-spacing:.05em;text-transform:uppercase;width:auto;max-width:190px;text-overflow:ellipsis}
-.st-ctl select.pill:hover{background:rgba(255,255,255,.12)}
-.st-ctl select.pill option{color:var(--text);background:var(--surface);text-transform:none}
-.st-next{border:0;border-left:1px solid rgba(255,255,255,.3);background:none;color:#fff;width:30px;display:grid;place-items:center}
-.st-next:hover{background:rgba(255,255,255,.15)}
+.st-ctl{display:inline-flex;align-items:stretch;border-radius:999px;overflow:hidden;background:color-mix(in srgb,var(--c) 16%,transparent);color:color-mix(in srgb,var(--c) 80%,var(--text));min-width:0;padding-left:11px;position:relative}
+.st-ctl::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c);align-self:center;flex:none}
+.st-ctl select.pill{background:none;color:inherit;border:0;border-radius:0;padding:7px 12px 7px 7px;font:600 calc(13px*var(--ts))/1 var(--body);width:auto;max-width:190px;text-overflow:ellipsis}
+.st-ctl select.pill:hover{background:none;text-decoration:underline;text-underline-offset:3px}
+.st-ctl select.pill option{color:var(--text);background:var(--surface)}
+.st-next{border:0;border-left:1px solid color-mix(in srgb,var(--c) 30%,transparent);background:none;color:inherit;width:30px;display:grid;place-items:center}
+.st-next:hover{background:color-mix(in srgb,var(--c) 18%,transparent)}
 .st-next .i{width:13px;height:13px;stroke:none}
 .st-done{width:32px;height:30px;border:1px solid var(--line);background:var(--surface-2);border-radius:7px;display:grid;place-items:center;color:var(--muted)}
 .st-done:hover{color:var(--st-done);border-color:var(--st-done)}
