@@ -866,7 +866,7 @@ kbd{font:500 calc(11px*var(--ts)) var(--mono);border:1px solid var(--line);borde
 .mark-wrap{position:relative;flex:none;display:grid}
 .selbox{position:absolute;inset:0;display:grid;place-items:center;background:color-mix(in srgb,var(--surface) 85%,transparent);border-radius:26%;opacity:0;cursor:pointer}
 .selbox input{width:17px;height:17px;accent-color:var(--accent);cursor:pointer}
-.row:hover .selbox,.card:hover .selbox,.selecting .selbox,.selbox:focus-within{opacity:1}
+.selbox{opacity:1}
 .row.picked,.card.picked{background:var(--accent-soft)}
 .card.picked{border-color:var(--accent)}
 body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
@@ -1672,7 +1672,7 @@ function jobCard(j){
   const ts=live().filter(t=>t.jobId===j.id);
   const st=statsFor(ts);
   const total=ts.length||1;
-  const bar=STATUSES.map(s=>{const n=ts.filter(t=>stOf(t)===s.id).length;return n?`<i style="width:${n/total*100}%;background:${stColor(s.id)}" title="${s.label}: ${n}"></i>`:''}).join('');
+  const bar=STATUSES.map(s=>{const n=ts.filter(t=>stOf(t)===s.id).length;return n?`<i style="width:${n/total*100}%;background:${stColor(s.id)}"></i>`:''}).join('');
   const next=ts.filter(t=>!isClosed(t)&&t.due).sort((a,b)=>a.due.localeCompare(b.due))[0];
   const cl=clientsOf(j.id).length;
   return `<div class="job-wrap"><button class="job-card" data-act="nav" data-tab="${j.id}">
@@ -1725,7 +1725,7 @@ function listView(list,job){
   for(const s of STATUSES){
     const rows=list.filter(t=>stOf(t)===s.id);
     const open=!S.ui.collapsed[s.id];
-    html+=`<section class="group" id="grp-${s.id}" data-drop="${s.id}"><div class="group-bar"><button class="group-head ${open?'open':''}" data-act="group" data-status="${s.id}" aria-expanded="${open}">${I.chev}<span class="pill" ${pillStyle(s.id)} title="${esc(s.label)}"><span class="pl">${esc(s.label)}</span></span><span class="count">${rows.length}</span></button>${s.id==='done'&&rows.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}">${I.archive}Archive all ${rows.length} done</button>`:''}</div>`;
+    html+=`<section class="group" id="grp-${s.id}" data-drop="${s.id}"><div class="group-bar"><button class="group-head ${open?'open':''}" data-act="group" data-status="${s.id}" aria-expanded="${open}">${I.chev}<span class="pill" ${pillStyle(s.id)}><span class="pl">${esc(s.label)}</span></span><span class="count">${rows.length}</span></button>${s.id==='done'&&rows.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}">${I.archive}Archive all ${rows.length} done</button>`:''}</div>`;
     if(open&&rows.length){
       html+=`<div class="rows">${rows.length?ROW_HEAD:''}`;
       html+=rows.map(t=>rowHtml(t,job,showJob)).join('');
@@ -1740,7 +1740,7 @@ function listView(list,job){
 function boardView(list,job){
   return `<div class="board-wrap"><div class="board">${STATUSES.map(s=>{
     const cards=list.filter(t=>stOf(t)===s.id);
-    return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill" ${pillStyle(s.id)} title="${esc(s.label)}"><span class="pl">${esc(s.label)}</span></span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
+    return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill" ${pillStyle(s.id)}><span class="pl">${esc(s.label)}</span></span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
       ${cards.map(t=>`<div class="card ${SEL.has(t.id)?'picked':''}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="card-top"><div class="mark-wrap">${taskMark(t)}${selBox(t)}</div><div class="t-name" title="Double-click to rename">${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${esc(t.name||'Untitled task')}</div></div>${metaLine(t,job,!job)}
         <div class="card-foot"><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):'No date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
@@ -1777,7 +1777,7 @@ function calendarView(list){
     const evs=byDay[k]||[];
     const heavy=(load[k]||0)>=lim;
     cells+=`<div class="day ${d.getMonth()!==m-1?'out':''} ${k===t0?'today':''} ${heavy?'busy':''}"><div class="dn"><b>${d.getDate()}</b>${heavy?`<span class="busy-tag" title="${load[k]} tasks due across all jobs">${I.warn}${load[k]}</span>`:''}</div>
-      ${evs.slice(0,4).map(t=>`<button class="ev ${isClosed(t)?'is-done':''}" style="--c:${stColor(stOf(t))}" data-act="open" data-id="${t.id}" title="${esc(t.name)} · ${esc(stLabel(t.status))}"><span>${esc(t.name||'Untitled task')}</span></button>`).join('')}
+      ${evs.slice(0,4).map(t=>`<button class="ev ${isClosed(t)?'is-done':''}" style="--c:${stColor(stOf(t))}" data-act="open" data-id="${t.id}"><span>${esc(t.name||'Untitled task')}</span></button>`).join('')}
       ${evs.length>4?`<span class="more">+${evs.length-4} more</span>`:''}</div>`;
   }
   const noDate=list.filter(t=>!t.due&&!isClosed(t)).length;
@@ -1967,7 +1967,7 @@ function tplMenu(t){
 /* Multi-select: tick tasks in the list or board (hover a task's logo, or turn on Select in the toolbar),
    then change them together from the bar at the bottom. */
 const SEL=new Set();let selLast=null,bulkDelArmed=false,SELMODE=false;
-const selBox=t=>`<label class="selbox" data-stop title="Select"><input type="checkbox" data-act="sel" data-id="${t.id}" ${SEL.has(t.id)?'checked':''} aria-label="Select ${esc(t.name||'task')}"></label>`;
+const selBox=t=>!(SEL.size||SELMODE)?'':`<label class="selbox" data-stop><input type="checkbox" data-act="sel" data-id="${t.id}" ${SEL.has(t.id)?'checked':''} aria-label="Select ${esc(t.name||'task')}"></label>`;
 function clearSel(){SEL.clear();SELMODE=false;bulkDelArmed=false;render()}
 function renderBulk(){
   let e=$('#bulk');if(!e){e=document.createElement('div');e.id='bulk';e.className='bulk';document.body.appendChild(e)}
@@ -2041,7 +2041,7 @@ function renderDrawer(){
       const client=j?.type==='agency'?f(I.user,'Client',`<select id="d-client" data-field="clientId"><option value="">No client</option>${cl.map(c=>`<option value="${c.id}" ${c.id===t.clientId?'selected':''}>${esc(c.name)}</option>`).join('')}</select>`,'d-client'):'';
       const busy=(()=>{if(!t.due||isClosed(t)||t.archived)return'';const n=dueLoad(t.id)[t.due]||0;return n+1>=dayLimit()?`<p class="load-warn pf-wide">${I.warn}Busy day: ${n} other task${n===1?' is':'s are'} due ${(d=>/^(Today|Tomorrow|Yesterday)$/.test(d)?d.toLowerCase():'on '+d)(fmtDate(t.due))}.</p>`:''})();
       return `<div class="props2">
-      ${f(I.status,'Status',`<div class="st-ctl" ${pillStyle(cur)}>${statusSelect(t,'d-status')}${nxt?`<button type="button" class="st-next" data-act="d-next" title="Move to ${esc(nxt.label)}" aria-label="Move to ${esc(nxt.label)}"><svg class="i" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" fill="currentColor"/></svg></button>`:''}</div>${cur!=='done'?`<button type="button" class="st-done" data-act="d-done" title="Mark ${esc(stLabel('done'))}" aria-label="Mark ${esc(stLabel('done'))}"><svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg></button>`:''}`)}
+      ${f(I.status,'Status',`<div class="st-ctl" ${pillStyle(cur)} data-notip>${statusSelect(t,'d-status')}${nxt?`<button type="button" class="st-next" data-act="d-next" data-notip aria-label="Move to ${esc(nxt.label)}"><svg class="i" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" fill="currentColor"/></svg></button>`:''}</div>${cur!=='done'?`<button type="button" class="st-done" data-act="d-done" data-notip aria-label="Mark ${esc(stLabel('done'))}"><svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg></button>`:''}`)}
       ${f(I.flag,'Priority',`<div class="prio-ctl p-${prio}">${I.flag.replace('class="i"','class="i" style="width:14px;height:14px"')}<select id="d-prio" data-field="priority">${PRIORITIES.map(p=>`<option value="${p.id}" ${prio===p.id?'selected':''}>${p.label}</option>`).join('')}</select></div>`,'d-prio')}
       ${f(I.cal,'Dates',`<div class="date-ctl"><input type="date" id="d-start" data-field="start" value="${esc(t.start||'')}" aria-label="Start date" title="Start date"><span class="arrow">→</span><input type="date" id="d-due" data-field="due" class="${t.due?dueClass(t):''}" value="${esc(t.due||'')}" aria-label="Due date" title="Due date"></div>`,'',true)}
       ${job}
@@ -2766,6 +2766,7 @@ function detailsPane(job){
 const tipEl=document.createElement('div');tipEl.className='tip';tipEl.hidden=true;tipEl.setAttribute('role','tooltip');document.body.append(tipEl);
 let tipFor=null;
 function tipText(el){
+  if(el.closest('[data-notip]'))return '';
   if(el.hasAttribute('title')){const t=el.getAttribute('title');el.removeAttribute('title');if(t)el.dataset.tip=t}
   if(el.dataset.tip)return el.dataset.tip;
   const al=el.getAttribute('aria-label');
