@@ -461,6 +461,33 @@ button.tool svg{color:var(--faint)}
 .check-add input{flex:1;border:0;background:none;outline:none;padding:4px 0;color:var(--text)}
 .progress{height:4px;background:var(--surface-2);border-radius:2px;overflow:hidden;margin-bottom:6px}
 .progress i{display:block;height:100%;background:var(--st-done)}
+/* notes: formatted view + formatting toolbar */
+.notes-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.notes-head .section-title{margin:0}
+.notes-tools{display:flex;gap:2px;margin-left:auto}
+.notes-tools button{min-width:28px;height:28px;border:0;background:none;border-radius:6px;color:var(--muted);font:600 calc(13px*var(--ts)) var(--body);display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.notes-tools button:hover{background:var(--surface-2);color:var(--text)}
+.notes-tools .i{width:15px;height:15px}
+.notes-head .btn{margin-left:auto}
+.notes-view{border:1px solid transparent;border-radius:9px;padding:8px 10px;margin:0 -10px;cursor:text;line-height:1.55;overflow-wrap:anywhere}
+.notes-view:hover{background:var(--surface-2)}
+.notes-view p{margin:0}
+.notes-view p.gap{height:.7em}
+.notes-view ul,.notes-view ol{margin:2px 0;padding-left:22px}
+.notes-view li{margin:1px 0}
+.notes-view h5{margin:6px 0 2px;font-size:calc(14px*var(--ts));font-weight:700}
+.notes-view a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+/* checklist drag handle */
+.ck-grip{flex:none;width:14px;height:22px;display:flex;align-items:center;justify-content:center;color:var(--faint);cursor:grab;touch-action:none;opacity:0;margin-left:-4px}
+.ck-grip svg{width:12px;height:12px}
+.check:hover .ck-grip,.check.ck-drag .ck-grip{opacity:1}
+@media (hover:none){.ck-grip{opacity:.6}}
+.check.ck-drag{background:var(--surface-2);opacity:.7}
+.check.ck-before{box-shadow:0 -2px 0 0 var(--accent)}
+.check.ck-after{box-shadow:0 2px 0 0 var(--accent)}
+body.ck-dragging,body.ck-dragging *{cursor:grabbing!important;user-select:none}
+/* on shift now (sidebar) */
+.shift-dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--st-done);box-shadow:0 0 0 2px color-mix(in srgb,var(--st-done) 25%,transparent)}
 textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:10px;resize:vertical;line-height:1.5}
 .d-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--faint);font-size:calc(12px*var(--ts));border-top:1px solid var(--line);padding-top:14px}
 
@@ -1006,7 +1033,6 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .nav-row.dragging{opacity:.5}
 .nav-row.drop-before{box-shadow:0 -2px 0 0 var(--accent)}
 .nav-row.drop-after{box-shadow:0 2px 0 0 var(--accent)}
-.side{position:relative}
 .side-toggle{position:absolute;top:16px;right:8px;width:28px;height:28px;opacity:.6}
 .side-toggle:hover{opacity:1}
 @media (min-width:821px){
@@ -1018,6 +1044,8 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
   body.side-mini .nav{width:100%}
   body.side-mini .nav-item{justify-content:center;padding:8px 0}
   body.side-mini .nav.jobs{margin:0;padding:0;border:0}
+  body.side-mini .nav-item{position:relative}
+  body.side-mini .shift-dot{position:absolute;top:5px;right:14px}
   body.side-mini .side-foot{width:100%}
 }
 @media (max-width:820px){.side-toggle{display:none}}
@@ -1753,7 +1781,7 @@ function renderSide(){
   <nav class="nav jobs" id="nav-jobs" aria-label="Jobs" ${jobsOpen?'':'hidden'}>`;
   for(const j of jobsSorted()){
     const on=u.tab===j.id;
-    html+=`<div class="nav-row" draggable="true" data-job="${j.id}"><button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}" ${u.sideMini?`title="${esc(j.name)}"`:''}>${jobMark(j,18)}<span class="name">${esc(j.name)}</span><span class="count">${openCount(j.id)}</span></button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.pencil}</button></div>`;
+    html+=`<div class="nav-row" draggable="true" data-job="${j.id}"><button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}" ${u.sideMini?`title="${esc(j.name)}"`:''}>${jobMark(j,18)}<span class="name">${esc(j.name)}</span>${shiftDot(j)}<span class="count">${openCount(j.id)}</span></button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.pencil}</button></div>`;
   }
   html+=`<button class="nav-item nav-new" data-act="new-job"${tt('New job')}>${I.plus}<span class="name">New job</span></button></nav>
   <nav class="nav" aria-label="More"><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived"${tt('Archived')}>${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item ${u.tab==='activity'?'on':''}" data-act="nav" data-tab="activity"${tt('Activity')}>${I.clock}<span class="name">Activity</span></button><button class="nav-item ${u.tab==='trash'?'on':''}" data-act="nav" data-tab="trash"${tt('Trash')}>${I.trash}<span class="name">Trash</span><span class="count">${S.ready&&trashed().length?trashed().length:''}</span></button></nav>
@@ -2127,7 +2155,7 @@ function renderArchive(){
 
 /* ================= drawer ================= */
 let deleteArmed=false, clearArmed=false;
-function openTask(id,tab){seenTask(id);if(S.tasks[id]&&!S.tasks[id]._draft){S.ui.recent=[id,...(S.ui.recent||[]).filter(x=>x!==id)].slice(0,8);saveUi()}if(S.ui.openTask!==id)TPL={open:false,naming:false,del:null};if(DRAFT&&DRAFT.id!==id)discardDraft();if(S.ui.openTask!==id||tab)S.ui.dtab=tab||'details';S.ui.openTask=id;noteDelArmed=null;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender()}
+function openTask(id,tab){seenTask(id);if(NOTES_EDIT!==id)NOTES_EDIT=null;if(S.tasks[id]&&!S.tasks[id]._draft){S.ui.recent=[id,...(S.ui.recent||[]).filter(x=>x!==id)].slice(0,8);saveUi()}if(S.ui.openTask!==id)TPL={open:false,naming:false,del:null};if(DRAFT&&DRAFT.id!==id)discardDraft();if(S.ui.openTask!==id||tab)S.ui.dtab=tab||'details';S.ui.openTask=id;noteDelArmed=null;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender()}
 function closeDrawer(){flushAll();discardDraft();S.ui.openTask=null;$('#drawer').hidden=true;$('#scrim').hidden=true;scheduleRender()}
 /* Task activity: the task's log entries plus your own posted updates (kind 'note'), newest first */
 function taskActivity(t){
@@ -2287,15 +2315,70 @@ function renderDrawer(){
     <div><h4 class="section-title">Checklist<span class="mono">${checklist.length?`${doneN}/${checklist.length}`:''}</span>${!tplHome(t)?'':`<button type="button" class="tpl-btn ${TPL.open?'on':''}" data-act="tpl-toggle" aria-expanded="${TPL.open}">${I.task}Templates</button>`}</h4>
       ${TPL.open?tplMenu(t):''}
       ${checklist.length?`<div class="progress"><i style="width:${doneN/checklist.length*100}%"></i></div>`:''}
-      <div class="checklist">${checklist.map(c=>`<div class="check ${c.done?'done':''}"><input type="checkbox" data-act="check" data-cid="${esc(c.id)}" ${c.done?'checked':''} aria-label="Done"><input class="txt" data-act="check-text" data-cid="${esc(c.id)}" data-fk="ck-${esc(c.id)}" value="${esc(c.text)}" aria-label="Checklist item"><button class="icon-btn" data-act="check-del" data-cid="${esc(c.id)}" aria-label="Remove item">${I.x}</button></div>`).join('')}
+      <div class="checklist">${checklist.map(c=>`<div class="check ${c.done?'done':''}" data-cid="${esc(c.id)}"><span class="ck-grip" data-grip="${esc(c.id)}" title="Drag to reorder" aria-hidden="true"><svg viewBox="0 0 12 12" fill="currentColor"><circle cx="4" cy="2.5" r="1.1"/><circle cx="8" cy="2.5" r="1.1"/><circle cx="4" cy="6" r="1.1"/><circle cx="8" cy="6" r="1.1"/><circle cx="4" cy="9.5" r="1.1"/><circle cx="8" cy="9.5" r="1.1"/></svg></span><input type="checkbox" data-act="check" data-cid="${esc(c.id)}" ${c.done?'checked':''} aria-label="Done"><input class="txt" data-act="check-text" data-cid="${esc(c.id)}" data-fk="ck-${esc(c.id)}" value="${esc(c.text)}" aria-label="Checklist item"><button class="icon-btn" data-act="check-del" data-cid="${esc(c.id)}" aria-label="Remove item">${I.x}</button></div>`).join('')}
       <form class="check-add" data-act="check-add">${I.plus}<input data-fk="ck-new" placeholder="Add a step (rough cut, captions, color…)" aria-label="Add checklist item"></form></div></div>
-    <div><h4 class="section-title">Notes</h4><textarea class="notes" data-field="notes" data-fk="d-notes" placeholder="Brief, feedback, music choices, specs…">${esc(t.notes||'')}</textarea></div>
+    ${notesBlock(t)}
     ${t._draft?`<div class="d-foot d-save"><button class="btn" data-act="drawer-close">Cancel</button><button class="btn primary" data-act="save-draft">${I.plus}Save task</button></div>`:`<div class="d-foot"><span>${t.created?'Created '+fmtDate(ymd(new Date(t.created))):''}${t.doneAt?' · Done '+fmtDate(t.doneAt):''}</span>
       <span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" data-act="d-duplicate">${I.copy}Duplicate</button>${isClosed(t)&&!t.archived?`<button class="btn sm" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}<button class="btn sm danger ${deleteArmed?'armed':''}" data-act="delete-task">${I.trash}${deleteArmed?'Click again to move to Trash':'Delete task'}</button></span></div>`}
   </div>`}`});
   autosize($('.d-name'));
 }
 /* a hidden element measures 0, so leave the height alone until it can be measured */
+/* ================= notes formatting =================
+   Notes are plain text with light markdown: **bold**, *italic*, "- " bullets, "1. " numbered lists, "# " headings,
+   [text](url) and bare links. Shown formatted; click to edit (NOTES_EDIT), with a small toolbar. */
+let NOTES_EDIT=null;
+const unesc=x=>x.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&');
+function mdInline(line,job){
+  const toks=[];
+  let h=esc(line).replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)|\bhttps?:\/\/[^\s<]*[^\s<.,;:!?)\]]/g,(m,txt,url)=>{
+    const raw=unesc(url||m),href=linkHref(raw,job);
+    toks.push(href?`<a href="${esc(href)}"${linkTarget(raw,job)} data-stop>${txt||m}</a>`:(txt||m));return `\u0000${toks.length-1}\u0000`});
+  h=h.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|[^*\w])\*(?!\s)(.+?)\*(?!\*)/g,'$1<i>$2</i>');
+  return h.replace(/\u0000(\d+)\u0000/g,(_,i)=>toks[+i]);
+}
+function mdLite(text,job){
+  let out='',list=null;const close=()=>{if(list){out+=`</${list}>`;list=null}};
+  for(const ln of String(text||'').split('\n')){
+    let m=/^\s*[-*•]\s+(.*)$/.exec(ln),k='ul';
+    if(!m){m=/^\s*\d+[.)]\s+(.*)$/.exec(ln);k='ol'}
+    if(m){if(list!==k){close();out+=`<${k}>`;list=k}out+=`<li>${mdInline(m[1],job)}</li>`;continue}
+    close();
+    const hd=/^#{1,3}\s+(.*)$/.exec(ln);
+    out+=hd?`<h5>${mdInline(hd[1],job)}</h5>`:ln.trim()?`<p>${mdInline(ln,job)}</p>`:'<p class="gap"></p>';
+  }
+  close();return out;
+}
+const NOTE_TOOLS=[['b','Bold (⌘B)','<b>B</b>'],['i','Italic (⌘I)','<i style="font-family:Georgia,serif">I</i>'],['ul','Bulleted list','<svg class="i" viewBox="0 0 16 16"><path d="M6 4h8M6 8h8M6 12h8"/><circle cx="2.8" cy="4" r="1" fill="currentColor"/><circle cx="2.8" cy="8" r="1" fill="currentColor"/><circle cx="2.8" cy="12" r="1" fill="currentColor"/></svg>'],['ol','Numbered list','<span style="font:600 calc(11px*var(--ts)) var(--mono)">1.</span>'],['link','Link',I.ext]];
+function notesBlock(t){
+  const editing=t._draft||NOTES_EDIT===t.id||!(t.notes||'').trim();
+  return `<div class="notes-wrap"><div class="notes-head"><h4 class="section-title">Notes</h4>${editing
+    ?`<div class="notes-tools" role="toolbar" aria-label="Formatting">${NOTE_TOOLS.map(([f,l,ic])=>`<button type="button" data-act="nfmt" data-f="${f}" title="${l}" aria-label="${l}">${ic}</button>`).join('')}</div>`
+    :`<button type="button" class="btn sm ghost" data-act="notes-edit">${I.pencil}Edit</button>`}</div>
+    ${editing?`<textarea class="notes" data-field="notes" data-fk="d-notes" placeholder="Brief, feedback, music choices, specs… **bold**, - bullets and links work.">${esc(t.notes||'')}</textarea>`
+    :`<div class="notes-view" data-act="notes-edit" title="Click to edit">${mdLite(t.notes,S.jobs[t.jobId])}</div>`}</div>`;
+}
+function editNotes(){
+  NOTES_EDIT=S.ui.openTask;renderDrawer();
+  const ta=$('#drawer textarea.notes');if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);autosize(ta)}
+}
+/* apply a toolbar format to the notes textarea around the selection */
+function notesFormat(f){
+  const ta=$('#drawer textarea.notes');if(!ta)return;
+  const v=ta.value;let a=ta.selectionStart,b=ta.selectionEnd;const sel=v.slice(a,b);
+  if(f==='b'||f==='i'){const w=f==='b'?'**':'*';ta.setRangeText(w+sel+w,a,b,'select');if(!sel)ta.setSelectionRange(a+w.length,a+w.length);else ta.setSelectionRange(a+w.length,b+w.length)}
+  else if(f==='link'){
+    if(/^https?:\/\/\S+$/.test(sel)){ta.setRangeText(`[link](${sel})`,a,b);ta.setSelectionRange(a+1,a+5)}
+    else{ta.setRangeText(`[${sel||'text'}](https://)`,a,b);const p=a+(sel||'text').length+3;ta.setSelectionRange(p,p+8)}
+  }else{
+    const ls=v.lastIndexOf('\n',a-1)+1,le=(i=>i<0?v.length:i)(v.indexOf('\n',b));
+    const lines=v.slice(ls,le).split('\n'),re=f==='ul'?/^\s*[-*•]\s+/:/^\s*\d+[.)]\s+/;
+    const on=lines.some(l=>l.trim())&&lines.every(l=>re.test(l)||!l.trim()),one=lines.length===1;
+    const out=lines.map((l,i)=>!l.trim()&&!one?l:on?l.replace(re,''):(f==='ul'?'- ':`${i+1}. `)+l.replace(/^\s*([-*•]|\d+[.)])\s+/,'')).join('\n');
+    ta.setRangeText(out,ls,le);if(one)ta.setSelectionRange(ls+out.length,ls+out.length);else ta.setSelectionRange(ls,ls+out.length);
+  }
+  ta.focus();ta.dispatchEvent(new Event('input',{bubbles:true}));autosize(ta);
+}
 function autosize(el){if(!el||!el.offsetParent)return;el.style.height='auto';el.style.height=el.scrollHeight+'px'}
 
 /* Every status change can be undone from its toast; bulk changes pass quiet and show one toast for all. */
@@ -2747,6 +2830,15 @@ function diffLabel(tz){
 }
 const timeThere=tz=>{try{return new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'short',hour:'numeric',minute:'2-digit'}).format(new Date())}catch(e){return ''}};
 const tzCity=tz=>String(tz||'').split('/').pop().replace(/_/g,' ');
+/* Is it inside this job's shift right now? Shift times are the user's own time; overnight shifts count from the start day. */
+function onShift(j,now=new Date()){
+  const w=workOf(j);if(!w.shiftStart||!w.shiftEnd||!(w.days||[]).length)return false;
+  const mins=x=>{const [h,m]=String(x).split(':').map(Number);return h*60+(m||0)};
+  const a=mins(w.shiftStart),b=mins(w.shiftEnd),n=now.getHours()*60+now.getMinutes(),d=now.getDay(),has=x=>w.days.map(Number).includes(x);
+  if(a===b)return false;
+  return a<b?has(d)&&n>=a&&n<b:(has(d)&&n>=a)||(has((d+6)%7)&&n<b);
+}
+const shiftDot=j=>onShift(j)?`<span class="shift-dot" title="On shift now (${esc(fmtClock(workOf(j).shiftStart))}–${esc(fmtClock(workOf(j).shiftEnd))})" aria-label="On shift now"></span>`:'';
 function fmtClock(hm,shift){
   if(!/^\d{1,2}:\d{2}$/.test(hm||''))return '';
   let [h,m]=hm.split(':').map(Number);let t=((h*60+m+(shift||0))%1440+1440)%1440;h=Math.floor(t/60);m=t%60;
@@ -3377,6 +3469,8 @@ document.addEventListener('click',e=>{
       const v=el.dataset.path,msg=IS_MAC?'Path copied':'Path copied. Finder paths open on your Mac.';
       try{navigator.clipboard.writeText(v).then(()=>toast(msg),()=>toast(v))}catch(x){toast(v)}
       break}
+    case 'notes-edit': editNotes();break;
+    case 'nfmt': notesFormat(el.dataset.f);break;
     case 'check-del':{const t=S.tasks[u.openTask];patch('tasks',t.id,{checklist:(t.checklist||[]).filter(c=>c.id!==el.dataset.cid)});renderDrawer();break}
     case 'archive': archiveTasks([el.dataset.id]);break;
     case 'archive-all': archiveTasks(filtered().filter(t=>stOf(t)===el.dataset.status).map(t=>t.id));break;
@@ -3526,6 +3620,51 @@ document.addEventListener('input',e=>{
   }
 });
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.classList?.contains('d-name')){e.preventDefault();e.target.blur()}});
+/* notes: ⌘B / ⌘I, and Enter continues a list (Enter on an empty item ends it) */
+document.addEventListener('keydown',e=>{
+  const ta=e.target;if(!ta.matches?.('#drawer textarea.notes'))return;
+  if((e.metaKey||e.ctrlKey)&&!e.shiftKey&&!e.altKey&&(e.key==='b'||e.key==='i')){e.preventDefault();notesFormat(e.key);return}
+  if(e.key!=='Enter'||e.shiftKey||e.metaKey||e.ctrlKey||ta.selectionStart!==ta.selectionEnd)return;
+  const v=ta.value,p=ta.selectionStart,ls=v.lastIndexOf('\n',p-1)+1,line=v.slice(ls,p);
+  const m=/^(\s*)([-*•]|(\d+)([.)]))\s+/.exec(line);if(!m)return;
+  e.preventDefault();
+  if(!line.slice(m[0].length).trim()&&!v.slice(p).split('\n')[0].trim()){ta.setRangeText('',ls,p,'end')}
+  else ta.setRangeText('\n'+m[1]+(m[3]?`${+m[3]+1}${m[4]}`:m[2])+' ',p,p,'end');
+  ta.dispatchEvent(new Event('input',{bubbles:true}));autosize(ta);
+});
+/* toolbar buttons keep the textarea focused */
+document.addEventListener('mousedown',e=>{if(e.target.closest?.('.notes-tools button'))e.preventDefault()});
+document.addEventListener('focusin',e=>{if(e.target.matches?.('#drawer textarea.notes')&&S.ui.openTask)NOTES_EDIT=S.ui.openTask});
+/* leaving the notes shows them formatted again (not when only the window lost focus) */
+document.addEventListener('focusout',e=>{
+  if(!e.target.matches?.('#drawer textarea.notes')||e.relatedTarget?.closest?.('.notes-tools'))return;
+  const ta=e.target;setTimeout(()=>{if(document.activeElement===ta||!S.ui.openTask||NOTES_EDIT!==S.ui.openTask)return;NOTES_EDIT=null;if(!$('#drawer').hidden)renderDrawer()},0);
+});
+/* checklist: drag the grip to reorder steps */
+let CKD=null;
+document.addEventListener('pointerdown',e=>{
+  const g=e.target.closest?.('.ck-grip');if(!g||!S.ui.openTask)return;
+  e.preventDefault();const row=g.closest('.check');
+  CKD={id:g.dataset.grip,row,list:row.parentElement,to:null};row.classList.add('ck-drag');document.body.classList.add('ck-dragging');
+  try{g.setPointerCapture(e.pointerId)}catch(x){}
+});
+document.addEventListener('pointermove',e=>{
+  if(!CKD)return;
+  const rows=[...CKD.list.querySelectorAll('.check')];rows.forEach(r=>r.classList.remove('ck-before','ck-after'));
+  let tgt=rows.find(r=>{const b=r.getBoundingClientRect();return e.clientY<b.top+b.height/2}),after=false;
+  if(!tgt){tgt=rows[rows.length-1];after=true}
+  if(!tgt||tgt===CKD.row){CKD.to=null;return}
+  CKD.to={id:tgt.dataset.cid,after};tgt.classList.add(after?'ck-after':'ck-before');
+});
+function ckDrop(){
+  if(!CKD)return;const d=CKD;CKD=null;document.body.classList.remove('ck-dragging');
+  d.list.querySelectorAll('.check').forEach(r=>r.classList.remove('ck-before','ck-after','ck-drag'));
+  const t=S.tasks[S.ui.openTask];if(!t||!d.to)return;
+  const arr=[...(t.checklist||[])],from=arr.findIndex(c=>c.id===d.id);if(from<0)return;
+  const [item]=arr.splice(from,1);let at=arr.findIndex(c=>c.id===d.to.id);if(at<0)return;if(d.to.after)at++;
+  arr.splice(at,0,item);patch('tasks',t.id,{checklist:arr});renderDrawer();
+}
+document.addEventListener('pointerup',ckDrop);document.addEventListener('pointercancel',ckDrop);
 document.addEventListener('focusout',e=>{if(e.target.dataset?.field&&S.ui.openTask)flush('tasks/'+S.ui.openTask)});
 document.addEventListener('submit',e=>{
   const f=e.target;e.preventDefault();
