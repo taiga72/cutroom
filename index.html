@@ -574,6 +574,39 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .acct-btns{display:flex;gap:6px;flex-wrap:wrap}
 .acct-btns .btn[disabled]{opacity:.6;cursor:default}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+:root[data-motion="reduce"] *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+/* high contrast (Settings → Accessibility): stronger text and borders, light and dark */
+:root[data-contrast="high"]:not([data-theme="dark"]){--text:#05070b;--muted:#30353f;--faint:#4a505c;--line:#8a919e;--line-strong:#5c6370}
+@media (prefers-color-scheme: dark){:root[data-contrast="high"]:not([data-theme="light"]){--text:#ffffff;--muted:#d6d9e0;--faint:#b4bac6;--line:#6c7485;--line-strong:#9098a8}}
+:root[data-contrast="high"][data-theme="dark"]{--text:#ffffff;--muted:#d6d9e0;--faint:#b4bac6;--line:#6c7485;--line-strong:#9098a8}
+:root[data-contrast="high"] :focus-visible{outline:3px solid var(--accent)!important;outline-offset:2px}
+/* celebration when a task is done */
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:80;overflow:hidden}
+.confetti i{position:absolute;width:7px;height:11px;border-radius:2px;opacity:0;animation:conf 1.15s cubic-bezier(.15,.65,.35,1) forwards}
+@keyframes conf{0%{transform:translate(-50%,-50%) rotate(0);opacity:1}75%{opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--r));opacity:0}}
+/* resizable task panel */
+.drawer{width:min(var(--dw,760px),100%)}
+.d-resize{position:fixed;top:0;bottom:0;right:min(var(--dw,760px),100%);width:10px;margin-right:-5px;cursor:col-resize;z-index:22;touch-action:none}
+.d-resize::after{content:"";position:absolute;left:4px;top:50%;width:2px;height:44px;margin-top:-22px;border-radius:2px;background:var(--line-strong);opacity:0;transition:opacity .15s}
+.d-resize:hover::after,.d-resize.drag::after{opacity:1}
+.drawer[hidden]+.d-resize{display:none}
+body.resizing{cursor:col-resize;user-select:none}
+body.resizing .drawer{transition:none}
+/* changed on another device */
+.fresh-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:middle;flex:none}
+.synced{display:block;padding:0 10px 2px 25px;font-size:calc(11px*var(--ts));color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.side-mini .synced{display:none}
+/* calendar: narrow weekends */
+.cal{--wd:minmax(96px,1fr);--wk:56px}
+.day.wk-min .ev{height:7px;padding:0;min-height:0;font-size:0;border-radius:3px}
+.day.wk-min .ev span,.day.wk-min .hol span,.day.wk-min .busy-tag{display:none}
+.day.wk-min .more{font-size:calc(10px*var(--ts))}
+.week{--wd:minmax(0,1fr);--wk:64px}
+.wday.wk-min{padding:6px 4px}
+.wday.wk-min .wcard{padding:4px}
+.wday.wk-min .wcard small,.wday.wk-min .wc-st,.wday.wk-min .hol span,.wday.wk-min .busy-tag{display:none}
+.wday.wk-min .wcard b{font-size:calc(11px*var(--ts));display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.last-backup{margin:0;font-size:calc(13px*var(--ts));color:var(--muted)}
 @media (max-width:820px){
   .app{display:block}
   .mtop{display:flex;flex-direction:column;gap:8px;position:sticky;top:0;z-index:15;background:var(--surface);border-bottom:1px solid var(--line);padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top,0px))}
@@ -931,6 +964,8 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .chip.age{color:var(--muted)}
 .chip.age.old{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 40%,transparent);background:color-mix(in srgb,var(--warn) 10%,transparent)}
 .d-age{display:block;margin-top:4px;font-size:calc(12px*var(--ts));color:var(--faint)}
+.pf-v:has(>.d-age){flex-wrap:wrap}
+.pf-v>.d-age{flex:0 0 100%;margin-top:2px}
 .d-age.old{color:var(--warn)}
 /* CSV import preview */
 .imp-box{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--surface-2);display:flex;flex-direction:column;gap:8px}
@@ -986,6 +1021,12 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
   body.side-mini .side-foot{width:100%}
 }
 @media (max-width:820px){.side-toggle{display:none}}
+@media (max-width:820px){
+  .cal{--wd:minmax(0,1fr);--wk:26px}
+  .d-resize{display:none}
+  .week .wday.wk-min{padding:8px}
+  .week .wday.wk-min .wcard small,.week .wday.wk-min .wc-st{display:revert}
+}
 </style>
 
 <div class="app">
@@ -1025,6 +1066,7 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 <div class="auth" id="auth" hidden></div>
 <div class="scrim" id="scrim" hidden data-act="drawer-close"></div>
 <aside class="drawer" id="drawer" hidden aria-label="Task details"></aside>
+<div class="d-resize" id="d-resize" title="Drag to resize · double-click to reset" aria-hidden="true"></div>
 <div class="modal-wrap" id="modal" hidden></div>
 <div class="modal-wrap crop-wrap" id="crop" hidden></div>
 <div class="toast" id="toast" hidden role="status"></div>
@@ -1190,13 +1232,34 @@ const today=()=>ymd(new Date());
 const diffDays=(a,b)=>Math.round((parseD(a)-parseD(b))/86400000);
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MONTH_FULL=['January','February','March','April','May','June','July','August','September','October','November','December'];
+/* Look & date preferences (settings/app), previewed live from SM while Settings is open */
+const PREF_DEF={dateRel:false,dateFmt:'md',weekStart:'mon',hideWeekends:false,confetti:true,motion:'system',contrast:'normal'};
+const pref=k=>{let o=null;try{o=SM}catch(e){/* Settings state not set up yet */}o=o||S.settings?.app||{};return o[k]!==undefined&&o[k]!==null?o[k]:PREF_DEF[k]};
+const reducedMotion=()=>pref('motion')==='reduce'||matchMedia('(prefers-reduced-motion:reduce)').matches;
+function absDate(s){
+  const d=parseD(s);
+  const y=d.getFullYear()!==new Date().getFullYear()?` ’${String(d.getFullYear()).slice(2)}`:'';
+  return pref('dateFmt')==='dm'?`${d.getDate()} ${MON[d.getMonth()]}${y}`:`${MON[d.getMonth()]} ${d.getDate()}${y}`;
+}
 function fmtDate(s){
   if(!s) return '';
   const dd=diffDays(s,today());
   if(dd===0) return 'Today'; if(dd===1) return 'Tomorrow'; if(dd===-1) return 'Yesterday';
-  const d=parseD(s);
-  return `${MON[d.getMonth()]} ${d.getDate()}`+(d.getFullYear()!==new Date().getFullYear()?` ’${String(d.getFullYear()).slice(2)}`:'');
+  return absDate(s);
 }
+/* Dates in task lists and cards: "in 3 days" / "2 days late" when relative dates are on */
+function fmtRel(s,late){
+  if(!s) return '';
+  const dd=diffDays(s,today());
+  if(!pref('dateRel')||Math.abs(dd)<=1||Math.abs(dd)>60) return fmtDate(s);
+  return dd>0?`in ${dd} days`:late?`${-dd} days late`:`${-dd} days ago`;
+}
+const relTitle=s=>s&&pref('dateRel')?` title="${absDate(s)}"`:'';
+const WS=()=>pref('weekStart')==='sun'?0:1;
+const weekStartOf=d=>{d=new Date(d);d.setDate(d.getDate()-((d.getDay()-WS()+7)%7));return d};
+const isWeekend=d=>d.getDay()===0||d.getDay()===6;
+/* grid columns for a 7-day row; weekends narrow when "hide weekends" is on */
+const weekCols=()=>Array.from({length:7},(_,i)=>pref('hideWeekends')&&((WS()+i)%7===0||(WS()+i)%7===6)?'var(--wk)':'var(--wd)').join(' ');
 function dueClass(t){
   if(!t.due) return 'none';
   if(isClosed(t)) return '';
@@ -1277,7 +1340,7 @@ window.addEventListener('pagehide',()=>{if(B.mode==='cloud'&&S.ready)saveSnap()}
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&B.mode==='cloud'&&S.ready)saveSnap()});
 function cloudPut(col,id){
   const d=S[col][id]; if(!d) return;
-  return B.sb.from('docs').upsert({user_id:B.uid,col,id,data:clean(d),updated_at:new Date().toISOString()}).then(({error})=>{if(error)throw error});
+  return B.sb.from('docs').upsert({user_id:B.uid,col,id,data:clean(d),updated_at:new Date().toISOString()}).then(({error})=>{if(error)throw error;noteSynced()});
 }
 function cloudDel(col,id){return B.sb.from('docs').delete().match({user_id:B.uid,col,id}).then(({error})=>{if(error)throw error})}
 function saveLocal(){lsSet(LS_DATA,{jobs:S.jobs,clients:S.clients,tasks:S.tasks,settings:S.settings})}
@@ -1395,7 +1458,9 @@ async function cloudStart(session){
   render();
   OUT=lsGet(outKey())||{};lsSet('cutroom.lastuid',{uid:B.uid,email:B.email});
   let offlineStart=false;
-  try{if(Object.keys(OUT).length&&navigator.onLine)await flushOut();await cloudLoad();saveSnap()}
+  B.syncedAt=lsGet('cutroom.synced.'+B.uid)||null;FRESH=new Set(lsGet(freshKey())||[]);
+  const snap0=lsGet(snapKey());
+  try{if(Object.keys(OUT).length&&navigator.onLine)await flushOut();await cloudLoad();noteSynced();if(snap0)markFresh(stamps(snap0.tasks));saveSnap()}
   catch(e){console.error(e);const snap=lsGet(snapKey());
     if(snap&&isNetErr(e)){COLS.forEach(c=>{S[c]=snap[c]||{}});offlineStart=true;B.offline=true}
     else{toast("Couldn't load your tasks. Reload the page to try again.");return}}
@@ -1426,7 +1491,7 @@ async function cloudLoad(){
 /* Picks up changes made on another device. Skipped while this tab still has writes on the way. */
 async function cloudRefresh(){
   if(!S.ready||document.hidden||inflight||Object.keys(pending).length||Object.keys(OUT).length||!navigator.onLine) return;
-  try{await cloudLoad();saveSnap();if(!inflight)scheduleRender(true)}catch(e){console.error(e)}
+  try{const before=stamps(S.tasks);await cloudLoad();noteSynced();markFresh(before);saveSnap();if(!inflight)scheduleRender(true)}catch(e){console.error(e)}
 }
 function showSetup(cfg){
   applyTheme('system');document.title='Finish setup · '+APP_NAME;
@@ -1653,6 +1718,8 @@ function applyLook(o){
   const ts=TEXT_SIZES.some(x=>x[0]===+o.textSize)?+o.textSize:1;
   if(ts===1) r.style.removeProperty('--ts'); else r.style.setProperty('--ts',ts);
   if(o.density==='compact') r.setAttribute('data-density','compact'); else r.removeAttribute('data-density');
+  if(o.motion==='reduce') r.setAttribute('data-motion','reduce'); else r.removeAttribute('data-motion');
+  if(o.contrast==='high') r.setAttribute('data-contrast','high'); else r.removeAttribute('data-contrast');
 }
 function migrateStatuses(){
   pruneLog();purgeOldTrash();
@@ -1670,7 +1737,7 @@ function render(){
   document.title=(a.name||'').trim()||APP_NAME;
   const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
   withFocus(()=>{renderSide();renderMain()});
-  renderBell();renderBulk();
+  renderBell();renderBulk();applyDrawerW();
 }
 
 function renderSide(){
@@ -1691,6 +1758,7 @@ function renderSide(){
   html+=`<button class="nav-item nav-new" data-act="new-job"${tt('New job')}>${I.plus}<span class="name">New job</span></button></nav>
   <nav class="nav" aria-label="More"><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived"${tt('Archived')}>${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item ${u.tab==='activity'?'on':''}" data-act="nav" data-tab="activity"${tt('Activity')}>${I.clock}<span class="name">Activity</span></button><button class="nav-item ${u.tab==='trash'?'on':''}" data-act="nav" data-tab="trash"${tt('Trash')}>${I.trash}<span class="name">Trash</span><span class="count">${S.ready&&trashed().length?trashed().length:''}</span></button></nav>
   <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='cloud'&&(B.offline||Object.keys(OUT).length)?`<span class="sync-dot local"></span>Offline · ${Object.keys(OUT).length?`${Object.keys(OUT).length} change${Object.keys(OUT).length===1?'':'s'} waiting to sync`:'changes will sync'}`:B.mode==='db'||B.mode==='cloud'?'<span class="sync-dot"></span>Saved to your account':B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
+    ${B.mode==='cloud'&&B.syncedAt?`<small class="synced" title="Last time this device heard back from your account">Last synced ${syncedAgo()}</small>`:''}
     <button class="nav-item foot-settings" data-act="open-settings"${tt('Settings')}>${I.gear}<span class="name">Settings</span></button></div>`;
   $('#side').innerHTML=html;
   $('#mbrand').innerHTML=`${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b>`;
@@ -1807,11 +1875,11 @@ const statusSelect=(t,act)=>`<select class="pill" ${pillStyle(stOf(t))} data-act
 const ROW_HEAD=`<div class="row-head"><span></span><span>Task</span><span>Status</span><span class="c-prio">Priority</span><span class="c-start">Start</span><span>Due</span><span>Links</span></div>`;
 const rowHtml=(t,job,showJob)=>`<div class="row ${isClosed(t)?'done-row':''} ${S.ui.openTask===t.id?'focus':''} ${SEL.has(t.id)?'picked':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="mark-wrap">${taskMark(t)}${selBox(t)}</div>
-        <div class="t-main"><div class="t-name" title="Double-click to rename">${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${esc(t.name||'Untitled task')}</div>${metaLine(t,job,showJob)}</div>
+        <div class="t-main"><div class="t-name" title="Double-click to rename">${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${esc(t.name||'Untitled task')}</div>${metaLine(t,job,showJob)}</div>
         <div class="c-status" data-stop>${statusSelect(t,'row-status')}${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
         <div class="c-prio">${prioHtml(t.priority)}</div>
-        <div class="c-start date ${t.start?'':'none'}">${t.start?fmtDate(t.start):'—'}</div>
-        <div class="c-due date ${dueClass(t)}">${t.due?fmtDate(t.due):'—'}</div>
+        <div class="c-start date ${t.start?'':'none'}"${relTitle(t.start)}>${t.start?fmtRel(t.start):'—'}</div>
+        <div class="c-due date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,!isClosed(t)):'—'}</div>
         <div class="c-links">${linkIcons(t)}</div></div>`;
 function listView(list,job){
   const showJob=!job;
@@ -1836,32 +1904,31 @@ function boardView(list,job){
     const cards=list.filter(t=>stOf(t)===s.id);
     return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill" ${pillStyle(s.id)}><span class="pl">${esc(s.label)}</span></span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
       ${cards.map(t=>`<div class="card ${SEL.has(t.id)?'picked':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
-        <div class="card-top"><div class="mark-wrap">${taskMark(t)}${selBox(t)}</div><div class="t-name" title="Double-click to rename">${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${esc(t.name||'Untitled task')}</div></div>${metaLine(t,job,!job)}
-        <div class="card-foot"><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):'No date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
+        <div class="card-top"><div class="mark-wrap">${taskMark(t)}${selBox(t)}</div><div class="t-name" title="Double-click to rename">${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${esc(t.name||'Untitled task')}</div></div>${metaLine(t,job,!job)}
+        <div class="card-foot"><span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,!isClosed(t)):'No date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
       </div>`;
   }).join('')}</div></div>`;
 }
 
 function weekView(list){
-  const t0=today(),mon=S.ui.week||(()=>{const d=parseD(t0);d.setDate(d.getDate()-((d.getDay()+6)%7));return ymd(d)})();
-  const start=parseD(mon),load=dueLoad(),lim=dayLimit();
+  const t0=today(),start=weekStartOf(parseD(S.ui.week||t0)),load=dueLoad(),lim=dayLimit();
   const byDay={};list.forEach(t=>{if(t.due)(byDay[t.due]=byDay[t.due]||[]).push(t)});
   const end=new Date(start);end.setDate(start.getDate()+6);
   const hol=holidayMap([...new Set([start.getFullYear(),end.getFullYear()])]);
   let cols='';
   for(let i=0;i<7;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=ymd(d),evs=byDay[k]||[],heavy=(load[k]||0)>=lim,hs=hol[k]||[];
-    cols+=`<div class="wday ${k===t0?'today':''} ${heavy?'busy':''} ${hs.length?'holiday':''}"><div class="wd-head"><span>${WEEKDAY[d.getDay()]}</span><b>${d.getDate()}</b>${heavy?`<span class="busy-tag" title="${load[k]} tasks due across all jobs">${I.warn}${load[k]}</span>`:''}</div>${holHtml(hs)}
+    cols+=`<div class="wday ${k===t0?'today':''} ${heavy?'busy':''} ${hs.length?'holiday':''} ${pref('hideWeekends')&&isWeekend(d)?'wk-min':''}"><div class="wd-head"><span>${WEEKDAY[d.getDay()]}</span><b>${d.getDate()}</b>${heavy?`<span class="busy-tag" title="${load[k]} tasks due across all jobs">${I.warn}${load[k]}</span>`:''}</div>${holHtml(hs)}
       ${evs.map(t=>`<div class="wcard ${isClosed(t)?'is-done':''}" style="--c:${stColor(stOf(t))}" data-act="open" data-id="${t.id}" tabindex="0"><b>${esc(t.name||'Untitled task')}</b><small>${esc([S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '))}</small><span class="wc-st">${esc(stLabel(stOf(t)))}</span></div>`).join('')||'<span class="wd-empty">—</span>'}</div>`}
   const lbl=start.getMonth()===end.getMonth()?`${MONTH_FULL[start.getMonth()]} ${start.getDate()}–${end.getDate()}`:`${MONTH_FULL[start.getMonth()].slice(0,3)} ${start.getDate()} – ${MONTH_FULL[end.getMonth()].slice(0,3)} ${end.getDate()}`;
   return `<div class="cal-bar">${calModeSeg()}<h2>${lbl}, ${end.getFullYear()}</h2><button class="icon-btn" data-act="cal" data-step="-1" aria-label="Previous week">${I.left}</button><button class="btn sm" data-act="cal" data-step="0">Today</button><button class="icon-btn" data-act="cal" data-step="1" aria-label="Next week">${I.left.replace('<svg','<svg style="transform:scaleX(-1)"')}</button></div>
-    <div class="week">${cols}</div>`;
+    <div class="week" style="grid-template-columns:${weekCols()}">${cols}</div>`;
 }
 const calModeSeg=()=>`<div class="seg cal-mode" role="tablist" aria-label="Calendar range"><button type="button" data-act="cal-mode" data-mode="month" class="${S.ui.calMode!=='week'?'on':''}">Month</button><button type="button" data-act="cal-mode" data-mode="week" class="${S.ui.calMode==='week'?'on':''}">Week</button></div>`;
 function calendarView(list){
   if(S.ui.calMode==='week')return weekView(list);
   const [y,m]=S.ui.month.split('-').map(Number);
   const first=new Date(y,m-1,1);
-  const startOffset=(first.getDay()+6)%7;
+  const startOffset=(first.getDay()-WS()+7)%7;
   const start=new Date(y,m-1,1-startOffset);
   const t0=today();
   const byDay={};list.forEach(t=>{if(t.due)(byDay[t.due]=byDay[t.due]||[]).push(t)});
@@ -1873,14 +1940,14 @@ function calendarView(list){
     const d=new Date(start);d.setDate(start.getDate()+i);const k=ymd(d);
     const evs=byDay[k]||[],hs=hol[k]||[];
     const heavy=(load[k]||0)>=lim;
-    cells+=`<div class="day ${d.getMonth()!==m-1?'out':''} ${k===t0?'today':''} ${heavy?'busy':''} ${hs.length?'holiday':''}"><div class="dn"><b>${d.getDate()}</b>${heavy?`<span class="busy-tag" title="${load[k]} tasks due across all jobs">${I.warn}${load[k]}</span>`:''}</div>${holHtml(hs.slice(0,2))}${hs.length>2?`<div class="hol" title="${esc(hs.slice(2).map(h=>h.cc+': '+h.name).join('\n'))}"><span>+${hs.length-2} more</span></div>`:''}
+    cells+=`<div class="day ${d.getMonth()!==m-1?'out':''} ${k===t0?'today':''} ${heavy?'busy':''} ${hs.length?'holiday':''} ${pref('hideWeekends')&&isWeekend(d)?'wk-min':''}"><div class="dn"><b>${d.getDate()}</b>${heavy?`<span class="busy-tag" title="${load[k]} tasks due across all jobs">${I.warn}${load[k]}</span>`:''}</div>${holHtml(hs.slice(0,2))}${hs.length>2?`<div class="hol" title="${esc(hs.slice(2).map(h=>h.cc+': '+h.name).join('\n'))}"><span>+${hs.length-2} more</span></div>`:''}
       ${evs.slice(0,4).map(t=>`<button class="ev ${isClosed(t)?'is-done':''}" style="--c:${stColor(stOf(t))}" data-act="open" data-id="${t.id}"><span>${esc(t.name||'Untitled task')}</span></button>`).join('')}
       ${evs.length>4?`<span class="more">+${evs.length-4} more</span>`:''}</div>`;
   }
   const noDate=list.filter(t=>!t.due&&!isClosed(t)).length;
   return `<div class="cal-bar">${calModeSeg()}<h2>${MONTH_FULL[m-1]} ${y}</h2><button class="icon-btn" data-act="cal" data-step="-1" aria-label="Previous month">${I.left}</button><button class="btn sm" data-act="cal" data-step="0">Today</button><button class="icon-btn" data-act="cal" data-step="1" aria-label="Next month">${I.chev}</button>
     <span class="hint" style="margin-left:auto">Tasks show on their due date${noDate?` · ${noDate} open task${noDate===1?' has':'s have'} no due date`:''}${holidayCountries().length?` · Holidays: ${holidayCountries().join(', ')}`:''}</span></div>
-    <div class="cal-wrap"><div class="cal">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="dow">${d}</div>`).join('')}${cells}</div></div>`;
+    <div class="cal-wrap"><div class="cal" style="grid-template-columns:${weekCols()}">${Array.from({length:7},(_,i)=>WEEKDAY[(WS()+i)%7]).map(d=>`<div class="dow">${pref('hideWeekends')&&(d==='Sat'||d==='Sun')?d[0]:d}</div>`).join('')}${cells}</div></div>`;
 }
 
 /* ================= workload ================= */
@@ -1957,7 +2024,8 @@ function notifications(all){
   }
   const load=dueLoad();
   for(let i=0;i<7;i++){const d=addDays(t0,i),n=load[d]||0;if(n>=lim)out.push({key:`busy:${d}:${n}`,rank:2.5,kind:'warn',icon:'warn',day:d,title:`${i===0?'Today':i===1?'Tomorrow':WEEKDAY[parseD(d).getDay()]+' '+fmtDate(d)} is a busy day`,body:`${n} tasks are due.`})}
-  out.forEach(n=>{n.sub=n.task?who(n.task):'All jobs'});
+  {const b=backupDue();if(b)out.push({key:`backup:${b.last||'never'}:${Math.floor(b.days/30)}`,rank:7,kind:'info',icon:'download',backup:true,sub:'Settings → Backup',title:b.last?`Your last backup was ${b.days} days ago`:"You haven't downloaded a backup yet",body:'A backup file keeps a copy of every job and task on your computer. It takes a second.'})}
+  out.forEach(n=>{n.sub=n.sub||(n.task?who(n.task):'All jobs')});
   const list=out.sort((a,b)=>a.rank-b.rank||(a.task?.due||a.day||'').localeCompare(b.task?.due||b.day||''));
   return all?list:list.filter(n=>!NS.hidden[n.key]);
 }
@@ -1972,9 +2040,19 @@ function renderBell(){
     ${list.length?`<div class="notes-list">${list.map(n=>`<div class="note ${n.kind} ${NS.read[n.key]?'':'unread'}"><button type="button" class="note-main" data-act="note-open" data-key="${esc(n.key)}">${I[n.icon]}<span><b>${esc(n.title)}</b>${n.body?`<span>${esc(n.body)}</span>`:''}<small>${esc(n.sub)}</small></span></button><button type="button" class="icon-btn" data-act="note-hide" data-key="${esc(n.key)}" aria-label="Dismiss" title="Dismiss">${I.x}</button></div>`).join('')}</div>`
     :`<p class="notes-empty">You're all caught up. Deadlines, busy days and tasks that need a nudge will show up here.</p>`}`;
 }
+/* Backup reminder: 30+ days since the last download (or since the first real task, if never) */
+const BACKUP_DAYS=30;
+function backupDue(){
+  const real=Object.values(S.tasks).filter(t=>!t._draft&&!t.example);if(!real.length)return null;
+  const last=appSettings().backupAt||null;
+  const from=last||ymd(new Date(Math.min(...real.map(t=>t.created||Date.now()))));
+  const days=diffDays(today(),from);
+  return days>=BACKUP_DAYS?{last,days}:null;
+}
 function openNote(key){
   const n=notifications(true).find(x=>x.key===key);if(!n)return;
   NS.read[key]=1;saveNotes();notesOpen=false;renderBell();
+  if(n.backup){openSettings();SM.sec='backup';renderSettings();return}
   if(n.task)openTask(n.task.id);
   else if(n.day){const u=S.ui;u.tab='overview';u.client='all';u.view='calendar';u.month=n.day.slice(0,7);saveUi();render()}
 }
@@ -2049,7 +2127,7 @@ function renderArchive(){
 
 /* ================= drawer ================= */
 let deleteArmed=false, clearArmed=false;
-function openTask(id,tab){if(S.tasks[id]&&!S.tasks[id]._draft){S.ui.recent=[id,...(S.ui.recent||[]).filter(x=>x!==id)].slice(0,8);saveUi()}if(S.ui.openTask!==id)TPL={open:false,naming:false,del:null};if(DRAFT&&DRAFT.id!==id)discardDraft();if(S.ui.openTask!==id||tab)S.ui.dtab=tab||'details';S.ui.openTask=id;noteDelArmed=null;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender()}
+function openTask(id,tab){seenTask(id);if(S.tasks[id]&&!S.tasks[id]._draft){S.ui.recent=[id,...(S.ui.recent||[]).filter(x=>x!==id)].slice(0,8);saveUi()}if(S.ui.openTask!==id)TPL={open:false,naming:false,del:null};if(DRAFT&&DRAFT.id!==id)discardDraft();if(S.ui.openTask!==id||tab)S.ui.dtab=tab||'details';S.ui.openTask=id;noteDelArmed=null;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender()}
 function closeDrawer(){flushAll();discardDraft();S.ui.openTask=null;$('#drawer').hidden=true;$('#scrim').hidden=true;scheduleRender()}
 /* Task activity: the task's log entries plus your own posted updates (kind 'note'), newest first */
 function taskActivity(t){
@@ -2229,8 +2307,48 @@ function setStatus(id,st,o={}){
   logAct('status',`${stLabel(t.status)} → ${stLabel(st)}${p.revision?` (round R${p.revision})`:''}`,{task:t});
   if(st==='done') p.doneAt=today(); else if(t.doneAt) p.doneAt=null;
   patch('tasks',id,p);
+  if(st==='done'&&!o.quiet&&!t._draft)celebrate();
   if(!o.quiet&&!t._draft)toast(`${t.name?`“${t.name.length>40?t.name.slice(0,39)+'…':t.name}” → `:'Moved to '}${stLabel(st)}${p.revision?` · round R${p.revision}`:''}`,{label:'Undo',fn:()=>undoStatus([[id,prev]])});
   return prev;
+}
+/* A little confetti burst when a task is done (Settings → Appearance; off with reduced motion) */
+let lastPt=null;document.addEventListener('pointerdown',e=>{lastPt={x:e.clientX,y:e.clientY,at:Date.now()}},true);
+function celebrate(){
+  if(!pref('confetti')||reducedMotion())return;
+  const near=lastPt&&Date.now()-lastPt.at<3000,x=near?lastPt.x:innerWidth/2,y=near?lastPt.y:innerHeight/2;
+  const cols=[stColor('done'),'var(--accent)','#f5b400','#e8515d','#4c8dff','#9b6bff'];
+  const box=document.createElement('div');box.className='confetti';box.setAttribute('aria-hidden','true');
+  for(let i=0;i<40;i++){const a=Math.random()*Math.PI*2,v=70+Math.random()*130,e=document.createElement('i');
+    e.style.cssText=`left:${x}px;top:${y}px;background:${cols[i%cols.length]};--dx:${Math.round(Math.cos(a)*v)}px;--dy:${Math.round(Math.sin(a)*v*.8+90)}px;--r:${Math.round(Math.random()*720-360)}deg;animation-delay:${Math.round(Math.random()*80)}ms`;box.appendChild(e)}
+  document.body.appendChild(box);setTimeout(()=>box.remove(),1400);
+}
+/* Task panel width: drag its left edge (desktop), kept per device in S.ui.drawerW; double-click resets */
+function applyDrawerW(){const w=S.ui.drawerW;if(w)document.documentElement.style.setProperty('--dw',w+'px');else document.documentElement.style.removeProperty('--dw')}
+(function(){
+  const h=$('#d-resize');if(!h)return;let drag=false;
+  h.addEventListener('pointerdown',e=>{drag=true;h.setPointerCapture(e.pointerId);h.classList.add('drag');document.body.classList.add('resizing');e.preventDefault()});
+  h.addEventListener('pointermove',e=>{if(!drag)return;S.ui.drawerW=Math.round(Math.min(innerWidth*.92,Math.max(460,innerWidth-e.clientX)));applyDrawerW()});
+  const end=()=>{if(!drag)return;drag=false;h.classList.remove('drag');document.body.classList.remove('resizing');saveUi()};
+  h.addEventListener('pointerup',end);h.addEventListener('pointercancel',end);
+  h.addEventListener('dblclick',()=>{S.ui.drawerW=null;applyDrawerW();saveUi()});
+})();
+/* Tasks changed on another device since this device last saw them get a dot until opened (hosted mode) */
+let FRESH=new Set();
+const freshKey=()=>'cutroom.fresh.'+B.uid;
+const freshDot=t=>FRESH.has(t.id)?'<span class="fresh-dot" title="Changed on another device"></span>':'';
+const stamps=tasks=>{const m={};for(const id in tasks||{})m[id]=tasks[id].updated||tasks[id].created||0;return m};
+function markFresh(before){
+  for(const t of Object.values(S.tasks)){if(t._draft||t.deleted)continue;const b=before[t.id];if(b===undefined||(t.updated||t.created||0)>b)FRESH.add(t.id)}
+  for(const id of [...FRESH])if(!S.tasks[id]||S.tasks[id].deleted)FRESH.delete(id);
+  lsSet(freshKey(),[...FRESH]);
+}
+function seenTask(id){if(FRESH.delete(id)&&B.uid)lsSet(freshKey(),[...FRESH])}
+/* "Last synced" in the sidebar footer (hosted mode) */
+function noteSynced(){B.syncedAt=Date.now();if(B.uid)lsSet('cutroom.synced.'+B.uid,B.syncedAt)}
+function syncedAgo(){
+  const t=B.syncedAt;if(!t)return '';
+  const m=Math.floor((Date.now()-t)/60000);
+  return m<1?'just now':m<60?`${m} min ago`:m<1440?`${Math.floor(m/60)} h ago`:`${Math.floor(m/1440)} day${m<2880?'':'s'} ago`;
 }
 function undoStatus(list){
   for(const [id,prev] of list){const t=S.tasks[id];if(!t)continue;logAct('status',`${stLabel(t.status)} → ${stLabel(prev.status)} (undone)`,{task:t});patch('tasks',id,{status:prev.status,revision:prev.revision,doneAt:prev.doneAt})}
@@ -2386,7 +2504,7 @@ if(BM){closeBrand();return}
 let SM=null;
 function openSettings(){
   const a=appSettings();
-  SM={sec:'appearance',statuses:STATUSES.map(x=>({...x})),stMoves:{},stArm:null,stPick:null,stTo:null,restore:null,name:a.name||'',logo:a.logo||null,theme:a.theme||'system',scheme:a.scheme||'splice',textSize:+a.textSize||1,density:a.density||'comfortable',dayLimit:dayLimit(),holidays:[...holidayCountries()],holAuto:!Array.isArray(a.holidays),imp:null,impJob:S.jobs[S.ui.tab]?S.ui.tab:(jobsSorted()[0]?.id||''),orig:a.logo||null,uploaded:[],busy:false};
+  SM={sec:'appearance',statuses:STATUSES.map(x=>({...x})),stMoves:{},stArm:null,stPick:null,stTo:null,restore:null,name:a.name||'',logo:a.logo||null,theme:a.theme||'system',scheme:a.scheme||'splice',textSize:+a.textSize||1,density:a.density||'comfortable',...Object.fromEntries(Object.keys(PREF_DEF).map(k=>[k,a[k]!==undefined&&a[k]!==null?a[k]:PREF_DEF[k]])),dayLimit:dayLimit(),holidays:[...holidayCountries()],holAuto:!Array.isArray(a.holidays),imp:null,impJob:S.jobs[S.ui.tab]?S.ui.tab:(jobsSorted()[0]?.id||''),orig:a.logo||null,uploaded:[],busy:false};
   CAL.disArmed=false;if(B.mode==='cloud'&&B.cfg.calendar)calStatus();
   renderSettings();$('#modal').hidden=false;render();
 }
@@ -2394,7 +2512,7 @@ function closeSettings(save){
   if(!SM)return;
   const sm=SM;SM=null;
   if(save){
-    const data={statuses:sm.statuses.map(x=>({id:x.id,label:x.label.trim()||'Untitled',color:x.color||''})),name:sm.name.trim(),logo:sm.logo||null,theme:sm.theme,scheme:sm.scheme,textSize:sm.textSize,density:sm.density,dayLimit:Math.min(20,Math.max(1,parseInt(sm.dayLimit,10)||3)),...(sm.holAuto?{}:{holidays:sm.holidays})};
+    const data={statuses:sm.statuses.map(x=>({id:x.id,label:x.label.trim()||'Untitled',color:x.color||''})),name:sm.name.trim(),logo:sm.logo||null,theme:sm.theme,scheme:sm.scheme,textSize:sm.textSize,density:sm.density,...Object.fromEntries(Object.keys(PREF_DEF).map(k=>[k,sm[k]])),dayLimit:Math.min(20,Math.max(1,parseInt(sm.dayLimit,10)||3)),...(sm.holAuto?{}:{holidays:sm.holidays})};
     if(S.settings.app) patch('settings','app',data); else create('settings',data,'app');
     // tasks in deleted statuses move to the status picked for them (following chains of deletes)
     const keep=new Set(data.statuses.map(x=>x.id)),dest=id=>{let d=id,n=0;while(!keep.has(d)&&sm.stMoves[d]&&n++<20)d=sm.stMoves[d];return keep.has(d)?d:data.statuses[0].id};
@@ -2413,11 +2531,18 @@ function renderSettings(){
       ${opt('system','Match device',['#f3f4f7','#0e1015'])}${opt('light','Light',['#f3f4f7','#ffffff'])}${opt('dark','Dark',['#0e1015','#161920'])}</div></div>
       <div class="field"><span class="lbl" id="s-scheme-lbl">Color scheme</span>
       <div class="scheme-pick" role="group" aria-labelledby="s-scheme-lbl">${SCHEMES.map(([id,name,la,ls])=>`<button type="button" data-act="s-scheme" data-v="${id}" class="${SM.scheme===id?'on':''}" aria-pressed="${SM.scheme===id}"><span class="scheme-dot" style="background:${ls||'#f3f4f7'}"><i style="background:${la}"></i></span><span>${esc(name)}</span></button>`).join('')}</div>
-      <p class="hint">Each scheme has a light and a dark version and follows the theme above. Changes show right away. Click Save to keep them.</p></div>`},
+      <p class="hint">Each scheme has a light and a dark version and follows the theme above. Changes show right away. Click Save to keep them.</p></div>
+      ${prefPick('dateRel','Dates in lists and cards',[[false,absDate(addDays(today(),3)),'The date itself'],[true,'in 3 days','How far away, like “2 days late”']])}
+      ${prefPick('dateFmt','Date format',[['md','Oct 1','Month first'],['dm','1 Oct','Day first']])}
+      ${prefPick('weekStart','Week starts on',[['mon','Monday',''],['sun','Sunday','']])}
+      ${prefPick('hideWeekends','Weekends on the Calendar',[[false,'Full width','Same size as weekdays'],[true,'Narrow','More room for Monday to Friday']])}
+      ${prefPick('confetti','Celebrate finished tasks',[[true,'On','A little confetti when a task moves to Done'],[false,'Off','']])}`},
     {id:'a11y',label:'Accessibility',icon:I.a11y,html:`<div class="field"><span class="lbl" id="s-ts-lbl">Text size</span>
       <div class="pick-row" role="group" aria-labelledby="s-ts-lbl">${TEXT_SIZES.map(([v,l])=>`<button type="button" data-act="s-ts" data-v="${v}" class="${+SM.textSize===v?'on':''}" aria-pressed="${+SM.textSize===v}"><span class="aa" style="font-size:${Math.round(16*v)}px">Aa</span>${l}<small>${Math.round(v*100)}%</small></button>`).join('')}</div></div>
       <div class="field"><span class="lbl" id="s-dens-lbl">Density</span>
-      <div class="pick-row two" role="group" aria-labelledby="s-dens-lbl">${[['comfortable','Comfortable','More space between rows and cards',8],['compact','Compact','Fits more tasks on screen',3]].map(([id,l,d,g])=>`<button type="button" data-act="s-dens" data-v="${id}" class="${SM.density===id?'on':''}" aria-pressed="${SM.density===id}"><span class="dens-demo" style="gap:${g}px"><i></i><i></i><i></i></span>${l}<small>${d}</small></button>`).join('')}</div></div>`},
+      <div class="pick-row two" role="group" aria-labelledby="s-dens-lbl">${[['comfortable','Comfortable','More space between rows and cards',8],['compact','Compact','Fits more tasks on screen',3]].map(([id,l,d,g])=>`<button type="button" data-act="s-dens" data-v="${id}" class="${SM.density===id?'on':''}" aria-pressed="${SM.density===id}"><span class="dens-demo" style="gap:${g}px"><i></i><i></i><i></i></span>${l}<small>${d}</small></button>`).join('')}</div></div>
+      ${prefPick('motion','Motion',[['system','Match device','Animations follow your device setting'],['reduce','Reduce motion','No animations or sliding']])}
+      ${prefPick('contrast','Contrast',[['normal','Standard',''],['high','High contrast','Darker text and stronger borders']])}`},
     {id:'statuses',label:'Statuses',icon:I.status,html:statusSettingsHtml()},
     {id:'workload',label:'Workload',icon:I.clock,html:`<div class="field"><label for="s-limit">Busy day warning</label><div class="limit-row"><span>Warn me when</span><input type="number" id="s-limit" data-fk="s-limit" min="1" max="20" value="${esc(SM.dayLimit)}"><span>or more tasks are due on the same day.</span></div><p class="hint">Busy days are flagged on the Calendar, in notifications, and when you pick a due date.</p></div>`},
     {id:'holidays',label:'Holidays',icon:'<svg class="i" viewBox="0 0 16 16"><path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.8 3.8l1.4 1.4M10.8 10.8l1.4 1.4M3.8 12.2l1.4-1.4M10.8 5.2l1.4-1.4"/><circle cx="8" cy="8" r="2.5"/></svg>',html:holidaySettingsHtml()},
@@ -2852,6 +2977,8 @@ function downloadBackup(){
   const blob=new Blob([JSON.stringify(file,null,1)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`splice-co-backup-${today()}.json`;
   document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  if(S.settings.app)patch('settings','app',{backupAt:today()});else create('settings',{backupAt:today()},'app');
+  if(SM)renderSettings();
   toast('Backup downloaded');
 }
 async function readBackup(file){
@@ -2922,6 +3049,10 @@ function finderSettingsHtml(){
     <p class="hint">Test it with the button below, not the ▶ button in Shortcuts (that runs it with no path). The first time, the browser asks to open Shortcuts, and macOS may ask to allow the script: allow both. Use full paths (starting with /Users/…); Option ⌥ + Command ⌘ + C in Finder gives you one.</p>
     ${IS_MAC?`<div class="acct-btns"><a class="btn sm" href="${pathOpenUrl('/Applications')}">${I.folder}Test: open Applications</a></div>`:''}</div>`;
 }
+/* two-choice picker for a look/date preference (SM[k]); data-v holds JSON so booleans stay booleans */
+function prefPick(k,label,opts){
+  return `<div class="field"><span class="lbl" id="pp-${k}">${label}</span><div class="pick-row two" role="group" aria-labelledby="pp-${k}">${opts.map(([v,l,d])=>`<button type="button" data-act="s-pref" data-k="${k}" data-v='${esc(JSON.stringify(v))}' class="${SM[k]===v?'on':''}" aria-pressed="${SM[k]===v}">${esc(l)}${d?`<small>${esc(d)}</small>`:''}</button>`).join('')}</div></div>`;
+}
 function holidaySettingsHtml(){
   const sug=suggestedCountries().filter(cc=>!SM.holidays.includes(cc));
   return `<div class="field"><span class="lbl">Public holidays on the Calendar</span>
@@ -2956,7 +3087,7 @@ function impDate(v){
   v=(v||'').trim();if(!v)return '';
   let m=/^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(v);if(m)return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
   m=/^(\d{1,2})[\/.\-](\d{1,2})(?:[\/.\-](\d{2,4}))?$/.exec(v);
-  if(m){let a=+m[1],b=+m[2],y=m[3]?+m[3]:new Date().getFullYear();if(y<100)y+=2000;if(a>12&&b<=12)[a,b]=[b,a];if(a<1||a>12||b<1||b>31)return '';return `${y}-${String(a).padStart(2,'0')}-${String(b).padStart(2,'0')}`}
+  if(m){let a=+m[1],b=+m[2],y=m[3]?+m[3]:new Date().getFullYear();if(y<100)y+=2000;if(pref('dateFmt')==='dm')[a,b]=[b,a];if(a>12&&b<=12)[a,b]=[b,a];if(a<1||a>12||b<1||b>31)return '';return `${y}-${String(a).padStart(2,'0')}-${String(b).padStart(2,'0')}`}
   let d=new Date(/\d{4}/.test(v)?v:`${v} ${new Date().getFullYear()}`);return isNaN(d)?'':ymd(d);
 }
 function impStatus(v){
@@ -3036,8 +3167,10 @@ function runImport(){
 }
 function backupSettingsHtml(){
   const r=SM.restore;
+  const last=appSettings().backupAt;
   return `<div class="field"><span class="lbl">Export tasks as a spreadsheet</span><div class="acct-btns"><select class="sel" id="csv-job" aria-label="Which job"><option value="all">All jobs</option>${jobsSorted().map(j=>`<option value="${j.id}">${esc(j.name)}</option>`).join('')}</select><button type="button" class="btn sm" data-act="export-csv">${I.download}Export CSV</button></div><p class="hint">Same layout as a task tracker sheet: client, title, drafts (revision rounds), date assigned, deadline, status and the storage, task and review links, grouped by month. Opens in Excel, Numbers or Google Sheets.</p></div>
   <div class="field"><span class="lbl">Backup</span>
+    <p class="last-backup">${last?`Last backup downloaded ${fmtDate(last)}${diffDays(today(),last)>1?` (${diffDays(today(),last)} days ago)`:''}.`:'No backup downloaded yet.'} You'll get a reminder in notifications after ${BACKUP_DAYS} days.</p>
     <div class="acct-btns"><button type="button" class="btn sm" data-act="backup-download">${I.download}Download backup</button><button type="button" class="btn sm" data-act="backup-pick">${I.upload}Restore from a backup…</button></div>
     ${r?`<div class="restore-box"><p class="acct-line"><b>${esc(r.name)}</b>${r.date?` · saved ${esc(fmtDate(ymd(new Date(r.date))))}`:''}<br>${r.counts.jobs} jobs, ${r.counts.clients} clients and ${r.counts.tasks} tasks. Restoring adds back anything missing and sets items that are in both back to the backup's version. Nothing else is deleted.</p>
       <div class="acct-btns"><button type="button" class="btn sm primary" data-act="backup-restore">Restore now</button><button type="button" class="btn sm ghost" data-act="backup-cancel">Cancel</button></div></div>`
@@ -3164,6 +3297,7 @@ document.addEventListener('click',e=>{
     case 'backup-cancel': SM.restore=null;renderSettings();break;
     case 'backup-restore': runRestore();break;
     case 'imp-pick': $('#import-in').click();break;
+    case 's-pref': if(SM&&el.dataset.k in PREF_DEF){SM[el.dataset.k]=JSON.parse(el.dataset.v);renderSettings();render()}break;
     case 'imp-cancel': SM.imp=null;renderSettings();break;
     case 'imp-run': runImport();break;
     case 'hol-add': if(!SM.holidays.includes(el.dataset.cc))SM.holidays.push(el.dataset.cc);SM.holAuto=false;renderSettings();break;
@@ -3178,7 +3312,7 @@ document.addEventListener('click',e=>{
     case 'stat': u.due=u.due===el.dataset.due?'all':el.dataset.due;render();break;
     case 'jump-status':{
       u.view='list';u.collapsed[el.dataset.status]=false;u.due='all';saveUi();render();
-      $('#grp-'+el.dataset.status)?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'});break}
+      $('#grp-'+el.dataset.status)?.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'start'});break}
     case 'reset-filters': u.q='';u.prio='all';u.due='all';$('#q').value='';render();break;
     case 'open': if(e.target.closest('select,a,input'))return;
       if(e.target.closest('.row .t-name,.card .t-name')){clearTimeout(nameClickT);if(e.detail>1)break;const id=el.dataset.id,dt=el.dataset.dtab;nameClickT=setTimeout(()=>openTask(id,dt),230);break}
@@ -3219,7 +3353,7 @@ document.addEventListener('click',e=>{
     case 'edit-job': openJobModal(el.dataset.id);break;
     case 'cal-mode': u.calMode=el.dataset.mode;saveUi();render();break;
     case 'cal':{const st=+el.dataset.step;
-      if(u.calMode==='week'){const d=parseD(today());d.setDate(d.getDate()-((d.getDay()+6)%7));let w=st?parseD(u.week||ymd(d)):d;if(st)w.setDate(w.getDate()+7*st);u.week=ymd(w);saveUi();render();break}
+      if(u.calMode==='week'){let w=weekStartOf(st?parseD(u.week||today()):parseD(today()));if(st)w.setDate(w.getDate()+7*st);u.week=ymd(w);saveUi();render();break}
       if(!st)u.month=today().slice(0,7);else{const [y,m]=u.month.split('-').map(Number);const d=new Date(y,m-1+st,1);u.month=`${d.getFullYear()}-${pad(d.getMonth()+1)}`}saveUi();render();break}
     case 'drawer-close': closeDrawer();break;
     case 'clear-examples':
@@ -3325,7 +3459,7 @@ document.addEventListener('change',e=>{
   if(el.id==='f-due'){u.due=el.value;render();return}
   if(el.id==='arch-job'){u.ajob=el.value;saveUi();render();return}
   if(el.id==='bulk-move'&&el.value){moveTasks([...SEL],el.value);return}
-  if(el.id==='bulk-status'&&el.value){const v=el.value,undo=[];[...SEL].forEach(id=>{const prev=setStatus(id,v,{quiet:true});if(prev)undo.push([id,prev])});render();toast(`Moved ${undo.length} task${undo.length===1?'':'s'} to ${stLabel(v)}`,undo.length?{label:'Undo',fn:()=>undoStatus(undo)}:null);return}
+  if(el.id==='bulk-status'&&el.value){const v=el.value,undo=[];[...SEL].forEach(id=>{const prev=setStatus(id,v,{quiet:true});if(prev)undo.push([id,prev])});if(v==='done'&&undo.length)celebrate();render();toast(`Moved ${undo.length} task${undo.length===1?'':'s'} to ${stLabel(v)}`,undo.length?{label:'Undo',fn:()=>undoStatus(undo)}:null);return}
   if(el.id==='bulk-prio'&&el.value){const v=el.value;[...SEL].forEach(id=>{const t=S.tasks[id];if(t&&(t.priority||'normal')!==v){patch('tasks',id,{priority:v});logAct('edit',`Priority set to ${(PRIORITIES.find(x=>x.id===v)||{}).label}`,{task:t})}});render();toast(`Priority set for ${SEL.size} task${SEL.size===1?'':'s'}`);return}
   if(el.id==='bulk-due'&&el.value){const v=el.value;[...SEL].forEach(id=>{const t=S.tasks[id];if(t&&t.due!==v){patch('tasks',id,{due:v});logAct('date',`Due date set to ${fmtDate(v)}`,{task:t})}});render();toast(`Due date set for ${SEL.size} task${SEL.size===1?'':'s'}`);return}
   if(el.id==='log-job'){u.ljob=el.value;u.lmore=0;saveUi();render();return}
