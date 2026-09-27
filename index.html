@@ -934,6 +934,28 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
   .pin-card .pill{display:none}
   .cal-bar{flex-wrap:wrap}
 }
+/* job color stripe */
+.row{border-left:3px solid var(--jc,transparent)}
+.card{border-left:3px solid var(--jc,var(--line))}
+/* sidebar: reorder + collapse */
+.nav-row.dragging{opacity:.5}
+.nav-row.drop-before{box-shadow:0 -2px 0 0 var(--accent)}
+.nav-row.drop-after{box-shadow:0 2px 0 0 var(--accent)}
+.side{position:relative}
+.side-toggle{position:absolute;top:16px;right:8px;width:28px;height:28px;opacity:.6}
+.side-toggle:hover{opacity:1}
+@media (min-width:821px){
+  body.side-mini .app{grid-template-columns:68px minmax(0,1fr)}
+  body.side-mini .side{padding:14px 8px;align-items:center;gap:12px}
+  body.side-mini .side-toggle{position:static;transform:scaleX(-1);order:-1}
+  body.side-mini .brand{padding:0;justify-content:center}
+  body.side-mini .brand b,body.side-mini .nav-item .name,body.side-mini .nav-item .count,body.side-mini .nav-item kbd,body.side-mini .jobs-toggle > svg:last-child,body.side-mini .save-state,body.side-mini .nav-row .edit{display:none}
+  body.side-mini .nav{width:100%}
+  body.side-mini .nav-item{justify-content:center;padding:8px 0}
+  body.side-mini .nav.jobs{margin:0;padding:0;border:0}
+  body.side-mini .side-foot{width:100%}
+}
+@media (max-width:820px){.side-toggle{display:none}}
 </style>
 
 <div class="app">
@@ -1198,6 +1220,30 @@ let inflight=0;
 function chain(key,fn){inflight++;chains[key]=(chains[key]||Promise.resolve()).then(fn).catch(onWriteError).finally(()=>{inflight--});return chains[key]}
 function onWriteError(e){console.error(e);toast(e&&e.code==='quota_exceeded'?'Storage is full. Delete some old tasks to add new ones.':"Couldn't save that change. Check your connection and try again.")}
 /* cloud writes send the whole document, so a write is never a partial merge */
+/* Offline: writes that can't reach Supabase wait in an outbox on this device (OUT, localStorage) and are
+   sent when the connection is back; a snapshot of the data lets the app open without internet. */
+let OUT={};const outKey=()=>'cutroom.outbox.'+B.uid,snapKey=()=>'cutroom.snap.'+B.uid;
+const isNetErr=e=>!navigator.onLine||/fetch|network|load failed|timeout/i.test(String(e?.message||e));
+function queueOut(key,op){OUT[key]=op;lsSet(outKey(),OUT);saveSnap();B.offline=true;renderSide()}
+function cloudWrite(col,id,op){
+  const key=col+'/'+id;
+  if(!navigator.onLine||OUT[key]){queueOut(key,op);return}
+  chain(key,()=>(op==='del'?cloudDel(col,id):cloudPut(col,id)).catch(e=>{if(isNetErr(e)){queueOut(key,op);return}throw e}));
+  saveSnapSoon();
+}
+let outBusy=false;
+async function flushOut(){
+  if(B.mode!=='cloud'||outBusy||!navigator.onLine||!Object.keys(OUT).length)return;outBusy=true;
+  try{for(const key of Object.keys(OUT)){const [col,id]=key.split('/');try{S[col][id]&&OUT[key]!=='del'?await cloudPut(col,id):await cloudDel(col,id);delete OUT[key];lsSet(outKey(),OUT)}catch(e){if(isNetErr(e))break;console.error(e);delete OUT[key]}}}
+  finally{outBusy=false;if(!Object.keys(OUT).length){B.offline=false;toast('Back online. Your changes are saved to your account.');calSoon('tasks')}renderSide()}
+}
+let snapT=null;
+function saveSnap(){if(B.mode==='cloud'&&B.uid)lsSet(snapKey(),{jobs:S.jobs,clients:S.clients,tasks:S.tasks,settings:S.settings,at:Date.now()})}
+function saveSnapSoon(){clearTimeout(snapT);snapT=setTimeout(saveSnap,800)}
+window.addEventListener('online',()=>{flushOut().then(()=>{if(!Object.keys(OUT).length)cloudRefresh()})});
+window.addEventListener('offline',()=>{if(B.mode==='cloud'){B.offline=true;renderSide()}});
+window.addEventListener('pagehide',()=>{if(B.mode==='cloud'&&S.ready)saveSnap()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&B.mode==='cloud'&&S.ready)saveSnap()});
 function cloudPut(col,id){
   const d=S[col][id]; if(!d) return;
   return B.sb.from('docs').upsert({user_id:B.uid,col,id,data:clean(d),updated_at:new Date().toISOString()}).then(({error})=>{if(error)throw error});
@@ -1210,7 +1256,7 @@ function create(col,data,id){
   id=id||uid();
   S[col][id]={...data,id};
   if(B.mode==='db'){const ref=B.db.doc(col+'/'+id);chain(col+'/'+id,()=>ref.set(clean(S[col][id])))}
-  else if(B.mode==='cloud'){chain(col+'/'+id,()=>cloudPut(col,id));calSoon(col)}
+  else if(B.mode==='cloud'){cloudWrite(col,id,'put');calSoon(col)}
   else saveLocal();
   scheduleRender();
   return id;
@@ -1231,7 +1277,7 @@ function patch(col,id,p,delay){
 function flush(key){
   const p=pending[key]; if(!p) return; delete pending[key]; clearTimeout(timers[key]);
   if(B.mode==='db'){const ref=B.db.doc(key);chain(key,()=>ref.update(p))}
-  else if(B.mode==='cloud'){const [col,id]=key.split('/');chain(key,()=>cloudPut(col,id));calSoon(col)}
+  else if(B.mode==='cloud'){const [col,id]=key.split('/');cloudWrite(col,id,'put');calSoon(col)}
   else saveLocal();
 }
 function remove(col,id){
@@ -1239,7 +1285,7 @@ function remove(col,id){
   const key=col+'/'+id; delete pending[key]; clearTimeout(timers[key]);
   delete S[col][id];
   if(B.mode==='db'){const ref=B.db.doc(key);chain(key,()=>ref.delete())}
-  else if(B.mode==='cloud'){chain(key,()=>cloudDel(col,id));calSoon(col)}
+  else if(B.mode==='cloud'){cloudWrite(col,id,'del');calSoon(col)}
   else saveLocal();
   scheduleRender();
 }
@@ -1291,18 +1337,22 @@ async function cloudBoot(){
     /* our own route answered, but the Vercel keys aren't set: say so instead of quietly saving locally */
     if(r.status===503&&cfg&&cfg.error){showSetup(cfg);return true}
     if(!r.ok) return false;
-  }catch(e){return false}
+    if(cfg&&cfg.supabaseUrl)lsSet('cutroom.cfg',cfg);
+  }catch(e){cfg=lsGet('cutroom.cfg');if(!cfg)return false}   // offline: use the settings from the last visit
   if(!cfg||!cfg.supabaseUrl||!cfg.supabaseAnonKey) return false;
   const hashErr=new URLSearchParams(location.hash.slice(1)).get('error_description');
   try{await loadScript(SB_JS)}catch(e){showAuth({error:"Couldn't load the sign-in service. Check your connection and reload the page."});return true}
   B.mode='cloud';B.cfg=cfg;
   B.sb=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{auth:{flowType:'implicit',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-  const {data:{session}}=await B.sb.auth.getSession();
+  // offline, the session check can stall while it retries a token refresh, so don't wait on it for long
+  const {data:{session}}=await Promise.race([B.sb.auth.getSession(),new Promise(r=>setTimeout(()=>r({data:{session:null}}),navigator.onLine?15000:2500))]).catch(()=>({data:{session:null}}));
   B.sb.auth.onAuthStateChange((ev,sess)=>{
     if(ev==='SIGNED_OUT') location.replace(location.pathname);
     else if(sess&&!B.uid) cloudStart(sess);
   });
+  const last=lsGet('cutroom.lastuid');
   if(session) cloudStart(session);
+  else if(!navigator.onLine&&last&&lsGet('cutroom.snap.'+last.uid)) cloudStart({user:{id:last.uid,email:last.email}});
   else showAuth(hashErr?{error:hashErr.replace(/\+/g,' ')}:{});
   if(location.hash&&/access_token|error/.test(location.hash)) history.replaceState(null,'',location.pathname+location.search);
   return true;
@@ -1312,8 +1362,15 @@ async function cloudStart(session){
   B.uid=session.user.id;B.email=session.user.email||'';
   $('#auth').hidden=true;$('#auth').innerHTML='';$('.app').hidden=false;
   render();
-  try{await cloudLoad()}catch(e){console.error(e);toast("Couldn't load your tasks. Reload the page to try again.");return}
-  S.ready=true;migrateStatuses();render();
+  OUT=lsGet(outKey())||{};lsSet('cutroom.lastuid',{uid:B.uid,email:B.email});
+  let offlineStart=false;
+  try{if(Object.keys(OUT).length&&navigator.onLine)await flushOut();await cloudLoad();saveSnap()}
+  catch(e){console.error(e);const snap=lsGet(snapKey());
+    if(snap&&isNetErr(e)){COLS.forEach(c=>{S[c]=snap[c]||{}});offlineStart=true;B.offline=true}
+    else{toast("Couldn't load your tasks. Reload the page to try again.");return}}
+  S.ready=true;if(!offlineStart)migrateStatuses();render();
+  if(offlineStart)toast("You're offline. Showing what's saved on this device; changes sync when you're back online.");
+  setInterval(flushOut,30000);
   setInterval(cloudRefresh,60000);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)cloudRefresh()});
   const back=new URLSearchParams(location.search).get('calendar');
@@ -1337,8 +1394,8 @@ async function cloudLoad(){
 }
 /* Picks up changes made on another device. Skipped while this tab still has writes on the way. */
 async function cloudRefresh(){
-  if(!S.ready||document.hidden||inflight||Object.keys(pending).length) return;
-  try{await cloudLoad();if(!inflight)scheduleRender(true)}catch(e){console.error(e)}
+  if(!S.ready||document.hidden||inflight||Object.keys(pending).length||Object.keys(OUT).length||!navigator.onLine) return;
+  try{await cloudLoad();saveSnap();if(!inflight)scheduleRender(true)}catch(e){console.error(e)}
 }
 function showSetup(cfg){
   applyTheme('system');document.title='Finish setup · '+APP_NAME;
@@ -1402,7 +1459,7 @@ function calSet(j){Object.assign(CAL,{loaded:true,connected:!!j.connected,email:
 async function calStatus(){try{calSet(await calApi('status'))}catch(e){CAL.loaded=true;if(SM)renderSettings()}}
 let calT=null,calRunning=false,calAgain=false,calWarned=false;
 /* runs even when this tab thinks it isn't connected, in case another device connected since */
-function calSoon(col){if(col==='settings'||!B.cfg.calendar)return;clearTimeout(calT);calT=setTimeout(calSync,4000)}
+function calSoon(col){if(col==='settings'||!B.cfg.calendar||!navigator.onLine||Object.keys(OUT).length)return;clearTimeout(calT);calT=setTimeout(calSync,4000)}
 async function calSync(manual){
   if(calRunning){calAgain=true;return}
   calRunning=true;
@@ -1454,8 +1511,10 @@ function accountSettingsHtml(){
 /* ================= derived ================= */
 const jobsSorted=()=>Object.values(S.jobs).sort((a,b)=>(a.order??0)-(b.order??0)||a.name.localeCompare(b.name));
 const clientsOf=jid=>Object.values(S.clients).filter(c=>c.jobId===jid).sort((a,b)=>(a.order??0)-(b.order??0)||a.name.localeCompare(b.name));
-const live=()=>Object.values(S.tasks).filter(t=>!t.archived&&!t._draft);
-const archived=()=>Object.values(S.tasks).filter(t=>t.archived&&S.jobs[t.jobId]);
+const live=()=>Object.values(S.tasks).filter(t=>!t.archived&&!t._draft&&!t.deleted);
+const archived=()=>Object.values(S.tasks).filter(t=>t.archived&&!t.deleted&&S.jobs[t.jobId]);
+const trashed=()=>Object.values(S.tasks).filter(t=>t.deleted&&S.jobs[t.jobId]);
+const TRASH_DAYS=30;
 const tasksOfScope=()=>live().filter(t=>S.jobs[t.jobId]&&(S.ui.tab==='overview'||t.jobId===S.ui.tab)&&(S.ui.tab==='overview'||S.ui.client==='all'||t.clientId===S.ui.client));
 function filtered(){
   const u=S.ui,t0=today(),q=u.q.trim().toLowerCase();
@@ -1565,7 +1624,7 @@ function applyLook(o){
   if(o.density==='compact') r.setAttribute('data-density','compact'); else r.removeAttribute('data-density');
 }
 function migrateStatuses(){
-  pruneLog();
+  pruneLog();purgeOldTrash();
   for(const t of Object.values(S.tasks)){
     if(t.status==='dropped')patch('tasks',t.id,{status:'done',doneAt:t.doneAt||today()});
     // Finder paths briefly went into the files link; they belong in the project folder now
@@ -1588,18 +1647,20 @@ function renderSide(){
   const openCount=jid=>live().filter(t=>t.jobId===jid&&!isClosed(t)).length;
   const allOpen=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)).length;
   const app=appSettings();const appLogo=imgSrc(app.logo);
-  let html=`<button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Overview">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
-  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button>
-  <button class="nav-item jobs-toggle ${jobsOpen?'open':''}" data-act="toggle-jobs" aria-expanded="${jobsOpen}" aria-controls="nav-jobs">${I.briefcase}<span class="name">Jobs</span><span class="count">${S.ready?jobsSorted().length:''}</span>${I.chev}</button></nav>
+  document.body.classList.toggle('side-mini',!!u.sideMini);
+  const tt=n=>u.sideMini?` title="${n}"`:'';
+  let html=`<button type="button" class="icon-btn side-toggle" data-act="side-mini" aria-label="${u.sideMini?'Expand sidebar':'Collapse sidebar'}" title="${u.sideMini?'Expand sidebar':'Collapse sidebar'}">${I.left}</button><button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Overview">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
+  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview"${tt('Overview')}>${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button>
+  <button class="nav-item jobs-toggle ${jobsOpen?'open':''}"${tt('Jobs')} data-act="toggle-jobs" aria-expanded="${jobsOpen}" aria-controls="nav-jobs">${I.briefcase}<span class="name">Jobs</span><span class="count">${S.ready?jobsSorted().length:''}</span>${I.chev}</button></nav>
   <nav class="nav jobs" id="nav-jobs" aria-label="Jobs" ${jobsOpen?'':'hidden'}>`;
   for(const j of jobsSorted()){
     const on=u.tab===j.id;
-    html+=`<div class="nav-row"><button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}">${jobMark(j,18)}<span class="name">${esc(j.name)}</span><span class="count">${openCount(j.id)}</span></button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.pencil}</button></div>`;
+    html+=`<div class="nav-row" draggable="true" data-job="${j.id}"><button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}" ${u.sideMini?`title="${esc(j.name)}"`:''}>${jobMark(j,18)}<span class="name">${esc(j.name)}</span><span class="count">${openCount(j.id)}</span></button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.pencil}</button></div>`;
   }
-  html+=`<button class="nav-item nav-new" data-act="new-job">${I.plus}<span class="name">New job</span></button></nav>
-  <nav class="nav" aria-label="More"><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item ${u.tab==='activity'?'on':''}" data-act="nav" data-tab="activity">${I.clock}<span class="name">Activity</span></button></nav>
-  <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='db'||B.mode==='cloud'?'<span class="sync-dot"></span>Saved to your account':B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
-    <button class="nav-item foot-settings" data-act="open-settings">${I.gear}<span class="name">Settings</span></button></div>`;
+  html+=`<button class="nav-item nav-new" data-act="new-job"${tt('New job')}>${I.plus}<span class="name">New job</span></button></nav>
+  <nav class="nav" aria-label="More"><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived"${tt('Archived')}>${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item ${u.tab==='activity'?'on':''}" data-act="nav" data-tab="activity"${tt('Activity')}>${I.clock}<span class="name">Activity</span></button><button class="nav-item ${u.tab==='trash'?'on':''}" data-act="nav" data-tab="trash"${tt('Trash')}>${I.trash}<span class="name">Trash</span><span class="count">${S.ready&&trashed().length?trashed().length:''}</span></button></nav>
+  <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='cloud'&&(B.offline||Object.keys(OUT).length)?`<span class="sync-dot local"></span>Offline · ${Object.keys(OUT).length?`${Object.keys(OUT).length} change${Object.keys(OUT).length===1?'':'s'} waiting to sync`:'changes will sync'}`:B.mode==='db'||B.mode==='cloud'?'<span class="sync-dot"></span>Saved to your account':B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
+    <button class="nav-item foot-settings" data-act="open-settings"${tt('Settings')}>${I.gear}<span class="name">Settings</span></button></div>`;
   $('#side').innerHTML=html;
   $('#mbrand').innerHTML=`${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b>`;
 }
@@ -1608,7 +1669,7 @@ function renderMain(){
   const u=S.ui;
   $('#subnav').innerHTML='';
   if(!S.ready){$('#view').innerHTML='<div class="loading">Loading your tasks…</div>';$('#toolbar').hidden=true;return}
-  if(u.tab!=='overview'&&u.tab!=='archived'&&u.tab!=='activity'&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
+  if(u.tab!=='overview'&&u.tab!=='archived'&&u.tab!=='activity'&&u.tab!=='trash'&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
   if(u.client!=='all'&&!S.clients[u.client]) u.client='all';
   const job=u.tab==='overview'?null:S.jobs[u.tab];
 
@@ -1617,6 +1678,7 @@ function renderMain(){
 
   if(u.tab==='archived'){renderArchive();return}
   if(u.tab==='activity'){renderActivity();return}
+  if(u.tab==='trash'){renderTrash();return}
   const scope=tasksOfScope();
   if(!job){
     $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>Overview</h1><div class="sub">${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients${(()=>{const h=jobsSorted().reduce((a,j)=>a+weeklyHours(workOf(j)),0);return h?` · ${fmtNum(h)} h/week scheduled`:''})()} <span class="sub-tail">· everything due across your work</span></div></div>
@@ -1630,7 +1692,7 @@ function renderMain(){
       (cur||paneName)?`<button type="button" data-act="nav" data-tab="${job.id}" data-pane="tasks">${jobMark(job,14)}${esc(job.name)}</button>`:`<span aria-current="page">${jobMark(job,14)}${esc(job.name)}</span>`];
     if(cur)crumbs.push(paneName?`<button type="button" data-act="nav" data-tab="${job.id}" data-client="${cur.id}" data-pane="tasks">${esc(cur.name)}</button>`:`<span aria-current="page">${esc(cur.name)}</span>`);
     if(paneName)crumbs.push(`<span aria-current="page">${paneName}</span>`);
-    $('#head').innerHTML=`<nav class="crumbs" aria-label="Breadcrumb">${crumbs.join('<i aria-hidden="true">›</i>')}</nav><div class="head"><div class="head-title"><h1>${jobMark(job,34)}<span>${esc(job.name)}</span><button class="icon-btn h1-edit" data-act="edit-job" data-id="${job.id}" title="Edit job" aria-label="Edit job">${I.pencil}</button></h1>
+    $('#head').innerHTML=`<nav class="crumbs" aria-label="Breadcrumb">${crumbs.join('<i aria-hidden="true">›</i>')}</nav><div class="head"><div class="head-title"><h1>${jobMark(job,34)}<span>${esc(job.name)}</span><button class="icon-btn h1-edit" data-act="edit-job" data-id="${job.id}" title="Edit job" aria-label="Edit job">${I.pencil}</button><button class="icon-btn h1-edit" data-act="export-csv" data-job="${job.id}" title="Export tasks as CSV" aria-label="Export tasks as CSV">${I.download}</button></h1>
       <div class="sub"><span class="badge">${job.type==='agency'?I.briefcase+'Agency':I.user+'Direct client'}</span>${job.type==='agency'?`<span>${cl.length} client${cl.length===1?'':'s'}</span>`:''}</div></div></div>`;
     $('#subnav').innerHTML=`<div class="pane-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${u.pane==='brand'||u.pane==='details'?'':'on'}" aria-selected="${u.pane!=='brand'&&u.pane!=='details'}" data-act="pane" data-pane="tasks">${I.task}Tasks</button><button role="tab" class="${u.pane==='details'?'on':''}" aria-selected="${u.pane==='details'}" data-act="pane" data-pane="details">${I.info}Details</button><button role="tab" class="${u.pane==='brand'?'on':''}" aria-selected="${u.pane==='brand'}" data-act="pane" data-pane="brand">${I.palette}Brand guide</button></div>
       ${job.type==='agency'?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}`;
@@ -1711,7 +1773,7 @@ const prioHtml=p=>{p=p||'normal';return `<span class="prio ${p}">${p==='normal'?
 const statusSelect=(t,act)=>`<select class="pill" ${pillStyle(stOf(t))} data-act="${act}" data-id="${t.id}" aria-label="Status">${STATUSES.map(s=>`<option value="${s.id}" ${s.id===stOf(t)?'selected':''}>${s.label}</option>`).join('')}</select>`;
 
 const ROW_HEAD=`<div class="row-head"><span></span><span>Task</span><span>Status</span><span class="c-prio">Priority</span><span class="c-start">Start</span><span>Due</span><span>Links</span></div>`;
-const rowHtml=(t,job,showJob)=>`<div class="row ${isClosed(t)?'done-row':''} ${S.ui.openTask===t.id?'focus':''} ${SEL.has(t.id)?'picked':''}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
+const rowHtml=(t,job,showJob)=>`<div class="row ${isClosed(t)?'done-row':''} ${S.ui.openTask===t.id?'focus':''} ${SEL.has(t.id)?'picked':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="mark-wrap">${taskMark(t)}${selBox(t)}</div>
         <div class="t-main"><div class="t-name" title="Double-click to rename">${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${esc(t.name||'Untitled task')}</div>${metaLine(t,job,showJob)}</div>
         <div class="c-status" data-stop>${statusSelect(t,'row-status')}${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
@@ -1741,7 +1803,7 @@ function boardView(list,job){
   return `<div class="board-wrap"><div class="board">${STATUSES.map(s=>{
     const cards=list.filter(t=>stOf(t)===s.id);
     return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill" ${pillStyle(s.id)}><span class="pl">${esc(s.label)}</span></span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
-      ${cards.map(t=>`<div class="card ${SEL.has(t.id)?'picked':''}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
+      ${cards.map(t=>`<div class="card ${SEL.has(t.id)?'picked':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="card-top"><div class="mark-wrap">${taskMark(t)}${selBox(t)}</div><div class="t-name" title="Double-click to rename">${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${esc(t.name||'Untitled task')}</div></div>${metaLine(t,job,!job)}
         <div class="card-foot"><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):'No date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
       </div>`;
@@ -1987,14 +2049,14 @@ const MODKEY=IS_MAC?'⌘K':'Ctrl K';
 function jumpItems(q){
   q=q.trim().toLowerCase();
   const out=[],score=(txt)=>{txt=(txt||'').toLowerCase();if(!q)return 1;const i=txt.indexOf(q);return i<0?0:i===0?3:(txt[i-1]===' '?2:1)};
-  const pages=[['overview','Overview',I.grid],['activity','Activity',I.clock],['archived','Archived',I.archive]];
+  const pages=[['overview','Overview',I.grid],['activity','Activity',I.clock],['archived','Archived',I.archive],['trash','Trash',I.trash]];
   for(const [id,l,ic] of pages){const sc=score(l);if(sc)out.push({sc:sc+.5,icon:ic,label:l,sub:'Page',act:'nav',tab:id})}
   if(!q){(S.ui.recent||[]).map(id=>S.tasks[id]).filter(t=>t&&!t._draft).forEach((t,k)=>out.push({sc:10-k*.1,icon:`<span class="jdot" ${pillStyle(stOf(t))}></span>`,label:t.name||'Untitled task',sub:['Recent',S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '),act:'open',id:t.id}))}
   if(!q||score('new task'))out.push({sc:q?3:.9,icon:I.plus,label:'New task',sub:'Action',act:'new-task'});
   if(q&&score('settings'))out.push({sc:3,icon:I.gear,label:'Settings',sub:'Action',act:'open-settings'});
   for(const j of jobsSorted()){const sc=score(j.name);if(sc)out.push({sc:sc+.4,icon:jobMark(j,16),label:j.name,sub:j.type==='agency'?'Agency':'Direct client',act:'nav',tab:j.id})}
   for(const c of Object.values(S.clients)){const sc=score(c.name);if(sc)out.push({sc:sc+.3,icon:clientMark(c,16),label:c.name,sub:`Client · ${S.jobs[c.jobId]?.name||''}`,act:'nav',tab:c.jobId,client:c.id})}
-  if(q)for(const t of Object.values(S.tasks)){if(t._draft)continue;const sc=Math.max(score(t.name),score(S.clients[t.clientId]?.name)*.6);if(sc)out.push({sc:sc+(t.archived?0:isClosed(t)?.05:.2),icon:`<span class="jdot" ${pillStyle(stOf(t))}></span>`,label:t.name||'Untitled task',sub:[S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name,t.archived?'Archived':stLabel(stOf(t))].filter(Boolean).join(' · '),act:'open',id:t.id})}
+  if(q)for(const t of Object.values(S.tasks)){if(t._draft||t.deleted)continue;const sc=Math.max(score(t.name),score(S.clients[t.clientId]?.name)*.6);if(sc)out.push({sc:sc+(t.archived?0:isClosed(t)?.05:.2),icon:`<span class="jdot" ${pillStyle(stOf(t))}></span>`,label:t.name||'Untitled task',sub:[S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name,t.archived?'Archived':stLabel(stOf(t))].filter(Boolean).join(' · '),act:'open',id:t.id})}
   return out.sort((a,b)=>b.sc-a.sc).slice(0,12);
 }
 function focusSearch(){const q=$('#q'),ts=$('#top-search');if(q&&ts&&!ts.hidden&&q.offsetParent){q.focus();q.select()}else openJump()}
@@ -2014,7 +2076,7 @@ function renderJump(){
 }
 function jumpGo(k){
   const x=JUMP?.items?.[k];closeJump();if(!x)return;const u=S.ui;
-  if(x.act==='nav'){if(x.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity'].includes(u.tab))u.from=u.tab}u.tab=x.tab;u.client=x.client||'all';saveUi();render();window.scrollTo({top:0});closeSide()}
+  if(x.act==='nav'){if(x.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash'].includes(u.tab))u.from=u.tab}u.tab=x.tab;u.client=x.client||'all';saveUi();render();window.scrollTo({top:0});closeSide()}
   else if(x.act==='open')openTask(x.id);
   else if(x.act==='new-task'){const id=newTask();if(id){openTask(id);setTimeout(()=>$('.d-name')?.focus(),30)}}
   else if(x.act==='open-settings')openSettings();
@@ -2032,6 +2094,7 @@ function renderDrawer(){
     ${t._draft?'':`<button class="icon-btn ${t.pinned?'pin-on':''}" data-act="d-pin" aria-pressed="${!!t.pinned}" aria-label="${t.pinned?'Unpin':'Pin to the top'}" title="${t.pinned?'Unpin':'Pin to the top of the Overview'}">${I.pin}</button><button class="icon-btn" data-act="d-duplicate" aria-label="Duplicate task" title="Duplicate (make a copy to edit)">${I.copy}</button>`}<button class="icon-btn" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
   ${t._draft?'':`<div class="d-tabs" role="tablist"><button role="tab" data-act="d-tab" data-tab="details" class="${S.ui.dtab!=='activity'?'on':''}" aria-selected="${S.ui.dtab!=='activity'}">${I.info}Details</button><button role="tab" data-act="d-tab" data-tab="activity" class="${S.ui.dtab==='activity'?'on':''}" aria-selected="${S.ui.dtab==='activity'}">${I.clock}Activity<span class="mono">${taskActivity(t).length}</span></button></div>`}
   ${!t._draft&&S.ui.dtab==='activity'?activityPane(t):`  <div class="d-body">
+    ${t.deleted?`<div class="d-archived">${I.trash}<span><b>In Trash</b> since ${fmtDate(t.deletedAt)}. It's deleted for good after ${TRASH_DAYS} days.</span><button class="btn sm" data-act="trash-restore" data-id="${t.id}">Restore</button></div>`:''}
     ${t.archived?`<div class="d-archived">${I.archive}<span><b>Archived</b>${t.archivedAt?' '+fmtDate(t.archivedAt):''}. Hidden from Overview and job tabs.</span><button class="btn sm" data-act="restore" data-id="${t.id}">Restore</button></div>`:''}
     <textarea class="d-name" rows="1" data-field="name" data-fk="d-name" aria-label="Task name" placeholder="Task name">${esc(t.name)}</textarea>
     ${(()=>{
@@ -2060,7 +2123,7 @@ function renderDrawer(){
       <form class="check-add" data-act="check-add">${I.plus}<input data-fk="ck-new" placeholder="Add a step (rough cut, captions, color…)" aria-label="Add checklist item"></form></div></div>
     <div><h4 class="section-title">Notes</h4><textarea class="notes" data-field="notes" data-fk="d-notes" placeholder="Brief, feedback, music choices, specs…">${esc(t.notes||'')}</textarea></div>
     ${t._draft?`<div class="d-foot d-save"><button class="btn" data-act="drawer-close">Cancel</button><button class="btn primary" data-act="save-draft">${I.plus}Save task</button></div>`:`<div class="d-foot"><span>${t.created?'Created '+fmtDate(ymd(new Date(t.created))):''}${t.doneAt?' · Done '+fmtDate(t.doneAt):''}</span>
-      <span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" data-act="d-duplicate">${I.copy}Duplicate</button>${isClosed(t)&&!t.archived?`<button class="btn sm" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}<button class="btn sm danger ${deleteArmed?'armed':''}" data-act="delete-task">${I.trash}${deleteArmed?'Click again to delete':'Delete task'}</button></span></div>`}
+      <span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" data-act="d-duplicate">${I.copy}Duplicate</button>${isClosed(t)&&!t.archived?`<button class="btn sm" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}<button class="btn sm danger ${deleteArmed?'armed':''}" data-act="delete-task">${I.trash}${deleteArmed?'Click again to move to Trash':'Delete task'}</button></span></div>`}
   </div>`}`});
   autosize($('.d-name'));
 }
@@ -2083,14 +2146,57 @@ function undoStatus(list){
   for(const [id,prev] of list){const t=S.tasks[id];if(!t)continue;logAct('status',`${stLabel(t.status)} → ${stLabel(prev.status)} (undone)`,{task:t});patch('tasks',id,{status:prev.status,revision:prev.revision,doneAt:prev.doneAt})}
   render();if(S.ui.openTask)renderDrawer();
 }
-/* Deletes can be undone too: the task comes back whole, with the same id. */
+/* Deleting moves tasks to the Trash (deleted:true) for 30 days; Undo or the Trash page brings them back. */
 function deleteTasks(ids){
-  const snaps=ids.map(id=>S.tasks[id]).filter(t=>t&&!t._draft).map(t=>JSON.parse(JSON.stringify(t)));if(!snaps.length)return;
-  for(const t of snaps){logAct('delete','Deleted',{task:t});if(S.ui.openTask===t.id)closeDrawer();SEL.delete(t.id);remove('tasks',t.id)}
+  const ts=ids.map(id=>S.tasks[id]).filter(t=>t&&!t._draft&&!t.deleted);if(!ts.length)return;
+  const at=today();
+  for(const t of ts){logAct('delete','Moved to Trash',{task:t});if(S.ui.openTask===t.id)closeDrawer();SEL.delete(t.id);patch('tasks',t.id,{deleted:true,deletedAt:at})}
   render();
-  let undone=false;
-  toast(snaps.length===1?`Deleted “${snaps[0].name||'task'}”`:`Deleted ${snaps.length} tasks`,{label:'Undo',fn:()=>{undone=true;for(const t of snaps){const {id,...data}=t;create('tasks',data,id);logAct('restore','Restored after delete',{task:t})}render()}});
-  setTimeout(()=>{if(!undone)snaps.forEach(dropTaskPicture)},8000);
+  toast(ts.length===1?`Moved “${ts[0].name||'task'}” to Trash`:`Moved ${ts.length} tasks to Trash`,{label:'Undo',fn:()=>restoreTrash(ts.map(t=>t.id),true)});
+}
+function restoreTrash(ids,quiet){
+  ids.forEach(id=>{const t=S.tasks[id];if(t&&t.deleted){patch('tasks',id,{deleted:false,deletedAt:null});logAct('restore','Restored from Trash',{task:t})}});
+  render();if(!quiet)toast(ids.length===1?`Restored “${S.tasks[ids[0]]?.name||'task'}”`:`Restored ${ids.length} tasks`);
+}
+function purgeTasks(ids){ids.forEach(id=>{const t=S.tasks[id];if(!t)return;dropTaskPicture(t);remove('tasks',id)})}
+function purgeOldTrash(){const cut=new Date();cut.setDate(cut.getDate()-TRASH_DAYS);const c=ymd(cut);purgeTasks(Object.values(S.tasks).filter(t=>t.deleted&&(t.deletedAt||'')<c).map(t=>t.id))}
+let trashArmed=null;
+/* CSV export in the layout of the user's own tracker sheet (no Notes column):
+   a title row, headers, then month rows (by date assigned) with that month's tasks under them. */
+function exportCSV(jobId){
+  const all=jobId==='all',job=S.jobs[jobId],tl=job?.tools||{};
+  const ts=Object.values(S.tasks).filter(t=>!t._draft&&!t.deleted&&S.jobs[t.jobId]&&(all||t.jobId===jobId));
+  if(!ts.length){toast('No tasks to export yet');return}
+  const assigned=t=>t.start||(t.created?ymd(new Date(t.created)):'');
+  ts.sort((a,b)=>(assigned(a)||'9999').localeCompare(assigned(b)||'9999')||(a.name||'').localeCompare(b.name||''));
+  const us=d=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(d||''))return '';const [y,m,dd]=d.split('-');return `${m}/${dd}/${y}`};
+  const years=new Set(ts.map(t=>assigned(t).slice(0,4)).filter(Boolean));
+  const head=[...(all?['Job']:[]),'Client','Reel Title','No of Drafts','Date Assigned','Deadline','Status',all?'Storage link':(tl.storage||'Storage'),all?'Task link':(tl.tracker&&tl.tracker!=='None'?tl.tracker:'Task link'),all?'Review link':(tl.upload||'Review link')];
+  const rows=[[`${all?'All jobs':job.name} Task Tracker`],head];let mo=null;
+  for(const t of ts){
+    const a=assigned(t),k=a.slice(0,7)||'none';
+    if(k!==mo){mo=k;rows.push([k==='none'?'NO DATE':MONTH_FULL[+k.slice(5,7)-1].toUpperCase()+(years.size>1?' '+k.slice(0,4):'')])}
+    const j=S.jobs[t.jobId],cl=S.clients[t.clientId];
+    rows.push([...(all?[j.name]:[]),cl?cl.name:(j.type==='agency'?'':j.name),t.name||'',t.revision||'',us(a),us(t.due),stLabel(stOf(t)),t.links?.file||'',t.links?.task||'',t.links?.upload||'']);
+  }
+  const csv='\ufeff'+rows.map(r=>r.map(v=>{v=String(v??'');return /[",\n]/.test(v)?`"${v.replace(/"/g,'""')}"`:v}).join(',')).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download=`${(all?'all-jobs':job.name).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}-task-tracker-${today()}.csv`;
+  document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
+  toast(`Exported ${ts.length} task${ts.length===1?'':'s'}`);
+}
+function renderTrash(){
+  const all=trashed().sort((a,b)=>(b.deletedAt||'').localeCompare(a.deletedAt||''));
+  $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${I.trash.replace('class="i"','class="i" style="width:28px;height:28px"')}Trash</h1><div class="sub">${all.length} task${all.length===1?'':'s'} · deleted tasks stay here for ${TRASH_DAYS} days, then they're gone for good.</div></div></div>`;
+  $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
+  if(!all.length){$('#view').innerHTML=`<div class="empty"><h3>Trash is empty</h3><p>Deleted tasks land here, so you can bring them back for ${TRASH_DAYS} days.</p></div>`;return}
+  const left=t=>{const d=TRASH_DAYS-diffDays(today(),t.deletedAt||today());return d<=0?'today':d===1?'in 1 day':`in ${d} days`};
+  $('#view').innerHTML=`<div class="arch-bar"><span class="spacer" style="flex:1"></span><button class="btn sm danger ${trashArmed==='all'?'armed':''}" data-act="trash-empty">${I.trash}${trashArmed==='all'?'Click again to delete everything':'Empty Trash'}</button></div>
+    <div class="rows">${all.map(t=>`<div class="arow" data-act="open" data-id="${t.id}" tabindex="0">${taskMark(t)}
+      <div class="t-main"><div class="t-name">${esc(t.name||'Untitled task')}</div>${metaLine(t,null,true)}</div>
+      <div class="date"><small>Deleted</small>${t.deletedAt?fmtDate(t.deletedAt):'—'}</div>
+      <div class="date"><small>Gone</small>${left(t)}</div>
+      <div class="acts"><button class="btn sm" data-act="trash-restore" data-id="${t.id}">Restore</button><button class="btn sm danger ${trashArmed===t.id?'armed':''}" data-act="trash-purge" data-id="${t.id}">${trashArmed===t.id?'Click again':'Delete for good'}</button></div></div>`).join('')}</div>`;
 }
 function newTask(opts={}){
   const u=S.ui;
@@ -2726,7 +2832,8 @@ function finderSettingsHtml(){
 }
 function backupSettingsHtml(){
   const r=SM.restore;
-  return `<div class="field"><span class="lbl">Backup</span>
+  return `<div class="field"><span class="lbl">Export tasks as a spreadsheet</span><div class="acct-btns"><select class="sel" id="csv-job" aria-label="Which job"><option value="all">All jobs</option>${jobsSorted().map(j=>`<option value="${j.id}">${esc(j.name)}</option>`).join('')}</select><button type="button" class="btn sm" data-act="export-csv">${I.download}Export CSV</button></div><p class="hint">Same layout as a task tracker sheet: client, title, drafts (revision rounds), date assigned, deadline, status and the storage, task and review links, grouped by month. Opens in Excel, Numbers or Google Sheets.</p></div>
+  <div class="field"><span class="lbl">Backup</span>
     <div class="acct-btns"><button type="button" class="btn sm" data-act="backup-download">${I.download}Download backup</button><button type="button" class="btn sm" data-act="backup-pick">${I.upload}Restore from a backup…</button></div>
     ${r?`<div class="restore-box"><p class="acct-line"><b>${esc(r.name)}</b>${r.date?` · saved ${esc(fmtDate(ymd(new Date(r.date))))}`:''}<br>${r.counts.jobs} jobs, ${r.counts.clients} clients and ${r.counts.tasks} tasks. Restoring adds back anything missing and sets items that are in both back to the backup's version. Nothing else is deleted.</p>
       <div class="acct-btns"><button type="button" class="btn sm primary" data-act="backup-restore">Restore now</button><button type="button" class="btn sm ghost" data-act="backup-cancel">Cancel</button></div></div>`
@@ -2831,7 +2938,7 @@ document.addEventListener('click',e=>{
   if(a!=='cal-disconnect'&&CAL.disArmed){CAL.disArmed=false;if(SM)renderSettings()}
   if(SM&&SM.stArm&&!/^st-(del|del-go)$/.test(a)&&!el.closest('.st-del-box')){SM.stArm=null;renderSettings()}
   switch(a){
-    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';saveUi();render();window.scrollTo({top:0});break;
+    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';saveUi();render();window.scrollTo({top:0});break;
     case 'view': u.view=el.dataset.view;saveUi();render();break;
     case 'log-more': u.lmore=(u.lmore||200)+200;render();break;
     case 'bell': notesOpen=!notesOpen;if(notesOpen)saveNotes();renderBell();break;
@@ -2870,6 +2977,11 @@ document.addEventListener('click',e=>{
     case 'd-tab': S.ui.dtab=el.dataset.tab;noteDelArmed=null;renderDrawer();$('#drawer').scrollTop=0;if(S.ui.dtab==='details')autosize($('.d-name'));break;
     case 'note-post': postNote();break;
     case 'd-duplicate': duplicateTask(u.openTask);break;
+    case 'export-csv': exportCSV(el.dataset.job||($('#csv-job')?.value)||'all');break;
+    case 'side-mini': u.sideMini=!u.sideMini;saveUi();render();break;
+    case 'trash-restore': trashArmed=null;restoreTrash([el.dataset.id]);break;
+    case 'trash-purge': if(trashArmed!==el.dataset.id){trashArmed=el.dataset.id;render();break}trashArmed=null;purgeTasks([el.dataset.id]);render();toast('Deleted for good');break;
+    case 'trash-empty': if(trashArmed!=='all'){trashArmed='all';render();break}{const ids=trashed().map(t=>t.id);trashArmed=null;purgeTasks(ids);render();toast(`Deleted ${ids.length} task${ids.length===1?'':'s'} for good`)}break;
     case 'd-pin':case 'unpin':{const id=el.dataset.id||u.openTask,t=S.tasks[id];if(!t)break;const on=a==='unpin'?false:!t.pinned;patch('tasks',id,{pinned:on});logAct('edit',on?'Pinned':'Unpinned',{task:t});render();if(u.openTask===id)renderDrawer();toast(on?'Pinned to the top':'Unpinned');break}
     case 'jump': openJump();break;
     case 'sel':{const id=el.dataset.id;
@@ -2979,6 +3091,7 @@ document.addEventListener('click',e=>{
   }
   if(a!=='delete-task'&&deleteArmed&&$('#drawer').contains(el)){deleteArmed=false;renderDrawer()}
   if(a!=='bulk-delete'&&bulkDelArmed){bulkDelArmed=false;renderBulk()}
+  if(trashArmed&&!/^trash-(purge|empty)$/.test(a)){trashArmed=null;if(u.tab==='trash')render()}
 });
 document.addEventListener('keydown',e=>{
   if((e.metaKey||e.ctrlKey)&&!e.altKey&&e.key.toLowerCase()==='k'&&S.ready){e.preventDefault();JUMP?closeJump():openJump();return}
@@ -3103,7 +3216,14 @@ function dropOrder(zone,id,targetId,after){
   ids.forEach((x,i)=>{const t=S.tasks[x];if(t&&t.order!==(i+1)*1000)patch('tasks',x,{order:(i+1)*1000})});
   if(S.ui.sort!=='manual'){S.ui.sort='manual';saveUi();toast('Sorted by your own order now. Change it any time in Sort.')}
 }
-document.addEventListener('dragstart',e=>{const c=e.target.closest?.('.card,.row[draggable]');if(!c)return;dragId=c.dataset.id;c.classList.add('dragging');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',dragId)}catch(x){}});
+let jobDrag=null;
+function jobDropMark(e){document.querySelectorAll('.nav-row.drop-before,.nav-row.drop-after').forEach(x=>x.classList.remove('drop-before','drop-after'));const r=e.target.closest?.('.nav-row[data-job]');if(!r||r.dataset.job===jobDrag)return null;const b=r.getBoundingClientRect(),after=e.clientY>b.top+b.height/2;r.classList.add(after?'drop-after':'drop-before');return {id:r.dataset.job,after}}
+document.addEventListener('dragstart',e=>{const jr=e.target.closest?.('.nav-row[data-job]');if(jr){jobDrag=jr.dataset.job;jr.classList.add('dragging');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',jobDrag)}catch(x){}return}});
+document.addEventListener('dragover',e=>{if(jobDrag&&e.target.closest?.('#nav-jobs')){e.preventDefault();jobDropMark(e)}});
+document.addEventListener('drop',e=>{if(!jobDrag)return;const m=jobDropMark(e);document.querySelectorAll('.nav-row').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'));const id=jobDrag;jobDrag=null;if(!m)return;e.preventDefault();
+  const ids=jobsSorted().map(j=>j.id).filter(x=>x!==id);ids.splice(ids.indexOf(m.id)+(m.after?1:0),0,id);ids.forEach((x,i)=>{if(S.jobs[x].order!==i)patch('jobs',x,{order:i})});render()});
+document.addEventListener('dragend',()=>{if(jobDrag){jobDrag=null;document.querySelectorAll('.nav-row').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'))}});
+document.addEventListener('dragstart',e=>{if(jobDrag)return;const c=e.target.closest?.('.card,.row[draggable]');if(!c)return;dragId=c.dataset.id;c.classList.add('dragging');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',dragId)}catch(x){}});
 document.addEventListener('dragend',e=>{e.target.classList?.remove('dragging');document.querySelectorAll('.col.drag,.group.drag').forEach(c=>c.classList.remove('drag'));clearDropMark();dragId=null});
 document.addEventListener('dragover',e=>{
   const col=e.target.closest?.('[data-drop]');
@@ -3123,6 +3243,7 @@ document.addEventListener('drop',e=>{
 setInterval(()=>{if(S.ready&&!document.hidden&&$('#modal').hidden)scheduleRender()},60000);
 document.addEventListener('toggle',e=>{if(e.target.classList?.contains('d-brand')){S.ui.brandTaskOpen=e.target.open;saveUi()}},true);
 placeTopRight();
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('/sw.js').catch(()=>{});
 boot();
 })();
 </script>
