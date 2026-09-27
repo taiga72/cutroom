@@ -924,31 +924,11 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .wc-st{font-size:calc(11px*var(--ts));font-weight:600;color:color-mix(in srgb,var(--c) 80%,var(--text))}
 .wcard.is-done{opacity:.55}
 .wd-empty{color:var(--faint);font-size:calc(12px*var(--ts))}
-/* monthly summary */
-.sum-stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:18px}
-.sum-job{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:14px 16px;margin-bottom:12px}
-.sum-job h3{display:flex;align-items:center;gap:8px;margin:0 0 10px;font:700 calc(16px*var(--ts)) var(--display)}
-.sum-job h3 .count{margin-left:auto;font:500 calc(12px*var(--ts)) var(--mono);color:var(--faint)}
-.sum-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.sum-grid > div{display:flex;flex-direction:column;gap:1px}
-.sum-grid small{font-size:calc(10.5px*var(--ts));font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
-.sum-grid b{font:700 calc(18px*var(--ts)) var(--display)}
-.sum-grid span{font-size:calc(12px*var(--ts));color:var(--muted)}
-.sum-grid span.over{color:var(--danger)}
-.sum-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:calc(13px*var(--ts))}
-.sum-table th{text-align:left;font-size:calc(10.5px*var(--ts));font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);padding:6px 8px;border-bottom:1px solid var(--line)}
-.sum-table td{padding:6px 8px;border-bottom:1px solid var(--line)}
-.sum-table td:first-child{display:flex;align-items:center;gap:6px}
-.sum-table tr:last-child td{border-bottom:0}
-.sum-list{margin-top:10px}
-.sum-list summary{cursor:pointer;color:var(--muted);font-size:calc(13px*var(--ts))}
-.sum-list .lrow{padding:6px 4px}
 @media (max-width:820px){
   .week{grid-template-columns:minmax(0,1fr);gap:6px}
   .wday{min-height:0;flex-direction:row;flex-wrap:wrap;align-items:flex-start}
   .wd-head{width:100%}
   .wcard{flex:1 1 100%}
-  .sum-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .pin-list{grid-template-columns:minmax(0,1fr)}
   .pin-card{grid-template-columns:auto minmax(0,1fr) auto auto}
   .pin-card .pill{display:none}
@@ -1609,7 +1589,7 @@ function renderSide(){
   const allOpen=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)).length;
   const app=appSettings();const appLogo=imgSrc(app.logo);
   let html=`<button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Overview">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
-  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item ${u.tab==='activity'?'on':''}" data-act="nav" data-tab="activity">${I.clock}<span class="name">Activity</span></button><button class="nav-item ${u.tab==='summary'?'on':''}" data-act="nav" data-tab="summary">${I.chart}<span class="name">Monthly summary</span></button>
+  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview">${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button>
   <button class="nav-item jobs-toggle ${jobsOpen?'open':''}" data-act="toggle-jobs" aria-expanded="${jobsOpen}" aria-controls="nav-jobs">${I.briefcase}<span class="name">Jobs</span><span class="count">${S.ready?jobsSorted().length:''}</span>${I.chev}</button></nav>
   <nav class="nav jobs" id="nav-jobs" aria-label="Jobs" ${jobsOpen?'':'hidden'}>`;
   for(const j of jobsSorted()){
@@ -1617,6 +1597,7 @@ function renderSide(){
     html+=`<div class="nav-row"><button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}">${jobMark(j,18)}<span class="name">${esc(j.name)}</span><span class="count">${openCount(j.id)}</span></button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.pencil}</button></div>`;
   }
   html+=`<button class="nav-item nav-new" data-act="new-job">${I.plus}<span class="name">New job</span></button></nav>
+  <nav class="nav" aria-label="More"><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived">${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item ${u.tab==='activity'?'on':''}" data-act="nav" data-tab="activity">${I.clock}<span class="name">Activity</span></button></nav>
   <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='db'||B.mode==='cloud'?'<span class="sync-dot"></span>Saved to your account':B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
     <button class="nav-item foot-settings" data-act="open-settings">${I.gear}<span class="name">Settings</span></button></div>`;
   $('#side').innerHTML=html;
@@ -1627,7 +1608,7 @@ function renderMain(){
   const u=S.ui;
   $('#subnav').innerHTML='';
   if(!S.ready){$('#view').innerHTML='<div class="loading">Loading your tasks…</div>';$('#toolbar').hidden=true;return}
-  if(u.tab!=='overview'&&u.tab!=='archived'&&u.tab!=='activity'&&u.tab!=='summary'&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
+  if(u.tab!=='overview'&&u.tab!=='archived'&&u.tab!=='activity'&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
   if(u.client!=='all'&&!S.clients[u.client]) u.client='all';
   const job=u.tab==='overview'?null:S.jobs[u.tab];
 
@@ -1636,7 +1617,6 @@ function renderMain(){
 
   if(u.tab==='archived'){renderArchive();return}
   if(u.tab==='activity'){renderActivity();return}
-  if(u.tab==='summary'){renderSummary();return}
   const scope=tasksOfScope();
   if(!job){
     $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>Overview</h1><div class="sub">${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients${(()=>{const h=jobsSorted().reduce((a,j)=>a+weeklyHours(workOf(j)),0);return h?` · ${fmtNum(h)} h/week scheduled`:''})()} <span class="sub-tail">· everything due across your work</span></div></div>
@@ -1644,7 +1624,7 @@ function renderMain(){
   }else{
     const cl=clientsOf(job.id);
 
-    const from=u.from==='archived'?['archived','Archived',I.archive]:u.from==='activity'?['activity','Activity',I.clock]:u.from==='summary'?['summary','Monthly summary',I.chart]:['overview','Overview',I.grid],cur=u.client!=='all'&&S.clients[u.client];
+    const from=u.from==='archived'?['archived','Archived',I.archive]:u.from==='activity'?['activity','Activity',I.clock]:['overview','Overview',I.grid],cur=u.client!=='all'&&S.clients[u.client];
     const paneName={details:'Details',brand:'Brand guide'}[u.pane];
     const crumbs=[`<button type="button" data-act="nav" data-tab="${from[0]}">${from[2]}${from[1]}</button>`,
       (cur||paneName)?`<button type="button" data-act="nav" data-tab="${job.id}" data-pane="tasks">${jobMark(job,14)}${esc(job.name)}</button>`:`<span aria-current="page">${jobMark(job,14)}${esc(job.name)}</span>`];
@@ -1890,37 +1870,6 @@ function logRow(e,showTask=true){
     <div class="l-main">${showTask&&e.task?`<b>${esc(e.task)}</b>`:''}<span>${esc(e.text)}</span>${showTask&&j?`<small>${jobMark(j,12)}${esc(j.name)}</small>`:''}</div>
     <time datetime="${esc(e.at)}">${fmtTime(e.at)}</time></div>`;
 }
-/* Monthly summary: per job, what was delivered in the month (doneAt), on time vs due, turnaround and revision rounds. */
-function monthStats(tasks,mo){
-  const done=tasks.filter(t=>t.doneAt&&t.doneAt.slice(0,7)===mo);
-  const withDue=done.filter(t=>t.due),onTime=withDue.filter(t=>t.doneAt<=t.due).length;
-  const turn=done.filter(t=>t.created).map(t=>Math.max(0,diffDays(t.doneAt,ymd(new Date(t.created)))));
-  const revs=done.map(t=>t.revision||0);
-  return {done:done.length,onTime,withDue:withDue.length,turn:turn.length?turn.reduce((a,b)=>a+b,0)/turn.length:null,revAvg:revs.length?revs.reduce((a,b)=>a+b,0)/revs.length:null,revMax:revs.length?Math.max(...revs):0,list:done};
-}
-function renderSummary(){
-  const u=S.ui,mo=u.smonth||today().slice(0,7),[y,m]=mo.split('-').map(Number),cur=mo===today().slice(0,7);
-  const all=Object.values(S.tasks).filter(t=>!t._draft&&S.jobs[t.jobId]);
-  $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${I.chart.replace('class="i"','class="i" style="width:28px;height:28px"')}Monthly summary</h1><div class="sub">What you delivered per job, counted by the day each task was marked Done.</div></div></div>`;
-  $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
-  const tot=monthStats(all,mo),fmt1=v=>v==null?'—':fmtNum(Math.round(v*10)/10);
-  const pct=(a,b)=>b?Math.round(a/b*100)+'%':'—';
-  let html=`<div class="cal-bar sum-bar"><h2>${MONTH_FULL[m-1]} ${y}</h2><button class="icon-btn" data-act="smonth" data-step="-1" aria-label="Previous month">${I.left}</button><button class="btn sm" data-act="smonth" data-step="0">This month</button><button class="icon-btn" data-act="smonth" data-step="1" aria-label="Next month">${I.left.replace('<svg','<svg style="transform:scaleX(-1)"')}</button></div>
-    <div class="stats sum-stats"><div class="stat"><small>Delivered</small><b>${tot.done}</b></div><div class="stat"><small>On time</small><b>${pct(tot.onTime,tot.withDue)}</b></div><div class="stat"><small>Avg. turnaround</small><b>${tot.turn==null?'—':fmt1(tot.turn)+' d'}</b></div><div class="stat"><small>Avg. revision rounds</small><b>${fmt1(tot.revAvg)}</b></div></div>`;
-  for(const j of jobsSorted()){
-    const jt=all.filter(t=>t.jobId===j.id),st=monthStats(jt,mo),w=workOf(j),pay=parseFloat(w.pay?.amount);
-    const openNow=cur?jt.filter(t=>!t.archived&&!isClosed(t)).length:null,overNow=cur?jt.filter(t=>!t.archived&&!isClosed(t)&&t.due&&t.due<today()).length:null;
-    const perVideo=w.pay?.period==='month'&&pay&&st.done?`${w.pay.currency||''} ${fmtNum(Math.round(pay/st.done))}`:'';
-    const cls=j.type==='agency'?clientsOf(j.id).map(c=>({c,s:monthStats(jt.filter(t=>t.clientId===c.id),mo)})).filter(x=>x.s.done):[];
-    html+=`<section class="sum-job"><h3>${jobMark(j,22)}${esc(j.name)}<span class="count">${st.done} delivered</span></h3>
-      <div class="sum-grid"><div><small>Delivered</small><b>${st.done}</b></div><div><small>On time</small><b>${pct(st.onTime,st.withDue)}</b>${st.withDue?`<span>${st.onTime} of ${st.withDue} with a due date</span>`:''}</div><div><small>Avg. turnaround</small><b>${st.turn==null?'—':fmt1(st.turn)+' days'}</b><span>created → done</span></div><div><small>Revision rounds</small><b>${fmt1(st.revAvg)}</b>${st.done?`<span>avg · most R${st.revMax}</span>`:''}</div>${cur?`<div><small>Open now</small><b>${openNow}</b>${overNow?`<span class="over">${overNow} overdue</span>`:''}</div>`:''}${perVideo?`<div><small>Pay per video</small><b>${esc(perVideo)}</b><span>${esc(payLabel(w.pay))} ÷ ${st.done} delivered</span></div>`:''}</div>
-      ${cls.length?`<table class="sum-table"><thead><tr><th>Client</th><th>Delivered</th><th>On time</th><th>Avg. revisions</th></tr></thead><tbody>${cls.map(({c,s})=>`<tr><td>${clientMark(c,16)}${esc(c.name)}</td><td>${s.done}</td><td>${pct(s.onTime,s.withDue)}</td><td>${fmt1(s.revAvg)}</td></tr>`).join('')}</tbody></table>`:''}
-      ${st.done?`<details class="sum-list"><summary>Show the ${st.done} task${st.done===1?'':'s'}</summary>${st.list.sort((a,b)=>a.doneAt.localeCompare(b.doneAt)).map(t=>`<div class="lrow link" data-act="open" data-id="${t.id}" tabindex="0"><span class="l-ic k-create">${I.task}</span><div class="l-main"><b>${esc(t.name||'Untitled task')}</b><span>${esc(S.clients[t.clientId]?.name||'')}${t.revision?` · R${t.revision}`:''}${t.due?` · due ${fmtDate(t.due)}`:''}</span></div><time>${fmtDate(t.doneAt)}</time></div>`).join('')}</details>`:''}
-    </section>`;
-  }
-  if(!tot.done)html+=`<p class="hint" style="margin-top:12px">Nothing was marked Done in ${MONTH_FULL[m-1]}${cur?' yet':''}.</p>`;
-  $('#view').innerHTML=html;
-}
 function renderActivity(){
   const u=S.ui,q=(u.lq||'').trim().toLowerCase(),all=logItems();
   $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${I.clock.replace('class="i"','class="i" style="width:28px;height:28px"')}Activity</h1><div class="sub">What changed in your tracker, newest first. Kept for ${LOG_MONTHS} months.</div></div></div>`;
@@ -2038,7 +1987,7 @@ const MODKEY=IS_MAC?'⌘K':'Ctrl K';
 function jumpItems(q){
   q=q.trim().toLowerCase();
   const out=[],score=(txt)=>{txt=(txt||'').toLowerCase();if(!q)return 1;const i=txt.indexOf(q);return i<0?0:i===0?3:(txt[i-1]===' '?2:1)};
-  const pages=[['overview','Overview',I.grid],['activity','Activity',I.clock],['summary','Monthly summary',I.chart],['archived','Archived',I.archive]];
+  const pages=[['overview','Overview',I.grid],['activity','Activity',I.clock],['archived','Archived',I.archive]];
   for(const [id,l,ic] of pages){const sc=score(l);if(sc)out.push({sc:sc+.5,icon:ic,label:l,sub:'Page',act:'nav',tab:id})}
   if(!q){(S.ui.recent||[]).map(id=>S.tasks[id]).filter(t=>t&&!t._draft).forEach((t,k)=>out.push({sc:10-k*.1,icon:`<span class="jdot" ${pillStyle(stOf(t))}></span>`,label:t.name||'Untitled task',sub:['Recent',S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '),act:'open',id:t.id}))}
   if(!q||score('new task'))out.push({sc:q?3:.9,icon:I.plus,label:'New task',sub:'Action',act:'new-task'});
@@ -2881,7 +2830,7 @@ document.addEventListener('click',e=>{
   if(a!=='cal-disconnect'&&CAL.disArmed){CAL.disArmed=false;if(SM)renderSettings()}
   if(SM&&SM.stArm&&!/^st-(del|del-go)$/.test(a)&&!el.closest('.st-del-box')){SM.stArm=null;renderSettings()}
   switch(a){
-    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','summary'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';saveUi();render();window.scrollTo({top:0});break;
+    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';saveUi();render();window.scrollTo({top:0});break;
     case 'view': u.view=el.dataset.view;saveUi();render();break;
     case 'log-more': u.lmore=(u.lmore||200)+200;render();break;
     case 'bell': notesOpen=!notesOpen;if(notesOpen)saveNotes();renderBell();break;
@@ -2946,7 +2895,6 @@ document.addEventListener('click',e=>{
     case 'new-task':{const id=newTask({status:el.dataset.status,due:el.dataset.due});if(id){openTask(id);setTimeout(()=>$('.d-name')?.focus(),30)}break}
     case 'new-job': openJobModal();break;
     case 'edit-job': openJobModal(el.dataset.id);break;
-    case 'smonth':{const st=+el.dataset.step;if(!st)u.smonth=today().slice(0,7);else{const [y,m]=(u.smonth||today().slice(0,7)).split('-').map(Number);const d=new Date(y,m-1+st,1);u.smonth=`${d.getFullYear()}-${pad(d.getMonth()+1)}`}saveUi();render();break}
     case 'cal-mode': u.calMode=el.dataset.mode;saveUi();render();break;
     case 'cal':{const st=+el.dataset.step;
       if(u.calMode==='week'){const d=parseD(today());d.setDate(d.getDate()-((d.getDay()+6)%7));let w=st?parseD(u.week||ymd(d)):d;if(st)w.setDate(w.getDate()+7*st);u.week=ymd(w);saveUi();render();break}
