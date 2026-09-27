@@ -413,11 +413,11 @@ select.pill::before{display:none}
 
 /* ---------- drawer ---------- */
 .scrim{position:fixed;inset:0;background:rgba(10,12,16,.35);z-index:20}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:min(580px,100%);background:var(--surface);z-index:21;box-shadow:var(--shadow-lg);overflow-y:auto;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(760px,100%);background:var(--surface);z-index:21;box-shadow:var(--shadow-lg);overflow-y:auto;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .d-top{display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:1}
 .d-top .crumb{flex:1;min-width:0;display:flex;align-items:center;gap:6px;color:var(--muted);font-size:calc(13px*var(--ts));overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .d-body{padding:18px;display:flex;flex-direction:column;gap:18px}
-.d-name{width:100%;border:1px solid transparent;background:none;font:700 calc(22px*var(--ts))/1.25 var(--display);letter-spacing:-.01em;padding:4px 6px;margin:-4px -6px;border-radius:7px;resize:none;overflow:hidden}
+.d-name{width:100%;border:1px solid transparent;background:none;font:700 calc(26px*var(--ts))/1.2 var(--display);letter-spacing:-.01em;padding:4px 6px;margin:-4px -6px;border-radius:7px;resize:none;overflow:hidden}
 .d-name:hover{border-color:var(--line)}
 .d-name:focus{outline:none;border-color:var(--accent);background:var(--surface-2)}
 .props{display:grid;grid-template-columns:120px minmax(0,1fr);gap:8px 12px;align-items:center}
@@ -796,6 +796,41 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .tl-note-head .icon-btn.danger{color:var(--danger);background:var(--danger-soft)}
 .tl-note p{margin:4px 0 0;white-space:normal;line-height:1.5}
 @media (max-width:820px){.lrow{padding:7px 10px;gap:8px}.lrow time{font-size:calc(11px*var(--ts))}}
+/* task fields, ClickUp-style: two columns of label + value, borderless until hovered */
+.d-body{container-type:inline-size}
+.props2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 28px}
+.pf{display:grid;grid-template-columns:118px minmax(0,1fr);align-items:center;gap:8px;min-height:38px}
+.pf > label,.pf-l{color:var(--muted);font-size:calc(13.5px*var(--ts));display:flex;align-items:center;gap:8px}
+.pf > label .i,.pf-l .i{width:17px;height:17px;color:var(--faint)}
+.pf-v{display:flex;align-items:center;gap:6px;min-width:0}
+.pf-wide{grid-column:1/-1}
+.pf-v select,.pf-v input[type=text],.pf-v input[type=date]{border:1px solid transparent;background:none;border-radius:7px;padding:6px 8px;font-size:calc(14px*var(--ts));width:100%;min-width:0;color:var(--text);cursor:pointer}
+.pf-v input[type=text]{cursor:text}
+.pf-v select:hover,.pf-v input:hover{background:var(--surface-2)}
+.pf-v select:focus,.pf-v input:focus{outline:none;border-color:var(--accent);background:var(--surface)}
+.pf-v input::placeholder{color:var(--faint)}
+.st-ctl{display:inline-flex;align-items:stretch;border-radius:7px;overflow:hidden;background:color-mix(in srgb,var(--c) 90%,#000);min-width:0}
+.st-ctl select.pill{background:none;color:#fff;border:0;border-radius:0;padding:7px 12px;font:700 calc(12.5px*var(--ts))/1 var(--body);letter-spacing:.05em;text-transform:uppercase;width:auto;max-width:190px;text-overflow:ellipsis}
+.st-ctl select.pill:hover{background:rgba(255,255,255,.12)}
+.st-ctl select.pill option{color:var(--text);background:var(--surface);text-transform:none}
+.st-next{border:0;border-left:1px solid rgba(255,255,255,.3);background:none;color:#fff;width:30px;display:grid;place-items:center}
+.st-next:hover{background:rgba(255,255,255,.15)}
+.st-next .i{width:13px;height:13px;stroke:none}
+.st-done{width:32px;height:30px;border:1px solid var(--line);background:var(--surface-2);border-radius:7px;display:grid;place-items:center;color:var(--muted)}
+.st-done:hover{color:var(--st-done);border-color:var(--st-done)}
+.prio-ctl{display:flex;align-items:center;width:100%;border-radius:7px}
+.prio-ctl > .i{margin-left:8px;flex:none}
+.prio-ctl select{padding-left:6px!important}
+.prio-ctl.p-urgent > .i{color:var(--danger)} .prio-ctl.p-high > .i{color:var(--st-rev)} .prio-ctl.p-normal > .i{color:var(--st-prog)} .prio-ctl.p-low > .i{color:var(--faint)}
+.date-ctl{display:flex;align-items:center;gap:2px;min-width:0;width:100%}
+.date-ctl{max-width:360px}
+.date-ctl input{flex:1;min-width:0}
+.date-ctl .arrow{color:var(--faint);flex:none}
+.date-ctl input.over{color:var(--danger)} .date-ctl input.soon{color:var(--warn)}
+.pf-v .stepper{border-color:transparent}
+.pf-v .stepper:hover{border-color:var(--line)}
+@container (max-width:600px){.props2{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:820px){.pf{grid-template-columns:96px minmax(0,1fr)}.d-name{font-size:calc(22px*var(--ts))}}
 </style>
 
 <div class="app">
@@ -1801,17 +1836,23 @@ function renderDrawer(){
   ${!t._draft&&S.ui.dtab==='activity'?activityPane(t):`  <div class="d-body">
     ${t.archived?`<div class="d-archived">${I.archive}<span><b>Archived</b>${t.archivedAt?' '+fmtDate(t.archivedAt):''}. Hidden from Overview and job tabs.</span><button class="btn sm" data-act="restore" data-id="${t.id}">Restore</button></div>`:''}
     <textarea class="d-name" rows="1" data-field="name" data-fk="d-name" aria-label="Task name" placeholder="Task name">${esc(t.name)}</textarea>
-    <div class="props">
-      <span class="lbl">${I.status}Status</span><div>${statusSelect(t,'d-status')}</div>
-      <label for="d-prio">${I.flag}Priority</label><select id="d-prio" data-field="priority">${PRIORITIES.map(p=>`<option value="${p.id}" ${(t.priority||'normal')===p.id?'selected':''}>${p.label}</option>`).join('')}</select>
-      <label for="d-job">${I.briefcase}Job</label><select id="d-job" data-field="jobId">${jobsSorted().map(x=>`<option value="${x.id}" ${x.id===t.jobId?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
-      ${j?.type==='agency'?`<label for="d-client">${I.user}Client</label><select id="d-client" data-field="clientId"><option value="">No client</option>${cl.map(c=>`<option value="${c.id}" ${c.id===t.clientId?'selected':''}>${esc(c.name)}</option>`).join('')}</select>`:''}
-      <span class="lbl">${I.cal}Dates</span><div class="pair"><input type="date" id="d-start" data-field="start" value="${esc(t.start||'')}" aria-label="Start date" title="Start date"><input type="date" id="d-due" data-field="due" value="${esc(t.due||'')}" aria-label="Due date" title="Due date"></div>
-      ${(()=>{if(!t.due||isClosed(t)||t.archived)return'';const n=dueLoad(t.id)[t.due]||0;return n+1>=dayLimit()?`<span></span><p class="load-warn">${I.warn}Busy day: ${n} other task${n===1?' is':'s are'} due ${(d=>/^(Today|Tomorrow|Yesterday)$/.test(d)?d.toLowerCase():'on '+d)(fmtDate(t.due))}.</p>`:''})()}
-      <span class="lbl">${I.ratio}Format</span><div class="fmt-pick">${FORMATS.map(f=>`<button data-act="fmt" data-fmt="${f}" class="${t.format===f?'on':''}" aria-pressed="${t.format===f}">${f}</button>`).join('')}</div>
-      <label for="d-len">${I.clock}Length</label><input type="text" id="d-len" data-field="length" data-fk="d-len" value="${esc(t.length||'')}" placeholder="e.g. 0:30 or 3 × 0:15">
-      <span class="lbl">${I.loop}Revision round</span><div class="stepper"><button data-act="rev" data-step="-1" aria-label="Decrease revision round">−</button><output>R${t.revision||0}</output><button data-act="rev" data-step="1" aria-label="Increase revision round">+</button></div>
-    </div>
+    ${(()=>{
+      const cur=stOf(t),idx=STATUSES.findIndex(x=>x.id===cur),nxt=STATUSES[idx+1],prio=t.priority||'normal';
+      const f=(icon,label,body,forId,wide)=>`<div class="pf${wide?' pf-wide':''}">${forId?`<label for="${forId}">`:'<span class="pf-l">'}${icon}${label}${forId?'</label>':'</span>'}<div class="pf-v">${body}</div></div>`;
+      const job=f(I.briefcase,'Job',`<select id="d-job" data-field="jobId">${jobsSorted().map(x=>`<option value="${x.id}" ${x.id===t.jobId?'selected':''}>${esc(x.name)}</option>`).join('')}</select>`,'d-job');
+      const client=j?.type==='agency'?f(I.user,'Client',`<select id="d-client" data-field="clientId"><option value="">No client</option>${cl.map(c=>`<option value="${c.id}" ${c.id===t.clientId?'selected':''}>${esc(c.name)}</option>`).join('')}</select>`,'d-client'):'';
+      const busy=(()=>{if(!t.due||isClosed(t)||t.archived)return'';const n=dueLoad(t.id)[t.due]||0;return n+1>=dayLimit()?`<p class="load-warn pf-wide">${I.warn}Busy day: ${n} other task${n===1?' is':'s are'} due ${(d=>/^(Today|Tomorrow|Yesterday)$/.test(d)?d.toLowerCase():'on '+d)(fmtDate(t.due))}.</p>`:''})();
+      return `<div class="props2">
+      ${f(I.status,'Status',`<div class="st-ctl" ${pillStyle(cur)}>${statusSelect(t,'d-status')}${nxt?`<button type="button" class="st-next" data-act="d-next" title="Move to ${esc(nxt.label)}" aria-label="Move to ${esc(nxt.label)}"><svg class="i" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" fill="currentColor"/></svg></button>`:''}</div>${cur!=='done'?`<button type="button" class="st-done" data-act="d-done" title="Mark ${esc(stLabel('done'))}" aria-label="Mark ${esc(stLabel('done'))}"><svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg></button>`:''}`)}
+      ${f(I.flag,'Priority',`<div class="prio-ctl p-${prio}">${I.flag}<select id="d-prio" data-field="priority">${PRIORITIES.map(p=>`<option value="${p.id}" ${prio===p.id?'selected':''}>${p.label}</option>`).join('')}</select></div>`,'d-prio')}
+      ${f(I.cal,'Dates',`<div class="date-ctl"><input type="date" id="d-start" data-field="start" value="${esc(t.start||'')}" aria-label="Start date" title="Start date"><span class="arrow">→</span><input type="date" id="d-due" data-field="due" class="${t.due?dueClass(t):''}" value="${esc(t.due||'')}" aria-label="Due date" title="Due date"></div>`,'',true)}
+      ${job}
+      ${busy}
+      ${f(I.clock,'Length',`<input type="text" id="d-len" data-field="length" data-fk="d-len" value="${esc(t.length||'')}" placeholder="e.g. 0:30 or 3 × 0:15">`,'d-len')}
+      ${client||f(I.ratio,'Format',`<div class="fmt-pick">${FORMATS.map(x=>`<button data-act="fmt" data-fmt="${x}" class="${t.format===x?'on':''}" aria-pressed="${t.format===x}">${x}</button>`).join('')}</div>`)}
+      ${f(I.loop,'Revision',`<div class="stepper"><button data-act="rev" data-step="-1" aria-label="Decrease revision round">−</button><output>R${t.revision||0}</output><button data-act="rev" data-step="1" aria-label="Increase revision round">+</button></div>`)}
+      ${client?f(I.ratio,'Format',`<div class="fmt-pick">${FORMATS.map(x=>`<button data-act="fmt" data-fmt="${x}" class="${t.format===x?'on':''}" aria-pressed="${t.format===x}">${x}</button>`).join('')}</div>`):''}
+    </div>`})()}
     ${brandForTask(t)}
     <div><h4 class="section-title">Links</h4>${linkRow('task',I.task)}${linkRow('upload',I.film)}${linkRow('file',I.folder)}${linkRow('project',I.mac)}</div>
     <div><h4 class="section-title">Checklist<span class="mono">${checklist.length?`${doneN}/${checklist.length}`:''}</span></h4>
@@ -2598,6 +2639,8 @@ document.addEventListener('click',e=>{
     case 'open': if(e.target.closest('select,a,input'))return; openTask(el.dataset.id,el.dataset.dtab);break;
     case 'd-tab': S.ui.dtab=el.dataset.tab;noteDelArmed=null;renderDrawer();$('#drawer').scrollTop=0;if(S.ui.dtab==='details')autosize($('.d-name'));break;
     case 'note-post': postNote();break;
+    case 'd-next':{const t=S.tasks[u.openTask];if(!t)break;const i=STATUSES.findIndex(x=>x.id===stOf(t)),n=STATUSES[i+1];if(n){setStatus(t.id,n.id);render();renderDrawer()}break}
+    case 'd-done':{const t=S.tasks[u.openTask];if(!t)break;setStatus(t.id,'done');render();renderDrawer();toast(`Marked ${stLabel('done')}`);break}
     case 'note-del': if(noteDelArmed===el.dataset.at)deleteNote(el.dataset.at);else{noteDelArmed=el.dataset.at;renderDrawer()}break;
     case 'new-task':{const id=newTask({status:el.dataset.status,due:el.dataset.due});if(id){openTask(id);setTimeout(()=>$('.d-name')?.focus(),30)}break}
     case 'new-job': openJobModal();break;
