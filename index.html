@@ -367,7 +367,7 @@ select.pill::before{display:none}
 
 /* ---------- board ---------- */
 .board-wrap{overflow-x:auto;padding-bottom:6px}
-.board{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(210px,1fr);gap:10px;min-width:min-content}
+.board{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(160px,1fr);gap:10px;min-width:min-content}
 .col{background:var(--surface-2);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:8px;min-height:180px;border:1px solid transparent}
 .col.drag{border-color:var(--accent);background:var(--accent-soft)}
 .col-head{display:flex;align-items:center;justify-content:space-between;padding:2px 4px}
@@ -432,7 +432,6 @@ select.pill::before{display:none}
 button.tool{font:inherit;color:inherit;text-align:left;cursor:pointer}
 button.tool:hover{border-color:var(--accent)}
 button.tool svg{color:var(--faint)}
-.finder-set summary{cursor:pointer;list-style:revert}
 .steps{margin:8px 0;padding-left:20px;font-size:calc(13px*var(--ts));color:var(--text);display:flex;flex-direction:column;gap:6px;line-height:1.5}
 .copy-code{font-family:var(--mono);font-size:calc(12px*var(--ts));background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;user-select:all}
 .checklist{display:flex;flex-direction:column;gap:2px}
@@ -693,6 +692,59 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   :root[data-density="compact"] .card{padding:6px}
   :root[data-density="compact"] .main{gap:8px;padding-top:8px}
 }
+/* breadcrumbs */
+.crumbs{display:flex;align-items:center;flex-wrap:wrap;gap:2px 4px;font-size:calc(13px*var(--ts));color:var(--muted);margin:0 0 6px -6px}
+.crumbs button,.crumbs span{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:3px 6px;border-radius:6px;color:var(--muted);font-weight:500}
+.crumbs button:hover{background:var(--surface-2);color:var(--text)}
+.crumbs span[aria-current]{color:var(--text);font-weight:600}
+.crumbs i{font-style:normal;color:var(--faint)}
+.crumbs .i{width:14px;height:14px}
+/* Settings-style modals */
+.modal.pref-modal{width:min(900px,100%);height:min(720px,calc(100vh - 32px));overflow:hidden}
+.pref{flex:1;min-height:0;display:grid;grid-template-columns:220px minmax(0,1fr)}
+.pref-nav{display:flex;flex-direction:column;gap:2px;padding:14px 10px;border-right:1px solid var(--line);overflow:auto;background:var(--surface)}
+.pref-nav button{display:flex;align-items:center;gap:10px;border:0;background:none;padding:8px 12px;border-radius:8px;text-align:left;font-weight:500;color:var(--text);white-space:nowrap}
+.pref-nav button:hover{background:var(--surface-2)}
+.pref-nav button.on{background:var(--accent);color:var(--accent-ink)}
+.pref-nav button span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.pref-nav button small{font:500 calc(11px*var(--ts)) var(--mono);opacity:.75}
+.pref-body{overflow:auto;padding:22px 26px 28px;display:flex;flex-direction:column;gap:20px}
+.pref-sec{display:flex;flex-direction:column;gap:20px}
+.pref-h{margin:0;font:700 calc(21px*var(--ts))/1.2 var(--display)}
+.pref-sec > .field + .field,.pref-sec > .field + .wf-grid,.pref-sec > .wf-grid + .wf-grid,.pref-sec > .wf-grid + .field,.pref-sec > .wf-grid + label{border-top:1px solid var(--line);padding-top:20px}
+.pref-body .bm-note{margin-top:auto;border-top:1px solid var(--line);padding-top:16px}
+.bm-log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:calc(13px*var(--ts))}
+.bm-log b{display:inline-block;min-width:74px;color:var(--muted);font-weight:600;margin-right:8px}
+/* status editor */
+.st-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.st-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto 64px;align-items:center;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--surface)}
+.st-row:first-child{border-top:0}
+.st-row.armed{background:var(--danger-soft)}
+.st-row input{border:1px solid transparent;background:none;border-radius:7px;padding:6px 8px;font-weight:600;width:100%}
+.st-row input:hover{border-color:var(--line)}
+.st-row input:focus{border-color:var(--accent);background:var(--surface);outline:none}
+.st-dot{width:22px;height:22px;border-radius:50%;border:3px solid color-mix(in srgb,var(--c) 30%,transparent);background:var(--c);padding:0;flex:none}
+.st-row .icon-btn[disabled]{opacity:.3;pointer-events:none}
+.st-row .icon-btn.danger{color:var(--danger);background:var(--danger-soft)}
+.st-lock{font-size:calc(11px*var(--ts));font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px;justify-self:center}
+.st-count{font:500 calc(11px*var(--ts)) var(--mono);color:var(--faint);text-align:right}
+.st-swatches{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 2px 28px}
+.st-swatches button{width:22px;height:22px;border-radius:50%;background:var(--c);border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line)}
+.st-swatches button.on{box-shadow:0 0 0 2px var(--text)}
+.st-swatches button.def{background:conic-gradient(var(--c) 0 50%,var(--surface-2) 0)}
+.st-del-box{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 0 2px 28px;font-size:calc(13px*var(--ts))}
+.st-del-box select{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:5px 8px}
+@media (max-width:820px){
+  .modal.pref-modal{height:calc(100vh - 24px)}
+  .pref{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+  .pref-nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);padding:8px;gap:4px;scrollbar-width:none}
+  .pref-nav button{padding:6px 10px;flex:none}
+  .pref-body{padding:14px 14px 20px;gap:14px}
+  .pref-sec{gap:14px}
+  .pref-h{display:none}
+  .st-row{grid-template-columns:auto minmax(0,1fr) auto auto auto;gap:2px}
+  .st-count{display:none}
+}
 </style>
 
 <div class="app">
@@ -743,7 +795,7 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 'use strict';
 
 /* ================= constants ================= */
-const STATUSES=[
+const DEFAULT_STATUSES=[
   {id:'waiting_client',label:'Waiting on client'},
   {id:'not_started',label:'Not started'},
   {id:'in_progress',label:'In progress'},
@@ -751,7 +803,21 @@ const STATUSES=[
   {id:'revisions',label:'Revisions'},
   {id:'client_review',label:'Client review'},
   {id:'done',label:'Done'}];
-const ST=Object.fromEntries(STATUSES.map(s=>[s.id,s]));
+/* The user can rename, recolor, reorder, add and delete statuses in Settings (settings/app.statuses).
+   'done' always exists (it can be renamed, not deleted). Built-in ids keep their extras (revision rounds, reminders). */
+let STATUSES=DEFAULT_STATUSES.map(s=>({...s,color:''}));
+let ST=Object.fromEntries(STATUSES.map(s=>[s.id,s]));
+const STATUS_COLORS=['#7d8596','#2f73e8','#0b7f93','#14b8a6','#2b9348','#84cc16','#b8860b','#e07b00','#d9362b','#c2417a','#8b5cf6','#6366f1'];
+function loadStatuses(){
+  const cs=appSettings().statuses;
+  let list=Array.isArray(cs)&&cs.length?cs.filter(x=>x&&x.id&&x.label).map(x=>({id:String(x.id),label:String(x.label),color:x.color||''})):DEFAULT_STATUSES.map(x=>({...x,color:''}));
+  if(!list.some(x=>x.id==='done'))list.push({id:'done',label:'Done',color:''});
+  STATUSES=list;ST=Object.fromEntries(list.map(x=>[x.id,x]));
+}
+const stColor=id=>ST[id]?.color||(STATUS_VAR[id]?`var(${STATUS_VAR[id]})`:'#7d8596');
+const stLabel=id=>ST[id]?.label||'Unknown status';
+const stOf=t=>ST[t.status]?t.status:STATUSES[0].id;   // tasks in a deleted status show in the first one
+const pillStyle=id=>`style="--c:${stColor(id)}"`;
 const STATUS_VAR={not_started:'--st-not',in_progress:'--st-prog',internal_review:'--st-review',client_review:'--st-client',revisions:'--st-rev',waiting_client:'--st-wait',done:'--st-done',dropped:'--st-drop'};
 /* Done and Dropped are closed: no deadlines, counts, notifications or calendar events */
 const isClosed=t=>t.status==='done'||t.status==='dropped';  // 'dropped' was removed; old ones are moved to Done on load
@@ -777,6 +843,8 @@ const I={
   chev:'<svg class="i" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4"/></svg>',
   left:'<svg class="i" viewBox="0 0 16 16"><path d="M10 4 6 8l4 4"/></svg>',
   task:'<svg class="i" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="11" height="11" rx="2"/><path d="M5.5 8l2 2 3-4"/></svg>',
+  a11y:'<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5"/><circle cx="8" cy="5" r=".9"/><path d="M5 7h6M8 7v2.5M6.5 12L8 9.5 9.5 12"/></svg>',
+  music:'<svg class="i" viewBox="0 0 16 16"><path d="M6 12V3.5l7-1.5v8.5"/><circle cx="4.5" cy="12" r="1.5"/><circle cx="11.5" cy="10.5" r="1.5"/></svg>',
   mac:'<svg class="i" viewBox="0 0 16 16"><rect x="2.5" y="3" width="11" height="7.5" rx="1"/><path d="M1 13h14"/></svg>',
   film:'<svg class="i" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M6.8 6.2v3.6L9.8 8z"/></svg>',
   folder:'<svg class="i" viewBox="0 0 16 16"><path d="M2 4.5A1.5 1.5 0 0 1 3.5 3h2.8l1.5 1.5h4.7A1.5 1.5 0 0 1 14 6v5.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 11.5z"/></svg>',
@@ -1287,6 +1355,7 @@ function migrateStatuses(){
 }
 function render(){
   const a=appSettings();
+  loadStatuses();
   applyLook(SM||a);
   document.title=(a.name||'').trim()||APP_NAME;
   const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
@@ -1333,7 +1402,13 @@ function renderMain(){
   }else{
     const cl=clientsOf(job.id);
 
-    $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${jobMark(job,34)}<span>${esc(job.name)}</span><button class="icon-btn h1-edit" data-act="edit-job" data-id="${job.id}" title="Edit job" aria-label="Edit job">${I.pencil}</button></h1>
+    const from=u.from==='archived'?['archived','Archived',I.archive]:['overview','Overview',I.grid],cur=u.client!=='all'&&S.clients[u.client];
+    const paneName={details:'Details',brand:'Brand guide'}[u.pane];
+    const crumbs=[`<button type="button" data-act="nav" data-tab="${from[0]}">${from[2]}${from[1]}</button>`,
+      (cur||paneName)?`<button type="button" data-act="nav" data-tab="${job.id}" data-pane="tasks">${jobMark(job,14)}${esc(job.name)}</button>`:`<span aria-current="page">${jobMark(job,14)}${esc(job.name)}</span>`];
+    if(cur)crumbs.push(paneName?`<button type="button" data-act="nav" data-tab="${job.id}" data-client="${cur.id}" data-pane="tasks">${esc(cur.name)}</button>`:`<span aria-current="page">${esc(cur.name)}</span>`);
+    if(paneName)crumbs.push(`<span aria-current="page">${paneName}</span>`);
+    $('#head').innerHTML=`<nav class="crumbs" aria-label="Breadcrumb">${crumbs.join('<i aria-hidden="true">›</i>')}</nav><div class="head"><div class="head-title"><h1>${jobMark(job,34)}<span>${esc(job.name)}</span><button class="icon-btn h1-edit" data-act="edit-job" data-id="${job.id}" title="Edit job" aria-label="Edit job">${I.pencil}</button></h1>
       <div class="sub"><span class="badge">${job.type==='agency'?I.briefcase+'Agency':I.user+'Direct client'}</span>${job.type==='agency'?`<span>${cl.length} client${cl.length===1?'':'s'}</span>`:''}</div></div></div>`;
     $('#subnav').innerHTML=`<div class="pane-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${u.pane==='brand'||u.pane==='details'?'':'on'}" aria-selected="${u.pane!=='brand'&&u.pane!=='details'}" data-act="pane" data-pane="tasks">${I.task}Tasks</button><button role="tab" class="${u.pane==='details'?'on':''}" aria-selected="${u.pane==='details'}" data-act="pane" data-pane="details">${I.info}Details</button><button role="tab" class="${u.pane==='brand'?'on':''}" aria-selected="${u.pane==='brand'}" data-act="pane" data-pane="brand">${I.palette}Brand guide</button></div>
       ${job.type==='agency'?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}`;
@@ -1345,10 +1420,10 @@ function renderMain(){
   }
   const st=statsFor(scope);
   const stat=(key,label,val,cls='')=>`<button class="stat ${cls} ${u.due===key?'on':''}" data-act="stat" data-due="${key}"><small>${label}</small><b>${val}</b></button>`;
-  $('#stats').innerHTML=Object.keys(S.jobs).length?`<div class="stats">
+  $('#stats').innerHTML=Object.keys(S.jobs).length?`<div class="stats" style="grid-template-columns:repeat(${3+!!ST.internal_review+!!ST.revisions},minmax(0,1fr))">
     ${stat('all','Open tasks',st.open)}${stat('overdue','Overdue',st.overdue,st.overdue?'alert':'')}${stat('week','Due in 7 days',st.week)}
-    <button class="stat" data-act="jump-status" data-status="internal_review"><small>Internal review</small><b>${st.review}</b></button>
-    <button class="stat ${st.revisions?'warn':''}" data-act="jump-status" data-status="revisions"><small>In revisions</small><b>${st.revisions}</b></button></div>`:'';
+    ${ST.internal_review?`<button class="stat" data-act="jump-status" data-status="internal_review"><small>${esc(stLabel('internal_review'))}</small><b>${st.review}</b></button>`:''}
+    ${ST.revisions?`<button class="stat ${st.revisions?'warn':''}" data-act="jump-status" data-status="revisions"><small>${esc(stLabel('revisions'))}</small><b>${st.revisions}</b></button>`:''}</div>`:'';
 
   $('#jobcards').innerHTML=!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')}</div>`:'';
 
@@ -1370,7 +1445,7 @@ function jobCard(j){
   const ts=live().filter(t=>t.jobId===j.id);
   const st=statsFor(ts);
   const total=ts.length||1;
-  const bar=STATUSES.map(s=>{const n=ts.filter(t=>t.status===s.id).length;return n?`<i style="width:${n/total*100}%;background:var(${STATUS_VAR[s.id]})" title="${s.label}: ${n}"></i>`:''}).join('');
+  const bar=STATUSES.map(s=>{const n=ts.filter(t=>stOf(t)===s.id).length;return n?`<i style="width:${n/total*100}%;background:${stColor(s.id)}" title="${s.label}: ${n}"></i>`:''}).join('');
   const next=ts.filter(t=>!isClosed(t)&&t.due).sort((a,b)=>a.due.localeCompare(b.due))[0];
   const cl=clientsOf(j.id).length;
   return `<div class="job-wrap"><button class="job-card" data-act="nav" data-tab="${j.id}">
@@ -1406,7 +1481,7 @@ const taskMark=t=>{
   return `<div class="tmark" title="${esc(who)}">${src?`<img src="${esc(src)}" alt="" loading="lazy" onerror="this.remove()">`:''}${I.building}</div>`;
 };
 const prioHtml=p=>{p=p||'normal';return `<span class="prio ${p}">${p==='normal'?'':I.flag}${PRIORITIES.find(x=>x.id===p)?.label||''}</span>`};
-const statusSelect=(t,act)=>`<select class="pill st-${t.status}" data-act="${act}" data-id="${t.id}" aria-label="Status">${STATUSES.map(s=>`<option value="${s.id}" ${s.id===t.status?'selected':''}>${s.label}</option>`).join('')}</select>`;
+const statusSelect=(t,act)=>`<select class="pill" ${pillStyle(stOf(t))} data-act="${act}" data-id="${t.id}" aria-label="Status">${STATUSES.map(s=>`<option value="${s.id}" ${s.id===stOf(t)?'selected':''}>${s.label}</option>`).join('')}</select>`;
 
 const ROW_HEAD=`<div class="row-head"><span></span><span>Task</span><span>Status</span><span class="c-prio">Priority</span><span class="c-start">Start</span><span>Due</span><span>Links</span></div>`;
 const rowHtml=(t,job,showJob)=>`<div class="row ${isClosed(t)?'done-row':''} ${S.ui.openTask===t.id?'focus':''}" data-act="open" data-id="${t.id}" tabindex="0">
@@ -1421,9 +1496,9 @@ function listView(list,job){
   const showJob=!job;
   let html='';
   for(const s of STATUSES){
-    const rows=list.filter(t=>t.status===s.id);
+    const rows=list.filter(t=>stOf(t)===s.id);
     const open=!S.ui.collapsed[s.id];
-    html+=`<section class="group" id="grp-${s.id}"><div class="group-bar"><button class="group-head ${open?'open':''}" data-act="group" data-status="${s.id}" aria-expanded="${open}">${I.chev}<span class="pill st-${s.id}">${s.label}</span><span class="count">${rows.length}</span></button>${s.id==='done'&&rows.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}">${I.archive}Archive all ${rows.length} done</button>`:''}</div>`;
+    html+=`<section class="group" id="grp-${s.id}"><div class="group-bar"><button class="group-head ${open?'open':''}" data-act="group" data-status="${s.id}" aria-expanded="${open}">${I.chev}<span class="pill" ${pillStyle(s.id)}>${s.label}</span><span class="count">${rows.length}</span></button>${s.id==='done'&&rows.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}">${I.archive}Archive all ${rows.length} done</button>`:''}</div>`;
     if(open&&rows.length){
       html+=`<div class="rows">${rows.length?ROW_HEAD:''}`;
       html+=rows.map(t=>rowHtml(t,job,showJob)).join('');
@@ -1437,8 +1512,8 @@ function listView(list,job){
 
 function boardView(list,job){
   return `<div class="board-wrap"><div class="board">${STATUSES.map(s=>{
-    const cards=list.filter(t=>t.status===s.id);
-    return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill st-${s.id}">${s.label}</span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
+    const cards=list.filter(t=>stOf(t)===s.id);
+    return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill" ${pillStyle(s.id)}>${s.label}</span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
       ${cards.map(t=>`<div class="card" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="card-top">${taskMark(t)}<div class="t-name">${esc(t.name||'Untitled task')}</div></div>${metaLine(t,job,!job)}
         <div class="card-foot"><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):'No date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
@@ -1460,7 +1535,7 @@ function calendarView(list){
     const evs=byDay[k]||[];
     const heavy=(load[k]||0)>=lim;
     cells+=`<div class="day ${d.getMonth()!==m-1?'out':''} ${k===t0?'today':''} ${heavy?'busy':''}"><div class="dn"><b>${d.getDate()}</b>${heavy?`<span class="busy-tag" title="${load[k]} tasks due across all jobs">${I.warn}${load[k]}</span>`:''}</div>
-      ${evs.slice(0,4).map(t=>`<button class="ev ${isClosed(t)?'is-done':''}" style="--c:var(${STATUS_VAR[t.status]})" data-act="open" data-id="${t.id}" title="${esc(t.name)} · ${ST[t.status]?.label}"><span>${esc(t.name||'Untitled task')}</span></button>`).join('')}
+      ${evs.slice(0,4).map(t=>`<button class="ev ${isClosed(t)?'is-done':''}" style="--c:${stColor(stOf(t))}" data-act="open" data-id="${t.id}" title="${esc(t.name)} · ${esc(stLabel(t.status))}"><span>${esc(t.name||'Untitled task')}</span></button>`).join('')}
       ${evs.length>4?`<span class="more">+${evs.length-4} more</span>`:''}</div>`;
   }
   const noDate=list.filter(t=>!t.due&&!isClosed(t)).length;
@@ -1499,7 +1574,7 @@ function notifications(all){
     if(t.start===t0&&t.status==='not_started')out.push({key:`start:${t.id}:${t.start}`,rank:3,kind:'info',icon:'flag',task:t,title:`${nm} starts today`,body:"It's still Not started."});
     if(['internal_review','client_review','revisions','waiting_client'].includes(t.status)&&t.updated&&Date.now()-t.updated>=3*86400000){
       const d=Math.floor((Date.now()-t.updated)/86400000);
-      out.push({key:`stale:${t.id}:${ymd(new Date(t.updated))}`,rank:4,kind:'info',icon:'loop',task:t,title:`${nm} has been in ${ST[t.status].label} for ${d} days`,body:t.status==='client_review'||t.status==='waiting_client'?'No update since. Worth a nudge to the client?':'No changes since. Worth a follow-up?'});
+      out.push({key:`stale:${t.id}:${ymd(new Date(t.updated))}`,rank:4,kind:'info',icon:'loop',task:t,title:`${nm} has been in ${stLabel(t.status)} for ${d} days`,body:t.status==='client_review'||t.status==='waiting_client'?'No update since. Worth a nudge to the client?':'No changes since. Worth a follow-up?'});
     }
     if((t.revision||0)>=3)out.push({key:`rev:${t.id}:${t.revision}`,rank:5,kind:'info',icon:'loop',task:t,title:`${nm} is on revision round ${t.revision}`,body:'Might be time to agree the remaining changes in one go.'});
     if(!t.due&&(t.priority==='urgent'||t.priority==='high'))out.push({key:`nodate:${t.id}`,rank:6,kind:'info',icon:'cal',task:t,title:`${nm} is ${t.priority==='urgent'?'urgent':'high priority'} but has no due date`,body:''});
@@ -1688,7 +1763,7 @@ function dropImage(v){
 let M=null;
 function openJobModal(id){
   const j=id?S.jobs[id]:null;
-  M={id:id||null,name:j?.name||'',type:j?.type||'agency',color:j?.color||COLORS[Object.keys(S.jobs).length%COLORS.length],
+  M={sec:'general',id:id||null,name:j?.name||'',type:j?.type||'agency',color:j?.color||COLORS[Object.keys(S.jobs).length%COLORS.length],
     tools:{comms:'Slack',tracker:'ClickUp',upload:'Frame.io',storage:'Google Drive',...(j?.tools||{})},
     toolLinks:{...(j?.toolLinks||{})},folder:j?.folder||'',
     logo:j?.logo||null,
@@ -1706,7 +1781,7 @@ if(BM){closeBrand();return}
 let SM=null;
 function openSettings(){
   const a=appSettings();
-  SM={restore:null,name:a.name||'',logo:a.logo||null,theme:a.theme||'system',scheme:a.scheme||'splice',textSize:+a.textSize||1,density:a.density||'comfortable',dayLimit:dayLimit(),orig:a.logo||null,uploaded:[],busy:false};
+  SM={sec:'appearance',statuses:STATUSES.map(x=>({...x})),stMoves:{},stArm:null,stPick:null,stTo:null,restore:null,name:a.name||'',logo:a.logo||null,theme:a.theme||'system',scheme:a.scheme||'splice',textSize:+a.textSize||1,density:a.density||'comfortable',dayLimit:dayLimit(),orig:a.logo||null,uploaded:[],busy:false};
   CAL.disArmed=false;if(B.mode==='cloud'&&B.cfg.calendar)calStatus();
   renderSettings();$('#modal').hidden=false;render();
 }
@@ -1714,8 +1789,11 @@ function closeSettings(save){
   if(!SM)return;
   const sm=SM;SM=null;
   if(save){
-    const data={name:sm.name.trim(),logo:sm.logo||null,theme:sm.theme,scheme:sm.scheme,textSize:sm.textSize,density:sm.density,dayLimit:Math.min(20,Math.max(1,parseInt(sm.dayLimit,10)||3))};
+    const data={statuses:sm.statuses.map(x=>({id:x.id,label:x.label.trim()||'Untitled',color:x.color||''})),name:sm.name.trim(),logo:sm.logo||null,theme:sm.theme,scheme:sm.scheme,textSize:sm.textSize,density:sm.density,dayLimit:Math.min(20,Math.max(1,parseInt(sm.dayLimit,10)||3))};
     if(S.settings.app) patch('settings','app',data); else create('settings',data,'app');
+    // tasks in deleted statuses move to the status picked for them (following chains of deletes)
+    const keep=new Set(data.statuses.map(x=>x.id)),dest=id=>{let d=id,n=0;while(!keep.has(d)&&sm.stMoves[d]&&n++<20)d=sm.stMoves[d];return keep.has(d)?d:data.statuses[0].id};
+    for(const t of Object.values(S.tasks))if(!t._draft&&t.status&&!keep.has(t.status)&&t.status!=='dropped'){const to=dest(t.status);patch('tasks',t.id,{status:to,...(to==='done'&&!t.doneAt?{doneAt:today()}:{})})}
     [sm.orig,...sm.uploaded].forEach(v=>{if(v&&v!==sm.logo)dropImage(v)});
     toast('Settings saved');
   }else sm.uploaded.forEach(dropImage);
@@ -1725,31 +1803,31 @@ function renderSettings(){
   if(!SM)return;
   const src=imgSrc(SM.logo);
   const opt=(id,label,cols)=>`<button type="button" data-act="s-theme" data-theme-opt="${id}" class="${SM.theme===id?'on':''}" aria-pressed="${SM.theme===id}"><span class="swatch-demo">${cols.map(c=>`<i style="background:${c}"></i>`).join('')}</span>${label}</button>`;
-  withFocus(()=>{$('#modal').innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="s-title">
-  <header><h2 id="s-title">Settings</h2><button class="icon-btn" data-act="s-cancel" aria-label="Close">${I.x}</button></header>
-  <form class="m-body" data-act="s-save" id="s-form">
-    <div class="field"><span class="lbl">Appearance</span><div class="theme-pick">
-      ${opt('system','Match device',['#f3f4f7','#0e1015'])}${opt('light','Light',['#f3f4f7','#ffffff'])}${opt('dark','Dark',['#0e1015','#161920'])}</div>
-      <div class="sub-lbl" id="s-scheme-lbl">Color scheme</div>
-      <div class="scheme-pick" role="group" aria-labelledby="s-scheme-lbl">${SCHEMES.map(([id,name,la,ls,da,ds])=>`<button type="button" data-act="s-scheme" data-v="${id}" class="${SM.scheme===id?'on':''}" aria-pressed="${SM.scheme===id}"><span class="scheme-dot" style="background:${ls||'#f3f4f7'}"><i style="background:${la}"></i></span><span>${esc(name)}</span></button>`).join('')}</div>
-      <p class="hint">Each scheme has a light and a dark version and follows the Match device / Light / Dark choice. Changes show right away. Click Save to keep them.</p></div>
-    <div class="field"><span class="lbl">Accessibility</span>
-      <div class="sub-lbl" id="s-ts-lbl">Text size</div>
-      <div class="pick-row" role="group" aria-labelledby="s-ts-lbl">${TEXT_SIZES.map(([v,l])=>`<button type="button" data-act="s-ts" data-v="${v}" class="${+SM.textSize===v?'on':''}" aria-pressed="${+SM.textSize===v}"><span class="aa" style="font-size:${Math.round(16*v)}px">Aa</span>${l}<small>${Math.round(v*100)}%</small></button>`).join('')}</div>
-      <div class="sub-lbl" id="s-dens-lbl">Density</div>
-      <div class="pick-row two" role="group" aria-labelledby="s-dens-lbl">${[['comfortable','Comfortable','More space between rows and cards',8],['compact','Compact','Fits more tasks on screen',3]].map(([id,l,d,g])=>`<button type="button" data-act="s-dens" data-v="${id}" class="${SM.density===id?'on':''}" aria-pressed="${SM.density===id}"><span class="dens-demo" style="gap:${g}px"><i></i><i></i><i></i></span>${l}<small>${d}</small></button>`).join('')}</div>
-    </div>
-    <div class="field"><label for="s-name">App name</label><input type="text" id="s-name" data-fk="s-name" value="${esc(SM.name)}" placeholder="${esc(APP_NAME)}" maxlength="40"><p class="hint">Shown at the top of the sidebar and in the browser tab. Leave it empty to use “${esc(APP_NAME)}”.</p></div>
+  const secs=[
+    {id:'appearance',label:'Appearance',icon:I.palette,html:`<div class="field"><span class="lbl">Theme</span><div class="theme-pick">
+      ${opt('system','Match device',['#f3f4f7','#0e1015'])}${opt('light','Light',['#f3f4f7','#ffffff'])}${opt('dark','Dark',['#0e1015','#161920'])}</div></div>
+      <div class="field"><span class="lbl" id="s-scheme-lbl">Color scheme</span>
+      <div class="scheme-pick" role="group" aria-labelledby="s-scheme-lbl">${SCHEMES.map(([id,name,la,ls])=>`<button type="button" data-act="s-scheme" data-v="${id}" class="${SM.scheme===id?'on':''}" aria-pressed="${SM.scheme===id}"><span class="scheme-dot" style="background:${ls||'#f3f4f7'}"><i style="background:${la}"></i></span><span>${esc(name)}</span></button>`).join('')}</div>
+      <p class="hint">Each scheme has a light and a dark version and follows the theme above. Changes show right away. Click Save to keep them.</p></div>`},
+    {id:'a11y',label:'Accessibility',icon:I.a11y,html:`<div class="field"><span class="lbl" id="s-ts-lbl">Text size</span>
+      <div class="pick-row" role="group" aria-labelledby="s-ts-lbl">${TEXT_SIZES.map(([v,l])=>`<button type="button" data-act="s-ts" data-v="${v}" class="${+SM.textSize===v?'on':''}" aria-pressed="${+SM.textSize===v}"><span class="aa" style="font-size:${Math.round(16*v)}px">Aa</span>${l}<small>${Math.round(v*100)}%</small></button>`).join('')}</div></div>
+      <div class="field"><span class="lbl" id="s-dens-lbl">Density</span>
+      <div class="pick-row two" role="group" aria-labelledby="s-dens-lbl">${[['comfortable','Comfortable','More space between rows and cards',8],['compact','Compact','Fits more tasks on screen',3]].map(([id,l,d,g])=>`<button type="button" data-act="s-dens" data-v="${id}" class="${SM.density===id?'on':''}" aria-pressed="${SM.density===id}"><span class="dens-demo" style="gap:${g}px"><i></i><i></i><i></i></span>${l}<small>${d}</small></button>`).join('')}</div></div>`},
+    {id:'statuses',label:'Statuses',icon:I.status,html:statusSettingsHtml()},
+    {id:'workload',label:'Workload',icon:I.clock,html:`<div class="field"><label for="s-limit">Busy day warning</label><div class="limit-row"><span>Warn me when</span><input type="number" id="s-limit" data-fk="s-limit" min="1" max="20" value="${esc(SM.dayLimit)}"><span>or more tasks are due on the same day.</span></div><p class="hint">Busy days are flagged on the Calendar, in notifications, and when you pick a due date.</p></div>`},
+    {id:'branding',label:'App name & logo',icon:I.image,html:`<div class="field"><label for="s-name">App name</label><input type="text" id="s-name" data-fk="s-name" value="${esc(SM.name)}" placeholder="${esc(APP_NAME)}" maxlength="40"><p class="hint">Shown at the top of the sidebar and in the browser tab. Leave it empty to use “${esc(APP_NAME)}”.</p></div>
     <div class="field"><span class="lbl">App logo</span><div class="logo-field">
       <button type="button" class="logo-box ${src?'has':''}" data-act="s-logo-pick" aria-label="${src?'Replace':'Upload'} app logo" style="${src?'':'background:var(--surface);border-style:solid;border-color:var(--line)'}">${src?`<img src="${esc(src)}" alt="">`:`<img src="${APP_LOGO}" alt="" style="object-fit:contain;padding:8px">`}</button>
       <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${canUpload()?`<button type="button" class="btn sm" data-act="s-logo-pick">${I.image}${src?'Replace':'Upload'}</button>`:''}${src?'<button type="button" class="btn sm" data-act="s-logo-remove">Remove</button>':''}${SM.busy?'<span class="hint">Uploading…</span>':''}</div>
-      <p class="hint">Replaces the ${esc(APP_NAME)} logo next to the app name and in the browser tab. A square image works best.</p></div></div></div>
-    <div class="field"><label for="s-limit">Busy day warning</label><div class="limit-row"><span>Warn me when</span><input type="number" id="s-limit" data-fk="s-limit" min="1" max="20" value="${esc(SM.dayLimit)}"><span>or more tasks are due on the same day.</span></div><p class="hint">Busy days are flagged on the Calendar, in notifications, and when you pick a due date.</p></div>
-    ${finderSettingsHtml()}
-    ${backupSettingsHtml()}
-    ${accountSettingsHtml()}
-  </form>
+      <p class="hint">Replaces the ${esc(APP_NAME)} logo next to the app name and in the browser tab. A square image works best.</p></div></div></div>`},
+    {id:'finder',label:'Finder folders',icon:I.folder,html:finderSettingsHtml()},
+    ...(B.mode==='cloud'?[{id:'account',label:'Calendar & account',icon:I.cal,html:accountSettingsHtml()}]:[]),
+    {id:'backup',label:'Backup',icon:I.download,html:backupSettingsHtml()}];
+  withFocus(()=>{$('#modal').innerHTML=`<div class="modal pref-modal" role="dialog" aria-modal="true" aria-labelledby="s-title">
+  <header><h2 id="s-title">Settings</h2><button class="icon-btn" data-act="s-cancel" aria-label="Close">${I.x}</button></header>
+  ${prefLayout('s',SM.sec,secs,'form','data-act="s-save" id="s-form"')}
   <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="s-cancel">Cancel</button><button type="submit" form="s-form" class="btn primary">Save</button></div></footer></div>`});
+  prefNavInView();
 }
 async function setAppLogo(file){
   const sm=SM;if(!sm||!file)return;
@@ -1854,10 +1932,10 @@ async function setModalLogo(file){
 }
 function renderModal(){
   if(!M) return;
-  withFocus(()=>{$('#modal').innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+  withFocus(()=>{$('#modal').innerHTML=`<div class="modal pref-modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
   <header><h2 id="m-title">${M.id?'Edit job':'New job'}</h2><button class="icon-btn" data-act="modal-close" aria-label="Close">${I.x}</button></header>
-  <form class="m-body" data-act="modal-save" id="m-form">
-    <div class="field"><label for="m-name">Job name</label><input type="text" id="m-name" data-m="name" data-fk="m-name" value="${esc(M.name)}" placeholder="e.g. Northlight Media" required></div>
+  ${prefLayout('m',M.sec,[
+    {id:'general',label:'General',icon:I.briefcase,html:`    <div class="field"><label for="m-name">Job name</label><input type="text" id="m-name" data-m="name" data-fk="m-name" value="${esc(M.name)}" placeholder="e.g. Northlight Media"></div>
     <div class="field"><span class="lbl">Logo or picture</span><div class="logo-field">
       <button type="button" class="logo-box ${M.logo?'has':''}" data-act="m-logo-pick" style="${M.logo?'':`background:${esc(M.color)};border-color:transparent`}" aria-label="${M.logo?'Replace':'Upload'} job logo">${M.logo?`<img src="${esc(imgSrc(M.logo))}" alt="">`:esc(initials(M.name))}</button>
       <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${canUpload()?`<button type="button" class="btn sm" data-act="m-logo-pick">${I.image}${M.logo?'Replace':'Upload'}</button>`:''}${M.logo?'<button type="button" class="btn sm" data-act="m-logo-remove">Remove</button>':''}${M.busy?'<span class="hint">Uploading…</span>':''}</div>
@@ -1866,22 +1944,24 @@ function renderModal(){
       <button type="button" data-act="m-type" data-type="agency" class="${M.type==='agency'?'on':''}" aria-pressed="${M.type==='agency'}"><b>Agency</b><small>You edit for several of their clients</small></button>
       <button type="button" data-act="m-type" data-type="direct" class="${M.type==='direct'?'on':''}" aria-pressed="${M.type==='direct'}"><b>Direct client</b><small>You work straight with one client</small></button></div></div>
     <div class="field"><span class="lbl">Color</span><div class="swatches">${COLORS.map(c=>`<button type="button" data-act="m-color" data-color="${c}" style="--c:${c}" class="${M.color===c?'on':''}" aria-label="Color ${c}" aria-pressed="${M.color===c}"></button>`).join('')}</div>${B.mode==='cloud'&&B.cfg?.calendar?'<p class="hint">Also colors this job\'s events in Google Calendar.</p>':''}</div>
-    <div class="field"><span class="lbl">Tools for this job</span><div class="tool-grid">${TOOL_ROLES.map(r=>{const v=M.tools[r.id];const custom=v&&!r.opts.includes(v);return `<div class="tool-cell"><span class="lbl">${r.label}</span>
+`},
+    ...(M.type==='agency'?[{id:'clients',label:'Clients',icon:I.user,badge:M.clients.filter(c=>c.name.trim()).length||'',html:M.type==='agency'?`<div class="field"><span class="lbl">Clients</span><div class="client-list">${M.clients.map((c,i)=>`<div class="cl"><button type="button" class="logo-box sm ${c.logo?'has':''}" data-act="m-client-logo" data-i="${i}" title="${c.logo?'Replace':'Add'} picture for ${esc(c.name||'this client')}" aria-label="${c.logo?'Replace':'Add'} client picture">${c.logo?`<img src="${esc(imgSrc(c.logo))}" alt="">`:I.image}</button><input type="text" data-m-client="${i}" data-fk="m-cl-${c.id||'n'+i}" value="${esc(c.name)}" placeholder="Client name" aria-label="Client name">${c.logo?`<button type="button" class="btn sm ghost" data-act="m-client-logo-remove" data-i="${i}">Remove picture</button>`:''}<button type="button" class="icon-btn" data-act="m-del-client" data-i="${i}" aria-label="Remove client">${I.x}</button></div>`).join('')}
+      <button type="button" class="btn sm" data-act="m-add-client" style="align-self:flex-start">${I.plus}Add client</button></div>
+      <p class="hint">Click the square next to a client to add their logo or picture. Removing a client keeps its tasks in this job without a client.</p></div>`:''}]:[]),
+    {id:'tools',label:'Tools & folders',icon:I.grid,html:`    <div class="field"><span class="lbl">Tools for this job</span><div class="tool-grid">${TOOL_ROLES.map(r=>{const v=M.tools[r.id];const custom=v&&!r.opts.includes(v);return `<div class="tool-cell"><span class="lbl">${r.label}</span>
       <select data-m-tool="${r.id}" aria-label="${r.label}">${r.opts.map(o=>`<option ${o===v||(custom&&o==='Other')?'selected':''}>${o}</option>`).join('')}</select>
       ${v==='Other'||custom?`<input type="text" data-m-toolname="${r.id}" data-fk="m-tn-${r.id}" value="${custom?esc(v):''}" placeholder="Tool name">`:''}
       <input type="url" data-m-link="${r.id}" data-fk="m-tl-${r.id}" value="${esc(M.toolLinks[r.id]||'')}" placeholder="Workspace link (optional)"></div>`}).join('')}</div>
       <p class="hint">Workspace links show as buttons in the job's Details tab, so the Slack channel or Frame.io project is one click away.</p></div>
     <div class="field"><label for="m-folder">Project folder on your Mac</label><input type="text" id="m-folder" data-fk="m-folder" value="${esc(M.folder||'')}" placeholder="/Users/you/Projects/${esc(M.name||'Job')}" autocapitalize="off" spellcheck="false"><p class="hint">Where you keep this job's assets and project files. Paste the path (select the folder in Finder and press ⌥⌘C). It opens in Finder from the job's Details tab. Tasks can have their own project folder too.</p></div>
-    ${workForm()}
-    ${M.type==='agency'?`<div class="field"><span class="lbl">Clients</span><div class="client-list">${M.clients.map((c,i)=>`<div class="cl"><button type="button" class="logo-box sm ${c.logo?'has':''}" data-act="m-client-logo" data-i="${i}" title="${c.logo?'Replace':'Add'} picture for ${esc(c.name||'this client')}" aria-label="${c.logo?'Replace':'Add'} client picture">${c.logo?`<img src="${esc(imgSrc(c.logo))}" alt="">`:I.image}</button><input type="text" data-m-client="${i}" data-fk="m-cl-${c.id||'n'+i}" value="${esc(c.name)}" placeholder="Client name" aria-label="Client name">${c.logo?`<button type="button" class="btn sm ghost" data-act="m-client-logo-remove" data-i="${i}">Remove picture</button>`:''}<button type="button" class="icon-btn" data-act="m-del-client" data-i="${i}" aria-label="Remove client">${I.x}</button></div>`).join('')}
-      <button type="button" class="btn sm" data-act="m-add-client" style="align-self:flex-start">${I.plus}Add client</button></div>
-      <p class="hint">Click the square next to a client to add their logo or picture. Removing a client keeps its tasks in this job without a client.</p></div>`:''}
-  </form>
+`},
+    {id:'work',label:'Work details',icon:I.clock,html:workForm()}],'form','data-act="modal-save" id="m-form"')}
   <footer>${M.id?`<button type="button" class="btn danger ${M.delArmed?'armed':''}" data-act="m-delete">${I.trash}${M.delArmed?'Delete job and all its tasks':'Delete job'}</button>`:'<span></span>'}
     <div style="display:flex;gap:8px"><button type="button" class="btn" data-act="modal-close">Cancel</button><button type="submit" form="m-form" class="btn primary">${M.id?'Save':'Create job'}</button></div></footer></div>`});
+  prefNavInView();
 }
 function saveModal(){
-  const name=M.name.trim();if(!name){toast('Give the job a name.');$('#m-name')?.focus();return}
+  const name=M.name.trim();if(!name){M.sec='general';renderModal();toast('Give the job a name.');$('#m-name')?.focus();return}
   const tools={...M.tools};
   const data={name,type:M.type,color:M.color,tools,toolLinks:M.toolLinks,folder:(M.folder||'').trim(),logo:M.logo||null,work:{...M.work,days:[...M.work.days].sort()}};
   let id=M.id;
@@ -1978,7 +2058,7 @@ const fmtLong=s=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(s||''))return s||'';const d=par
 /* Form section inside the job modal */
 function workForm(){
   const w=M.work,p=w.pay,diff=w.tz?diffLabel(w.tz):'';
-  return `<div class="field"><span class="lbl">Work details</span><div class="work-form">
+  return `<div class="field"><div class="work-form">
     <div class="wf-row"><span class="wf-lbl">Days you work</span><div class="day-pick">${DAY_ORDER.map(d=>`<button type="button" data-act="m-day" data-day="${d}" class="${w.days.includes(d)?'on':''}" aria-pressed="${w.days.includes(d)}">${WEEKDAY[d]}</button>`).join('')}</div></div>
     <div class="wf-grid">
       <label>Hours per day<input type="number" min="0" max="24" step="0.5" data-mw="hours" data-fk="mw-hours" value="${esc(w.hours)}" placeholder="e.g. 4"></label>
@@ -2080,7 +2160,7 @@ let BM=null;
 function openBrand(col,id){
   const doc=S[col][id];if(!doc)return;
   const b=brandOf(doc);
-  BM={col,id,name:doc.name,b:JSON.parse(JSON.stringify(b)),orig:JSON.stringify(b),origPdfs:b.pdfs.map(p=>p.v),uploaded:[],note:'',busy:false};
+  BM={sec:'colors',col,id,name:doc.name,b:JSON.parse(JSON.stringify(b)),orig:JSON.stringify(b),origPdfs:b.pdfs.map(p=>p.v),uploaded:[],note:'',busy:false};
   if(!BM.b.colors.length)BM.b.colors=[];
   renderBrand();$('#modal').hidden=false;
 }
@@ -2088,23 +2168,29 @@ function renderBrand(){
   if(!BM)return;const b=BM.b;
   const inp=(path,label,ph,type='text')=>`<label>${label}<input type="${type}" data-bm="${path}" data-fk="bm-${path}" value="${esc(path.split('.').reduce((o,k)=>o?.[k],b)||'')}" placeholder="${esc(ph)}"></label>`;
   const area=(path,label,ph,rows=2)=>`<label>${label}<textarea data-bm="${path}" data-fk="bm-${path}" rows="${rows}" placeholder="${esc(ph)}">${esc(b[path]||'')}</textarea></label>`;
-  withFocus(()=>{$('#modal').innerHTML=`<div class="modal brand-modal" role="dialog" aria-modal="true" aria-labelledby="bm-title">
+  withFocus(()=>{$('#modal').innerHTML=`<div class="modal brand-modal pref-modal" role="dialog" aria-modal="true" aria-labelledby="bm-title">
   <header><h2 id="bm-title">${I.palette}${esc(BM.name)} brand guide</h2><button class="icon-btn" data-act="brand-cancel" aria-label="Close">${I.x}</button></header>
-  <div class="m-body">
-    <div class="field"><span class="lbl">Colors</span><div class="bm-colors">${b.colors.map((c,i)=>`<div class="bm-color"><input type="color" data-bm-color="${i}" value="${/^#[0-9a-f]{6}$/i.test(c.hex)?esc(c.hex):'#000000'}" aria-label="Pick color"><input type="text" data-bm-hex="${i}" data-fk="bm-hex-${i}" value="${esc(c.hex)}" placeholder="#000000" aria-label="Hex code"><input type="text" data-bm-cname="${i}" data-fk="bm-cn-${i}" value="${esc(c.name||'')}" placeholder="Name, e.g. Primary blue" aria-label="Color name"><button type="button" class="icon-btn" data-act="bm-del-color" data-i="${i}" aria-label="Remove color">${I.x}</button></div>`).join('')}
+  ${prefLayout('b',BM.sec,[
+    {id:'colors',label:'Colors & fonts',icon:I.palette,badge:b.colors.length||'',html:`    <div class="field"><span class="lbl">Colors</span><div class="bm-colors">${b.colors.map((c,i)=>`<div class="bm-color"><input type="color" data-bm-color="${i}" value="${/^#[0-9a-f]{6}$/i.test(c.hex)?esc(c.hex):'#000000'}" aria-label="Pick color"><input type="text" data-bm-hex="${i}" data-fk="bm-hex-${i}" value="${esc(c.hex)}" placeholder="#000000" aria-label="Hex code"><input type="text" data-bm-cname="${i}" data-fk="bm-cn-${i}" value="${esc(c.name||'')}" placeholder="Name, e.g. Primary blue" aria-label="Color name"><button type="button" class="icon-btn" data-act="bm-del-color" data-i="${i}" aria-label="Remove color">${I.x}</button></div>`).join('')}
       <button type="button" class="btn sm" data-act="bm-add-color" style="align-self:flex-start">${I.plus}Add color</button></div></div>
     <div class="wf-grid">${inp('fonts.head','Headline font','e.g. Montserrat Bold')}${inp('fonts.body','Body & caption font','e.g. Inter Medium')}</div>
-    <div class="wf-grid">${area('captions','Captions','Font, case, color, position, highlight words…')}${area('logo','Logo','Which version, where, minimum size, clear space…')}</div>
+`},
+    {id:'graphics',label:'Captions & graphics',icon:I.film,html:`    <div class="wf-grid">${area('captions','Captions','Font, case, color, position, highlight words…')}${area('logo','Logo','Which version, where, minimum size, clear space…')}</div>
     <div class="wf-grid">${area('endcard','Intro, outro & end card','Length, animation, what goes on the end card…')}${area('cta','Call to action','Exact wording, e.g. “Shop now at kora.com”')}</div>
-    <div class="wf-grid">${area('music','Music','Style, approved library or track list…')}${inp('loudness','Loudness target','e.g. -14 LUFS')}</div>
-    <div class="wf-grid">${area('dos','Do (one per line)','Show the product in the first 3 seconds\nUse brand colors on text',4)}${area('donts',"Don't (one per line)",'No competitor products\nNo stock music with vocals',4)}</div>
-    ${area('tone','Tone & pacing','e.g. Warm, upbeat, quick cuts, no hard sell')}
+`},
+    {id:'audio',label:'Music & audio',icon:I.music,html:`    <div class="wf-grid">${area('music','Music','Style, approved library or track list…')}${inp('loudness','Loudness target','e.g. -14 LUFS')}</div>
+`},
+    {id:'dos',label:"Do's & don'ts",icon:I.task,html:`    <div class="wf-grid">${area('dos','Do (one per line)','Show the product in the first 3 seconds\nUse brand colors on text',4)}${area('donts',"Don't (one per line)",'No competitor products\nNo stock music with vocals',4)}</div>
+`},
+    {id:'tone',label:'Tone & links',icon:I.info,html:`    ${area('tone','Tone & pacing','e.g. Warm, upbeat, quick cuts, no hard sell')}
     <div class="wf-grid">${inp('links.guide','Brand guidelines link','Drive or Dropbox link','url')}${inp('links.assets','Logo & asset folder','Link','url')}${inp('links.refs','Reference videos','Link','url')}</div>
-    <div class="field"><span class="lbl">PDF files</span><div class="bm-pdfs">${b.pdfs.map((p,i)=>`<div class="bm-pdf">${I.file}<span>${esc(p.name)}<small>${fmtSize(p.size||0)}</small></span><button type="button" class="btn sm ghost" data-act="bm-del-pdf" data-i="${i}">Remove</button></div>`).join('')}
+`},
+    {id:'files',label:'PDF files',icon:I.file,badge:b.pdfs.length||'',html:`    <div class="field"><div class="bm-pdfs">${b.pdfs.map((p,i)=>`<div class="bm-pdf">${I.file}<span>${esc(p.name)}<small>${fmtSize(p.size||0)}</small></span><button type="button" class="btn sm ghost" data-act="bm-del-pdf" data-i="${i}">Remove</button></div>`).join('')}
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${canUpload()?`<button type="button" class="btn sm" data-act="bm-add-pdf">${I.plus}Upload PDF</button>`:''}${BM.busy?'<span class="hint">Uploading…</span>':''}<span class="hint">PDF only, up to 20 MB.</span></div></div></div>
-    <label class="bm-note">What changed? (optional, goes in the change log)<input type="text" data-bm-note data-fk="bm-note" value="${esc(BM.note)}" placeholder="e.g. New end card from October"></label>
-  </div>
+`},
+    ...((b.log||[]).length?[{id:'history',label:'Change log',icon:I.loop,html:`<ul class="bm-log">${b.log.map(l=>`<li><b>${esc(fmtDate(l.date))}</b>${esc(l.text)}</li>`).join('')}</ul>`}]:[])])}
   <footer><span class="hint">${b.updated?`Last updated ${esc(fmtDate(b.updated))}`:''}</span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="brand-cancel">Cancel</button><button type="button" class="btn primary" data-act="brand-save" ${BM.busy?'disabled':''}>Save guide</button></div></footer></div>`});
+  prefNavInView();
 }
 const BRAND_PARTS=[['colors','colors'],['fonts','fonts'],['captions','captions'],['logo','logo'],['endcard','end card'],['cta','call to action'],['music','music'],['loudness','loudness'],['dos',"do's"],['donts',"don'ts"],['tone','tone'],['links','links'],['pdfs','PDFs']];
 function saveBrand(){
@@ -2173,9 +2259,46 @@ function runRestore(){
   closeSettings(false);render();toast(`Restored ${n} item${n===1?'':'s'} from the backup`);
 }
 function pathHint(){return IS_MAC?`Opens in Finder through your “${esc(OPEN_SHORTCUT)}” shortcut. First time? Set it up in Settings → Finder folders.`:'Finder paths open only on your Mac. On this device the button copies the path.'}
+/* Settings-style layout: section list on the left, one section shown on the right. All sections stay
+   in the page (hidden), so switching keeps what was typed. key: s (Settings), m (job), b (brand guide). */
+function prefLayout(key,active,sections,tag='div',attrs=''){
+  if(!sections.some(x=>x.id===active))active=sections[0].id;
+  return `<${tag} class="pref" ${attrs}><nav class="pref-nav" role="tablist" aria-label="Sections">${sections.map(x=>`<button type="button" role="tab" data-act="pref-sec" data-key="${key}" data-sec="${x.id}" class="${x.id===active?'on':''}" aria-selected="${x.id===active}">${x.icon||''}<span>${x.label}</span>${x.badge?`<small>${x.badge}</small>`:''}</button>`).join('')}</nav>
+    <div class="pref-body">${sections.map(x=>`<section class="pref-sec" data-sec="${x.id}" role="tabpanel" ${x.id===active?'':'hidden'}><h3 class="pref-h">${x.label}</h3>${x.html}</section>`).join('')}${key==='b'?`<label class="bm-note">What changed? (optional, goes in the change log)<input type="text" data-bm-note data-fk="bm-note" value="${esc(BM.note)}" placeholder="e.g. New end card from October"></label>`:''}</div></${tag}>`;
+}
+function showPrefSec(el){
+  const st={s:SM,m:M,b:BM}[el.dataset.key];if(st)st.sec=el.dataset.sec;
+  const box=el.closest('.pref');if(!box)return;
+  box.querySelectorAll('.pref-nav button').forEach(b=>{const on=b===el;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
+  box.querySelectorAll('.pref-sec').forEach(x=>x.hidden=x.dataset.sec!==el.dataset.sec);
+  box.querySelector('.pref-body').scrollTop=0;
+  el.scrollIntoView({block:'nearest',inline:'nearest'});
+}
+/* after a re-render, keep the chosen section's tab in view (the phone tab row scrolls sideways) */
+function prefNavInView(){const b=document.querySelector('#modal .pref-nav button.on'),nav=b?.parentElement;if(b&&nav.scrollWidth>nav.clientWidth)nav.scrollLeft=b.offsetLeft-nav.clientWidth/2+b.offsetWidth/2}
+function statusSettingsHtml(){
+  const used=id=>Object.values(S.tasks).filter(t=>!t._draft&&t.status===id).length;
+  const rows=SM.statuses.map((x,i)=>{
+    const n=used(x.id),armed=SM.stArm===x.id,col=x.color||(STATUS_VAR[x.id]?`var(${STATUS_VAR[x.id]})`:'#7d8596');
+    const others=SM.statuses.filter(o=>o.id!==x.id);
+    return `<div class="st-row ${armed?'armed':''}">
+      <button type="button" class="st-dot" data-act="st-color" data-i="${i}" style="--c:${col}" title="Change color" aria-label="Change color of ${esc(x.label)}"></button>
+      <input type="text" data-st-label="${i}" data-fk="st-l-${x.id}" value="${esc(x.label)}" maxlength="30" aria-label="Status name">
+      <button type="button" class="icon-btn" data-act="st-move" data-i="${i}" data-d="-1" ${i?'':'disabled'} title="Move up" aria-label="Move up"><svg class="i" viewBox="0 0 16 16"><path d="M4 10l4-4 4 4"/></svg></button>
+      <button type="button" class="icon-btn" data-act="st-move" data-i="${i}" data-d="1" ${i<SM.statuses.length-1?'':'disabled'} title="Move down" aria-label="Move down"><svg class="i" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg></button>
+      ${x.id==='done'?`<span class="st-lock" title="Tasks here count as finished. It can be renamed but not deleted.">Finished</span>`:`<button type="button" class="icon-btn ${armed&&!n?'danger':''}" data-act="st-del" data-i="${i}" title="${armed&&!n?'Click again to delete':'Delete status'}" aria-label="Delete ${esc(x.label)}">${I.trash}</button>`}
+      <small class="st-count">${n?`${n} task${n===1?'':'s'}`:''}</small>
+      ${SM.stPick===i?`<div class="st-swatches">${STATUS_VAR[x.id]?`<button type="button" data-act="st-swatch" data-i="${i}" data-c="" class="def ${x.color?'':'on'}" title="Default color" style="--c:var(${STATUS_VAR[x.id]})"></button>`:''}${STATUS_COLORS.map(c=>`<button type="button" data-act="st-swatch" data-i="${i}" data-c="${c}" style="--c:${c}" class="${x.color===c?'on':''}" aria-label="Color ${c}"></button>`).join('')}</div>`:''}
+      ${armed&&n?`<div class="st-del-box">Move its ${n} task${n===1?'':'s'} to <select data-st-to aria-label="Move tasks to">${others.map(o=>`<option value="${o.id}" ${SM.stTo===o.id?'selected':''}>${esc(o.label)}</option>`).join('')}</select><button type="button" class="btn sm danger" data-act="st-del-go" data-i="${i}">Delete status</button><button type="button" class="btn sm ghost" data-act="st-del-cancel">Keep it</button></div>`:''}
+    </div>`}).join('');
+  return `<div class="field"><p class="hint" style="margin:0">Name them however you work. The order here is the order of the list groups and board columns. Changes apply when you click Save.</p>
+    <div class="st-list">${rows}</div>
+    <div class="acct-btns">${SM.statuses.length<14?`<button type="button" class="btn sm" data-act="st-add">${I.plus}Add status</button>`:''}<button type="button" class="btn sm ghost" data-act="st-reset">Reset to the defaults</button></div>
+    ${SM.stMoves&&Object.keys(SM.stMoves).length?`<p class="hint">Deleted statuses' tasks move when you click Save.</p>`:''}</div>`;
+}
 function finderSettingsHtml(){
-  return `<details class="field finder-set"><summary class="lbl">Finder folders (Mac)</summary>
-    <p class="hint" style="margin-top:6px">Paste a Finder path into a task's <b>Project folder (Mac)</b> or a job's <b>Project folder on your Mac</b> (in Edit job), and clicking it opens that folder (or file) on your Mac. To copy a path in Finder, select the item and press <b>Option ⌥ + Command ⌘ + C</b>. Websites aren't allowed to open Finder by themselves, so it goes through a small shortcut you set up once:</p>
+  return `<div class="field">
+    <p class="hint" style="margin:0">Paste a Finder path into a task's <b>Project folder (Mac)</b> or a job's <b>Project folder on your Mac</b> (in Edit job), and clicking it opens that folder (or file) on your Mac. To copy a path in Finder, select the item and press <b>Option ⌥ + Command ⌘ + C</b>. Websites aren't allowed to open Finder by themselves, so it goes through a small shortcut you set up once:</p>
     <ol class="steps">
       <li>Open the <b>Shortcuts</b> app. In the menu bar at the very top of the screen, click <b>Shortcuts</b> (next to the Apple logo) → <b>Settings…</b> (or press <b>⌘ ,</b>). Open the <b>Advanced</b> tab and tick <b>Allow Running Scripts</b>.</li>
       <li>Make a new shortcut with <b>+</b> and name it exactly <b>${esc(OPEN_SHORTCUT)}</b> (click the name at the top of the editor to rename it).</li>
@@ -2184,7 +2307,7 @@ function finderSettingsHtml(){
       <li>If it shows “Receive … input”, set it to <b>Text</b> (or Any). Close the editor.</li>
     </ol>
     <p class="hint">Test it with the button below, not the ▶ button in Shortcuts (that runs it with no path). The first time, the browser asks to open Shortcuts, and macOS may ask to allow the script: allow both. Use full paths (starting with /Users/…); Option ⌥ + Command ⌘ + C in Finder gives you one.</p>
-    ${IS_MAC?`<div class="acct-btns"><a class="btn sm" href="${pathOpenUrl('/Applications')}">${I.folder}Test: open Applications</a></div>`:''}</details>`;
+    ${IS_MAC?`<div class="acct-btns"><a class="btn sm" href="${pathOpenUrl('/Applications')}">${I.folder}Test: open Applications</a></div>`:''}</div>`;
 }
 function backupSettingsHtml(){
   const r=SM.restore;
@@ -2280,8 +2403,9 @@ document.addEventListener('click',e=>{
   if(a!=='clear-examples'&&clearArmed){clearArmed=false;render()}
   if(a!=='arch-delete'&&archDelArmed){archDelArmed=null;render()}
   if(a!=='cal-disconnect'&&CAL.disArmed){CAL.disArmed=false;if(SM)renderSettings()}
+  if(SM&&SM.stArm&&!/^st-(del|del-go)$/.test(a)&&!el.closest('.st-del-box')){SM.stArm=null;renderSettings()}
   switch(a){
-    case 'nav': if(el.dataset.tab!==u.tab)u.pane='tasks';u.tab=el.dataset.tab;u.client=el.dataset.client||'all';saveUi();render();window.scrollTo({top:0});break;
+    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(u.tab==='overview'||u.tab==='archived')u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';saveUi();render();window.scrollTo({top:0});break;
     case 'view': u.view=el.dataset.view;saveUi();render();break;
     case 'bell': notesOpen=!notesOpen;if(notesOpen)saveNotes();renderBell();break;
     case 'notes-read': notifications().forEach(n=>NS.read[n.key]=1);saveNotes();renderBell();break;
@@ -2342,7 +2466,7 @@ document.addEventListener('click',e=>{
       break}
     case 'check-del':{const t=S.tasks[u.openTask];patch('tasks',t.id,{checklist:(t.checklist||[]).filter(c=>c.id!==el.dataset.cid)});renderDrawer();break}
     case 'archive': archiveTasks([el.dataset.id]);break;
-    case 'archive-all': archiveTasks(filtered().filter(t=>t.status===el.dataset.status).map(t=>t.id));break;
+    case 'archive-all': archiveTasks(filtered().filter(t=>stOf(t)===el.dataset.status).map(t=>t.id));break;
     case 'restore': restoreTasks([el.dataset.id]);break;
     case 'arch-delete':
       if(archDelArmed!==el.dataset.id){archDelArmed=el.dataset.id;render();break}
@@ -2365,6 +2489,19 @@ document.addEventListener('click',e=>{
     case 'crop-fill': cropZoomTo(CR.coverT);break;
     case 'setup-local': $('#auth').hidden=true;$('#auth').innerHTML='';$('.app').hidden=false;localBoot();break;
     case 'auth-reset': showAuth({sent:null,error:''});$('#auth-email')?.focus();break;
+    case 'pref-sec': showPrefSec(el);break;
+    case 'st-add':{const used=new Set(SM.statuses.map(x=>x.color));SM.statuses.splice(Math.max(0,SM.statuses.findIndex(x=>x.id==='done')),0,{id:'st'+Date.now().toString(36),label:'New status',color:STATUS_COLORS.find(c=>!used.has(c))||STATUS_COLORS[0]});renderSettings();const ins=[...document.querySelectorAll('[data-st-label]')];const n=ins.find(x=>x.value==='New status');if(n){n.focus();n.select()}break}
+    case 'st-move':{const i=+el.dataset.i,j=i+ +el.dataset.d,a=SM.statuses;if(j<0||j>=a.length)break;[a[i],a[j]]=[a[j],a[i]];SM.stPick=null;renderSettings();break}
+    case 'st-color': SM.stPick=SM.stPick===+el.dataset.i?null:+el.dataset.i;renderSettings();break;
+    case 'st-swatch': SM.statuses[+el.dataset.i].color=el.dataset.c;SM.stPick=null;renderSettings();break;
+    case 'st-del':{const x=SM.statuses[+el.dataset.i];if(!x||x.id==='done')break;
+      const n=Object.values(S.tasks).filter(t=>!t._draft&&t.status===x.id).length;
+      if(SM.stArm===x.id&&!n){SM.statuses.splice(+el.dataset.i,1);SM.stArm=null;SM.stPick=null}
+      else{SM.stArm=x.id;SM.stTo=(SM.statuses.find(o=>o.id!==x.id&&o.id!=='done')||SM.statuses.find(o=>o.id!==x.id)).id}
+      renderSettings();break}
+    case 'st-del-go':{const x=SM.statuses[+el.dataset.i];if(!x)break;SM.stMoves[x.id]=SM.stTo;SM.statuses.splice(+el.dataset.i,1);SM.stArm=null;SM.stPick=null;renderSettings();break}
+    case 'st-del-cancel': SM.stArm=null;renderSettings();break;
+    case 'st-reset':{const had=new Set(SM.statuses.map(x=>x.id));SM.statuses=DEFAULT_STATUSES.map(x=>({...x,color:''}));const keep=new Set(SM.statuses.map(x=>x.id));for(const id of had)if(!keep.has(id))SM.stMoves[id]=SM.stMoves[id]||'not_started';SM.stArm=null;SM.stPick=null;renderSettings();break}
     case 's-theme': SM.theme=el.dataset.themeOpt;renderSettings();applyLook(SM);break;
     case 's-scheme': SM.scheme=el.dataset.v;renderSettings();applyLook(SM);break;
     case 's-ts': SM.textSize=+el.dataset.v;renderSettings();applyLook(SM);break;
@@ -2421,6 +2558,8 @@ document.addEventListener('input',e=>{
   if(el.id==='arch-q'){u.aq=el.value;render();return}
   if(el.id==='s-name'&&SM){SM.name=el.value;return}
   if(el.id==='s-limit'&&SM){SM.dayLimit=el.value;return}
+  if(SM&&el.dataset.stLabel!=null){const x=SM.statuses[+el.dataset.stLabel];if(x)x.label=el.value;return}
+  if(SM&&el.matches('[data-st-to]')){SM.stTo=el.value;return}
   if(BM&&$('#modal').contains(el)){
     if(el.dataset.bm){const k=el.dataset.bm.split('.');if(k.length===2)BM.b[k[0]][k[1]]=el.value;else BM.b[k[0]]=el.value}
     else if(el.dataset.bmHex!==undefined){const c=BM.b.colors[+el.dataset.bmHex];if(c){c.hex=el.value.trim();const sw=el.previousElementSibling;if(/^#[0-9a-f]{6}$/i.test(c.hex)&&sw)sw.value=c.hex}}

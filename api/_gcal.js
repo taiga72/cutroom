@@ -62,12 +62,12 @@ const createCalendar = g => g('POST', '/calendars', CAL_INFO);
 
 const nextDay = d => { const t = new Date(d + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() + 1); return t.toISOString().slice(0, 10); };
 
-function eventFor(t, jobs, clients, appUrl) {
+function eventFor(t, jobs, clients, appUrl, labels = {}) {
   const job = jobs[t.jobId], cl = t.clientId && clients[t.clientId];
   const who = cl ? `${job.name} · ${cl.name}` : job.name;
   const links = t.links || {};
   const lines = [
-    `Status: ${STATUS[t.status] || t.status}`,
+    `Status: ${labels[t.status] || STATUS[t.status] || t.status}`,
     `Priority: ${PRIO[t.priority] || 'Normal'}`,
     [t.format, t.length].filter(Boolean).join(' · '),
     t.revision ? `Revision ${t.revision}` : '',
@@ -88,9 +88,9 @@ function eventFor(t, jobs, clients, appUrl) {
 }
 
 async function loadDocs(uid) {
-  const out = { jobs: {}, clients: {}, tasks: {} };
+  const out = { jobs: {}, clients: {}, tasks: {}, settings: {} };
   for (let from = 0; ; from += 1000) {
-    const rows = await sb(`docs?user_id=eq.${uid}&col=in.(jobs,clients,tasks)&select=col,id,data&order=col,id`, {
+    const rows = await sb(`docs?user_id=eq.${uid}&col=in.(jobs,clients,tasks,settings)&select=col,id,data&order=col,id`, {
       headers: { Range: `${from}-${from + 999}` }
     });
     rows.forEach(r => { out[r.col][r.id] = { ...r.data, id: r.id }; });
@@ -129,11 +129,13 @@ async function syncUser(uid, appUrl) {
     // calendars made before the rename are still called "Cutroom"
     else if (existing.calendarName !== undefined && existing.calendarName !== APP_NAME) await g('PATCH', `/calendars/${encodeURIComponent(cal)}`, CAL_INFO).catch(() => {});
 
-    const { jobs, clients, tasks } = await loadDocs(uid);
+    const { jobs, clients, tasks, settings } = await loadDocs(uid);
+    // the user's own status names (Settings → Statuses)
+    const labels = Object.fromEntries((settings.app?.statuses || []).filter(x => x && x.id).map(x => [x.id, x.label]));
     const want = {};
     for (const t of Object.values(tasks)) {
       if (t.archived || t.status === 'done' || t.status === 'dropped' || !/^\d{4}-\d{2}-\d{2}$/.test(t.due || '') || !jobs[t.jobId]) continue;
-      want[t.id] = eventFor(t, jobs, clients, appUrl);
+      want[t.id] = eventFor(t, jobs, clients, appUrl, labels);
     }
     const seen = new Set(), ops = [];
     for (const ev of existing) {
