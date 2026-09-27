@@ -157,6 +157,8 @@ button.stat:hover{border-color:var(--line-strong)}
 .job-card{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:10px;min-width:0}
 .job-card:hover{border-color:var(--line-strong);box-shadow:var(--shadow)}
 .job-card h3{margin:0;font:700 calc(16px*var(--ts))/1.2 var(--display);display:flex;align-items:center;gap:8px}
+/* Overview job cards stay compact: type/tools and schedule live in the job's Details tab */
+.jobs-grid .job-card .jm-type,.jobs-grid .job-card .when,.head .sub-tail{display:none}
 .job-card h3 .jn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .job-card .meta{color:var(--muted);font-size:calc(12.5px*var(--ts))}
 .stack{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--surface-2);gap:1px}
@@ -599,7 +601,6 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
   .jobs-grid{display:flex;overflow-x:auto;gap:8px;scroll-snap-type:x mandatory;padding-bottom:2px}
   .jobs-grid > .job-wrap{flex:0 0 72%;scroll-snap-align:start}
   .job-card{padding:10px;gap:6px}
-  .job-card .jm-type,.job-card .when,.head .sub-tail{display:none}
   .job-card h3{font-size:calc(14px*var(--ts))}
   .toolbar{flex-wrap:nowrap;gap:6px;padding-block:6px;margin-block:-6px;position:static}
   .toolbar > *{flex:none}
