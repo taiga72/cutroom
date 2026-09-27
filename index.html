@@ -497,6 +497,46 @@ svg.svc{width:16px;height:16px;flex:none;display:block}
 .vopt .hint{margin:0}
 .vopt-btns{display:flex;gap:6px}
 .vopt-btns .btn{flex:1;justify-content:center}
+/* inline due / priority in list rows */
+.pedit,.dedit{position:relative;cursor:pointer;border-radius:6px;padding:3px 4px;margin:-3px -4px}
+.pedit:hover,.dedit:hover{background:var(--surface-2)}
+.cell-sel{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;font-size:16px}
+.cell-date{position:absolute;left:0;bottom:0;width:100%;height:100%;opacity:0;pointer-events:none;border:0;padding:0}
+/* stat tiles picker */
+.stats-wrap{position:relative}
+.stats-edit{position:absolute;top:-10px;right:-10px;width:26px;height:26px;border-radius:50%;background:var(--surface);border:1px solid var(--line);opacity:0;transition:opacity .15s;z-index:2}
+.stats-edit .i{width:13px;height:13px}
+.stats-wrap:hover .stats-edit,.stats-edit.on,.stats-edit:focus-visible{opacity:1}
+@media (hover:none){.stats-edit{opacity:.8}}
+.stat-pop{position:absolute;top:22px;right:0;z-index:31;width:250px;max-height:70vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lg);padding:12px;display:flex;flex-direction:column;gap:7px}
+.stat-pop b{font-size:calc(11px*var(--ts));letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+.stat-pop .hint{margin:0}
+.stat-pop label{display:flex;align-items:center;gap:8px;font-size:calc(14px*var(--ts))}
+.stat-pop label small{margin-left:auto;color:var(--faint);font-size:calc(11px*var(--ts))}
+.stat-pop input{accent-color:var(--accent);width:16px;height:16px}
+.stat-pop label:has(input:disabled){opacity:.5}
+/* archived: selection */
+.asel-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;margin:-4px 0 12px;border:1px solid var(--accent);background:var(--accent-soft);border-radius:10px}
+.asel-bar b{margin-right:auto}
+.arow.picked{background:var(--accent-soft)}
+.arch-bar .btn.on{border-color:var(--accent);color:var(--accent)}
+/* right-click menu */
+.ctx{position:fixed;z-index:70;width:280px;max-width:calc(100vw - 16px);background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lg);padding:8px;display:flex;flex-direction:column;gap:2px}
+.ctx-head{font-weight:700;padding:4px 8px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctx-lbl{font-size:calc(10.5px*var(--ts));font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);padding:6px 8px 3px}
+.ctx-sts{display:flex;flex-wrap:wrap;gap:4px;padding:0 6px 2px}
+.ctx-sts .pill{border:0;cursor:pointer;max-width:100%}
+.ctx-sts .pill.cur{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px currentColor}
+.ctx-prio{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;padding:0 6px 2px}
+.ctx-prio button{border:1px solid var(--line);background:none;border-radius:8px;padding:5px 4px;display:flex;justify-content:center;align-items:center;min-height:30px;font-size:calc(12px*var(--ts));color:var(--muted)}
+.ctx-prio button.cur{border-color:var(--accent);background:var(--accent-soft)}
+.ctx-prio .prio{font-size:calc(12px*var(--ts))}
+.ctx-sep{height:1px;background:var(--line);margin:6px 2px}
+.ctx-item{display:flex;align-items:center;gap:10px;border:0;background:none;text-align:left;padding:7px 8px;border-radius:7px;font-weight:500;color:var(--text)}
+.ctx-item:hover,.ctx-item:focus-visible{background:var(--surface-2)}
+.ctx-item.danger{color:var(--danger)}
+.ctx-item.armed{background:color-mix(in srgb,var(--danger) 12%,transparent)}
+.row,.card,.wcard,.arow{-webkit-touch-callout:none}
 /* checklist drag handle */
 .ck-grip{flex:none;width:14px;height:22px;display:flex;align-items:center;justify-content:center;color:var(--faint);cursor:grab;touch-action:none;opacity:0;margin-left:-4px}
 .ck-grip svg{width:12px;height:12px}
@@ -946,6 +986,7 @@ kbd{font:500 calc(11px*var(--ts)) var(--mono);border:1px solid var(--line);borde
 .selbox{position:absolute;inset:0;display:grid;place-items:center;background:color-mix(in srgb,var(--surface) 85%,transparent);border-radius:26%;opacity:0;cursor:pointer}
 .selbox input{width:17px;height:17px;accent-color:var(--accent);cursor:pointer}
 .selbox{opacity:1}
+.arow .selbox{position:static;inset:auto;background:none;width:32px;height:32px;display:grid;place-items:center}
 .row.picked,.card.picked{background:var(--accent-soft)}
 .card.picked{border-color:var(--accent)}
 body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
@@ -1114,7 +1155,7 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
         <option value="all">Any priority</option><option value="urgent">Urgent</option><option value="high">High</option><option value="normal">Normal</option><option value="low">Low</option>
       </select>
       <select class="sel" id="f-due" aria-label="Due date filter">
-        <option value="all">Any due date</option><option value="overdue">Overdue</option><option value="week">Due in 7 days</option><option value="nodate">No due date</option>
+        <option value="all">Any due date</option><option value="overdue">Overdue</option><option value="today">Due today</option><option value="week">Due in 7 days</option><option value="nodate">No due date</option>
         <optgroup label="Missing"><option value="miss-any">Missing a link</option><option value="miss-upload">No review link</option><option value="miss-file">No storage link</option><option value="miss-task">No task link</option></optgroup>
       </select>
       <select class="sel" id="f-sort" aria-label="Sort">
@@ -1713,6 +1754,7 @@ function filtered(){
   if(u.due==='overdue') list=list.filter(t=>t.due&&t.due<t0&&!isClosed(t));
   if(u.due==='week') list=list.filter(t=>t.due&&!isClosed(t)&&diffDays(t.due,t0)>=0&&diffDays(t.due,t0)<=7);
   if(u.due==='nodate') list=list.filter(t=>!t.due);
+  if(u.due==='today') list=list.filter(t=>t.due===t0&&!isClosed(t));
   if(q) list=list.filter(t=>[t.name,t.notes,S.clients[t.clientId]?.name,S.jobs[t.jobId]?.name,...(t.checklist||[]).map(c=>c.text),...Object.values(t.links||{})].some(x=>String(x||'').toLowerCase().includes(q)));
   if(u.due.startsWith('miss-')) list=list.filter(t=>!isClosed(t)&&missing(t,u.due.slice(5)));
   const by={
@@ -1729,6 +1771,29 @@ function filtered(){
   }[u.sort]||(()=>0);
   return list.sort(by);
 }
+/* Overview / job page stat tiles, chosen by the user (settings/app.stats, keys below; 'st:<status>' for any status) */
+const STAT_MAX=6;
+const statDefault=()=>['open','overdue','week','st:internal_review','st:revisions'].filter(k=>!k.startsWith('st:')||ST[k.slice(3)]);
+function statDefs(){
+  return [['open','Open tasks'],['overdue','Overdue'],['today','Due today'],['week','Due in 7 days'],['nodate','No due date'],
+    ...STATUSES.filter(x=>x.id!=='done').map(x=>['st:'+x.id,x.label])];
+}
+function statKeys(){const a=appSettings().stats,ok=new Set(statDefs().map(d=>d[0]));const k=(Array.isArray(a)?a:statDefault()).filter(x=>ok.has(x));return k.length?k:statDefault()}
+function statTile(key,label,list){
+  const t0=today(),open=list.filter(t=>!isClosed(t)),u=S.ui;
+  if(key.startsWith('st:')){const id=key.slice(3),n=open.filter(t=>stOf(t)===id).length;
+    return `<button class="stat ${id==='revisions'&&n?'warn':''}" data-act="jump-status" data-status="${id}"><small>${esc(label)}</small><b>${n}</b></button>`}
+  const n={open:open.length,overdue:open.filter(t=>t.due&&t.due<t0).length,today:open.filter(t=>t.due===t0).length,
+    week:open.filter(t=>t.due&&diffDays(t.due,t0)>=0&&diffDays(t.due,t0)<=7).length,nodate:open.filter(t=>!t.due).length}[key];
+  const f=key==='open'?'all':key,cls=key==='overdue'&&n?'alert':key==='today'&&n?'warn':'';
+  return `<button class="stat ${cls} ${u.due===f?'on':''}" data-act="stat" data-due="${f}"><small>${esc(label)}</small><b>${n}</b></button>`;
+}
+let STATPOP=false;
+function statPopHtml(){
+  if(!STATPOP)return '';const on=new Set(statKeys());
+  return `<div class="stat-pop" id="stat-pop"><b>Tiles to show</b><p class="hint">Pick up to ${STAT_MAX}. Saved to your account.</p>${statDefs().map(([k,l])=>`<label><input type="checkbox" data-stat-key="${k}" ${on.has(k)?'checked':''} ${!on.has(k)&&on.size>=STAT_MAX?'disabled':''}>${esc(l)}${k.startsWith('st:')?'<small>status</small>':''}</label>`).join('')}<button type="button" class="btn sm ghost" data-act="stat-reset">Reset to the default</button></div>`;
+}
+function saveStatKeys(keys){if(S.settings.app)patch('settings','app',{stats:keys});else create('settings',{stats:keys},'app');render()}
 function statsFor(list){
   const t0=today();
   const open=list.filter(t=>!isClosed(t));
@@ -1900,12 +1965,9 @@ function renderMain(){
     $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
     $('#view').innerHTML=u.pane==='brand'?brandPane(job):detailsPane(job);return;
   }
-  const st=statsFor(scope);
-  const stat=(key,label,val,cls='')=>`<button class="stat ${cls} ${u.due===key?'on':''}" data-act="stat" data-due="${key}"><small>${label}</small><b>${val}</b></button>`;
-  $('#stats').innerHTML=Object.keys(S.jobs).length?`<div class="stats" style="grid-template-columns:repeat(${3+!!ST.internal_review+!!ST.revisions},minmax(0,1fr))">
-    ${stat('all','Open tasks',st.open)}${stat('overdue','Overdue',st.overdue,st.overdue?'alert':'')}${stat('week','Due in 7 days',st.week)}
-    ${ST.internal_review?`<button class="stat" data-act="jump-status" data-status="internal_review"><small>${esc(stLabel('internal_review'))}</small><b>${st.review}</b></button>`:''}
-    ${ST.revisions?`<button class="stat ${st.revisions?'warn':''}" data-act="jump-status" data-status="revisions"><small>${esc(stLabel('revisions'))}</small><b>${st.revisions}</b></button>`:''}</div>`:'';
+  const keys=statKeys(),labels=Object.fromEntries(statDefs());
+  $('#stats').innerHTML=Object.keys(S.jobs).length?`<div class="stats-wrap"><div class="stats" style="grid-template-columns:repeat(${keys.length},minmax(0,1fr))">${keys.map(k=>statTile(k,labels[k],scope)).join('')}</div>
+    <button type="button" class="icon-btn stats-edit ${STATPOP?'on':''}" data-act="stat-edit" title="Choose tiles" aria-label="Choose which tiles show" aria-expanded="${STATPOP}">${I.pencil}</button>${statPopHtml()}</div>`:'';
 
   $('#jobcards').innerHTML=(!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')}</div>`:'')+pinnedStrip(scope);
 
@@ -1914,7 +1976,8 @@ function renderMain(){
   ['list','board','calendar'].forEach(v=>{const b=$('#v-'+v);b.classList.toggle('on',u.view===v);b.setAttribute('aria-selected',u.view===v)});
   if(document.activeElement!==$('#q')) $('#q').value=u.q;
   $('#f-prio').value=u.prio;$('#f-due').value=u.due;$('#f-sort').value=u.sort;
-  $('#vopt-wrap').hidden=u.view!=='list';if(u.view!=='list')VOPT=false;renderVopt();
+  $('#vopt-wrap').hidden=u.view!=='list';
+  $('#sel-btn').hidden=u.view==='calendar';if(u.view==='calendar'&&(SELMODE||SEL.size)){SEL.clear();SELMODE=false}if(u.view!=='list')VOPT=false;renderVopt();
 
   if(!Object.keys(S.jobs).length){
     $('#view').innerHTML=`<div class="empty"><h3>Add your first job</h3><p>A job is an agency you edit for (with its own clients) or a direct client. Each job keeps its own tools: where you talk, where tasks are assigned, where you upload, and where files live.</p><button class="btn primary" data-act="new-job">${I.plus}New job</button></div>`;
@@ -1998,6 +2061,61 @@ function renderTabbar(){
     +b('tb-cal','Calendar',I.cal,cal)
     +b('tb-search','Search','<svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 14 14"/></svg>',false);
 }
+/* ================= right-click (long-press on phones) menu on a task =================
+   On list rows, board cards and calendar entries: status, priority, pin, duplicate, copy link, archive, delete. */
+let CTX=null;
+function openCtx(id,x,y){
+  const t=S.tasks[id];if(!t||t._draft)return;
+  CTX={id,del:false,at:Date.now()};renderCtx();
+  const m=$('#ctx'),w=m.offsetWidth,h=m.offsetHeight;
+  m.style.left=Math.max(8,Math.min(x,innerWidth-w-8))+'px';m.style.top=Math.max(8,Math.min(y,innerHeight-h-8))+'px';
+}
+function closeCtx(){CTX=null;const m=$('#ctx');if(m){m.hidden=true;m.innerHTML=''}}
+function renderCtx(){
+  let m=$('#ctx');if(!m){m=document.createElement('div');m.id='ctx';m.className='ctx';m.setAttribute('role','menu');document.body.appendChild(m)}
+  const t=CTX&&S.tasks[CTX.id];if(!t){closeCtx();return}
+  m.hidden=false;
+  m.innerHTML=`<div class="ctx-head">${esc(t.name||'Untitled task')}</div>
+    <div class="ctx-lbl">Status</div><div class="ctx-sts">${STATUSES.map(x=>`<button type="button" class="pill ${stOf(t)===x.id?'cur':''}" ${pillStyle(x.id)} data-act="cx" data-do="status" data-v="${x.id}"><span class="pl">${esc(x.label)}</span></button>`).join('')}</div>
+    <div class="ctx-lbl">Priority</div><div class="ctx-prio">${PRIORITIES.map(p=>`<button type="button" class="${(t.priority||'normal')===p.id?'cur':''}" data-act="cx" data-do="prio" data-v="${p.id}">${prioHtml(p.id)}</button>`).join('')}</div>
+    <div class="ctx-sep"></div>
+    <button type="button" class="ctx-item" data-act="cx" data-do="open">${I.info}Open</button>
+    <button type="button" class="ctx-item" data-act="cx" data-do="pin">${I.pin}${t.pinned?'Unpin':'Pin to the top'}</button>
+    <button type="button" class="ctx-item" data-act="cx" data-do="dup">${I.copy}Duplicate</button>
+    <button type="button" class="ctx-item" data-act="cx" data-do="link">${LINK_IC}Copy link</button>
+    ${t.archived?`<button type="button" class="ctx-item" data-act="cx" data-do="restore">${I.archive}Restore from Archived</button>`:`<button type="button" class="ctx-item" data-act="cx" data-do="archive">${I.archive}Archive</button>`}
+    <button type="button" class="ctx-item danger ${CTX.del?'armed':''}" data-act="cx" data-do="del">${I.trash}${CTX.del?'Click again to move to Trash':'Delete'}</button>`;
+}
+function ctxDo(what,v){
+  const id=CTX?.id,t=S.tasks[id];if(!t){closeCtx();return}
+  if(what==='del'&&!CTX.del){CTX.del=true;renderCtx();return}
+  closeCtx();
+  if(what==='status'){setStatus(id,v);render();if(S.ui.openTask===id)renderDrawer()}
+  else if(what==='prio'){if((t.priority||'normal')!==v){patch('tasks',id,{priority:v});logAct('edit',`Priority set to ${(PRIORITIES.find(x=>x.id===v)||{}).label||v}`,{task:t})}render();if(S.ui.openTask===id)renderDrawer()}
+  else if(what==='open')openTask(id);
+  else if(what==='pin'){const on=!t.pinned;patch('tasks',id,{pinned:on});logAct('edit',on?'Pinned':'Unpinned',{task:t});render();toast(on?'Pinned to the top':'Unpinned')}
+  else if(what==='dup')duplicateTask(id);
+  else if(what==='link')copyTaskLink(id);
+  else if(what==='archive'){archiveTasks([id]);render()}
+  else if(what==='restore'){restoreTasks([id]);render()}
+  else if(what==='del')deleteTasks([id]);
+}
+const CTX_SEL='.row[data-id],.card[data-id],.wcard[data-id],.ev[data-id],.pin-card[data-id],.arow[data-id]';
+document.addEventListener('contextmenu',e=>{
+  const r=e.target.closest?.(CTX_SEL);if(!r||e.target.closest('input,textarea,select,a'))return;
+  e.preventDefault();openCtx(r.dataset.id,e.clientX,e.clientY);
+});
+/* long press on touch screens */
+let lpT=null,lpAt=null,lpFired=false;
+document.addEventListener('touchstart',e=>{
+  const r=e.target.closest?.(CTX_SEL);if(!r||e.touches.length>1||e.target.closest('input,textarea,select,a,button'))return;
+  const p=e.touches[0];lpAt={x:p.clientX,y:p.clientY};lpFired=false;clearTimeout(lpT);
+  lpT=setTimeout(()=>{lpFired=true;navigator.vibrate?.(10);openCtx(r.dataset.id,lpAt.x,lpAt.y)},480);
+},{passive:true});
+document.addEventListener('touchmove',e=>{if(!lpT||!lpAt)return;const p=e.touches[0];if(Math.hypot(p.clientX-lpAt.x,p.clientY-lpAt.y)>10){clearTimeout(lpT);lpT=null}},{passive:true});
+document.addEventListener('touchend',e=>{clearTimeout(lpT);lpT=null;if(lpFired){e.preventDefault();lpFired=false}});
+window.addEventListener('scroll',e=>{if(CTX&&Date.now()-CTX.at>300&&!e.target.closest?.('#ctx'))closeCtx()},true);
+window.addEventListener('resize',()=>{if(CTX)closeCtx()});
 function pinnedStrip(scope){
   const pins=scope.filter(t=>t.pinned&&!t._draft).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));if(!pins.length)return '';
   return `<section class="pins"><h3>${I.pin}Pinned<span class="count">${pins.length}</span></h3><div class="pin-list">${pins.map(t=>`<div class="pin-card" data-act="open" data-id="${t.id}" tabindex="0">${taskMark(t)}<div class="pc-main"><b>${esc(t.name||'Untitled task')}</b><small>${esc([S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '))}</small></div><span class="pill" ${pillStyle(stOf(t))}><span class="pl">${esc(stLabel(stOf(t)))}</span></span><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):''}</span><button class="icon-btn" data-act="unpin" data-id="${t.id}" data-stop title="Unpin" aria-label="Unpin">${I.x}</button></div>`).join('')}</div></section>`;
@@ -2072,9 +2190,9 @@ const rowHtml=(t,job,showJob)=>`<div class="row ${isClosed(t)?'done-row':''} ${S
         <div class="mark-wrap">${taskMark(t)}${selBox(t)}</div>
         <div class="t-main"><div class="t-name" title="Double-click to rename">${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${hlText(t.name||'Untitled task',qNow())}</div>${metaLine(t,job,showJob)}${searchHit(t)}</div>
         <div class="c-status" data-stop>${statusSelect(t,'row-status')}${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
-        <div class="c-prio">${prioHtml(t.priority)}</div>
+        <div class="c-prio pedit" title="Change priority">${prioHtml(t.priority)}<select class="cell-sel" data-act="row-prio" data-id="${t.id}" aria-label="Priority">${PRIORITIES.map(p=>`<option value="${p.id}" ${(t.priority||'normal')===p.id?'selected':''}>${p.label}</option>`).join('')}</select></div>
         <div class="c-start date ${t.start?'':'none'}"${relTitle(t.start)}>${t.start?fmtRel(t.start):'—'}</div>
-        <div class="c-due date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,!isClosed(t)):'—'}</div>
+        <div class="c-due date ${dueClass(t)} dedit" data-act="row-due-pick"${relTitle(t.due)||' title="Set due date"'}>${t.due?fmtRel(t.due,!isClosed(t)):'—'}<input type="date" class="cell-date" data-act="row-due" data-id="${t.id}" value="${esc(t.due||'')}" tabindex="-1" aria-label="Due date"></div>
         <div class="c-links">${linkIcons(t)}</div></div>`;
 function listView(list,job){
   const showJob=!job;
@@ -2296,21 +2414,36 @@ function renderActivity(){
   else if(list.length>shown.length)html+=`<div style="text-align:center;margin-top:14px"><button class="btn" data-act="log-more">Show more (${list.length-shown.length} older)</button></div>`;
   $('#view').innerHTML=html;
 }
+let ASEL=new Set(),ASELMODE=false,aselDelArmed=false;
 function renderArchive(){
   const u=S.ui,q=(u.aq||'').trim().toLowerCase();
   const all=archived();
   $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${I.archive.replace('class="i"','class="i" style="width:28px;height:28px"')}Archived</h1><div class="sub">${all.length} task${all.length===1?'':'s'} · hidden from Overview, job tabs and counts. Restore one to bring it back.</div></div></div>`;
   $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
   if(!all.length){$('#view').innerHTML=`<div class="empty"><h3>Nothing archived yet</h3><p>When a task is Done, click <b>Archive</b> on it to move it here and keep your lists clean.</p></div>`;return}
-  const list=all.filter(t=>(u.ajob||'all')==='all'||t.jobId===u.ajob).filter(t=>!q||[t.name,t.notes,S.clients[t.clientId]?.name,S.jobs[t.jobId]?.name].some(x=>String(x||'').toLowerCase().includes(q)))
+  if(u.ajob&&u.ajob!=='all'&&!S.jobs[u.ajob])u.ajob='all';
+  const aj=S.jobs[u.ajob],clientsWith=aj&&aj.type==='agency'?clientsOf(aj.id).filter(c=>all.some(t=>t.clientId===c.id)):[];
+  if(!clientsWith.some(c=>c.id===u.aclient))u.aclient='all';
+  const monthOf=t=>(t.archivedAt||t.doneAt||'').slice(0,7);
+  const months=[...new Set(all.map(monthOf).filter(Boolean))].sort().reverse();
+  if(u.amonth&&u.amonth!=='all'&&!months.includes(u.amonth))u.amonth='all';
+  const list=all.filter(t=>(u.ajob||'all')==='all'||t.jobId===u.ajob).filter(t=>(u.aclient||'all')==='all'||t.clientId===u.aclient).filter(t=>(u.amonth||'all')==='all'||monthOf(t)===u.amonth)
+    .filter(t=>!q||[t.name,t.notes,S.clients[t.clientId]?.name,S.jobs[t.jobId]?.name].some(x=>String(x||'').toLowerCase().includes(q)))
     .sort((a,b)=>(b.archivedAt||'').localeCompare(a.archivedAt||'')||(b.doneAt||'').localeCompare(a.doneAt||''));
+  for(const id of [...ASEL])if(!S.tasks[id]||!S.tasks[id].archived||S.tasks[id].deleted)ASEL.delete(id);
   const jobsWith=jobsSorted().filter(j=>all.some(t=>t.jobId===j.id));
+  const mLabel=m=>`${MONTH_FULL[+m.slice(5,7)-1]} ${m.slice(0,4)}`;
   let html=`<div class="arch-bar"><label class="search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="arch-q" data-fk="arch-q" type="search" placeholder="Search archived tasks" value="${esc(u.aq||'')}" autocomplete="off"></label>
-    <select class="sel" id="arch-job" aria-label="Filter by job"><option value="all">All jobs</option>${jobsWith.map(j=>`<option value="${j.id}" ${u.ajob===j.id?'selected':''}>${esc(j.name)}</option>`).join('')}</select></div>`;
+    <select class="sel" id="arch-job" aria-label="Filter by job"><option value="all">All jobs</option>${jobsWith.map(j=>`<option value="${j.id}" ${u.ajob===j.id?'selected':''}>${esc(j.name)}</option>`).join('')}</select>
+    ${clientsWith.length?`<select class="sel" id="arch-client" aria-label="Filter by client"><option value="all">All clients</option>${clientsWith.map(c=>`<option value="${c.id}" ${u.aclient===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>`:''}
+    <select class="sel" id="arch-month" aria-label="Filter by month archived"><option value="all">Any month</option>${months.map(m=>`<option value="${m}" ${u.amonth===m?'selected':''}>${mLabel(m)}</option>`).join('')}</select>
+    <button type="button" class="btn sm ${ASELMODE?'on':''}" data-act="asel-mode" aria-pressed="${ASELMODE}">${ASELMODE?'Done selecting':'Select'}</button>
+    ${ASELMODE?`<button type="button" class="btn sm ghost" data-act="asel-all" data-ids="${list.map(t=>t.id).join(',')}">${list.length&&list.every(t=>ASEL.has(t.id))?'Select none':`Select all ${list.length}`}</button>`:''}</div>
+    ${ASEL.size?`<div class="asel-bar"><b>${ASEL.size} selected</b><button type="button" class="btn sm primary" data-act="asel-restore">Restore ${ASEL.size}</button><button type="button" class="btn sm danger ${aselDelArmed?'armed':''}" data-act="asel-delete">${I.trash}${aselDelArmed?'Click again to move to Trash':'Delete'}</button><button type="button" class="icon-btn" data-act="asel-clear" title="Clear selection" aria-label="Clear selection">${I.x}</button></div>`:''}`;
   for(const j of jobsWith){
     const rows=list.filter(t=>t.jobId===j.id);if(!rows.length)continue;
-    html+=`<section class="arch-group"><h3>${jobMark(j,20)}${esc(j.name)}<span class="count">${rows.length}</span></h3><div class="rows">${rows.map(t=>`<div class="arow" data-act="open" data-id="${t.id}" tabindex="0">
-      ${taskMark(t)}
+    html+=`<section class="arch-group"><h3>${jobMark(j,20)}${esc(j.name)}<span class="count">${rows.length}</span></h3><div class="rows">${rows.map(t=>`<div class="arow ${ASEL.has(t.id)?'picked':''} ${ASELMODE?'selecting':''}" data-act="open" data-id="${t.id}" tabindex="0">
+      ${ASELMODE?`<label class="selbox" data-stop><input type="checkbox" data-act="asel" data-id="${t.id}" ${ASEL.has(t.id)?'checked':''} aria-label="Select ${esc(t.name||'task')}"></label>`:taskMark(t)}
       <div class="t-main"><div class="t-name">${esc(t.name||'Untitled task')}</div>${metaLine(t,j,false)}</div>
       <div class="date c-done"><small>Done</small>${t.doneAt?fmtDate(t.doneAt):'—'}</div>
       <div class="date c-done"><small>Archived</small>${t.archivedAt?fmtDate(t.archivedAt):'—'}</div>
@@ -3527,6 +3660,8 @@ document.addEventListener('click',e=>{
   if(narrow.matches&&$('#side').classList.contains('open')&&e.target.closest('#side [data-act]:not([data-act=toggle-jobs])'))setTimeout(closeSide,0);
   if(notesOpen&&!e.target.closest('.bell-wrap')){notesOpen=false;renderBell()}
   if(VOPT&&!e.target.closest('#vopt-wrap')){VOPT=false;renderVopt()}
+  if(STATPOP&&!e.target.closest('.stats-wrap')){STATPOP=false;render()}
+  if(CTX&&!e.target.closest('#ctx')){closeCtx()}
   if(JUMP&&e.target.id==='jump'){closeJump();return}
   const stop=e.target.closest('[data-stop]');
   const el=e.target.closest('[data-act]');
@@ -3541,6 +3676,8 @@ document.addEventListener('click',e=>{
     case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';{const v=u.views?.[u.tab];if(v)u.view=v}saveUi();render();window.scrollTo({top:0});break;
     case 'view': u.view=el.dataset.view;(u.views=u.views||{})[u.tab]=u.view;saveUi();render();break;
     case 'vopt': VOPT=!VOPT;renderVopt();break;
+    case 'cx': ctxDo(el.dataset.do,el.dataset.v);break;
+    case 'row-due-pick':{const inp=el.querySelector('.cell-date');if(!inp)break;try{inp.showPicker()}catch(x){inp.style.pointerEvents='auto';inp.focus();inp.click()}break}
     case 'tb-overview': if(u.tab!=='overview')u.from=u.tab;u.tab='overview';u.client='all';u.pane='tasks';if(u.view==='calendar')u.view=(u.views?.overview&&u.views.overview!=='calendar')?u.views.overview:'list';(u.views=u.views||{}).overview=u.view;saveUi();render();window.scrollTo({top:0});break;
     case 'tb-jobs': u.jobsOpen=true;saveUi();renderSide();openSide();break;
     case 'tb-cal': if(['archived','activity','trash'].includes(u.tab)){u.tab='overview';u.client='all'}u.pane='tasks';u.view='calendar';(u.views=u.views||{})[u.tab]='calendar';saveUi();render();window.scrollTo({top:0});break;
@@ -3581,6 +3718,8 @@ document.addEventListener('click',e=>{
     case 'toggle-jobs': u.jobsOpen=u.jobsOpen===false;saveUi();renderSide();break;
     case 'group': u.collapsed[el.dataset.status]=!u.collapsed[el.dataset.status];saveUi();render();break;
     case 'stat': u.due=u.due===el.dataset.due?'all':el.dataset.due;render();break;
+    case 'stat-edit': STATPOP=!STATPOP;render();break;
+    case 'stat-reset': saveStatKeys(statDefault());break;
     case 'jump-status':{
       u.view='list';u.collapsed[el.dataset.status]=false;u.due='all';saveUi();render();
       $('#grp-'+el.dataset.status)?.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'start'});break}
@@ -3654,6 +3793,11 @@ document.addEventListener('click',e=>{
     case 'archive': archiveTasks([el.dataset.id]);break;
     case 'archive-all': archiveTasks(filtered().filter(t=>stOf(t)===el.dataset.status).map(t=>t.id));break;
     case 'restore': restoreTasks([el.dataset.id]);break;
+    case 'asel-mode': ASELMODE=!ASELMODE;if(!ASELMODE)ASEL.clear();aselDelArmed=false;render();break;
+    case 'asel-all':{const ids=(el.dataset.ids||'').split(',').filter(Boolean);const all=ids.length&&ids.every(id=>ASEL.has(id));ids.forEach(id=>all?ASEL.delete(id):ASEL.add(id));aselDelArmed=false;render();break}
+    case 'asel-clear': ASEL.clear();aselDelArmed=false;render();break;
+    case 'asel-restore':{const ids=[...ASEL];ASEL.clear();ASELMODE=false;restoreTasks(ids);render();break}
+    case 'asel-delete': if(!aselDelArmed){aselDelArmed=true;render();break}{const ids=[...ASEL];ASEL.clear();ASELMODE=false;aselDelArmed=false;deleteTasks(ids);render()}break;
     case 'arch-delete':
       if(archDelArmed!==el.dataset.id){archDelArmed=el.dataset.id;render();break}
       archDelArmed=null;deleteTasks([el.dataset.id]);break;
@@ -3711,6 +3855,7 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('keydown',e=>{
   if((e.metaKey||e.ctrlKey)&&!e.altKey&&e.key.toLowerCase()==='k'&&S.ready){e.preventDefault();JUMP?closeJump():openJump();return}
+  if(CTX&&e.key==='Escape'){e.preventDefault();closeCtx();return}
   if(JUMP){
     if(e.key==='Escape'){e.preventDefault();closeJump();return}
     if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();const n=JUMP.items.length;if(n){JUMP.i=(JUMP.i+(e.key==='ArrowDown'?1:-1)+n)%n;renderJump()}return}
@@ -3730,8 +3875,12 @@ document.addEventListener('change',e=>{
   const el=e.target,u=S.ui;
   if(el.id==='f-prio'){u.prio=el.value;render();return}
   if(el.id==='f-due'){u.due=el.value;render();return}
+  if(el.dataset.statKey){const k=el.dataset.statKey,cur=statKeys(),order=statDefs().map(d=>d[0]);let next=el.checked?[...cur,k]:cur.filter(x=>x!==k);if(!next.length){render();return}next=order.filter(x=>next.includes(x)).slice(0,STAT_MAX);saveStatKeys(next);return}
   if(el.dataset.col&&el.closest('#vopt')){(u.hideCols=u.hideCols||{})[el.dataset.col]=!el.checked;saveUi();render();return}
-  if(el.id==='arch-job'){u.ajob=el.value;saveUi();render();return}
+  if(el.id==='arch-job'){u.ajob=el.value;u.aclient='all';saveUi();render();return}
+  if(el.id==='arch-client'){u.aclient=el.value;saveUi();render();return}
+  if(el.id==='arch-month'){u.amonth=el.value;saveUi();render();return}
+  if(el.dataset.act==='asel'){el.checked?ASEL.add(el.dataset.id):ASEL.delete(el.dataset.id);aselDelArmed=false;render();return}
   if(el.id==='bulk-move'&&el.value){moveTasks([...SEL],el.value);return}
   if(el.id==='bulk-status'&&el.value){const v=el.value,undo=[];[...SEL].forEach(id=>{const prev=setStatus(id,v,{quiet:true});if(prev)undo.push([id,prev])});if(v==='done'&&undo.length)celebrate();render();toast(`Moved ${undo.length} task${undo.length===1?'':'s'} to ${stLabel(v)}`,undo.length?{label:'Undo',fn:()=>undoStatus(undo)}:null);return}
   if(el.id==='bulk-prio'&&el.value){const v=el.value;[...SEL].forEach(id=>{const t=S.tasks[id];if(t&&(t.priority||'normal')!==v){patch('tasks',id,{priority:v});logAct('edit',`Priority set to ${(PRIORITIES.find(x=>x.id===v)||{}).label}`,{task:t})}});render();toast(`Priority set for ${SEL.size} task${SEL.size===1?'':'s'}`);return}
@@ -3747,6 +3896,8 @@ document.addEventListener('change',e=>{
   if(BM&&el.dataset.bmColor!==undefined){const c=BM.b.colors[+el.dataset.bmColor];if(c){c.hex=el.value;renderBrand()}return}
   if(el.id==='logo-in'){const f=el.files[0];el.value='';if(!f)return;const app=logoTarget?.kind==='app';openCrop(f,blob=>app?setAppLogo(blob):setModalLogo(blob));return}
   const act=el.dataset.act;
+  if(act==='row-prio'){const t=S.tasks[el.dataset.id],v=el.value;if(t&&(t.priority||'normal')!==v){patch('tasks',t.id,{priority:v});logAct('edit',`Priority set to ${(PRIORITIES.find(x=>x.id===v)||{}).label||v}`,{task:t})}render();return}
+  if(act==='row-due'){const t=S.tasks[el.dataset.id],v=el.value;if(t&&(t.due||'')!==v){patch('tasks',t.id,{due:v});logAct('date',v?`Due date set to ${fmtDate(v)}`:'Due date removed',{task:t});toast(v?`Due ${fmtDate(v)}`:'Due date removed')}render();return}
   if(act==='row-status'){setStatus(el.dataset.id,el.value);if(u.openTask===el.dataset.id)renderDrawer();return}
   if(act==='d-status'){setStatus(u.openTask,el.value);renderDrawer();return}
   if(act==='check'){const t=S.tasks[u.openTask];{const c=(t.checklist||[]).find(c=>c.id===el.dataset.cid);if(c&&el.checked)logAct('check',`Checked off “${c.text||'a step'}”`,{task:t})}patch('tasks',t.id,{checklist:(t.checklist||[]).map(c=>c.id===el.dataset.cid?{...c,done:el.checked}:c)});renderDrawer();return}
