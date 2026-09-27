@@ -430,8 +430,9 @@ select.pill::before{display:none}
 .stepper button:hover{background:var(--surface-2);color:var(--text)}
 .stepper output{min-width:44px;text-align:center;font:500 calc(13px*var(--ts)) var(--mono)}
 .fmt-pick{display:flex;gap:4px;flex-wrap:wrap}
-.fmt-pick button{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:4px 8px;font:500 calc(12px*var(--ts)) var(--mono);color:var(--muted)}
-.fmt-pick button.on{border-color:var(--accent);color:var(--text);background:var(--accent-soft)}
+.fmt-pick button{border:1px solid transparent;background:var(--surface-2);border-radius:999px;padding:5px 11px;font:600 calc(12px*var(--ts)) var(--mono);color:var(--muted)}
+.fmt-pick button:hover{color:var(--text);border-color:var(--line-strong)}
+.fmt-pick button.on{background:color-mix(in srgb,var(--accent) 16%,transparent);color:color-mix(in srgb,var(--accent) 80%,var(--text));border-color:transparent}
 .section-title{font-size:calc(11px*var(--ts));font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 8px;display:flex;justify-content:space-between;align-items:center}
 .link-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:end}
 .link-row + .link-row{margin-top:10px}
