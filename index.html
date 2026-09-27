@@ -804,9 +804,9 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .pf > label .i,.pf-l .i{width:17px;height:17px;color:var(--faint)}
 .pf-v{display:flex;align-items:center;gap:6px;min-width:0}
 .pf-wide{grid-column:1/-1}
-.pf-v select,.pf-v input[type=text],.pf-v input[type=date]{border:1px solid transparent;background:none;border-radius:7px;padding:6px 8px;font-size:calc(14px*var(--ts));width:100%;min-width:0;color:var(--text);cursor:pointer}
+.pf-v select,.pf-v input[type=text],.pf-v input[type=date]{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px;font-size:calc(14px*var(--ts));width:100%;min-width:0;color:var(--text);cursor:pointer}
 .pf-v input[type=text]{cursor:text}
-.pf-v select:hover,.pf-v input:hover{background:var(--surface-2)}
+.pf-v select:hover,.pf-v input:hover{border-color:var(--line-strong)}
 .pf-v select:focus,.pf-v input:focus{outline:none;border-color:var(--accent);background:var(--surface)}
 .pf-v input::placeholder{color:var(--faint)}
 .st-ctl{display:inline-flex;align-items:stretch;border-radius:999px;overflow:hidden;background:color-mix(in srgb,var(--c) 16%,transparent);color:color-mix(in srgb,var(--c) 80%,var(--text));min-width:0;padding-left:11px;position:relative}
@@ -819,17 +819,18 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .st-next .i{width:13px;height:13px;stroke:none}
 .st-done{width:32px;height:30px;border:1px solid var(--line);background:var(--surface-2);border-radius:7px;display:grid;place-items:center;color:var(--muted)}
 .st-done:hover{color:var(--st-done);border-color:var(--st-done)}
-.prio-ctl{display:flex;align-items:center;width:100%;border-radius:7px}
-.prio-ctl > .i{margin-left:8px;flex:none}
-.prio-ctl select{padding-left:6px!important}
-.prio-ctl.p-urgent > .i{color:var(--danger)} .prio-ctl.p-high > .i{color:var(--st-rev)} .prio-ctl.p-normal > .i{color:var(--st-prog)} .prio-ctl.p-low > .i{color:var(--faint)}
-.date-ctl{display:flex;align-items:center;gap:2px;min-width:0;width:100%}
-.date-ctl{max-width:360px}
+.prio-ctl{display:inline-flex;align-items:center;border-radius:999px;background:color-mix(in srgb,var(--c) 16%,transparent);color:color-mix(in srgb,var(--c) 80%,var(--text));padding-left:11px;max-width:100%}
+.prio-ctl.p-urgent{--c:var(--danger)} .prio-ctl.p-high{--c:var(--st-rev)} .prio-ctl.p-normal{--c:var(--st-prog)} .prio-ctl.p-low{--c:var(--faint)}
+.pf-v .prio-ctl select{appearance:none;-webkit-appearance:none;border:0;background:none;color:inherit;font-weight:600;font-size:calc(13px*var(--ts));padding:7px 12px 7px 6px;width:auto;border-radius:999px}
+.pf-v .prio-ctl select:hover{text-decoration:underline;text-underline-offset:3px}
+.prio-ctl select option{color:var(--text);background:var(--surface)}
+.date-ctl{display:flex;align-items:center;gap:6px;min-width:0;width:100%}
+.date-ctl{max-width:420px}
 .date-ctl input{flex:1;min-width:0}
 .date-ctl .arrow{color:var(--faint);flex:none}
 .date-ctl input.over{color:var(--danger)} .date-ctl input.soon{color:var(--warn)}
-.pf-v .stepper{border-color:transparent}
-.pf-v .stepper:hover{border-color:var(--line)}
+.pf-v .stepper{border-color:var(--line)}
+.pf-v .stepper:hover{border-color:var(--line-strong)}
 @container (max-width:600px){.props2{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:820px){.pf{grid-template-columns:96px minmax(0,1fr)}.d-name{font-size:calc(22px*var(--ts))}}
 </style>
@@ -1845,7 +1846,7 @@ function renderDrawer(){
       const busy=(()=>{if(!t.due||isClosed(t)||t.archived)return'';const n=dueLoad(t.id)[t.due]||0;return n+1>=dayLimit()?`<p class="load-warn pf-wide">${I.warn}Busy day: ${n} other task${n===1?' is':'s are'} due ${(d=>/^(Today|Tomorrow|Yesterday)$/.test(d)?d.toLowerCase():'on '+d)(fmtDate(t.due))}.</p>`:''})();
       return `<div class="props2">
       ${f(I.status,'Status',`<div class="st-ctl" ${pillStyle(cur)}>${statusSelect(t,'d-status')}${nxt?`<button type="button" class="st-next" data-act="d-next" title="Move to ${esc(nxt.label)}" aria-label="Move to ${esc(nxt.label)}"><svg class="i" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" fill="currentColor"/></svg></button>`:''}</div>${cur!=='done'?`<button type="button" class="st-done" data-act="d-done" title="Mark ${esc(stLabel('done'))}" aria-label="Mark ${esc(stLabel('done'))}"><svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg></button>`:''}`)}
-      ${f(I.flag,'Priority',`<div class="prio-ctl p-${prio}">${I.flag}<select id="d-prio" data-field="priority">${PRIORITIES.map(p=>`<option value="${p.id}" ${prio===p.id?'selected':''}>${p.label}</option>`).join('')}</select></div>`,'d-prio')}
+      ${f(I.flag,'Priority',`<div class="prio-ctl p-${prio}">${I.flag.replace('class="i"','class="i" style="width:14px;height:14px"')}<select id="d-prio" data-field="priority">${PRIORITIES.map(p=>`<option value="${p.id}" ${prio===p.id?'selected':''}>${p.label}</option>`).join('')}</select></div>`,'d-prio')}
       ${f(I.cal,'Dates',`<div class="date-ctl"><input type="date" id="d-start" data-field="start" value="${esc(t.start||'')}" aria-label="Start date" title="Start date"><span class="arrow">→</span><input type="date" id="d-due" data-field="due" class="${t.due?dueClass(t):''}" value="${esc(t.due||'')}" aria-label="Due date" title="Due date"></div>`,'',true)}
       ${job}
       ${busy}
@@ -2447,7 +2448,7 @@ function runRestore(){
   COLS.forEach(c=>{const m=r.data[c]||{};for(const id in m){const doc=m[id];if(doc&&typeof doc==='object'){create(c,{...doc},id);n++}}});
   closeSettings(false);render();toast(`Restored ${n} item${n===1?'':'s'} from the backup`);
 }
-function pathHint(){return IS_MAC?`Opens in Finder through your “${esc(OPEN_SHORTCUT)}” shortcut. First time? Set it up in Settings → Finder folders.`:'Finder paths open only on your Mac. On this device the button copies the path.'}
+function pathHint(){return IS_MAC?`Opens in Finder through your “${esc(OPEN_SHORTCUT)}” shortcut. First time? Set it up in Settings → Finder & Chrome.`:'Finder paths open only on your Mac. On this device the button copies the path.'}
 /* Settings-style layout: section list on the left, one section shown on the right. All sections stay
    in the page (hidden), so switching keeps what was typed. key: s (Settings), m (job), b (brand guide). */
 function prefLayout(key,active,sections,tag='div',attrs=''){
