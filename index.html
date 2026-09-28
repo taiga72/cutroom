@@ -947,6 +947,38 @@ body.side-mini .synced{display:none}
 .tl-note-head .icon-btn:hover,.tl-note-head .icon-btn.danger{opacity:1}
 .tl-note-head .icon-btn.danger{color:var(--danger);background:var(--danger-soft)}
 .tl-note p{margin:4px 0 0;white-space:normal;line-height:1.5}
+/* updates: formatted text, pictures, lightbox */
+.note-body.md,.note-reply .md{margin-top:4px;line-height:1.5;overflow-wrap:anywhere}
+.tl-note .md p{margin:0}
+.tl-note .md p.gap{height:.6em}
+.tl-note .md ul,.tl-note .md ol{margin:2px 0;padding-left:22px}
+.tl-note .md h5{margin:6px 0 2px;font-size:calc(14px*var(--ts))}
+.tl-note .md a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+.tl-note.resolved .note-body.md{text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--text) 45%,transparent);color:var(--muted)}
+.composer .fmt-bar{margin:0;padding:6px 8px 0;justify-content:flex-start}
+.reply-box .fmt-bar{margin:0 0 4px;justify-content:flex-start}
+.composer.drop-on,.reply-box.drop-on{outline:2px dashed var(--accent);outline-offset:2px}
+.att-list{display:flex;flex-wrap:wrap;gap:8px;padding:4px 12px 2px}
+.reply-box .att-list{padding:6px 0 0}
+.att{position:relative;width:72px;height:54px;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:var(--surface-2);display:grid;place-items:center;font-size:calc(11px*var(--ts));color:var(--muted)}
+.att img{width:100%;height:100%;object-fit:cover;display:block}
+.att .icon-btn{position:absolute;top:2px;right:2px;width:20px;height:20px;padding:0;border-radius:50%;background:rgba(0,0,0,.6);color:#fff}
+.att .icon-btn .i{width:11px;height:11px}
+.note-pics{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.note-pic{border:1px solid var(--line);padding:0;border-radius:8px;overflow:hidden;background:var(--surface-2);width:120px;height:80px;cursor:zoom-in}
+.note-reply .note-pic{width:96px;height:64px}
+.note-pic img{width:100%;height:100%;object-fit:cover;display:block}
+.note-pic:hover{border-color:var(--accent)}
+.lightbox{position:fixed;inset:0;z-index:90;background:rgba(6,8,12,.88);display:flex;align-items:center;justify-content:center;padding:48px 64px}
+.lightbox img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.lightbox .icon-btn{position:absolute;color:#fff;background:rgba(255,255,255,.12);border-radius:50%;width:40px;height:40px}
+.lightbox .icon-btn:hover{background:rgba(255,255,255,.22)}
+.lb-close{top:14px;right:14px}
+.lb-nav.prev{left:14px;top:50%;margin-top:-20px}
+.lb-nav.next{right:14px;top:50%;margin-top:-20px}
+.lb-count{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);color:#fff;font:600 calc(13px*var(--ts)) var(--mono)}
+.lb-open{position:absolute;bottom:12px;right:14px}
+@media (max-width:820px){.lightbox{padding:56px 8px}.note-pic{width:96px;height:64px}}
 /* resolve + reply */
 .tc{display:inline-block;font:600 calc(12.5px*var(--ts)) var(--mono);color:#e0a100;background:color-mix(in srgb,#e0a100 16%,transparent);border-radius:5px;padding:1px 6px;margin-right:6px}
 :root[data-theme="dark"] .tc{color:#f2c14e}
@@ -1248,6 +1280,8 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 <input type="file" id="import-in" accept=".csv,text/csv,.tsv,text/tab-separated-values,text/plain" hidden>
 <input type="file" id="pdf-in" accept="application/pdf,.pdf" hidden>
 <input type="file" id="logo-in" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+<input type="file" id="upd-pics-in" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden>
+<div class="lightbox" id="lightbox" hidden></div>
 
 <script>
 (function(){
@@ -1905,7 +1939,7 @@ function logAct(kind,text,o={}){
   if(!S.ready)return;
   const t=o.task;if(t&&(t._draft||(DRAFT&&t.id===DRAFT.id)))return;
   const d=new Date(),id='log-'+ymd(d).slice(0,7);
-  const e={at:d.toISOString(),kind,text,taskId:t?.id||null,task:t?(t.name||'Untitled task'):(o.taskName||''),jobId:o.jobId||t?.jobId||null};
+  const e={at:d.toISOString(),kind,text,taskId:t?.id||null,task:t?(t.name||'Untitled task'):(o.taskName||''),jobId:o.jobId||t?.jobId||null,...(o.extra||{})};
   const doc=S.settings[id],items=[e,...(doc?.items||[])].slice(0,LOG_MAX);
   if(doc)patch('settings',id,{items});else create('settings',{month:id.slice(4),items},id);
 }
@@ -2531,7 +2565,7 @@ function renderArchive(){
 
 /* ================= drawer ================= */
 let deleteArmed=false, clearArmed=false;
-function openTask(id,tab){seenTask(id);if(NOTES_EDIT!==id)NOTES_EDIT=null;if(S.tasks[id]&&!S.tasks[id]._draft){S.ui.recent=[id,...(S.ui.recent||[]).filter(x=>x!==id)].slice(0,8);saveUi()}if(S.ui.openTask!==id)TPL={open:false,naming:false,del:null};if(DRAFT&&DRAFT.id!==id)discardDraft();if(S.ui.openTask!==id||tab)S.ui.dtab=tab||'details';if(S.ui.openTask!==id){REPLY_AT=null;replyDelArmed=null}S.ui.openTask=id;noteDelArmed=null;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender();syncUrl()}
+function openTask(id,tab){seenTask(id);if(NOTES_EDIT!==id)NOTES_EDIT=null;if(S.tasks[id]&&!S.tasks[id]._draft){S.ui.recent=[id,...(S.ui.recent||[]).filter(x=>x!==id)].slice(0,8);saveUi()}if(S.ui.openTask!==id)TPL={open:false,naming:false,del:null};if(DRAFT&&DRAFT.id!==id)discardDraft();if(S.ui.openTask!==id||tab)S.ui.dtab=tab||'details';if(S.ui.openTask!==id){REPLY_AT=null;replyDelArmed=null;EDIT_AT=null;if(ATT.task&&ATT.task!==id)attReset()}S.ui.openTask=id;noteDelArmed=null;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender();syncUrl()}
 function closeDrawer(){flushAll();discardDraft();S.ui.openTask=null;$('#drawer').hidden=true;$('#scrim').hidden=true;scheduleRender();syncUrl()}
 let LSHOW=new Set();
 /* Task activity: the task's log entries plus your own posted updates (kind 'note'), newest first */
@@ -2552,8 +2586,9 @@ function activityPane(t){
   }
   return `<div class="d-body d-activity">
     <h2 class="d-act-title">${esc(t.name||'Untitled task')}</h2>
-    <div class="composer"><textarea id="note-in" data-fk="note-in" rows="2" placeholder="Post an update: what you sent, what the client said, what's next…"></textarea>
-      <div class="composer-foot"><span class="hint">⌘/Ctrl + Enter to post</span><button class="btn sm primary" data-act="note-post">Post update</button></div></div>
+    <div class="composer" data-drop-pics="note">${fmtBar('note-in')}<textarea id="note-in" data-fk="note-in" rows="2" placeholder="Post an update: what you sent, what the client said, what's next… Paste or drop a screenshot to attach it."></textarea>
+      ${attHtml('note')}
+      <div class="composer-foot"><button type="button" class="btn sm ghost" data-act="upd-attach" data-for="note" title="Attach pictures">${I.image}Picture</button><span class="hint">⌘/Ctrl + Enter to post</span><button class="btn sm primary" data-act="note-post" ${ATT.busy?'disabled':''}>Post update</button></div></div>
     ${notes.length?`<div class="notes-sum"><span><b>${notes.length-nDone}</b> open${nDone?` · <b>${nDone}</b> resolved`:''}</span>${nDone?`<button type="button" class="btn sm ghost" data-act="notes-hide-done">${S.ui.hideResolved?'Show resolved':'Hide resolved'}</button>`:''}</div>`:''}
     <div class="timeline">${rows||(S.ui.hideResolved&&nDone?'<p class="hint">Every update is resolved.</p>':'<p class="hint">Nothing yet. Changes to this task will show up here.</p>')}</div>
     ${h.length&&!logItems().some(e=>e.taskId===t.id&&e.kind!=='note')?'<p class="hint">Status, date and checklist changes are recorded from now on.</p>':''}
@@ -2565,16 +2600,53 @@ function activityPane(t){
 let REPLY_AT=null,replyDelArmed=null;
 const TC_RE=/^(\d{1,2}:\d{2}(?::\d{2})?(?:[;:.]\d{2})?)(?=\s|$)/;
 function noteText(txt){
-  return String(txt||'').split('\n').map(line=>{const m=TC_RE.exec(line.trim());if(!m)return esc(line);const lead=line.slice(0,line.indexOf(m[1]));return esc(lead)+`<span class="tc">${esc(m[1])}</span>`+esc(line.slice(lead.length+m[1].length))}).join('<br>');
+  const job=S.jobs[S.tasks[S.ui.openTask]?.jobId];
+  return mdLite(txt,job).replace(/(<(?:p|li|h5)>)(\d{1,2}:\d{2}(?::\d{2})?(?:[;:.]\d{2})?)(?=\s|<)/g,'$1<span class="tc">$2</span>');
+}
+/* formatting toolbar for any textarea (by id) */
+const fmtBar=ta=>`<div class="notes-tools fmt-bar" role="toolbar" aria-label="Formatting">${NOTE_TOOLS.map(([f,l,ic])=>`<button type="button" data-act="nfmt" data-f="${f}" data-ta="${ta}" title="${l}" aria-label="${l}">${ic}</button>`).join('')}</div>`;
+/* ---------- pictures on updates and replies ----------
+   Picked, pasted or dropped images upload straight away (storeImage, up to 1920px) into ATT[note|reply];
+   posting saves them on the update as pics:[ref]. Unposted ones are removed when the box is cancelled or the task changes. */
+let ATT={note:[],reply:[],busy:0,task:null},ATT_FOR='note',EDIT_AT=null,LB=null;
+function attReset(keepTask){if(!keepTask){[...ATT.note,...ATT.reply].forEach(dropImage);ATT.note=[];ATT.reply=[]}ATT.task=S.ui.openTask}
+function attHtml(k){
+  const list=ATT[k]||[];if(!list.length&&!ATT.busy)return '';
+  return `<div class="att-list">${list.map((v,i)=>`<span class="att"><img src="${esc(imgSrc(v)||'')}" alt=""><button type="button" class="icon-btn" data-act="att-rm" data-for="${k}" data-i="${i}" title="Remove picture" aria-label="Remove picture">${I.x}</button></span>`).join('')}${ATT.busy&&ATT_FOR===k?`<span class="att busy">Uploading…</span>`:''}</div>`;
+}
+function picsHtml(pics,at,rat){
+  if(!pics||!pics.length)return '';
+  return `<div class="note-pics">${pics.map((v,i)=>`<button type="button" class="note-pic" data-act="pic-view" data-at="${esc(at)}" data-rat="${esc(rat)}" data-i="${i}" aria-label="Open picture ${i+1}"><img src="${esc(imgSrc(v)||'')}" alt="" loading="lazy"></button>`).join('')}</div>`;
+}
+async function attAdd(files,k){
+  files=[...files].filter(f=>/^image\//.test(f.type));if(!files.length)return;
+  if(!canUpload()){toast("Pictures can't be uploaded here.");return}
+  if(ATT.task!==S.ui.openTask)attReset();
+  const keep=k==='note'?$('#note-in')?.value:$('#reply-in')?.value;
+  ATT_FOR=k;ATT.busy++;renderDrawer();
+  for(const f of files){try{ATT[k].push(await storeImage(f,1920,1280,'image/jpeg'))}catch(e){toast(uploadError(e))}}
+  ATT.busy--;renderDrawer();
+  const ta=$(k==='note'?'#note-in':'#reply-in');if(ta&&keep!=null&&!ta.value)ta.value=keep;ta?.focus();
+}
+function openLightbox(list,i){LB={list,i};renderLightbox()}
+function renderLightbox(){
+  const e=$('#lightbox');if(!LB){e.hidden=true;e.innerHTML='';return}
+  const n=LB.list.length;e.hidden=false;
+  e.innerHTML=`<button type="button" class="lb-close icon-btn" data-act="lb-close" title="Close (Esc)" aria-label="Close">${I.x}</button>
+    ${n>1?`<button type="button" class="lb-nav prev icon-btn" data-act="lb-step" data-d="-1" aria-label="Previous picture">${I.left}</button><button type="button" class="lb-nav next icon-btn" data-act="lb-step" data-d="1" aria-label="Next picture">${I.left.replace('<svg','<svg style="transform:scaleX(-1)"')}</button>`:''}
+    <img src="${esc(imgSrc(LB.list[LB.i])||'')}" alt=""><span class="lb-count">${n>1?`${LB.i+1} / ${n}`:''}</span><a class="btn sm lb-open" href="${esc(imgSrc(LB.list[LB.i])||'')}" target="_blank" rel="noopener">${I.ext}Open full size</a>`;
 }
 function noteHtml(e){
   const reps=e.replies||[];
   return `<div class="tl-note ${e.done?'resolved':''}"><div class="tl-note-head">${I.chat}<b>Update</b><time datetime="${esc(e.at)}">${fmtTime(e.at)}</time>
       <button class="icon-btn note-done ${e.done?'on':''}" data-act="note-done" data-at="${esc(e.at)}" title="${e.done?'Mark as not done':'Mark as done'}" aria-label="${e.done?'Mark as not done':'Mark as done'}" aria-pressed="${!!e.done}"><svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg></button>
+      <button class="icon-btn" data-act="edit-open" data-at="${esc(e.at)}" title="Edit update" aria-label="Edit update">${I.pencil}</button>
       <button class="icon-btn ${noteDelArmed===e.at?'danger':''}" data-act="note-del" data-at="${esc(e.at)}" title="${noteDelArmed===e.at?'Click again to delete':'Delete update'}" aria-label="Delete update">${I.trash}</button></div>
-    <p class="note-body">${noteText(e.text)}</p>
-    ${reps.length?`<div class="note-replies">${reps.map(r=>{const k=e.at+'|'+r.at;return `<div class="note-reply"><p>${noteText(r.text)}</p><time datetime="${esc(r.at)}">${fmtTime(r.at)}</time><button class="icon-btn ${replyDelArmed===k?'danger':''}" data-act="reply-del" data-at="${esc(e.at)}" data-rat="${esc(r.at)}" title="${replyDelArmed===k?'Click again to delete':'Delete reply'}" aria-label="Delete reply">${I.trash}</button></div>`}).join('')}</div>`:''}
-    ${REPLY_AT===e.at?`<div class="reply-box"><textarea id="reply-in" data-fk="reply-in" rows="2" placeholder="Reply…"></textarea><div class="composer-foot"><span class="hint">⌘/Ctrl + Enter to reply</span><button class="btn sm ghost" data-act="reply-cancel">Cancel</button><button class="btn sm primary" data-act="reply-post" data-at="${esc(e.at)}">Reply</button></div></div>`
+    ${EDIT_AT===e.at?`<div class="reply-box">${fmtBar('edit-in')}<textarea id="edit-in" data-fk="edit-in" rows="4">${esc(e.text||'')}</textarea><div class="composer-foot"><span class="hint">⌘/Ctrl + Enter to save</span><button class="btn sm ghost" data-act="edit-cancel">Cancel</button><button class="btn sm primary" data-act="edit-save" data-at="${esc(e.at)}">Save</button></div></div>`
+      :`<div class="note-body md">${noteText(e.text)}</div>`}
+    ${picsHtml(e.pics,e.at,'')}
+    ${reps.length?`<div class="note-replies">${reps.map(r=>{const k=e.at+'|'+r.at;return `<div class="note-reply"><div class="md">${noteText(r.text)}${picsHtml(r.pics,e.at,r.at)}</div><time datetime="${esc(r.at)}">${fmtTime(r.at)}</time><button class="icon-btn ${replyDelArmed===k?'danger':''}" data-act="reply-del" data-at="${esc(e.at)}" data-rat="${esc(r.at)}" title="${replyDelArmed===k?'Click again to delete':'Delete reply'}" aria-label="Delete reply">${I.trash}</button></div>`}).join('')}</div>`:''}
+    ${REPLY_AT===e.at?`<div class="reply-box" data-drop-pics="reply">${fmtBar('reply-in')}<textarea id="reply-in" data-fk="reply-in" rows="2" placeholder="Reply… (paste or drop a picture to attach it)"></textarea>${attHtml('reply')}<div class="composer-foot"><button type="button" class="btn sm ghost" data-act="upd-attach" data-for="reply" title="Attach pictures">${I.image}Picture</button><span class="hint">⌘/Ctrl + Enter to reply</span><button class="btn sm ghost" data-act="reply-cancel">Cancel</button><button class="btn sm primary" data-act="reply-post" data-at="${esc(e.at)}" ${ATT.busy?'disabled':''}>Reply</button></div></div>`
       :`<div class="note-foot"><button type="button" class="note-reply-btn" data-act="reply-open" data-at="${esc(e.at)}"><svg class="i" viewBox="0 0 16 16"><path d="M6.5 4 2.5 8l4 4M2.5 8h7a4 4 0 0 1 4 4v1"/></svg>Reply${reps.length?` · ${reps.length}`:''}</button>${e.done&&e.doneAt?`<span class="done-when"><svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg>Done ${esc(fmtDate(e.doneAt.slice(0,10)))}</span>`:''}</div>`}
   </div>`;
 }
@@ -2585,21 +2657,24 @@ function updateNote(at,fn){
 }
 function toggleNoteDone(at){updateNote(at,e=>e.done?{...e,done:false,doneAt:null}:{...e,done:true,doneAt:new Date().toISOString()});renderDrawer();scheduleRender()}
 function postReply(at){
-  const el=$('#reply-in');const v=el?.value.trim();if(!v){el?.focus();return}
-  updateNote(at,e=>({...e,replies:[...(e.replies||[]),{at:new Date().toISOString(),text:v}]}));REPLY_AT=null;renderDrawer();
+  if(ATT.busy)return;
+  const el=$('#reply-in');const v=el?.value.trim()||'',pics=ATT.task===S.ui.openTask?ATT.reply:[];if(!v&&!pics.length){el?.focus();return}
+  updateNote(at,e=>({...e,replies:[...(e.replies||[]),{at:new Date().toISOString(),text:v,...(pics.length?{pics:[...pics]}:{})}]}));ATT.reply=[];REPLY_AT=null;renderDrawer();
 }
-function deleteReply(at,rat){updateNote(at,e=>({...e,replies:(e.replies||[]).filter(r=>r.at!==rat)}));replyDelArmed=null;renderDrawer()}
+function deleteReply(at,rat){updateNote(at,e=>{const r=(e.replies||[]).find(r=>r.at===rat);(r?.pics||[]).forEach(dropImage);return {...e,replies:(e.replies||[]).filter(r=>r.at!==rat)}});replyDelArmed=null;renderDrawer()}
+function saveEdit(at){const v=$('#edit-in')?.value.trim();if(v==null)return;updateNote(at,e=>({...e,text:v,edited:new Date().toISOString()}));EDIT_AT=null;renderDrawer()}
+function findNote(at){const t=S.tasks[S.ui.openTask];return logItems().find(e=>e.at===at&&e.kind==='note'&&e.taskId===t?.id)}
 /* open (not ticked) updates on a task, for the list/board chip */
 let NOTE_OPEN=null;
 const openNotes=t=>{if(!NOTE_OPEN){NOTE_OPEN={};for(const e of logItems())if(e.kind==='note'&&!e.done&&e.taskId)NOTE_OPEN[e.taskId]=(NOTE_OPEN[e.taskId]||0)+1}return NOTE_OPEN[t.id]||0};
 function postNote(){
-  const t=S.tasks[S.ui.openTask],el=$('#note-in');if(!t||!el)return;
-  const v=el.value.trim();if(!v){el.focus();return}
-  logAct('note',v,{task:t});el.value='';renderDrawer();$('#note-in')?.focus();
+  const t=S.tasks[S.ui.openTask],el=$('#note-in');if(!t||!el||ATT.busy)return;
+  const v=el.value.trim(),pics=ATT.task===t.id?ATT.note:[];if(!v&&!pics.length){el.focus();return}
+  logAct('note',v,{task:t,extra:pics.length?{pics:[...pics]}:{}});ATT.note=[];el.value='';renderDrawer();$('#note-in')?.focus();
 }
 function deleteNote(at){
   const t=S.tasks[S.ui.openTask];
-  for(const k of Object.keys(S.settings))if(k.startsWith('log-')){const items=S.settings[k].items||[],i=items.findIndex(e=>e.at===at&&e.kind==='note'&&e.taskId===t?.id);if(i>=0){patch('settings',k,{items:items.filter((_,x)=>x!==i)});break}}
+  for(const k of Object.keys(S.settings))if(k.startsWith('log-')){const items=S.settings[k].items||[],i=items.findIndex(e=>e.at===at&&e.kind==='note'&&e.taskId===t?.id);if(i>=0){const n=items[i];[...(n.pics||[]),...(n.replies||[]).flatMap(r=>r.pics||[])].forEach(dropImage);patch('settings',k,{items:items.filter((_,x)=>x!==i)});break}}
   noteDelArmed=null;renderDrawer();
 }
 /* Checklist templates: saved on the task's client (agency jobs) or on the job (direct clients, or tasks without a client),
@@ -2778,8 +2853,8 @@ function editNotes(){
   const ta=$('#drawer textarea.notes');if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);autosize(ta)}
 }
 /* apply a toolbar format to the notes textarea around the selection */
-function notesFormat(f){
-  const ta=$('#drawer textarea.notes');if(!ta)return;
+function notesFormat(f,target){
+  const ta=target||$('#drawer textarea.notes');if(!ta)return;
   const v=ta.value;let a=ta.selectionStart,b=ta.selectionEnd;const sel=v.slice(a,b);
   if(f==='b'||f==='i'){const w=f==='b'?'**':'*';ta.setRangeText(w+sel+w,a,b,'select');if(!sel)ta.setSelectionRange(a+w.length,a+w.length);else ta.setSelectionRange(a+w.length,b+w.length)}
   else if(f==='link'){
@@ -3824,6 +3899,7 @@ document.addEventListener('click',e=>{
   if(VOPT&&!e.target.closest('#vopt-wrap')){VOPT=false;renderVopt()}
   if(STATPOP&&!e.target.closest('.stats-wrap')){STATPOP=false;render()}
   if(CTX&&!e.target.closest('#ctx')){closeCtx()}
+  if(LB&&e.target.id==='lightbox'){LB=null;renderLightbox();return}
   if(JUMP&&e.target.id==='jump'){closeJump();return}
   const stop=e.target.closest('[data-stop]');
   const el=e.target.closest('[data-act]');
@@ -3924,8 +4000,16 @@ document.addEventListener('click',e=>{
     case 'note-del': if(noteDelArmed===el.dataset.at)deleteNote(el.dataset.at);else{noteDelArmed=el.dataset.at;renderDrawer()}break;
     case 'note-done': toggleNoteDone(el.dataset.at);break;
     case 'notes-hide-done': u.hideResolved=!u.hideResolved;saveUi();renderDrawer();break;
-    case 'reply-open': REPLY_AT=el.dataset.at;replyDelArmed=null;renderDrawer();$('#reply-in')?.focus();break;
-    case 'reply-cancel': REPLY_AT=null;renderDrawer();break;
+    case 'reply-open': ATT.reply.forEach(dropImage);ATT.reply=[];REPLY_AT=el.dataset.at;replyDelArmed=null;EDIT_AT=null;renderDrawer();$('#reply-in')?.focus();break;
+    case 'reply-cancel': ATT.reply.forEach(dropImage);ATT.reply=[];REPLY_AT=null;renderDrawer();break;
+    case 'edit-open': EDIT_AT=el.dataset.at;REPLY_AT=null;renderDrawer();{const ta=$('#edit-in');if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)}}break;
+    case 'edit-cancel': EDIT_AT=null;renderDrawer();break;
+    case 'edit-save': saveEdit(el.dataset.at);break;
+    case 'upd-attach': ATT_FOR=el.dataset.for;if(ATT.task!==S.ui.openTask)attReset();$('#upd-pics-in').click();break;
+    case 'att-rm':{const k=el.dataset.for,i=+el.dataset.i;const v=ATT[k]?.[i];if(v){dropImage(v);ATT[k].splice(i,1)}renderDrawer();break}
+    case 'pic-view':{const n=findNote(el.dataset.at);if(!n)break;const r=el.dataset.rat?(n.replies||[]).find(r=>r.at===el.dataset.rat):null;openLightbox((r||n).pics||[],+el.dataset.i);break}
+    case 'lb-close': LB=null;renderLightbox();break;
+    case 'lb-step': if(LB){LB.i=(LB.i+(+el.dataset.d)+LB.list.length)%LB.list.length;renderLightbox()}break;
     case 'reply-post': postReply(el.dataset.at);break;
     case 'reply-del':{const k=el.dataset.at+'|'+el.dataset.rat;if(replyDelArmed===k)deleteReply(el.dataset.at,el.dataset.rat);else{replyDelArmed=k;renderDrawer()}break}
     case 'new-task':{const id=newTask({status:el.dataset.status,due:el.dataset.due});if(id){openTask(id);setTimeout(()=>$('.d-name')?.focus(),30)}break}
@@ -3958,7 +4042,7 @@ document.addEventListener('click',e=>{
       try{navigator.clipboard.writeText(v).then(()=>toast(msg),()=>toast(v))}catch(x){toast(v)}
       break}
     case 'notes-edit': editNotes();break;
-    case 'nfmt': notesFormat(el.dataset.f);break;
+    case 'nfmt': notesFormat(el.dataset.f,el.dataset.ta?$('#'+el.dataset.ta):null);break;
     case 'check-del':{const t=S.tasks[u.openTask];patch('tasks',t.id,{checklist:(t.checklist||[]).filter(c=>c.id!==el.dataset.cid)});renderDrawer();break}
     case 'archive': archiveTasks([el.dataset.id]);break;
     case 'archive-all': archiveTasks(filtered().filter(t=>stOf(t)===el.dataset.status).map(t=>t.id));break;
@@ -4061,6 +4145,7 @@ document.addEventListener('change',e=>{
   if(el.id==='f-sort'){u.sort=el.value;saveUi();render();return}
   if(el.id==='backup-in'){const f=el.files[0];el.value='';readBackup(f);return}
   if(el.id==='import-in'){const f=el.files[0];el.value='';readImport(f);return}
+  if(el.id==='upd-pics-in'){const fs=[...el.files];el.value='';attAdd(fs,ATT_FOR);return}
   if(el.id==='imp-job'&&SM){SM.impJob=el.value;renderSettings();return}
   if(el.id==='hol-add'&&SM&&el.value){if(!SM.holidays.includes(el.value))SM.holidays.push(el.value);SM.holAuto=false;renderSettings();return}
   if(el.id==='pdf-in'){const f=el.files[0];el.value='';addBrandPdf(f);return}
@@ -4124,8 +4209,8 @@ document.addEventListener('input',e=>{
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.classList?.contains('d-name')){e.preventDefault();e.target.blur()}});
 /* notes: ⌘B / ⌘I, and Enter continues a list (Enter on an empty item ends it) */
 document.addEventListener('keydown',e=>{
-  const ta=e.target;if(!ta.matches?.('#drawer textarea.notes'))return;
-  if((e.metaKey||e.ctrlKey)&&!e.shiftKey&&!e.altKey&&(e.key==='b'||e.key==='i')){e.preventDefault();notesFormat(e.key);return}
+  const ta=e.target;if(!ta.matches?.('#drawer textarea.notes,#note-in,#reply-in,#edit-in'))return;
+  if((e.metaKey||e.ctrlKey)&&!e.shiftKey&&!e.altKey&&(e.key==='b'||e.key==='i')){e.preventDefault();notesFormat(e.key,ta);return}
   if(e.key!=='Enter'||e.shiftKey||e.metaKey||e.ctrlKey||ta.selectionStart!==ta.selectionEnd)return;
   const v=ta.value,p=ta.selectionStart,ls=v.lastIndexOf('\n',p-1)+1,line=v.slice(ls,p);
   const m=/^(\s*)([-*•]|(\d+)([.)]))\s+/.exec(line);if(!m)return;
@@ -4235,6 +4320,18 @@ document.addEventListener('dragover',e=>{
     if(it&&it.dataset.id!==dragId&&col.contains(it)){const r=it.getBoundingClientRect();dropMark=it;it.classList.add(e.clientY>r.top+r.height/2?'drop-after':'drop-before')}}
 });
 document.addEventListener('keydown',e=>{if(e.target.id==='note-in'&&e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();postNote()}});
+document.addEventListener('keydown',e=>{
+  if(LB){if(e.key==='Escape'){e.preventDefault();e.stopPropagation();LB=null;renderLightbox()}else if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();LB.i=(LB.i+(e.key==='ArrowRight'?1:-1)+LB.list.length)%LB.list.length;renderLightbox()}return}
+  if(e.target.id==='edit-in'){if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)&&EDIT_AT){e.preventDefault();saveEdit(EDIT_AT)}else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();EDIT_AT=null;renderDrawer()}}
+},true);
+document.addEventListener('paste',e=>{
+  const id=e.target.id;if(id!=='note-in'&&id!=='reply-in')return;
+  const files=[...(e.clipboardData?.files||[])].filter(f=>/^image\//.test(f.type));if(!files.length)return;
+  e.preventDefault();attAdd(files,id==='note-in'?'note':'reply');
+});
+document.addEventListener('dragover',e=>{const z=e.target.closest?.('[data-drop-pics]');if(z&&[...(e.dataTransfer?.types||[])].includes('Files')){e.preventDefault();z.classList.add('drop-on')}});
+document.addEventListener('dragleave',e=>{const z=e.target.closest?.('[data-drop-pics]');if(z&&!z.contains(e.relatedTarget))z.classList.remove('drop-on')});
+document.addEventListener('drop',e=>{const z=e.target.closest?.('[data-drop-pics]');if(!z||!e.dataTransfer?.files?.length)return;e.preventDefault();z.classList.remove('drop-on');attAdd(e.dataTransfer.files,z.dataset.dropPics)});
 document.addEventListener('keydown',e=>{if(e.target.id==='reply-in'&&e.key==='Enter'&&(e.metaKey||e.ctrlKey)&&REPLY_AT){e.preventDefault();postReply(REPLY_AT)}else if(e.target.id==='reply-in'&&e.key==='Escape'){e.preventDefault();e.stopPropagation();REPLY_AT=null;renderDrawer()}},true);
 document.addEventListener('drop',e=>{
   const col=e.target.closest?.('[data-drop]');
