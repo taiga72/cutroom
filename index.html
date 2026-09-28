@@ -1407,6 +1407,40 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .chip.un-chip .i{width:11px;height:11px}
 #bulk-push{max-width:150px}
 @media (max-width:820px){.un-row{grid-template-columns:auto auto minmax(0,1fr) auto;gap:8px}.un-row .pill{display:none}.un-row .date{display:none}.upnext .un-hint{display:none}}
+
+/* ---------- focus timer ---------- */
+.pomo-wrap{position:relative;flex:none}
+.pomo-btn{height:38px;min-width:38px;padding:0 10px;border:1px solid var(--line);background:var(--surface);border-radius:9px;display:inline-flex;align-items:center;justify-content:center;gap:6px;color:var(--muted);font:600 calc(13px*var(--ts)) var(--mono)}
+.pomo-btn:hover{border-color:var(--line-strong);color:var(--text)}
+.pomo-btn.running{color:#fff;background:#e5484d;border-color:#e5484d}
+.pomo-btn.running.m-short,.pomo-btn.running.m-long{background:var(--st-done);border-color:var(--st-done)}
+.pomo-btn.paused{color:#e5484d;border-color:color-mix(in srgb,#e5484d 50%,var(--line))}
+.pomo-btn .i{width:17px;height:17px}
+.pomo-pop{width:min(330px,calc(100vw - 32px));padding:14px;display:flex;flex-direction:column;gap:12px;overflow:visible;max-height:none}
+.pp-modes{display:flex;width:100%}
+.pp-modes button{flex:1;padding:5px 6px;font-size:calc(12px*var(--ts))}
+.pp-time{text-align:center;font:700 calc(46px*var(--ts))/1 var(--mono);letter-spacing:-.02em;color:#e5484d;padding:6px 0}
+.pp-time.m-short,.pp-time.m-long{color:var(--st-done)}
+.pp-task{display:flex;align-items:center;gap:6px;min-height:28px}
+.pp-task .hint{margin:0;font-size:calc(12px*var(--ts))}
+.pp-link{flex:1;min-width:0;display:flex;align-items:center;gap:8px;border:0;background:var(--surface-2);border-radius:8px;padding:6px 8px;text-align:left;font-weight:600;color:var(--text)}
+.pp-link span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pp-btns{display:flex;gap:6px}
+.pp-btns .btn{flex:1;justify-content:center}
+.pp-foot{display:flex;align-items:center;gap:8px;font-size:calc(12px*var(--ts));color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.pp-foot span{flex:1}
+.d-pomo{position:relative}
+.d-pomo .dp-n{position:absolute;top:1px;right:0;font:700 calc(9px*var(--ts)) var(--mono);color:#e5484d}
+.chip.pomo-chip{display:inline-flex;align-items:center;gap:3px;color:#e5484d;border-color:color-mix(in srgb,#e5484d 35%,transparent);background:color-mix(in srgb,#e5484d 9%,transparent)}
+.chip.pomo-chip .i{width:11px;height:11px}
+.pomo-nums{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.pomo-num{display:flex;flex-direction:column;gap:4px;font-size:calc(12px*var(--ts));color:var(--muted);font-weight:600}
+.pomo-num input{width:100%}
+.pomo-num small{font-weight:500;color:var(--faint)}
+.pip-timer{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:color-mix(in srgb,#e5484d 10%,var(--surface));font-size:calc(12px*var(--ts));color:var(--muted)}
+.pip-timer .pt-mode{display:inline-flex;align-items:center;gap:5px;flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.pip-timer b{font:700 calc(16px*var(--ts)) var(--mono);color:#e5484d}
+@media (max-width:820px){.pomo-btn{height:34px;min-width:34px;padding:0 8px}}
 </style>
 
 <div class="app">
@@ -1416,7 +1450,7 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
   <div class="side-resize" id="side-resize" title="Drag to resize the sidebar · double-click to reset" aria-hidden="true"></div>
   <main class="main" id="main">
     <div id="banner"></div>
-    <div class="head-row"><div id="head"></div><div class="top-right"><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search tasks  ( / )" autocomplete="off"></label><div class="bell-wrap"><button type="button" class="icon-btn bell" id="bell" data-act="bell" aria-haspopup="true" aria-expanded="false" aria-controls="notes" title="Notifications"><svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bell-n" id="bell-n" hidden></span></button><div class="notes-pop" id="notes" hidden role="dialog" aria-label="Notifications"></div></div></div></div>
+    <div class="head-row"><div id="head"></div><div class="top-right"><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search tasks  ( / )" autocomplete="off"></label><div class="pomo-wrap"><button type="button" class="pomo-btn" id="pomo" data-act="pomo" aria-haspopup="true" aria-expanded="false" aria-controls="pomo-pop" title="Focus timer (P to start or pause)"></button><div class="notes-pop pomo-pop" id="pomo-pop" hidden role="dialog" aria-label="Focus timer"></div></div><div class="bell-wrap"><button type="button" class="icon-btn bell" id="bell" data-act="bell" aria-haspopup="true" aria-expanded="false" aria-controls="notes" title="Notifications"><svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bell-n" id="bell-n" hidden></span></button><div class="notes-pop" id="notes" hidden role="dialog" aria-label="Notifications"></div></div></div></div>
     <div id="subnav"></div>
     <div id="stats"></div>
     <div id="jobcards"></div>
@@ -1621,7 +1655,8 @@ const MONTH_FULL=['January','February','March','April','May','June','July','Augu
 /* Look & date preferences (settings/app), previewed live from SM while Settings is open */
 const PREF_DEF={dateRel:false,dateFmt:'md',weekStart:'mon',hideWeekends:false,confetti:true,motion:'system',contrast:'normal',trashDays:30,darkShade:'standard',pillStyle:'tint',tips:true,
   iconWeight:'regular',depth:'soft',sideStyle:'colored',thinScroll:false,toastPos:'bottom',nameWrap:false,doneStyle:'struck',overdueTint:false,statusIcons:false,prioColors:{},logoShape:'rounded',numFont:'mono',readSpacing:'normal',sideCounts:true,
-  compactHeader:false,greeting:true,greetName:'',drawerBand:true,boardTint:false,dueStyle:'text',jobProgress:'bar',calGrid:'lines',todayMark:'dot'};
+  compactHeader:false,greeting:true,greetName:'',drawerBand:true,boardTint:false,dueStyle:'text',jobProgress:'bar',calGrid:'lines',todayMark:'dot',
+  pomoFocus:25,pomoShort:5,pomoLong:15,pomoEvery:4,pomoAutoBreak:false,pomoAutoFocus:false,pomoSound:'chime',pomoPopup:false};
 const pref=k=>{let o=null;try{o=SM}catch(e){/* Settings state not set up yet */}o=o||S.settings?.app||{};return o[k]!==undefined&&o[k]!==null?o[k]:PREF_DEF[k]};
 const reducedMotion=()=>pref('motion')==='reduce'||matchMedia('(prefers-reduced-motion:reduce)').matches;
 function absDate(s){
@@ -2253,10 +2288,10 @@ function render(){
   const a=appSettings();
   loadStatuses();
   applyLook(SM||a);
-  document.title=(a.name||'').trim()||APP_NAME;
+  document.title=(a.name||'').trim()||APP_NAME;pomoTitle();
   const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
   withFocus(()=>{renderSide();renderMain()});
-  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();
+  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();
 }
 
 function renderSide(){
@@ -2541,6 +2576,7 @@ function metaLine(t,job,showJob){
   if(t.format) bits.push(`<span class="chip">${esc(t.format)}</span>`);
   if(t.revision) bits.push(`<span class="chip rev" title="Revision round">R${t.revision}</span>`);
   const cl=t.checklist||[]; if(cl.length) bits.push(`<span class="mono">${cl.filter(x=>x.done).length}/${cl.length}</span>`);
+  if(t.pomos)bits.push(`<span class="chip pomo-chip" title="${t.pomos} focus session${t.pomos===1?'':'s'}">${TOMATO_IC}${t.pomos}</span>`);
   {const q=t.upNext&&!isClosed(t)&&!t.archived?upNextPos(t):0;if(q)bits.push(`<span class="chip un-chip" title="Up next #${q}">${UP_IC}${q}</span>`)}
   {const n=openNotes(t);if(n)bits.push(`<span class="chip notes-chip" title="${n} open update${n===1?'':'s'} to work through">${I.chat}${n}</span>`)}
   if(!isClosed(t)&&!t.archived){const a=ageDays(t);if(a!==null&&a>=AGE_SHOW)bits.push(`<span class="chip age ${a>=AGE_OLD?'old':''}" title="Assigned ${a} days ago">${a}d</span>`)}
@@ -2788,7 +2824,8 @@ function restoreTasks(ids,quiet){
   if(ids.includes(S.ui.openTask))renderDrawer();
   if(!quiet)toast(ids.length===1?`Restored “${S.tasks[ids[0]].name||'task'}”`:`Restored ${ids.length} tasks`);
 }
-const LOG_ICON={note:I.chat,create:I.plus,status:I.status,date:I.cal,edit:I.pencil,check:I.task,archive:I.archive,restore:I.loop,delete:I.trash,job:I.briefcase,brand:I.palette};
+const TOMATO_IC='<svg class="i" viewBox="0 0 16 16"><path d="M8 4.5c3.3 0 5.5 2 5.5 4.8S11.3 14 8 14s-5.5-1.9-5.5-4.7S4.7 4.5 8 4.5z"/><path d="M8 4.5V2.2M5.6 4.9 8 6.1l2.4-1.2"/></svg>';
+const LOG_ICON={focus:TOMATO_IC,note:I.chat,create:I.plus,status:I.status,date:I.cal,edit:I.pencil,check:I.task,archive:I.archive,restore:I.loop,delete:I.trash,job:I.briefcase,brand:I.palette};
 const fmtTime=iso=>new Date(iso).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
 function dayHeading(iso){const d=ymd(new Date(iso)),t=today(),y=ymd(new Date(Date.now()-864e5));return d===t?'Today':d===y?'Yesterday':fmtLong(d)}
 function logRow(e,showTask=true){
@@ -2803,7 +2840,7 @@ function renderActivity(){
   $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${I.clock.replace('class="i"','class="i" style="width:28px;height:28px"')}Activity</h1><div class="sub">What changed in your tracker, newest first. Kept for ${LOG_MONTHS} months.</div></div></div>`;
   $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
   if(!all.length){$('#view').innerHTML=`<div class="empty"><h3>No activity yet</h3><p>Changes show up here as you work: new tasks, status moves, due dates, checklist steps, archiving and more.</p></div>`;return}
-  const kinds=[['all','Everything'],['note','Updates'],['status','Status'],['create','New tasks'],['date','Dates'],['check','Checklist'],['archive','Archive'],['delete','Deleted'],['job','Jobs & brand']];
+  const kinds=[['all','Everything'],['note','Updates'],['status','Status'],['create','New tasks'],['date','Dates'],['check','Checklist'],['archive','Archive'],['delete','Deleted'],['job','Jobs & brand'],['focus','Focus sessions']];
   const list=all.filter(e=>(u.ljob||'all')==='all'||e.jobId===u.ljob).filter(e=>{const k=u.lkind||'all';return k==='all'||e.kind===k||(k==='archive'&&e.kind==='restore')||(k==='job'&&e.kind==='brand')})
     .filter(e=>!q||[e.task,e.text,S.jobs[e.jobId]?.name].some(x=>String(x||'').toLowerCase().includes(q)));
   const shown=list.slice(0,u.lmore||200);
@@ -3046,7 +3083,7 @@ function jumpItems(q){
 }
 function focusSearch(){const q=$('#q'),ts=$('#top-search');if(q&&ts&&!ts.hidden&&q.offsetParent){q.focus();q.select()}else openJump()}
 /* Keyboard shortcuts (listed in Settings → Keyboard shortcuts). Never fire while typing in a field. */
-const SHORTCUTS=[['N','New task'],['A','Switch Details / Activity (with a task open)'],['Esc','Close the task, dialog or menu'],['/','Search tasks (top-right search box)'],[MODKEY,'Quick search: jump to any task, job, client or page']];
+const SHORTCUTS=[['N','New task'],['P','Start or pause the focus timer (links the open task)'],['A','Switch Details / Activity (with a task open)'],['Esc','Close the task, dialog or menu'],['/','Search tasks (top-right search box)'],[MODKEY,'Quick search: jump to any task, job, client or page']];
 const TYPING_KEYS=[[IS_MAC?'⌘Z':'Ctrl Z','Undo typing'],[IS_MAC?'⇧⌘Z':'Ctrl Y','Redo typing'],[IS_MAC?'⌘B ⌘I':'Ctrl B Ctrl I','Bold / italic in notes and updates'],[IS_MAC?'⌘↩':'Ctrl ↩','Post an update or reply']];
 const keyRows=list=>list.map(([k,d])=>`<div class="key-row"><span>${k.split(' ').map(x=>`<kbd>${x}</kbd>`).join(' ')}</span><span>${esc(d)}</span></div>`).join('');
 function shortcutSettingsHtml(){return `<div class="field"><p class="hint" style="margin:0">They work anywhere in the app, except while you're typing in a field.</p><div class="keys-list">${keyRows(SHORTCUTS)}</div></div>
@@ -3111,6 +3148,7 @@ function renderPip(){
   d.title=t.name||'Untitled task';
   d.body.innerHTML=`<div class="pip" style="--jc:${esc(j?.color||'transparent')}">
     <div class="pip-top"><span class="dot" style="background:${esc(j?.color||'var(--faint)')}"></span><span class="pip-crumb">${esc([j?.name,c?.name].filter(Boolean).join(' / '))}</span><button type="button" class="icon-btn" data-pa="show" title="Show this task in the app" aria-label="Show this task in the app">${I.ext}</button></div>
+    ${(()=>{const T=pomoState();return T.run==='idle'?'':`<div class="pip-timer ${T.run}"><span class="pt-mode">${TOMATO_IC}${esc(POMO_LABEL[T.mode])}${T.taskId&&T.taskId!==t.id?` · ${esc(S.tasks[T.taskId]?.name||'')}`:''}</span><b id="pip-time">${pomoClock(pomoLeft(T))}</b><button type="button" class="btn sm" data-pa="pomo">${T.run==='running'?'Pause':'Resume'}</button></div>`})()}
     <h1 class="pip-name">${esc(t.name||'Untitled task')}</h1>
     <div class="pip-st"><span class="pill" ${pillStyle(stOf(t))}><span class="pl">${esc(stLabel(stOf(t)))}</span></span>${nx&&!isClosed(t)?`<button type="button" class="btn sm" data-pa="next" title="Move to ${esc(nx.label)}">${esc(nx.label)} ›</button>`:''}${t.due?`<span class="date ${dueClass(t)}">Due ${esc(fmtDate(t.due))}</span>`:''}${t.revision?`<span class="chip rev">R${t.revision}</span>`:''}</div>
     ${links?`<div class="pip-links">${links}</div>`:''}
@@ -3128,6 +3166,7 @@ function pipClick(e){
     case 'next':{const i=STATUSES.findIndex(x=>x.id===stOf(t)),n=STATUSES[i+1];if(n){setStatus(t.id,n.id);render();if(S.ui.openTask===t.id)renderDrawer()}break}
     case 'resolve':updateNote(b.dataset.at,x=>x.done?{...x,done:false,doneAt:null}:{...x,done:true,doneAt:new Date().toISOString()},t.id);NOTE_OPEN=null;render();if(S.ui.openTask===t.id)renderDrawer();break;
     case 'done-toggle':PIP.showDone=!PIP.showDone;renderPip();break;
+    case 'pomo':pomoToggle();break;
   }
 }
 function pipChange(e){
@@ -3175,6 +3214,111 @@ function safeZonesHtml(){
     <div class="sz-grid">${Object.entries(SAFE_ZONES).map(([k,z])=>`<div class="sz-card"><div class="sz-prev"><img src="${esc(safeZoneUrl(k))}" alt="${esc(z.name)} safe zones"></div><b>${esc(z.name)}</b><small>Keep clear: ${z.top}px top · ${z.bottom}px bottom · ${z.right}px right</small><button type="button" class="btn sm" data-act="sz-dl" data-p="${k}">${I.download}Download PNG</button></div>`).join('')}</div>
     <p class="hint">The margins are approximate: the apps change their layouts now and then, and captions get taller when they're long. “All three” uses the biggest margin of each, for videos posted everywhere. The Reels overlay also marks the 3:4 crop your profile grid shows.</p></div>`;
 }
+/* ================= focus timer (Pomodoro) =================
+   One timer for the account in settings/timer: {mode:'focus'|'short'|'long', run:'idle'|'running'|'paused', endAt, left, taskId, cycle, day, today, dev}.
+   The end time is stored (not a counter), so it survives sleep, reloads and other devices. The device that last started it records the finished
+   session (task.pomos + a 'focus' log line); another device takes over if it's still unrecorded 90s after the end. */
+const POMO_LABEL={focus:'Focus',short:'Short break',long:'Long break'};
+const DEV=(()=>{let d=lsGet('cutroom.dev');if(!d){d=uid().slice(0,10);lsSet('cutroom.dev',d)}return d})();
+let POMO_OPEN=false,POMO_AC=null,POMO_DONE_AT=0;
+const pomoState=()=>({mode:'focus',run:'idle',endAt:null,left:null,taskId:null,cycle:0,day:'',today:0,...(S.settings?.timer||{})});
+const pomoDur=m=>(+pref(m==='focus'?'pomoFocus':m==='short'?'pomoShort':'pomoLong')||({focus:25,short:5,long:15})[m])*60000;
+const pomoLeft=T=>T.run==='running'?Math.max(0,T.endAt-Date.now()):T.run==='paused'?T.left:pomoDur(T.mode);
+const pomoClock=ms=>{const s=Math.ceil(ms/1000);return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`};
+const pomoToday=T=>T.day===today()?T.today||0:0;
+function pomoSet(p){if(S.settings.timer)patch('settings','timer',p);else create('settings',{...pomoState(),...p},'timer')}
+function pomoStart(mode,taskId){
+  pomoAudio();const T=pomoState(),m=mode||T.mode;
+  pomoSet({mode:m,run:'running',endAt:Date.now()+pomoDur(m),left:null,dev:DEV,...(taskId!==undefined?{taskId}:{})});
+  renderPomo();if(S.ui.openTask)renderDrawer();
+}
+function pomoToggle(taskId){
+  pomoAudio();const T=pomoState();
+  if(T.run==='running'){pomoSet({run:'paused',left:Math.max(0,T.endAt-Date.now()),endAt:null});toast(`${POMO_LABEL[T.mode]} paused`)}
+  else if(T.run==='paused'){pomoSet({run:'running',endAt:Date.now()+(T.left||0),left:null,dev:DEV})}
+  else{pomoStart(T.mode,T.mode==='focus'&&taskId?taskId:(T.mode==='focus'?T.taskId:null));const t=S.tasks[pomoState().taskId];toast(`${POMO_LABEL[T.mode]} started · ${Math.round(pomoDur(T.mode)/60000)} min${t&&T.mode==='focus'?` on “${t.name}”`:''}`);return}
+  renderPomo();if(S.ui.openTask)renderDrawer();
+}
+function pomoReset(){pomoSet({run:'idle',endAt:null,left:null});renderPomo();if(S.ui.openTask)renderDrawer()}
+function pomoSetMode(m){if(!POMO_LABEL[m])return;pomoSet({mode:m,run:'idle',endAt:null,left:null});renderPomo()}
+function pomoNext(T,finished){
+  let cycle=T.cycle||0;
+  if(T.mode==='focus'){if(finished)cycle++;return {mode:cycle>=(+pref('pomoEvery')||4)?'long':'short',cycle}}
+  return {mode:'focus',cycle:T.mode==='long'?0:cycle};
+}
+function pomoSkip(){const T=pomoState(),n=pomoNext(T,false);pomoSet({...n,run:'idle',endAt:null,left:null});renderPomo();if(S.ui.openTask)renderDrawer()}
+/* called every second: finish a session whose time is up */
+function pomoCheck(){
+  const T=pomoState();if(T.run!=='running'||!T.endAt||Date.now()<T.endAt)return;
+  if(T.dev!==DEV&&Date.now()<T.endAt+90000)return;          // the device that started it records it
+  if(POMO_DONE_AT===T.endAt)return;POMO_DONE_AT=T.endAt;
+  const n=pomoNext(T,true),mins=Math.round(pomoDur(T.mode)/60000),p={...n,run:'idle',endAt:null,left:null};
+  if(T.mode==='focus'){
+    p.day=today();p.today=pomoToday(T)+1;
+    const t=S.tasks[T.taskId];if(t&&!t.deleted){patch('tasks',t.id,{pomos:(t.pomos||0)+1});logAct('focus',`Focus session · ${mins} min`,{task:t})}
+  }
+  const auto=T.mode==='focus'?pref('pomoAutoBreak'):pref('pomoAutoFocus');
+  if(auto){p.run='running';p.endAt=Date.now()+pomoDur(n.mode);p.dev=DEV}
+  pomoSet(p);
+  const msg=T.mode==='focus'?`Focus done${S.tasks[T.taskId]?` on “${S.tasks[T.taskId].name}”`:''}. ${auto?`${POMO_LABEL[n.mode]} started.`:`Time for a ${POMO_LABEL[n.mode].toLowerCase()}.`}`:`Break's over.${auto?' Focus started.':''}`;
+  pomoChime(pref('pomoSound'));
+  toast(msg,auto?null:{label:`Start ${POMO_LABEL[n.mode].toLowerCase()}`,fn:()=>pomoStart(n.mode)});
+  if(pref('pomoPopup')&&'Notification' in window&&Notification.permission==='granted'&&(document.hidden||!document.hasFocus())){
+    try{const nt=new Notification(T.mode==='focus'?'Focus session done':'Break is over',{body:msg,tag:'splice-pomo',icon:'icon-192.png'});nt.onclick=()=>{window.focus();nt.close()}}catch(e){}
+  }
+  render();if(S.ui.openTask)renderDrawer();
+}
+/* chimes are synthesized (no sound files); the audio context starts on a click so the browser allows it later */
+function pomoAudio(){try{POMO_AC=POMO_AC||new (window.AudioContext||window.webkitAudioContext)();if(POMO_AC.state==='suspended')POMO_AC.resume()}catch(e){}}
+function pomoChime(kind,preview){
+  if(!kind||kind==='off')return;pomoAudio();const ac=POMO_AC;if(!ac)return;
+  const tone=(f,t0,len,type='sine',vol=.18)=>{const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(0,ac.currentTime+t0);g.gain.linearRampToValueAtTime(vol,ac.currentTime+t0+.02);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+t0+len);o.connect(g).connect(ac.destination);o.start(ac.currentTime+t0);o.stop(ac.currentTime+t0+len+.05)};
+  if(kind==='bell'){[0,.5,1].forEach(t=>{tone(660,t,1.2,'triangle',.22);tone(1320,t,.6,'sine',.06)})}
+  else if(kind==='soft'){tone(523.25,0,1.6,'sine',.16);tone(659.25,.25,1.6,'sine',.12)}
+  else{tone(880,0,.5);tone(1318.5,.18,.9);if(!preview){tone(880,1,.5);tone(1318.5,1.18,.9)}}
+}
+function pomoTitle(){
+  const T=pomoState();if(T.run==='idle')return;
+  const base=(appSettings().name||'').trim()||APP_NAME;
+  document.title=`${T.run==='running'?'▶':'⏸'} ${pomoClock(pomoLeft(T))} · ${POMO_LABEL[T.mode]} — ${base}`;
+}
+function renderPomo(){
+  const b=$('#pomo'),pop=$('#pomo-pop');if(!b)return;
+  const T=pomoState(),left=pomoLeft(T);
+  b.className=`pomo-btn ${T.run} m-${T.mode}`;b.setAttribute('aria-expanded',POMO_OPEN);
+  b.innerHTML=T.run==='idle'?TOMATO_IC:`${TOMATO_IC}<span class="pb-t">${pomoClock(left)}</span>`;
+  b.title=T.run==='idle'?'Focus timer (P to start or pause)':`${POMO_LABEL[T.mode]} · ${pomoClock(left)} left${T.run==='paused'?' (paused)':''}`;
+  pop.hidden=!POMO_OPEN;
+  if(POMO_OPEN){
+    const t=S.tasks[T.taskId],every=+pref('pomoEvery')||4,n=pomoToday(T);
+    pop.innerHTML=`<div class="pp-modes seg" role="tablist" aria-label="Timer mode">${Object.entries(POMO_LABEL).map(([k,l])=>`<button type="button" role="tab" data-act="pomo-mode" data-m="${k}" class="${T.mode===k?'on':''}" aria-selected="${T.mode===k}">${l}</button>`).join('')}</div>
+      <div class="pp-time m-${T.mode}" id="pomo-time">${pomoClock(left)}</div>
+      <div class="pp-task">${T.mode!=='focus'?`<span class="hint">Step away from the screen for a bit.</span>`:t?`<button type="button" class="pp-link" data-act="pomo-open" title="Open this task">${taskMark(t)}<span>${esc(t.name||'Untitled task')}</span></button><button type="button" class="icon-btn" data-act="pomo-unlink" title="Stop linking this task" aria-label="Stop linking this task">${I.x}</button>`:`<span class="hint">Not linked to a task. Press P or the tomato at the top of a task to focus on it.</span>`}</div>
+      <div class="pp-btns"><button type="button" class="btn primary" data-act="pomo-go">${T.run==='running'?'Pause':T.run==='paused'?'Resume':'Start'}</button><button type="button" class="btn" data-act="pomo-reset" ${T.run==='idle'?'disabled':''}>Reset</button><button type="button" class="btn ghost" data-act="pomo-skip" title="Go to the ${T.mode==='focus'?'break':'next focus'} without recording this one">Skip</button></div>
+      <div class="pp-foot"><span>${n} focus session${n===1?'':'s'} today · ${Math.min(T.cycle||0,every)} of ${every} before a long break</span><button type="button" class="btn sm ghost" data-act="pomo-settings">${I.gear}Settings</button></div>`;
+  }
+}
+function pomoTick(){
+  if(!S.ready)return;
+  pomoCheck();
+  const T=pomoState();if(T.run==='idle'&&!POMO_OPEN)return;
+  const left=pomoClock(pomoLeft(T)),bt=$('#pomo .pb-t');if(bt)bt.textContent=left;
+  const pt=$('#pomo-time');if(pt)pt.textContent=left;
+  const w=PIP.win;if(w&&!w.closed){const e=w.document.getElementById('pip-time');if(e)e.textContent=left}
+  pomoTitle();
+}
+setInterval(pomoTick,1000);
+function pomoSettingsHtml(){
+  const num=(k,l,max)=>`<label class="pomo-num"><span>${l}</span><input type="number" min="1" max="${max}" data-pk="${k}" data-fk="s-${k}" value="${esc(String(SM[k]))}"><small>${k==='pomoEvery'?'sessions':'min'}</small></label>`;
+  const np='Notification' in window?Notification.permission:'unsupported';
+  return `<div class="field"><span class="lbl">Lengths</span><div class="pomo-nums">${num('pomoFocus','Focus',180)}${num('pomoShort','Short break',60)}${num('pomoLong','Long break',90)}${num('pomoEvery','Long break after',12)}</div>
+    <p class="hint">Changes apply from the next session you start.</p></div>
+    ${prefRow('pomoAutoBreak','When focus ends',[[false,'Wait for me'],[true,'Start the break']])}
+    ${prefRow('pomoAutoFocus','When a break ends',[[false,'Wait for me'],[true,'Start focus']])}
+    ${prefRow('pomoSound','Sound',[['chime','Chime'],['bell','Bell'],['soft','Soft'],['off','Off']],'Plays when you pick one')}
+    ${prefRow('pomoPopup','Desktop pop-up when time’s up',[[false,'Off'],[true,'On']],np==='denied'?'Blocked in this browser: allow notifications for this site in its settings first':np==='unsupported'?'Not available in this browser':'Only shows while you’re in another app or tab')}
+    <p class="hint">The timer is shared by all your devices: start it on your Mac and your phone shows the same countdown (other devices catch up within a minute). Each finished focus session adds 🍅 1 to the linked task and a line to its activity. On a phone, a locked screen can't play the sound; the timer still keeps time.</p>`;
+}
 function renderDrawer(){
   const t=S.tasks[S.ui.openTask];
   if(!t){if(S.ui.openTask)closeDrawer();return}
@@ -3185,7 +3329,7 @@ function renderDrawer(){
   withFocus(()=>{$('#drawer').innerHTML=`
   ${t._draft?`<div class="d-draft">${t.copiedFrom?I.copy:I.plus}<b>${t.copiedFrom?'Copy of a task':'New task'}</b><span>Not saved yet</span></div>`:''}
   <div class="d-top" style="--jc:${esc(j?.color||'transparent')}"><div class="crumb">${taskMark(t)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
-    ${t._draft?'':`<button class="icon-btn ${t.pinned?'pin-on':''}" data-act="d-pin" aria-pressed="${!!t.pinned}" aria-label="${t.pinned?'Unpin':'Pin to the top'}" title="${t.pinned?'Unpin':'Pin to the top of the Overview'}">${I.pin}</button>${isClosed(t)?'':`<button class="icon-btn ${t.upNext?'pin-on':''}" data-act="d-upnext" aria-pressed="${!!t.upNext}" aria-label="${t.upNext?'Remove from Up next':'Add to Up next'}" title="${t.upNext?`Up next #${upNextPos(t)} · click to remove`:'Add to Up next (your queue on the Overview)'}">${UP_IC}</button>`}<button class="icon-btn" data-act="d-link" aria-label="Copy link to this task" title="Copy link to this task">${LINK_IC}</button><button class="icon-btn" data-act="d-duplicate" aria-label="Duplicate task" title="Duplicate (make a copy to edit)">${I.copy}</button>${canPip()?`<button class="icon-btn ${PIP.win&&PIP.id===t.id?'pin-on':''}" data-act="d-pip" aria-pressed="${!!(PIP.win&&PIP.id===t.id)}" aria-label="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task in its own window'}" title="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task over Premiere or Resolve'}">${PIP_IC}</button>`:''}`}<button class="icon-btn" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
+    ${t._draft?'':`<button class="icon-btn ${t.pinned?'pin-on':''}" data-act="d-pin" aria-pressed="${!!t.pinned}" aria-label="${t.pinned?'Unpin':'Pin to the top'}" title="${t.pinned?'Unpin':'Pin to the top of the Overview'}">${I.pin}</button>${isClosed(t)?'':(()=>{const T=pomoState(),on=T.taskId===t.id&&T.mode==='focus'&&T.run!=='idle';return `<button class="icon-btn d-pomo ${on?'pin-on':''}" data-act="d-pomo" aria-pressed="${on}" aria-label="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task'}" title="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task (starts a focus session)'}${t.pomos?` · ${t.pomos} focus session${t.pomos===1?'':'s'} so far`:''}">${TOMATO_IC}${t.pomos?`<span class="dp-n">${t.pomos}</span>`:''}</button>`})()}${isClosed(t)?'':`<button class="icon-btn ${t.upNext?'pin-on':''}" data-act="d-upnext" aria-pressed="${!!t.upNext}" aria-label="${t.upNext?'Remove from Up next':'Add to Up next'}" title="${t.upNext?`Up next #${upNextPos(t)} · click to remove`:'Add to Up next (your queue on the Overview)'}">${UP_IC}</button>`}<button class="icon-btn" data-act="d-link" aria-label="Copy link to this task" title="Copy link to this task">${LINK_IC}</button><button class="icon-btn" data-act="d-duplicate" aria-label="Duplicate task" title="Duplicate (make a copy to edit)">${I.copy}</button>${canPip()?`<button class="icon-btn ${PIP.win&&PIP.id===t.id?'pin-on':''}" data-act="d-pip" aria-pressed="${!!(PIP.win&&PIP.id===t.id)}" aria-label="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task in its own window'}" title="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task over Premiere or Resolve'}">${PIP_IC}</button>`:''}`}<button class="icon-btn" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
   ${t._draft?'':`<div class="d-tabs" role="tablist"><button role="tab" data-act="d-tab" data-tab="details" class="${S.ui.dtab!=='activity'?'on':''}" aria-selected="${S.ui.dtab!=='activity'}">${I.info}Details</button><button role="tab" data-act="d-tab" data-tab="activity" class="${S.ui.dtab==='activity'?'on':''}" aria-selected="${S.ui.dtab==='activity'}">${I.clock}Activity<span class="mono">${taskActivity(t).length}</span></button></div>`}
   ${!t._draft&&S.ui.dtab==='activity'?activityPane(t):`  <div class="d-body">
     ${SPLIT&&SPLIT.id===t.id?splitHtml(t):''}
@@ -3452,6 +3596,7 @@ const HELP=[
  ['Your data','Import from a spreadsheet',`Download your tracker sheet as CSV and import it; you'll see a preview first and existing tasks are skipped.`,['import','Import CSV']],
  ['Look and feel','Appearance',`Theme, color scheme, dark shade, status style, card depth, sidebar style, compact header, greeting, job card rings, due date badges, tinted board columns, calendar grid and today marker, dates, week start and many more. Everything previews live.`,['appearance','Appearance']],
  ['Getting work done','Type it all in the name',`When you add a task, type the client, the day and the priority right in the name: “Reel 7 Band fri !high”. A line under the name shows what will be picked up, and it's filled in when you save. Days: today, tomorrow, mon–sun, +3d, in 2 weeks, oct 2, 10/2. Priority: !urgent, !high, !low. Use @name to pick a client or job by its first letters.`,null],
+ ['Getting work done','Focus timer',`A Pomodoro timer top-right, next to the bell: 25 minutes of focus, then a 5-minute break, and a 15-minute break after every 4 (change them in Settings). Press P or the tomato at the top of a task to focus on that task; each finished session adds 🍅 1 to it and a line to its activity. The same timer shows on all your devices and in the floating task window. Turn on the desktop pop-up in Settings to be told when time's up while you're in Premiere.`,['pomo','Focus timer']],
  ['Getting work done','Save & add another',`Next to Save task: saves it and opens a fresh task for the same job, client and format, for entering a batch of reels in a row.`,null],
  ['Getting work done','Up next',`Your own queue across every job. Add a task from the right-click menu or the queue icon at the top of a task. The queue sits at the top of the Overview; drag to reorder. Finished tasks leave it on their own.`,null],
  ['Getting work done','Push due dates back',`Select tasks, then Push back… in the bar at the bottom: +1 day, +2 days, +1 week, or workdays that skip weekends. Undo puts the old dates back.`,null],
@@ -3744,6 +3889,7 @@ function renderSettings(){
     {id:'finder',label:'Finder & Chrome',icon:I.folder,html:finderSettingsHtml()},
     ...(B.mode==='cloud'?[{id:'account',label:'Calendar & account',icon:I.cal,html:accountSettingsHtml()}]:[]),
     {id:'keys',label:'Keyboard shortcuts',icon:'<svg class="i" viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8.5" rx="1.5"/><path d="M4 6.5h.01M6.5 6.5h.01M9 6.5h.01M11.5 6.5h.01M5 10h6"/></svg>',html:shortcutSettingsHtml()},
+    {id:'pomo',label:'Focus timer',icon:TOMATO_IC,html:pomoSettingsHtml()},
     {id:'safezones',label:'Safe-zone overlays',icon:SZ_IC,html:safeZonesHtml()},
     {id:'import',label:'Import CSV',icon:I.upload,html:importSettingsHtml()},
     {id:'backup',label:'Backup',icon:I.download,html:backupSettingsHtml()}];
@@ -4507,6 +4653,7 @@ function toast(msg,action){
 document.addEventListener('click',e=>{
   if(narrow.matches&&$('#side').classList.contains('open')&&e.target.closest('#side [data-act]:not([data-act=toggle-jobs])'))setTimeout(closeSide,0);
   if(notesOpen&&!e.target.closest('.bell-wrap')){notesOpen=false;renderBell()}
+  if(POMO_OPEN&&!e.target.closest('.pomo-wrap')){POMO_OPEN=false;renderPomo()}
   if(VOPT&&!e.target.closest('#vopt-wrap')){VOPT=false;renderVopt()}
   if(STATPOP&&!e.target.closest('.stats-wrap')){STATPOP=false;render()}
   if(CTX&&!e.target.closest('#ctx')){closeCtx()}
@@ -4556,7 +4703,10 @@ document.addEventListener('click',e=>{
     case 'rp-create': rpCreate();break;
     case 'rp-load': rpLoad(el.dataset.name);break;
     case 'imp-pick': $('#import-in').click();break;
-    case 's-pref': if(SM&&el.dataset.k in PREF_DEF){SM[el.dataset.k]=JSON.parse(el.dataset.v);renderSettings();render()}break;
+    case 's-pref': if(SM&&el.dataset.k in PREF_DEF){SM[el.dataset.k]=JSON.parse(el.dataset.v);
+      if(el.dataset.k==='pomoPopup'&&SM.pomoPopup){if(!('Notification' in window)){SM.pomoPopup=false;toast('This browser can’t show desktop pop-ups')}else if(Notification.permission!=='granted')Notification.requestPermission().then(r=>{if(r!=='granted'&&SM){SM.pomoPopup=false;toast('Pop-ups are blocked for this site. Allow them in the browser’s site settings, then try again.')}if(SM)renderSettings()})}
+      if(el.dataset.k==='pomoSound'&&SM.pomoSound!=='off')pomoChime(SM.pomoSound,true);
+      renderSettings();render()}break;
     case 's-prio-col': if(SM){SM.prioColors={...(SM.prioColors||{}),[el.dataset.p]:el.dataset.c||''};renderSettings();render()}break;
     case 'imp-cancel': SM.imp=null;renderSettings();break;
     case 'imp-run': runImport();break;
@@ -4615,6 +4765,16 @@ document.addEventListener('click',e=>{
     case 'tpl-del':{const t=S.tasks[u.openTask],h=tplHome(t);if(!h)break;if(TPL.del!==el.dataset.tid){TPL.del=el.dataset.tid;renderDrawer();break}
       patch(h.col,h.id,{templates:(h.doc.templates||[]).filter(y=>y.id!==el.dataset.tid)});TPL.del=null;renderDrawer();toast('Template deleted');break}
     case 'd-upnext':toggleUpNext(u.openTask);break;
+    case 'pomo':POMO_OPEN=!POMO_OPEN;if(POMO_OPEN){notesOpen=false;renderBell()}renderPomo();break;
+    case 'pomo-go':pomoToggle();break;
+    case 'pomo-reset':pomoReset();break;
+    case 'pomo-skip':pomoSkip();break;
+    case 'pomo-mode':pomoSetMode(el.dataset.m);break;
+    case 'pomo-unlink':pomoSet({taskId:null});renderPomo();break;
+    case 'pomo-open':{const id=pomoState().taskId;POMO_OPEN=false;renderPomo();if(S.tasks[id])openTask(id);break}
+    case 'pomo-settings':POMO_OPEN=false;renderPomo();openSettings();SM.sec='pomo';renderSettings();break;
+    case 'pomo-test':pomoChime(el.dataset.v||pref('pomoSound'),true);break;
+    case 'd-pomo':{const t=S.tasks[u.openTask];if(!t)break;const T=pomoState();if(T.run==='running'&&T.mode==='focus'&&T.taskId===t.id){pomoToggle()}else{pomoStart('focus',t.id)}renderDrawer();break}
     case 'un-rm':toggleUpNext(el.dataset.id);break;
     case 'd-pip':{const id=u.openTask;if(PIP.win&&PIP.id===id){PIP.win.close();break}openPip(id);break}
     case 'sz-dl':downloadSafeZone(el.dataset.p);break;
@@ -4741,12 +4901,13 @@ document.addEventListener('keydown',e=>{
     return;
   }
   if(e.key==='Escape'&&SEL.size&&$('#drawer').hidden&&$('#modal').hidden){clearSel();return}
-  if(e.key==='Escape'){if(!$('#filter-sheet').hidden){closeFilters();return}if($('#side').classList.contains('open')){closeSide();return}if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
+  if(e.key==='Escape'){if(POMO_OPEN){POMO_OPEN=false;renderPomo();return}if(!$('#filter-sheet').hidden){closeFilters();return}if($('#side').classList.contains('open')){closeSide();return}if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'');
   if(e.key==='Enter'&&!typing){const r=e.target.closest?.('[data-act="open"]');if(r){openTask(r.dataset.id);return}}
   if(typing||e.metaKey||e.ctrlKey||e.altKey)return;
   if(e.key==='a'&&!$('#drawer').hidden&&$('#modal').hidden){const t=S.tasks[S.ui.openTask];if(t&&!t._draft){e.preventDefault();S.ui.dtab=S.ui.dtab==='activity'?'details':'activity';renderDrawer();return}}
   if(e.key==='/'){e.preventDefault();focusSearch()}
+  else if(e.key==='p'&&S.ready&&$('#modal').hidden){e.preventDefault();pomoToggle(S.tasks[S.ui.openTask]&&!S.tasks[S.ui.openTask]._draft?S.ui.openTask:null)}
   else if(e.key==='n'&&$('#modal').hidden&&S.ready){e.preventDefault();const id=newTask();if(id){openTask(id);setTimeout(()=>$('.d-name')?.focus(),30)}}
 });
 document.addEventListener('change',e=>{
@@ -4804,6 +4965,7 @@ document.addEventListener('input',e=>{
   if(el.id==='jump-q'&&JUMP){JUMP.q=el.value;JUMP.i=0;renderJump();return}
   if(el.id==='s-name'&&SM){SM.name=el.value;return}
   if(el.id==='s-greet'&&SM){SM.greetName=el.value;render();return}
+  if(SM&&el.dataset.pk){const k=el.dataset.pk,v=parseInt(el.value,10);if(v>=1&&v<=(k==='pomoEvery'?12:180))SM[k]=v;return}
   if(el.id==='s-limit'&&SM){SM.dayLimit=el.value;return}
   if(SM&&el.dataset.stLabel!=null){const x=SM.statuses[+el.dataset.stLabel];if(x)x.label=el.value;return}
   if(SM&&el.matches('[data-st-to]')){SM.stTo=el.value;return}
