@@ -1229,6 +1229,59 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
   body.typing .tabbar{display:none}
   body.typing .main{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
 }
+/* ---------- appearance extras (Settings → Appearance / Accessibility) ---------- */
+:root[data-icons="light"] svg.i{stroke-width:1.1}
+:root[data-icons="bold"] svg.i{stroke-width:2.1}
+:root[data-depth="flat"]{--shadow:none}
+:root[data-depth="flat"] :is(.card,.job-card,.auth-card):hover{box-shadow:none}
+:root[data-depth="raised"] :is(.card,.job-card,.stat,.rows,.brand-panel,.wday,.pin-card){box-shadow:0 1px 2px rgba(10,12,16,.07),0 6px 18px rgba(10,12,16,.10)}
+:root[data-depth="raised"] :is(.card,.job-card):hover{box-shadow:0 2px 4px rgba(10,12,16,.09),0 12px 28px rgba(10,12,16,.16)}
+:root[data-side="plain"] .side{background:var(--surface)}
+:root[data-side="plain"][data-scheme] .side{--text:inherit;--muted:inherit;--faint:inherit;--line:inherit;--surface-2:inherit;--accent-soft:inherit;--surface:inherit;border-right-color:var(--line)}
+:root[data-side="frosted"] .side{background:color-mix(in srgb,var(--side-bg) 68%,transparent);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4)}
+:root[data-scroll="thin"] *{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--text) 24%,transparent) transparent}
+:root[data-toast="right"] .toast{left:auto;right:20px;transform:none}
+:root[data-toast="top"] .toast{top:calc(16px + env(safe-area-inset-top,0px));bottom:auto!important}
+:root[data-names="wrap"] :is(.row,.arow,.pin-card) .t-name{white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+:root[data-done="plain"] .done-row .t-name{color:inherit;text-decoration:none}
+:root[data-done="faded"] :is(.done-row,.card.is-done){opacity:.55}
+:root[data-done="faded"] .card.is-done .t-name{text-decoration:line-through;text-decoration-color:var(--faint)}
+:root[data-done="faded"] :is(.done-row,.card.is-done):hover{opacity:.85}
+:root[data-overdue="tint"] :is(.row.is-over,.card.is-over){background:color-mix(in srgb,var(--danger) 8%,var(--surface))}
+:root[data-sticons] .pill[data-st]::before{width:11px;height:11px;border-radius:0;background:var(--c)}
+:root[data-sticons] .pill[data-st="waiting_client"]::before{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 2h7M4.5 14h7M5 2c0 3.5 6 4.5 6 6s-6 2.5-6 6M11 2c0 3.5-6 4.5-6 6s6 2.5 6 6'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 2h7M4.5 14h7M5 2c0 3.5 6 4.5 6 6s-6 2.5-6 6M11 2c0 3.5-6 4.5-6 6s6 2.5 6 6'/%3E%3C/svg%3E") center/contain no-repeat}
+:root[data-sticons] .pill[data-st="not_started"]::before{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='8' r='5.5'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='8' r='5.5'/%3E%3C/svg%3E") center/contain no-repeat}
+:root[data-sticons] .pill[data-st="in_progress"]::before{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='black' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 3l8 5-8 5z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='black' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 3l8 5-8 5z'/%3E%3C/svg%3E") center/contain no-repeat}
+:root[data-sticons] .pill[data-st="internal_review"]::before{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8z'/%3E%3Ccircle cx='8' cy='8' r='2'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8z'/%3E%3Ccircle cx='8' cy='8' r='2'/%3E%3C/svg%3E") center/contain no-repeat}
+:root[data-sticons] .pill[data-st="client_review"]::before{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 3.5h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H7l-3 2.5v-2.5H3a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 3.5h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H7l-3 2.5v-2.5H3a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z'/%3E%3C/svg%3E") center/contain no-repeat}
+:root[data-sticons] .pill[data-st="revisions"]::before{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 6.5A5 5 0 0 0 3.6 5M3 9.5A5 5 0 0 0 12.4 11M3.5 2.5V5.2h2.7M12.5 13.5v-2.7H9.8'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 6.5A5 5 0 0 0 3.6 5M3 9.5A5 5 0 0 0 12.4 11M3.5 2.5V5.2h2.7M12.5 13.5v-2.7H9.8'/%3E%3C/svg%3E") center/contain no-repeat}
+:root[data-sticons] .pill[data-st="done"]::before{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8.5l3.2 3.2L13 4.5'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8.5l3.2 3.2L13 4.5'/%3E%3C/svg%3E") center/contain no-repeat}
+:root[data-sticons][data-pill="solid"] .pill[data-st]::before{background:#fff}
+:root[data-logos="circle"] :is(.logo,.tmark,.brand-logo:not(.def)){border-radius:50%}
+:root[data-nums="regular"]{--mono:var(--body)}
+:root[data-nums="regular"] body{font-variant-numeric:tabular-nums}
+:root[data-nums="regular"] :is(.tc,.copy-code,kbd){font-family:"JetBrains Mono",ui-monospace,monospace}
+:root[data-read="relaxed"] :is(.notes-view,.tl-note .md,.note-reply .md,.brand-panel .bv,textarea.notes,#note-in,#reply-in,#edit-in){line-height:1.8}
+:root[data-sidecounts="off"] .side .nav-item .count{display:none}
+.prio.urgent{color:var(--pr-urgent,var(--danger))} .prio.high{color:var(--pr-high,var(--st-rev))} .prio.low{color:var(--pr-low,var(--faint))}
+.prio-ctl.p-urgent{--c:var(--pr-urgent,var(--danger))} .prio-ctl.p-high{--c:var(--pr-high,var(--st-rev))} .prio-ctl.p-low{--c:var(--pr-low,var(--faint))}
+/* compact preference rows in Settings */
+.pref-group{margin:6px 0 -4px;font-size:calc(11px*var(--ts));font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.pref-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--line)}
+.pref-row .pr-l{display:flex;flex-direction:column;gap:2px;font-weight:600;min-width:0}
+.pref-row .pr-l small{font-weight:400;color:var(--muted);font-size:calc(12px*var(--ts))}
+.pref-row .seg button{padding:5px 10px}
+.prio-cols{display:flex;flex-direction:column;gap:8px}
+.prio-col-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.prio-col-row > span{width:64px;font-weight:600}
+.prio-col-row .sw{width:22px;height:22px;border-radius:50%;border:2px solid transparent;background:var(--c);padding:0;cursor:pointer}
+.prio-col-row .sw.on{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--c)}
+.prio-col-row .sw.def{background:none;border:1.5px dashed var(--line-strong);width:auto;height:22px;border-radius:11px;padding:0 8px;font-size:calc(11px*var(--ts));color:var(--muted)}
+.prio-col-row .sw.def.on{box-shadow:0 0 0 2px var(--accent)}
+@media (max-width:820px){
+  :root[data-toast="right"] .toast{left:50%;right:auto;transform:translateX(-50%)}
+  :root[data-names="wrap"] .card .t-name{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+}
 </style>
 
 <div class="app">
@@ -1310,7 +1363,7 @@ function loadStatuses(){
 const stColor=id=>ST[id]?.color||(STATUS_VAR[id]?`var(${STATUS_VAR[id]})`:'#7d8596');
 const stLabel=id=>ST[id]?.label||'Unknown status';
 const stOf=t=>ST[t.status]?t.status:STATUSES[0].id;   // tasks in a deleted status show in the first one
-const pillStyle=id=>`style="--c:${stColor(id)}"`;
+const pillStyle=id=>`style="--c:${stColor(id)}" data-st="${esc(id)}"`;
 const STATUS_VAR={not_started:'--st-not',in_progress:'--st-prog',internal_review:'--st-review',client_review:'--st-client',revisions:'--st-rev',waiting_client:'--st-wait',done:'--st-done',dropped:'--st-drop'};
 /* Done and Dropped are closed: no deadlines, counts, notifications or calendar events */
 const isClosed=t=>t.status==='done'||t.status==='dropped';  // 'dropped' was removed; old ones are moved to Done on load
@@ -1441,7 +1494,8 @@ const diffDays=(a,b)=>Math.round((parseD(a)-parseD(b))/86400000);
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MONTH_FULL=['January','February','March','April','May','June','July','August','September','October','November','December'];
 /* Look & date preferences (settings/app), previewed live from SM while Settings is open */
-const PREF_DEF={dateRel:false,dateFmt:'md',weekStart:'mon',hideWeekends:false,confetti:true,motion:'system',contrast:'normal',trashDays:30,darkShade:'standard',pillStyle:'tint',tips:true};
+const PREF_DEF={dateRel:false,dateFmt:'md',weekStart:'mon',hideWeekends:false,confetti:true,motion:'system',contrast:'normal',trashDays:30,darkShade:'standard',pillStyle:'tint',tips:true,
+  iconWeight:'regular',depth:'soft',sideStyle:'colored',thinScroll:false,toastPos:'bottom',nameWrap:false,doneStyle:'struck',overdueTint:false,statusIcons:false,prioColors:{},logoShape:'rounded',numFont:'mono',readSpacing:'normal',sideCounts:true};
 const pref=k=>{let o=null;try{o=SM}catch(e){/* Settings state not set up yet */}o=o||S.settings?.app||{};return o[k]!==undefined&&o[k]!==null?o[k]:PREF_DEF[k]};
 const reducedMotion=()=>pref('motion')==='reduce'||matchMedia('(prefers-reduced-motion:reduce)').matches;
 function absDate(s){
@@ -2030,6 +2084,21 @@ function applyLook(o){
   if(o.contrast==='high') r.setAttribute('data-contrast','high'); else r.removeAttribute('data-contrast');
   if(o.darkShade==='dim'||o.darkShade==='black') r.setAttribute('data-dark',o.darkShade); else r.removeAttribute('data-dark');
   if(['solid','outline','dot'].includes(o.pillStyle)) r.setAttribute('data-pill',o.pillStyle); else r.removeAttribute('data-pill');
+  const g=k=>o[k]!==undefined&&o[k]!==null?o[k]:PREF_DEF[k],at=(n,v)=>v?r.setAttribute(n,v):r.removeAttribute(n);
+  at('data-icons',g('iconWeight')!=='regular'&&g('iconWeight'));
+  at('data-depth',g('depth')!=='soft'&&g('depth'));
+  at('data-side',g('sideStyle')!=='colored'&&g('sideStyle'));
+  at('data-scroll',g('thinScroll')&&'thin');
+  at('data-toast',g('toastPos')!=='bottom'&&g('toastPos'));
+  at('data-names',g('nameWrap')&&'wrap');
+  at('data-done',g('doneStyle')!=='struck'&&g('doneStyle'));
+  at('data-overdue',g('overdueTint')&&'tint');
+  at('data-sticons',g('statusIcons')&&'on');
+  at('data-logos',g('logoShape')==='circle'&&'circle');
+  at('data-nums',g('numFont')==='regular'&&'regular');
+  at('data-read',g('readSpacing')==='relaxed'&&'relaxed');
+  at('data-sidecounts',!g('sideCounts')&&'off');
+  const pc=g('prioColors')||{};for(const p of ['urgent','high','low']){if(pc[p])r.style.setProperty('--pr-'+p,pc[p]);else r.style.removeProperty('--pr-'+p)}
 }
 function migrateStatuses(){
   pruneLog();purgeOldTrash();
@@ -2335,7 +2404,7 @@ function rowsAttrs(){
   const mid=['var(--w0)','minmax(0,1fr)','180px','84px',on('links')&&'120px'].filter(Boolean).join(' ');
   return `class="rows ${['prio','start','links'].filter(k=>h[k]).map(k=>'h-'+k).join(' ')}" style="--cols:${wide};--cols-mid:${mid}"`;
 }
-const rowHtml=(t,job,showJob)=>`<div class="row ${isClosed(t)?'done-row':''} ${S.ui.openTask===t.id?'focus':''} ${SEL.has(t.id)?'picked':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
+const rowHtml=(t,job,showJob)=>`<div class="row ${isClosed(t)?'done-row':''} ${dueClass(t)==='over'?'is-over':''} ${S.ui.openTask===t.id?'focus':''} ${SEL.has(t.id)?'picked':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="mark-wrap">${taskMark(t)}${selBox(t)}</div>
         <div class="t-main"><div class="t-name" title="Double-click to rename">${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${hlText(t.name||'Untitled task',qNow())}</div>${metaLine(t,job,showJob)}${searchHit(t)}</div>
         <div class="c-status" data-stop>${statusSelect(t,'row-status')}${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
@@ -2365,7 +2434,7 @@ function boardView(list,job){
   return `<div class="board-wrap"><div class="board">${STATUSES.map(s=>{
     const cards=list.filter(t=>stOf(t)===s.id);
     return `<div class="col" data-drop="${s.id}"><div class="col-head"><span class="pill" ${pillStyle(s.id)}><span class="pl">${esc(s.label)}</span></span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
-      ${cards.map(t=>`<div class="card ${SEL.has(t.id)?'picked':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
+      ${cards.map(t=>`<div class="card ${SEL.has(t.id)?'picked':''} ${isClosed(t)?'is-done':''} ${dueClass(t)==='over'?'is-over':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="card-top"><div class="mark-wrap">${taskMark(t)}${selBox(t)}</div><div class="t-name" title="Double-click to rename">${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${hlText(t.name||'Untitled task',qNow())}</div></div>${metaLine(t,job,!job)}${searchHit(t)}
         <div class="card-foot"><span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,!isClosed(t)):'No date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
       </div>`;
@@ -3163,6 +3232,23 @@ function renderSettings(){
       ${prefPick('darkShade','Dark mode shade',[['standard','Standard','Blue-grey, as before'],['dim','Dim','Softer grey, easier on the eyes'],['black','True black','Deepest black, great on OLED screens']])}
       <p class="hint" style="margin-top:-8px">Used whenever the app is dark (the Dark theme, or Match device at night).</p>
       <div class="field"><span class="lbl" id="pp-pill">Status style</span><div class="pick-row" role="group" aria-labelledby="pp-pill">${[['tint','Tinted'],['solid','Solid'],['outline','Outline'],['dot','Dot']].map(([v,l])=>`<button type="button" data-act="s-pref" data-k="pillStyle" data-v='"${v}"' class="${SM.pillStyle===v?'on':''}" aria-pressed="${SM.pillStyle===v}"><span class="pill pill-demo" data-ps="${v}" style="--c:var(--st-prog)">In progress</span>${l}</button>`).join('')}</div></div>
+      <p class="pref-group">Surfaces</p>
+      ${prefRow('depth','Card depth',[['flat','Flat'],['soft','Soft'],['raised','Raised']],'Shadows under cards and panels')}
+      ${prefRow('sideStyle','Sidebar',[['colored','Colored'],['plain','Plain'],['frosted','Frosted']],'Colored follows your color scheme')}
+      ${prefRow('iconWeight','Icon weight',[['light','Light'],['regular','Regular'],['bold','Bold']])}
+      ${prefRow('thinScroll','Scrollbars',[[false,'Standard'],[true,'Thin']])}
+      ${prefRow('toastPos','Messages like “Moved · Undo”',[['bottom','Bottom'],['right','Bottom right'],['top','Top']])}
+      <p class="pref-group">Tasks</p>
+      ${prefRow('nameWrap','Long task names',[[false,'One line'],[true,'Wrap']])}
+      ${prefRow('doneStyle','Finished tasks',[['plain','Plain'],['struck','Crossed out'],['faded','Faded']])}
+      ${prefRow('overdueTint','Overdue tasks',[[false,'Red date'],[true,'Red date + tint']])}
+      ${prefRow('statusIcons','Status marker',[[false,'Dot'],[true,'Icon']],'Icons for the built-in statuses; your own keep the dot')}
+      ${prioColorsHtml()}
+      <p class="pref-group">Details</p>
+      ${prefRow('logoShape','Logo shape',[['rounded','Rounded'],['circle','Circle']])}
+      ${prefRow('numFont','Dates and numbers',[['mono','Typewriter'],['regular','Regular']])}
+      ${prefRow('sideCounts','Counts in the sidebar',[[true,'Show'],[false,'Hide']])}
+      <p class="pref-group">Dates</p>
       ${prefPick('dateRel','Dates in lists and cards',[[false,absDate(addDays(today(),3)),'The date itself'],[true,'in 3 days','How far away, like “2 days late”']])}
       ${prefPick('dateFmt','Date format',[['md','Oct 1','Month first'],['dm','1 Oct','Day first']])}
       ${prefPick('weekStart','Week starts on',[['mon','Monday',''],['sun','Sunday','']])}
@@ -3173,6 +3259,7 @@ function renderSettings(){
       <div class="field"><span class="lbl" id="s-dens-lbl">Density</span>
       <div class="pick-row two" role="group" aria-labelledby="s-dens-lbl">${[['comfortable','Comfortable','More space between rows and cards',8],['compact','Compact','Fits more tasks on screen',3]].map(([id,l,d,g])=>`<button type="button" data-act="s-dens" data-v="${id}" class="${SM.density===id?'on':''}" aria-pressed="${SM.density===id}"><span class="dens-demo" style="gap:${g}px"><i></i><i></i><i></i></span>${l}<small>${d}</small></button>`).join('')}</div></div>
       ${prefPick('motion','Motion',[['system','Match device','Animations follow your device setting'],['reduce','Reduce motion','No animations or sliding']])}
+      ${prefPick('readSpacing','Line spacing for reading',[['normal','Normal','As it is now'],['relaxed','Relaxed','More space in notes, updates and brand guides']])}
       ${prefPick('tips','Hover labels',[[true,'On','A short label when you hover over an icon button'],[false,'Off','No labels on hover']])}
       ${prefPick('contrast','Contrast',[['normal','Standard',''],['high','High contrast','Darker text and stronger borders']])}`},
     {id:'statuses',label:'Statuses',icon:I.status,html:statusSettingsHtml()},
@@ -3697,6 +3784,14 @@ function finderSettingsHtml(){
     <p class="hint">Test it with the button below, not the ▶ button in Shortcuts (that runs it with no path). The first time, the browser asks to open Shortcuts, and macOS may ask to allow the script: allow both. Use full paths (starting with /Users/…); Option ⌥ + Command ⌘ + C in Finder gives you one.</p>
     ${IS_MAC?`<div class="acct-btns"><a class="btn sm" href="${pathOpenUrl('/Applications')}">${I.folder}Test: open Applications</a></div>`:''}</div>`;
 }
+/* compact preference row: label (+ hint) and a small segmented switch */
+function prefRow(k,label,opts,hint=''){
+  return `<div class="pref-row"><span class="pr-l">${label}${hint?`<small>${hint}</small>`:''}</span><div class="seg" role="group" aria-label="${esc(label)}">${opts.map(([v,l])=>`<button type="button" data-act="s-pref" data-k="${k}" data-v='${esc(JSON.stringify(v))}' class="${SM[k]===v?'on':''}" aria-pressed="${SM[k]===v}">${esc(l)}</button>`).join('')}</div></div>`;
+}
+function prioColorsHtml(){
+  const pc=SM.prioColors||{},defs={urgent:'var(--danger)',high:'var(--st-rev)',low:'var(--faint)'};
+  return `<div class="field"><span class="lbl">Priority colors</span><div class="prio-cols">${['urgent','high','low'].map(p=>`<div class="prio-col-row"><span>${PRIORITIES.find(x=>x.id===p).label}</span><button type="button" class="sw def ${pc[p]?'':'on'}" data-act="s-prio-col" data-p="${p}" data-c="" style="--c:${defs[p]}">Default</button>${STATUS_COLORS.map(c=>`<button type="button" class="sw ${pc[p]===c?'on':''}" data-act="s-prio-col" data-p="${p}" data-c="${c}" style="--c:${c}" aria-label="${p} ${c}"></button>`).join('')}</div>`).join('')}</div></div>`;
+}
 /* two-choice picker for a look/date preference (SM[k]); data-v holds JSON so booleans stay booleans */
 function prefPick(k,label,opts){
   return `<div class="field"><span class="lbl" id="pp-${k}">${label}</span><div class="pick-row ${opts.length===2?'two':opts.length===3?'three':''}" role="group" aria-labelledby="pp-${k}">${opts.map(([v,l,d])=>`<button type="button" data-act="s-pref" data-k="${k}" data-v='${esc(JSON.stringify(v))}' class="${SM[k]===v?'on':''}" aria-pressed="${SM[k]===v}">${esc(l)}${d?`<small>${esc(d)}</small>`:''}</button>`).join('')}</div></div>`;
@@ -3990,6 +4085,7 @@ document.addEventListener('click',e=>{
     case 'rp-load': rpLoad(el.dataset.name);break;
     case 'imp-pick': $('#import-in').click();break;
     case 's-pref': if(SM&&el.dataset.k in PREF_DEF){SM[el.dataset.k]=JSON.parse(el.dataset.v);renderSettings();render()}break;
+    case 's-prio-col': if(SM){SM.prioColors={...(SM.prioColors||{}),[el.dataset.p]:el.dataset.c||''};renderSettings();render()}break;
     case 'imp-cancel': SM.imp=null;renderSettings();break;
     case 'imp-run': runImport();break;
     case 'hol-add': if(!SM.holidays.includes(el.dataset.cc))SM.holidays.push(el.dataset.cc);SM.holAuto=false;renderSettings();break;
