@@ -951,7 +951,8 @@ body.side-mini .synced{display:none}
 .tc{display:inline-block;font:600 calc(12.5px*var(--ts)) var(--mono);color:#e0a100;background:color-mix(in srgb,#e0a100 16%,transparent);border-radius:5px;padding:1px 6px;margin-right:6px}
 :root[data-theme="dark"] .tc{color:#f2c14e}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tc{color:#f2c14e}}
-.tl-note .note-done{border-radius:50%;opacity:.75;border:1.5px solid var(--line-strong)}
+.tl-note .note-done{border-radius:50%;opacity:.75;border:1.5px solid var(--line-strong);padding:0;display:grid;place-items:center}
+.tl-note .note-done .i{display:block;margin:0}
 .tl-note .note-done .i{width:13px;height:13px;stroke-width:2.2}
 .tl-note .note-done:hover{opacity:1;border-color:var(--st-done);color:var(--st-done)}
 .tl-note .note-done.on{opacity:1;background:var(--st-done);border-color:var(--st-done);color:#fff}
