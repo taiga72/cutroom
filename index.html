@@ -947,6 +947,38 @@ body.side-mini .synced{display:none}
 .tl-note-head .icon-btn:hover,.tl-note-head .icon-btn.danger{opacity:1}
 .tl-note-head .icon-btn.danger{color:var(--danger);background:var(--danger-soft)}
 .tl-note p{margin:4px 0 0;white-space:normal;line-height:1.5}
+/* resolve + reply */
+.tc{display:inline-block;font:600 calc(12.5px*var(--ts)) var(--mono);color:#e0a100;background:color-mix(in srgb,#e0a100 16%,transparent);border-radius:5px;padding:1px 6px;margin-right:6px}
+:root[data-theme="dark"] .tc{color:#f2c14e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tc{color:#f2c14e}}
+.tl-note .note-done{border-radius:50%;opacity:.75;border:1.5px solid var(--line-strong)}
+.tl-note .note-done .i{width:13px;height:13px;stroke-width:2.2}
+.tl-note .note-done:hover{opacity:1;border-color:var(--st-done);color:var(--st-done)}
+.tl-note .note-done.on{opacity:1;background:var(--st-done);border-color:var(--st-done);color:#fff}
+.tl-note.resolved{background:var(--surface);opacity:.8}
+.tl-note.resolved .note-body{text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--text) 45%,transparent);color:var(--muted)}
+.tl-note.resolved .tc{opacity:.7}
+.note-foot{display:flex;align-items:center;gap:12px;margin-top:8px}
+.note-reply-btn{border:0;background:none;padding:2px 0;display:inline-flex;align-items:center;gap:5px;color:var(--muted);font-weight:600;font-size:calc(13px*var(--ts))}
+.note-reply-btn:hover{color:var(--accent)}
+.note-reply-btn .i{width:14px;height:14px}
+.done-when{display:inline-flex;align-items:center;gap:4px;color:var(--st-done);font-size:calc(12px*var(--ts));font-weight:600}
+.done-when .i{width:13px;height:13px;stroke-width:2.2}
+.note-replies{margin:8px 0 0 12px;padding-left:12px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.note-reply{display:flex;align-items:flex-start;gap:8px}
+.note-reply p{flex:1;margin:0;line-height:1.5}
+.note-reply .icon-btn{width:22px;height:22px;opacity:0}
+.note-reply:hover .icon-btn,.note-reply .icon-btn.danger{opacity:.7}
+.note-reply .icon-btn.danger{opacity:1;color:var(--danger);background:var(--danger-soft)}
+@media (hover:none){.note-reply .icon-btn{opacity:.6}}
+.reply-box{margin-top:8px}
+.reply-box textarea{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px;resize:vertical;font:inherit;color:var(--text)}
+.reply-box .composer-foot{display:flex;align-items:center;gap:6px;margin-top:6px}
+.reply-box .composer-foot .hint{margin-right:auto}
+.notes-sum{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:6px 2px;color:var(--muted);font-size:calc(13px*var(--ts))}
+.notes-sum b{color:var(--text)}
+.chip.notes-chip{display:inline-flex;align-items:center;gap:3px;color:var(--accent);border-color:color-mix(in srgb,var(--accent) 35%,transparent);background:var(--accent-soft)}
+.chip.notes-chip .i{width:11px;height:11px}
 @media (max-width:820px){.lrow{padding:7px 10px;gap:8px}.lrow time{font-size:calc(11px*var(--ts))}}
 /* task fields, ClickUp-style: two columns of label + value, borderless until hovered */
 .d-body{container-type:inline-size}
@@ -1933,6 +1965,7 @@ function migrateStatuses(){
   for(const j of Object.values(S.jobs))if(localPath(j.toolLinks?.storage)&&!j.folder)patch('jobs',j.id,{folder:j.toolLinks.storage,toolLinks:{storage:''}});
 }
 function render(){
+  NOTE_OPEN=null;
   const a=appSettings();
   loadStatuses();
   applyLook(SM||a);
@@ -2183,6 +2216,7 @@ function metaLine(t,job,showJob){
   if(t.format) bits.push(`<span class="chip">${esc(t.format)}</span>`);
   if(t.revision) bits.push(`<span class="chip rev" title="Revision round">R${t.revision}</span>`);
   const cl=t.checklist||[]; if(cl.length) bits.push(`<span class="mono">${cl.filter(x=>x.done).length}/${cl.length}</span>`);
+  {const n=openNotes(t);if(n)bits.push(`<span class="chip notes-chip" title="${n} open update${n===1?'':'s'} to work through">${I.chat}${n}</span>`)}
   if(!isClosed(t)&&!t.archived){const a=ageDays(t);if(a!==null&&a>=AGE_SHOW)bits.push(`<span class="chip age ${a>=AGE_OLD?'old':''}" title="Assigned ${a} days ago">${a}d</span>`)}
   return `<div class="t-meta">${bits.join('')}</div>`;
 }
@@ -2496,7 +2530,7 @@ function renderArchive(){
 
 /* ================= drawer ================= */
 let deleteArmed=false, clearArmed=false;
-function openTask(id,tab){seenTask(id);if(NOTES_EDIT!==id)NOTES_EDIT=null;if(S.tasks[id]&&!S.tasks[id]._draft){S.ui.recent=[id,...(S.ui.recent||[]).filter(x=>x!==id)].slice(0,8);saveUi()}if(S.ui.openTask!==id)TPL={open:false,naming:false,del:null};if(DRAFT&&DRAFT.id!==id)discardDraft();if(S.ui.openTask!==id||tab)S.ui.dtab=tab||'details';S.ui.openTask=id;noteDelArmed=null;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender();syncUrl()}
+function openTask(id,tab){seenTask(id);if(NOTES_EDIT!==id)NOTES_EDIT=null;if(S.tasks[id]&&!S.tasks[id]._draft){S.ui.recent=[id,...(S.ui.recent||[]).filter(x=>x!==id)].slice(0,8);saveUi()}if(S.ui.openTask!==id)TPL={open:false,naming:false,del:null};if(DRAFT&&DRAFT.id!==id)discardDraft();if(S.ui.openTask!==id||tab)S.ui.dtab=tab||'details';if(S.ui.openTask!==id){REPLY_AT=null;replyDelArmed=null}S.ui.openTask=id;noteDelArmed=null;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender();syncUrl()}
 function closeDrawer(){flushAll();discardDraft();S.ui.openTask=null;$('#drawer').hidden=true;$('#scrim').hidden=true;scheduleRender();syncUrl()}
 let LSHOW=new Set();
 /* Task activity: the task's log entries plus your own posted updates (kind 'note'), newest first */
@@ -2508,19 +2542,55 @@ function taskActivity(t){
 let noteDelArmed=null;
 function activityPane(t){
   const h=taskActivity(t);let day='',rows='';
+  const notes=h.filter(e=>e.kind==='note'),nDone=notes.filter(e=>e.done).length;
   for(const e of h){
     const d=dayHeading(e.at);if(d!==day){day=d;rows+=`<div class="tl-day">${esc(d)}</div>`}
-    rows+=e.kind==='note'?`<div class="tl-note"><div class="tl-note-head">${I.chat}<b>Update</b><time datetime="${esc(e.at)}">${fmtTime(e.at)}</time><button class="icon-btn ${noteDelArmed===e.at?'danger':''}" data-act="note-del" data-at="${esc(e.at)}" title="${noteDelArmed===e.at?'Click again to delete':'Delete update'}" aria-label="Delete update">${I.trash}</button></div><p>${esc(e.text).replace(/\n/g,'<br>')}</p></div>`
+    if(e.kind==='note'&&e.done&&S.ui.hideResolved)continue;
+    rows+=e.kind==='note'?noteHtml(e)
       :`<div class="tl-item"><span class="l-ic k-${e.kind}">${LOG_ICON[e.kind]||I.info}</span><span class="tl-text">${esc(e.text)}</span><time datetime="${esc(e.at)}">${fmtTime(e.at)}</time></div>`;
   }
   return `<div class="d-body d-activity">
     <h2 class="d-act-title">${esc(t.name||'Untitled task')}</h2>
     <div class="composer"><textarea id="note-in" data-fk="note-in" rows="2" placeholder="Post an update: what you sent, what the client said, what's next…"></textarea>
       <div class="composer-foot"><span class="hint">⌘/Ctrl + Enter to post</span><button class="btn sm primary" data-act="note-post">Post update</button></div></div>
-    <div class="timeline">${rows||'<p class="hint">Nothing yet. Changes to this task will show up here.</p>'}</div>
+    ${notes.length?`<div class="notes-sum"><span><b>${notes.length-nDone}</b> open${nDone?` · <b>${nDone}</b> resolved`:''}</span>${nDone?`<button type="button" class="btn sm ghost" data-act="notes-hide-done">${S.ui.hideResolved?'Show resolved':'Hide resolved'}</button>`:''}</div>`:''}
+    <div class="timeline">${rows||(S.ui.hideResolved&&nDone?'<p class="hint">Every update is resolved.</p>':'<p class="hint">Nothing yet. Changes to this task will show up here.</p>')}</div>
     ${h.length&&!logItems().some(e=>e.taskId===t.id&&e.kind!=='note')?'<p class="hint">Status, date and checklist changes are recorded from now on.</p>':''}
   </div>`;
 }
+/* ================= updates: resolve and reply (Frame.io style) =================
+   A posted update (log kind 'note') can be ticked off (done, doneAt) and gets replies:[{at,text}].
+   A timecode at the start of a line (12:25, 00:14:35;07) shows as a chip. */
+let REPLY_AT=null,replyDelArmed=null;
+const TC_RE=/^(\d{1,2}:\d{2}(?::\d{2})?(?:[;:.]\d{2})?)(?=\s|$)/;
+function noteText(txt){
+  return String(txt||'').split('\n').map(line=>{const m=TC_RE.exec(line.trim());if(!m)return esc(line);const lead=line.slice(0,line.indexOf(m[1]));return esc(lead)+`<span class="tc">${esc(m[1])}</span>`+esc(line.slice(lead.length+m[1].length))}).join('<br>');
+}
+function noteHtml(e){
+  const reps=e.replies||[];
+  return `<div class="tl-note ${e.done?'resolved':''}"><div class="tl-note-head">${I.chat}<b>Update</b><time datetime="${esc(e.at)}">${fmtTime(e.at)}</time>
+      <button class="icon-btn note-done ${e.done?'on':''}" data-act="note-done" data-at="${esc(e.at)}" title="${e.done?'Mark as not done':'Mark as done'}" aria-label="${e.done?'Mark as not done':'Mark as done'}" aria-pressed="${!!e.done}"><svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg></button>
+      <button class="icon-btn ${noteDelArmed===e.at?'danger':''}" data-act="note-del" data-at="${esc(e.at)}" title="${noteDelArmed===e.at?'Click again to delete':'Delete update'}" aria-label="Delete update">${I.trash}</button></div>
+    <p class="note-body">${noteText(e.text)}</p>
+    ${reps.length?`<div class="note-replies">${reps.map(r=>{const k=e.at+'|'+r.at;return `<div class="note-reply"><p>${noteText(r.text)}</p><time datetime="${esc(r.at)}">${fmtTime(r.at)}</time><button class="icon-btn ${replyDelArmed===k?'danger':''}" data-act="reply-del" data-at="${esc(e.at)}" data-rat="${esc(r.at)}" title="${replyDelArmed===k?'Click again to delete':'Delete reply'}" aria-label="Delete reply">${I.trash}</button></div>`}).join('')}</div>`:''}
+    ${REPLY_AT===e.at?`<div class="reply-box"><textarea id="reply-in" data-fk="reply-in" rows="2" placeholder="Reply…"></textarea><div class="composer-foot"><span class="hint">⌘/Ctrl + Enter to reply</span><button class="btn sm ghost" data-act="reply-cancel">Cancel</button><button class="btn sm primary" data-act="reply-post" data-at="${esc(e.at)}">Reply</button></div></div>`
+      :`<div class="note-foot"><button type="button" class="note-reply-btn" data-act="reply-open" data-at="${esc(e.at)}"><svg class="i" viewBox="0 0 16 16"><path d="M6.5 4 2.5 8l4 4M2.5 8h7a4 4 0 0 1 4 4v1"/></svg>Reply${reps.length?` · ${reps.length}`:''}</button>${e.done&&e.doneAt?`<span class="done-when"><svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg>Done ${esc(fmtDate(e.doneAt.slice(0,10)))}</span>`:''}</div>`}
+  </div>`;
+}
+/* change one update (found by task + time) with fn(item) → new item */
+function updateNote(at,fn){
+  const t=S.tasks[S.ui.openTask];if(!t)return;
+  for(const k of Object.keys(S.settings))if(k.startsWith('log-')){const items=S.settings[k].items||[],i=items.findIndex(e=>e.at===at&&e.kind==='note'&&e.taskId===t.id);if(i>=0){patch('settings',k,{items:items.map((e,x)=>x===i?fn(e):e)});return}}
+}
+function toggleNoteDone(at){updateNote(at,e=>e.done?{...e,done:false,doneAt:null}:{...e,done:true,doneAt:new Date().toISOString()});renderDrawer();scheduleRender()}
+function postReply(at){
+  const el=$('#reply-in');const v=el?.value.trim();if(!v){el?.focus();return}
+  updateNote(at,e=>({...e,replies:[...(e.replies||[]),{at:new Date().toISOString(),text:v}]}));REPLY_AT=null;renderDrawer();
+}
+function deleteReply(at,rat){updateNote(at,e=>({...e,replies:(e.replies||[]).filter(r=>r.at!==rat)}));replyDelArmed=null;renderDrawer()}
+/* open (not ticked) updates on a task, for the list/board chip */
+let NOTE_OPEN=null;
+const openNotes=t=>{if(!NOTE_OPEN){NOTE_OPEN={};for(const e of logItems())if(e.kind==='note'&&!e.done&&e.taskId)NOTE_OPEN[e.taskId]=(NOTE_OPEN[e.taskId]||0)+1}return NOTE_OPEN[t.id]||0};
 function postNote(){
   const t=S.tasks[S.ui.openTask],el=$('#note-in');if(!t||!el)return;
   const v=el.value.trim();if(!v){el.focus();return}
@@ -3851,6 +3921,12 @@ document.addEventListener('click',e=>{
     case 'd-next':{const t=S.tasks[u.openTask];if(!t)break;const i=STATUSES.findIndex(x=>x.id===stOf(t)),n=STATUSES[i+1];if(n){setStatus(t.id,n.id);render();renderDrawer()}break}
     case 'd-done':{const t=S.tasks[u.openTask];if(!t)break;setStatus(t.id,'done');render();renderDrawer();break}
     case 'note-del': if(noteDelArmed===el.dataset.at)deleteNote(el.dataset.at);else{noteDelArmed=el.dataset.at;renderDrawer()}break;
+    case 'note-done': toggleNoteDone(el.dataset.at);break;
+    case 'notes-hide-done': u.hideResolved=!u.hideResolved;saveUi();renderDrawer();break;
+    case 'reply-open': REPLY_AT=el.dataset.at;replyDelArmed=null;renderDrawer();$('#reply-in')?.focus();break;
+    case 'reply-cancel': REPLY_AT=null;renderDrawer();break;
+    case 'reply-post': postReply(el.dataset.at);break;
+    case 'reply-del':{const k=el.dataset.at+'|'+el.dataset.rat;if(replyDelArmed===k)deleteReply(el.dataset.at,el.dataset.rat);else{replyDelArmed=k;renderDrawer()}break}
     case 'new-task':{const id=newTask({status:el.dataset.status,due:el.dataset.due});if(id){openTask(id);setTimeout(()=>$('.d-name')?.focus(),30)}break}
     case 'new-job': openJobModal();break;
     case 'edit-job': openJobModal(el.dataset.id);break;
@@ -4158,6 +4234,7 @@ document.addEventListener('dragover',e=>{
     if(it&&it.dataset.id!==dragId&&col.contains(it)){const r=it.getBoundingClientRect();dropMark=it;it.classList.add(e.clientY>r.top+r.height/2?'drop-after':'drop-before')}}
 });
 document.addEventListener('keydown',e=>{if(e.target.id==='note-in'&&e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();postNote()}});
+document.addEventListener('keydown',e=>{if(e.target.id==='reply-in'&&e.key==='Enter'&&(e.metaKey||e.ctrlKey)&&REPLY_AT){e.preventDefault();postReply(REPLY_AT)}else if(e.target.id==='reply-in'&&e.key==='Escape'){e.preventDefault();e.stopPropagation();REPLY_AT=null;renderDrawer()}},true);
 document.addEventListener('drop',e=>{
   const col=e.target.closest?.('[data-drop]');
   if(col&&dragId){e.preventDefault();const id=dragId,it=dropMark,after=it?.classList.contains('drop-after');clearDropMark();dragId=null;
