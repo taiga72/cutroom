@@ -1350,6 +1350,35 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 :root[data-today="column"] .day.today .dn b{background:none;color:var(--accent);font-weight:700;padding:0}
 :root[data-today="column"] .wday.today{background:var(--accent-soft);border-color:transparent}
 .pr-input{width:180px;max-width:100%}
+
+/* ---------- floating task window + safe zones ---------- */
+.pip-body{background:var(--surface);margin:0}
+.pip{padding:12px 14px 20px;display:flex;flex-direction:column;gap:10px;border-top:3px solid var(--jc,transparent);min-height:100vh;box-sizing:border-box}
+.pip-top{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:calc(12px*var(--ts))}
+.pip-top .dot{width:8px;height:8px;border-radius:2px;flex:none}
+.pip-crumb{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pip-name{margin:0;font:700 calc(17px*var(--ts))/1.25 var(--display);overflow-wrap:anywhere}
+.pip-st{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px}
+.pip-links{display:flex;flex-wrap:wrap;gap:6px}
+.pip-links .btn{max-width:100%}
+.pip section{display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--line);padding-top:10px}
+.pip h2{margin:0 0 4px;display:flex;align-items:center;gap:8px;font:700 calc(11px*var(--ts)) var(--body);letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+.pip h2 small{font:500 calc(11px*var(--ts)) var(--mono);letter-spacing:0;text-transform:none}
+.pip h2 .btn{margin-left:auto;text-transform:none;letter-spacing:0}
+.pip-ck{display:flex;align-items:flex-start;gap:8px;padding:4px 2px;cursor:pointer;border-radius:6px}
+.pip-ck:hover{background:var(--surface-2)}
+.pip-ck input{margin-top:3px;accent-color:var(--accent);flex:none}
+.pip-ck.done span{text-decoration:line-through;color:var(--muted)}
+.pip-note{display:flex;gap:8px;align-items:flex-start;padding:8px;border-radius:8px;background:var(--surface-2)}
+.pip-note .note-done{width:22px;height:22px;flex:none}
+.pip-note .note-body{min-width:0;flex:1}
+.pip-note .note-body p{margin:0}
+.fmt-pick .fmt-sz{background:none;border:1px dashed var(--line-strong);color:var(--accent);font-family:var(--body)}
+.sz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:8px 0}
+.sz-card{display:flex;flex-direction:column;gap:6px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface)}
+.sz-card small{color:var(--muted);font-size:calc(11px*var(--ts))}
+.sz-prev{width:100%;aspect-ratio:9/16;border-radius:8px;overflow:hidden;background:linear-gradient(160deg,#3b4a63,#1b2230)}
+.sz-prev img{width:100%;height:100%;display:block}
 </style>
 
 <div class="app">
@@ -2199,7 +2228,7 @@ function render(){
   document.title=(a.name||'').trim()||APP_NAME;
   const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
   withFocus(()=>{renderSide();renderMain()});
-  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();
+  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();
 }
 
 function renderSide(){
@@ -2810,8 +2839,8 @@ function activityPane(t){
    A timecode at the start of a line (12:25, 00:14:35;07) shows as a chip. */
 let REPLY_AT=null,replyDelArmed=null;
 const TC_RE=/^(\d{1,2}:\d{2}(?::\d{2})?(?:[;:.]\d{2})?)(?=\s|$)/;
-function noteText(txt){
-  const job=S.jobs[S.tasks[S.ui.openTask]?.jobId];
+function noteText(txt,job){
+  job=job||S.jobs[S.tasks[S.ui.openTask]?.jobId];
   return mdLite(txt,job).replace(/(<(?:p|li|h5)>)(\d{1,2}:\d{2}(?::\d{2})?(?:[;:.]\d{2})?)(?=\s|<)/g,'$1<span class="tc">$2</span>');
 }
 /* formatting toolbar for any textarea (by id) */
@@ -2862,8 +2891,8 @@ function noteHtml(e){
   </div>`;
 }
 /* change one update (found by task + time) with fn(item) → new item */
-function updateNote(at,fn){
-  const t=S.tasks[S.ui.openTask];if(!t)return;
+function updateNote(at,fn,taskId){
+  const t=S.tasks[taskId||S.ui.openTask];if(!t)return;
   for(const k of Object.keys(S.settings))if(k.startsWith('log-')){const items=S.settings[k].items||[],i=items.findIndex(e=>e.at===at&&e.kind==='note'&&e.taskId===t.id);if(i>=0){patch('settings',k,{items:items.map((e,x)=>x===i?fn(e):e)});return}}
 }
 function toggleNoteDone(at){updateNote(at,e=>e.done?{...e,done:false,doneAt:null}:{...e,done:true,doneAt:new Date().toISOString()});renderDrawer();scheduleRender()}
@@ -2979,6 +3008,104 @@ function ageNote(t){
   const n=ageDays(t);if(n===null)return `<small class="d-age">Assigned ${fmtDate(a)}</small>`;
   return `<small class="d-age ${n>=AGE_OLD?'old':''}">Assigned ${n===0?'today':n===1?'yesterday':`${n} days ago`}${a===t.start?'':' (created)'}</small>`;
 }
+/* ================= floating task window (Document Picture-in-Picture, Chrome on a computer) =================
+   One task in a small always-on-top window: status, links, checklist and open updates. Redrawn by render() and renderDrawer(). */
+const PIP={win:null,id:null,showDone:false};
+const PIP_IC='<svg class="i" viewBox="0 0 16 16"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5"/><rect x="8" y="8" width="5" height="4" rx=".8" fill="currentColor" stroke="none"/></svg>';
+const canPip=()=>'documentPictureInPicture' in window&&!matchMedia('(pointer:coarse)').matches;
+async function openPip(id){
+  if(!canPip()){toast('The floating window needs Chrome on a computer');return}
+  PIP.id=id;
+  if(PIP.win&&!PIP.win.closed){renderPip();renderDrawer();return}
+  let w;
+  try{w=await documentPictureInPicture.requestWindow({width:380,height:600})}catch(e){toast('Couldn’t open the floating window');return}
+  PIP.win=w;
+  document.querySelectorAll('style,link[rel="stylesheet"],link[rel="preconnect"]').forEach(n=>w.document.head.appendChild(n.cloneNode(true)));
+  w.addEventListener('pagehide',()=>{PIP.win=null;PIP.id=null;if(S.ui.openTask)renderDrawer()});
+  w.document.addEventListener('click',pipClick);
+  w.document.addEventListener('change',pipChange);
+  renderPip();renderDrawer();
+}
+function renderPip(){
+  const w=PIP.win;if(!w||w.closed)return;
+  const d=w.document,r=document.documentElement,dr=d.documentElement;
+  for(const a of [...dr.attributes])dr.removeAttribute(a.name);
+  for(const a of r.attributes)dr.setAttribute(a.name,a.value);
+  d.body.className='pip-body';
+  const t=S.tasks[PIP.id];
+  if(!t||t.deleted){d.title='Task';d.body.innerHTML='<div class="pip"><p class="hint">This task was deleted or moved to Trash.</p></div>';return}
+  const j=S.jobs[t.jobId],c=S.clients[t.clientId],cl=t.checklist||[];
+  const notes=taskActivity(t).filter(e=>e.kind==='note'),open=notes.filter(e=>!e.done),shown=PIP.showDone?notes:open;
+  const i=STATUSES.findIndex(x=>x.id===stOf(t)),nx=STATUSES[i+1];
+  const links=['task','upload','file','project'].map(k=>{const v=t.links?.[k],u=v&&linkHref(v,j);return u?`<a class="btn sm" href="${esc(u)}"${linkTarget(v,j)}>${svcIcon(v)||I.ext}${esc(linkLabel(j,k))}</a>`:''}).join('');
+  const ck='<svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg>';
+  d.title=t.name||'Untitled task';
+  d.body.innerHTML=`<div class="pip" style="--jc:${esc(j?.color||'transparent')}">
+    <div class="pip-top"><span class="dot" style="background:${esc(j?.color||'var(--faint)')}"></span><span class="pip-crumb">${esc([j?.name,c?.name].filter(Boolean).join(' / '))}</span><button type="button" class="icon-btn" data-pa="show" title="Show this task in the app" aria-label="Show this task in the app">${I.ext}</button></div>
+    <h1 class="pip-name">${esc(t.name||'Untitled task')}</h1>
+    <div class="pip-st"><span class="pill" ${pillStyle(stOf(t))}><span class="pl">${esc(stLabel(stOf(t)))}</span></span>${nx&&!isClosed(t)?`<button type="button" class="btn sm" data-pa="next" title="Move to ${esc(nx.label)}">${esc(nx.label)} ›</button>`:''}${t.due?`<span class="date ${dueClass(t)}">Due ${esc(fmtDate(t.due))}</span>`:''}${t.revision?`<span class="chip rev">R${t.revision}</span>`:''}</div>
+    ${links?`<div class="pip-links">${links}</div>`:''}
+    ${cl.length?`<section><h2>Checklist <small>${cl.filter(x=>x.done).length}/${cl.length}</small></h2>${cl.map(x=>`<label class="pip-ck ${x.done?'done':''}"><input type="checkbox" data-pa="check" data-cid="${esc(x.id)}" ${x.done?'checked':''}><span>${esc(x.text||'')}</span></label>`).join('')}</section>`:''}
+    <section><h2>Updates <small>${open.length} open</small>${notes.length>open.length?`<button type="button" class="btn sm ghost" data-pa="done-toggle">${PIP.showDone?'Hide resolved':'Show resolved'}</button>`:''}</h2>
+      ${shown.length?shown.map(e=>`<div class="tl-note pip-note ${e.done?'resolved':''}"><button type="button" class="icon-btn note-done ${e.done?'on':''}" data-pa="resolve" data-at="${esc(e.at)}" title="${e.done?'Mark as not done':'Mark as done'}" aria-label="${e.done?'Mark as not done':'Mark as done'}">${ck}</button><div class="note-body md">${noteText(e.text,j)}</div></div>`).join(''):`<p class="hint">${notes.length?'Every update is resolved.':'No updates yet. Post them from the task’s Activity tab.'}</p>`}
+    </section>
+  </div>`;
+}
+function pipClick(e){
+  const b=e.target.closest('[data-pa]');if(!b||b.dataset.pa==='check')return;
+  const t=S.tasks[PIP.id];if(!t)return;
+  switch(b.dataset.pa){
+    case 'show':window.focus();openTask(t.id);break;
+    case 'next':{const i=STATUSES.findIndex(x=>x.id===stOf(t)),n=STATUSES[i+1];if(n){setStatus(t.id,n.id);render();if(S.ui.openTask===t.id)renderDrawer()}break}
+    case 'resolve':updateNote(b.dataset.at,x=>x.done?{...x,done:false,doneAt:null}:{...x,done:true,doneAt:new Date().toISOString()},t.id);NOTE_OPEN=null;render();if(S.ui.openTask===t.id)renderDrawer();break;
+    case 'done-toggle':PIP.showDone=!PIP.showDone;renderPip();break;
+  }
+}
+function pipChange(e){
+  const el=e.target;if(el.dataset.pa!=='check')return;
+  const t=S.tasks[PIP.id];if(!t)return;
+  const c=(t.checklist||[]).find(x=>x.id===el.dataset.cid);if(c&&el.checked)logAct('check',`Checked off “${c.text||'a step'}”`,{task:t});
+  patch('tasks',t.id,{checklist:(t.checklist||[]).map(x=>x.id===el.dataset.cid?{...x,done:el.checked}:x)});
+  render();if(S.ui.openTask===t.id)renderDrawer();
+}
+/* ================= safe-zone overlays (Settings → Safe-zone overlays) =================
+   Transparent 1080×1920 PNGs drawn on a canvas: shaded where each app's buttons and captions sit.
+   Margins are approximate (px at 1080×1920); the apps move things now and then. */
+const SZ_IC='<svg class="i" viewBox="0 0 16 16"><rect x="4" y="1.5" width="8" height="13" rx="1.5"/><rect x="5.5" y="4" width="4" height="7" rx=".5" stroke-dasharray="1.5 1.2"/></svg>';
+const SAFE_ZONES={
+  tiktok:{name:'TikTok',top:150,bottom:440,left:60,right:150,labels:{top:'Tabs',bottom:'Caption, sound & nav',right:'Buttons'}},
+  reels:{name:'Instagram Reels',top:250,bottom:450,left:60,right:140,grid:true,labels:{top:'Top bar',bottom:'Caption, audio & nav',right:'Buttons'}},
+  shorts:{name:'YouTube Shorts',top:240,bottom:500,left:60,right:190,labels:{top:'Top bar',bottom:'Title, channel & nav',right:'Buttons'}}
+};
+SAFE_ZONES.all={name:'All three',top:Math.max(...['tiktok','reels','shorts'].map(k=>SAFE_ZONES[k].top)),bottom:Math.max(...['tiktok','reels','shorts'].map(k=>SAFE_ZONES[k].bottom)),left:60,right:Math.max(...['tiktok','reels','shorts'].map(k=>SAFE_ZONES[k].right)),labels:{top:'Top bars',bottom:'Captions & nav',right:'Buttons'}};
+const SZ_URL={};
+function safeZoneCanvas(k){
+  const z=SAFE_ZONES[k],W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const g=cv.getContext('2d'),x0=z.left,y0=z.top,x1=W-z.right,y1=H-z.bottom;
+  g.fillStyle='rgba(255,45,85,.30)';
+  g.fillRect(0,0,W,y0);g.fillRect(0,y1,W,H-y1);g.fillRect(0,y0,x0,y1-y0);g.fillRect(x1,y0,W-x1,y1-y0);
+  if(z.grid){g.save();g.setLineDash([22,16]);g.lineWidth=4;g.strokeStyle='rgba(255,255,255,.85)';for(const y of [240,1680]){g.beginPath();g.moveTo(0,y);g.lineTo(W,y);g.stroke()}g.restore()}
+  g.lineWidth=6;g.strokeStyle='rgba(0,0,0,.45)';g.strokeRect(x0,y0,x1-x0,y1-y0);
+  g.lineWidth=3;g.strokeStyle='#fff';g.strokeRect(x0,y0,x1-x0,y1-y0);
+  g.font='700 38px system-ui,-apple-system,Segoe UI,sans-serif';g.fillStyle='#fff';g.shadowColor='rgba(0,0,0,.6)';g.shadowBlur=8;g.textAlign='center';g.textBaseline='middle';
+  g.fillText(z.labels.top,W/2,y0/2);g.fillText(z.labels.bottom,W/2,y1+(H-y1)/2);
+  g.save();g.translate(x1+(W-x1)/2,(y0+y1)/2);g.rotate(Math.PI/2);g.fillText(z.labels.right,0,0);g.restore();
+  g.font='600 30px system-ui,-apple-system,Segoe UI,sans-serif';g.textAlign='left';g.textBaseline='top';
+  g.fillText(`${z.name} safe area`,x0+18,y0+16);
+  if(z.grid){g.textAlign='right';g.fillText('Profile grid crop',x1-18,244)}
+  return cv;
+}
+function safeZoneUrl(k){if(!SZ_URL[k]){try{SZ_URL[k]=safeZoneCanvas(k).toDataURL('image/png')}catch(e){SZ_URL[k]=''}}return SZ_URL[k]}
+function downloadSafeZone(k){
+  if(!SAFE_ZONES[k])return;
+  safeZoneCanvas(k).toBlob(b=>{if(!b){toast('Couldn’t make the picture');return}const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`safe-zone-${k}-1080x1920.png`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast(`Downloaded ${SAFE_ZONES[k].name} overlay`)},'image/png');
+}
+function safeZonesHtml(){
+  return `<div class="field"><span class="lbl">Safe-zone overlays for 9:16</span>
+    <p class="hint">See-through 1080×1920 pictures that shade where each app puts its buttons, captions and bars. Drop one on the top track of your timeline, keep text and faces inside the white box, and turn the track off before you export.</p>
+    <div class="sz-grid">${Object.entries(SAFE_ZONES).map(([k,z])=>`<div class="sz-card"><div class="sz-prev"><img src="${esc(safeZoneUrl(k))}" alt="${esc(z.name)} safe zones"></div><b>${esc(z.name)}</b><small>Keep clear: ${z.top}px top · ${z.bottom}px bottom · ${z.right}px right</small><button type="button" class="btn sm" data-act="sz-dl" data-p="${k}">${I.download}Download PNG</button></div>`).join('')}</div>
+    <p class="hint">The margins are approximate: the apps change their layouts now and then, and captions get taller when they're long. “All three” uses the biggest margin of each, for videos posted everywhere. The Reels overlay also marks the 3:4 crop your profile grid shows.</p></div>`;
+}
 function renderDrawer(){
   const t=S.tasks[S.ui.openTask];
   if(!t){if(S.ui.openTask)closeDrawer();return}
@@ -2989,7 +3116,7 @@ function renderDrawer(){
   withFocus(()=>{$('#drawer').innerHTML=`
   ${t._draft?`<div class="d-draft">${t.copiedFrom?I.copy:I.plus}<b>${t.copiedFrom?'Copy of a task':'New task'}</b><span>Not saved yet</span></div>`:''}
   <div class="d-top" style="--jc:${esc(j?.color||'transparent')}"><div class="crumb">${taskMark(t)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
-    ${t._draft?'':`<button class="icon-btn ${t.pinned?'pin-on':''}" data-act="d-pin" aria-pressed="${!!t.pinned}" aria-label="${t.pinned?'Unpin':'Pin to the top'}" title="${t.pinned?'Unpin':'Pin to the top of the Overview'}">${I.pin}</button><button class="icon-btn" data-act="d-link" aria-label="Copy link to this task" title="Copy link to this task">${LINK_IC}</button><button class="icon-btn" data-act="d-duplicate" aria-label="Duplicate task" title="Duplicate (make a copy to edit)">${I.copy}</button>`}<button class="icon-btn" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
+    ${t._draft?'':`<button class="icon-btn ${t.pinned?'pin-on':''}" data-act="d-pin" aria-pressed="${!!t.pinned}" aria-label="${t.pinned?'Unpin':'Pin to the top'}" title="${t.pinned?'Unpin':'Pin to the top of the Overview'}">${I.pin}</button><button class="icon-btn" data-act="d-link" aria-label="Copy link to this task" title="Copy link to this task">${LINK_IC}</button><button class="icon-btn" data-act="d-duplicate" aria-label="Duplicate task" title="Duplicate (make a copy to edit)">${I.copy}</button>${canPip()?`<button class="icon-btn ${PIP.win&&PIP.id===t.id?'pin-on':''}" data-act="d-pip" aria-pressed="${!!(PIP.win&&PIP.id===t.id)}" aria-label="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task in its own window'}" title="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task over Premiere or Resolve'}">${PIP_IC}</button>`:''}`}<button class="icon-btn" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
   ${t._draft?'':`<div class="d-tabs" role="tablist"><button role="tab" data-act="d-tab" data-tab="details" class="${S.ui.dtab!=='activity'?'on':''}" aria-selected="${S.ui.dtab!=='activity'}">${I.info}Details</button><button role="tab" data-act="d-tab" data-tab="activity" class="${S.ui.dtab==='activity'?'on':''}" aria-selected="${S.ui.dtab==='activity'}">${I.clock}Activity<span class="mono">${taskActivity(t).length}</span></button></div>`}
   ${!t._draft&&S.ui.dtab==='activity'?activityPane(t):`  <div class="d-body">
     ${SPLIT&&SPLIT.id===t.id?splitHtml(t):''}
@@ -3009,9 +3136,9 @@ function renderDrawer(){
       ${job}
       ${busy}
       ${f(I.clock,'Length',`<input type="text" id="d-len" data-field="length" data-fk="d-len" value="${esc(t.length||'')}" placeholder="e.g. 0:30 or 3 × 0:15">`,'d-len')}
-      ${client||f(I.ratio,'Format',`<div class="fmt-pick">${FORMATS.map(x=>`<button data-act="fmt" data-fmt="${x}" class="${t.format===x?'on':''}" aria-pressed="${t.format===x}">${x}</button>`).join('')}</div>`)}
+      ${client||f(I.ratio,'Format',`<div class="fmt-pick">${FORMATS.map(x=>`<button data-act="fmt" data-fmt="${x}" class="${t.format===x?'on':''}" aria-pressed="${t.format===x}">${x}</button>`).join('')}${t.format==='9:16'?`<button type="button" class="fmt-sz" data-act="help-go" data-sec="safezones" title="Download safe-zone overlays for TikTok, Reels and Shorts">Safe zones</button>`:''}</div>`)}
       ${f(I.loop,'Revision',`<div class="stepper"><button data-act="rev" data-step="-1" aria-label="Decrease revision round">−</button><output>R${t.revision||0}</output><button data-act="rev" data-step="1" aria-label="Increase revision round">+</button></div>`)}
-      ${client?f(I.ratio,'Format',`<div class="fmt-pick">${FORMATS.map(x=>`<button data-act="fmt" data-fmt="${x}" class="${t.format===x?'on':''}" aria-pressed="${t.format===x}">${x}</button>`).join('')}</div>`):''}
+      ${client?f(I.ratio,'Format',`<div class="fmt-pick">${FORMATS.map(x=>`<button data-act="fmt" data-fmt="${x}" class="${t.format===x?'on':''}" aria-pressed="${t.format===x}">${x}</button>`).join('')}${t.format==='9:16'?`<button type="button" class="fmt-sz" data-act="help-go" data-sec="safezones" title="Download safe-zone overlays for TikTok, Reels and Shorts">Safe zones</button>`:''}</div>`):''}
     </div>`})()}
     ${brandForTask(t)}
     ${(()=>{const kinds=[['task',I.task],['upload',I.film],['file',I.folder],['project',I.mac]];
@@ -3027,6 +3154,7 @@ function renderDrawer(){
       <span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" data-act="d-duplicate">${I.copy}Duplicate</button><button class="btn sm" data-act="split-open">${SPLIT_IC}Split into tasks</button>${isClosed(t)&&!t.archived?`<button class="btn sm" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}<button class="btn sm danger ${deleteArmed?'armed':''}" data-act="delete-task">${I.trash}${deleteArmed?'Click again to move to Trash':'Delete task'}</button></span></div>`}
   </div>`}`});
   autosize($('.d-name'));
+  renderPip();
 }
 /* a hidden element measures 0, so leave the height alone until it can be measured */
 /* ================= notes formatting =================
@@ -3254,6 +3382,8 @@ const HELP=[
  ['Your data','Trash and Archived',`Deleted tasks wait in Trash (7, 30 or 90 days) before they're gone. Archived keeps finished tasks out of your lists; filter it by job, client or month and restore several at once.`,['backup','Trash time']],
  ['Your data','Import from a spreadsheet',`Download your tracker sheet as CSV and import it; you'll see a preview first and existing tasks are skipped.`,['import','Import CSV']],
  ['Look and feel','Appearance',`Theme, color scheme, dark shade, status style, card depth, sidebar style, compact header, greeting, job card rings, due date badges, tinted board columns, calendar grid and today marker, dates, week start and many more. Everything previews live.`,['appearance','Appearance']],
+ ['Editing','Floating task window',`The window icon at the top of a task opens it in a small window that stays on top of Premiere or Resolve (Chrome on a computer). Tick checklist steps, resolve client updates, move the status on and open the links from there. Click the icon again or close the window to stop.`,null],
+ ['Editing','Safe-zone overlays',`See-through 1080×1920 PNG guides for TikTok, Reels and Shorts, plus one that combines all three. Put one on the top track of your timeline to keep text and faces clear of each app's buttons and captions, then turn it off before you export.`,['safezones','Safe-zone overlays']],
  ['Look and feel','Accessibility',`Text size, density, reduce motion, high contrast, relaxed line spacing and hover labels.`,['a11y','Accessibility']],
  ['Look and feel','Stat tiles and list columns',`The pencil on the numbers at the top picks which tiles show. In the List view, the sliders button hides columns and folds every group. Drag the sidebar's or task panel's edge to resize them.`,null],
 ];
@@ -3466,6 +3596,7 @@ function renderSettings(){
     {id:'finder',label:'Finder & Chrome',icon:I.folder,html:finderSettingsHtml()},
     ...(B.mode==='cloud'?[{id:'account',label:'Calendar & account',icon:I.cal,html:accountSettingsHtml()}]:[]),
     {id:'keys',label:'Keyboard shortcuts',icon:'<svg class="i" viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8.5" rx="1.5"/><path d="M4 6.5h.01M6.5 6.5h.01M9 6.5h.01M11.5 6.5h.01M5 10h6"/></svg>',html:shortcutSettingsHtml()},
+    {id:'safezones',label:'Safe-zone overlays',icon:SZ_IC,html:safeZonesHtml()},
     {id:'import',label:'Import CSV',icon:I.upload,html:importSettingsHtml()},
     {id:'backup',label:'Backup',icon:I.download,html:backupSettingsHtml()}];
   keepScroll('#modal',()=>withFocus(()=>{$('#modal').innerHTML=`<div class="modal pref-modal" role="dialog" aria-modal="true" aria-labelledby="s-title">
@@ -4333,6 +4464,8 @@ document.addEventListener('click',e=>{
       patch('tasks',t.id,{checklist:[...(t.checklist||[]),...add]});logAct('check',`Added ${add.length} step${add.length===1?'':'s'} from “${x.name}”`,{task:t});TPL.open=false;renderDrawer();toast(`Added ${add.length} step${add.length===1?'':'s'}`);break}
     case 'tpl-del':{const t=S.tasks[u.openTask],h=tplHome(t);if(!h)break;if(TPL.del!==el.dataset.tid){TPL.del=el.dataset.tid;renderDrawer();break}
       patch(h.col,h.id,{templates:(h.doc.templates||[]).filter(y=>y.id!==el.dataset.tid)});TPL.del=null;renderDrawer();toast('Template deleted');break}
+    case 'd-pip':{const id=u.openTask;if(PIP.win&&PIP.id===id){PIP.win.close();break}openPip(id);break}
+    case 'sz-dl':downloadSafeZone(el.dataset.p);break;
     case 'd-next':{const t=S.tasks[u.openTask];if(!t)break;const i=STATUSES.findIndex(x=>x.id===stOf(t)),n=STATUSES[i+1];if(n){setStatus(t.id,n.id);render();renderDrawer()}break}
     case 'd-done':{const t=S.tasks[u.openTask];if(!t)break;setStatus(t.id,'done');render();renderDrawer();break}
     case 'note-del': if(noteDelArmed===el.dataset.at)deleteNote(el.dataset.at);else{noteDelArmed=el.dataset.at;renderDrawer()}break;
