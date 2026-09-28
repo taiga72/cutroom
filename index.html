@@ -2019,6 +2019,13 @@ document.addEventListener('keydown',e=>{
   if(undo&&h.i>0){h.i--;h.type='';undoApply(el,h.stack[h.i])}
   else if(redo&&h.i<h.stack.length-1){h.i++;h.type='';undoApply(el,h.stack[h.i])}
 },true);
+/* Redraw a dialog without losing its scroll position (the section list, the open section, the dialog body). */
+const KEEP_SCROLL=['.pref-body','.pref-nav','.m-body','.modal'];
+function keepScroll(root,fn){
+  const r=typeof root==='string'?$(root):root,saved=r?KEEP_SCROLL.map(sel=>{const e=r.querySelector(sel);return e?[sel,e.scrollTop,e.scrollLeft]:null}).filter(Boolean):[];
+  fn();
+  for(const [sel,t,l] of saved){const e=r.querySelector(sel);if(e){e.scrollTop=t;e.scrollLeft=l}}
+}
 function withFocus(fn){
   const a=document.activeElement,key=a&&a.dataset?a.dataset.fk:null;let v,s,e;
   if(key){v=a.value;try{s=a.selectionStart;e=a.selectionEnd}catch(x){}}
@@ -3275,10 +3282,10 @@ function renderSettings(){
     {id:'keys',label:'Keyboard shortcuts',icon:'<svg class="i" viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8.5" rx="1.5"/><path d="M4 6.5h.01M6.5 6.5h.01M9 6.5h.01M11.5 6.5h.01M5 10h6"/></svg>',html:shortcutSettingsHtml()},
     {id:'import',label:'Import CSV',icon:I.upload,html:importSettingsHtml()},
     {id:'backup',label:'Backup',icon:I.download,html:backupSettingsHtml()}];
-  withFocus(()=>{$('#modal').innerHTML=`<div class="modal pref-modal" role="dialog" aria-modal="true" aria-labelledby="s-title">
+  keepScroll('#modal',()=>withFocus(()=>{$('#modal').innerHTML=`<div class="modal pref-modal" role="dialog" aria-modal="true" aria-labelledby="s-title">
   <header><h2 id="s-title">Settings</h2><button class="icon-btn" data-act="s-cancel" aria-label="Close">${I.x}</button></header>
   ${prefLayout('s',SM.sec,secs,'form','data-act="s-save" id="s-form"')}
-  <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="s-cancel">Cancel</button><button type="submit" form="s-form" class="btn primary">Save</button></div></footer></div>`});
+  <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="s-cancel">Cancel</button><button type="submit" form="s-form" class="btn primary">Save</button></div></footer></div>`}));
   prefNavInView();
 }
 async function setAppLogo(file){
@@ -3384,7 +3391,7 @@ async function setModalLogo(file){
 }
 function renderModal(){
   if(!M) return;
-  withFocus(()=>{$('#modal').innerHTML=`<div class="modal pref-modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+  keepScroll('#modal',()=>withFocus(()=>{$('#modal').innerHTML=`<div class="modal pref-modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
   <header><h2 id="m-title">${M.id?'Edit job':'New job'}</h2><button class="icon-btn" data-act="modal-close" aria-label="Close">${I.x}</button></header>
   ${prefLayout('m',M.sec,[
     {id:'general',label:'General',icon:I.briefcase,html:`    <div class="field"><label for="m-name">Job name</label><input type="text" id="m-name" data-m="name" data-fk="m-name" value="${esc(M.name)}" placeholder="e.g. Northlight Media"></div>
@@ -3411,7 +3418,7 @@ function renderModal(){
       <div class="field"><label for="m-chrome">Chrome profile (Mac)</label><input type="text" id="m-chrome" data-fk="m-chrome" value="${esc(M.chromeProfile||'')}" placeholder="e.g. Profile 2" autocapitalize="off" spellcheck="false"><p class="hint">Opens every link in this job (task links, tools, brand guide) in this Chrome profile, through your “${esc(OPEN_SHORTCUT)}” shortcut. To find the name, open that profile's window, go to <b>chrome://version</b> and copy the last part of <b>Profile Path</b> (like “Default” or “Profile 2”). Needs the updated shortcut script in Settings → Finder & Chrome.</p></div>`},
     {id:'work',label:'Work details',icon:I.clock,html:workForm()}],'form','data-act="modal-save" id="m-form"')}
   <footer>${M.id?`<button type="button" class="btn danger ${M.delArmed?'armed':''}" data-act="m-delete">${I.trash}${M.delArmed?'Delete job and all its tasks':'Delete job'}</button>`:'<span></span>'}
-    <div style="display:flex;gap:8px"><button type="button" class="btn" data-act="modal-close">Cancel</button><button type="submit" form="m-form" class="btn primary">${M.id?'Save':'Create job'}</button></div></footer></div>`});
+    <div style="display:flex;gap:8px"><button type="button" class="btn" data-act="modal-close">Cancel</button><button type="submit" form="m-form" class="btn primary">${M.id?'Save':'Create job'}</button></div></footer></div>`}));
   prefNavInView();
 }
 function saveModal(){
@@ -3639,7 +3646,7 @@ function renderBrand(){
   if(!BM)return;const b=BM.b;
   const inp=(path,label,ph,type='text')=>`<label>${label}<input type="${type}" data-bm="${path}" data-fk="bm-${path}" value="${esc(path.split('.').reduce((o,k)=>o?.[k],b)||'')}" placeholder="${esc(ph)}"></label>`;
   const area=(path,label,ph,rows=2)=>`<label>${label}<textarea data-bm="${path}" data-fk="bm-${path}" rows="${rows}" placeholder="${esc(ph)}">${esc(b[path]||'')}</textarea></label>`;
-  withFocus(()=>{$('#modal').innerHTML=`<div class="modal brand-modal pref-modal" role="dialog" aria-modal="true" aria-labelledby="bm-title">
+  keepScroll('#modal',()=>withFocus(()=>{$('#modal').innerHTML=`<div class="modal brand-modal pref-modal" role="dialog" aria-modal="true" aria-labelledby="bm-title">
   <header><h2 id="bm-title">${I.palette}${esc(BM.name)} brand guide</h2><button class="icon-btn" data-act="brand-cancel" aria-label="Close">${I.x}</button></header>
   ${prefLayout('b',BM.sec,[
     {id:'colors',label:'Colors & fonts',icon:I.palette,badge:b.colors.length||'',html:`    <div class="field"><span class="lbl">Colors</span><div class="bm-colors">${b.colors.map((c,i)=>`<div class="bm-color"><input type="color" data-bm-color="${i}" value="${/^#[0-9a-f]{6}$/i.test(c.hex)?esc(c.hex):'#000000'}" aria-label="Pick color"><input type="text" data-bm-hex="${i}" data-fk="bm-hex-${i}" value="${esc(c.hex)}" placeholder="#000000" aria-label="Hex code"><input type="text" data-bm-cname="${i}" data-fk="bm-cn-${i}" value="${esc(c.name||'')}" placeholder="Name, e.g. Primary blue" aria-label="Color name"><button type="button" class="icon-btn" data-act="bm-del-color" data-i="${i}" aria-label="Remove color">${I.x}</button></div>`).join('')}
@@ -3660,7 +3667,7 @@ function renderBrand(){
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${canUpload()?`<button type="button" class="btn sm" data-act="bm-add-pdf">${I.plus}Upload PDF</button>`:''}${BM.busy?'<span class="hint">Uploading…</span>':''}<span class="hint">PDF only, up to 20 MB.</span></div></div></div>
 `},
     ...((b.log||[]).length?[{id:'history',label:'Change log',icon:I.loop,html:`<ul class="bm-log">${b.log.map(l=>`<li><b>${esc(fmtDate(l.date))}</b>${esc(l.text)}</li>`).join('')}</ul>`}]:[])])}
-  <footer><span class="hint">${b.updated?`Last updated ${esc(fmtDate(b.updated))}`:''}</span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="brand-cancel">Cancel</button><button type="button" class="btn primary" data-act="brand-save" ${BM.busy?'disabled':''}>Save guide</button></div></footer></div>`});
+  <footer><span class="hint">${b.updated?`Last updated ${esc(fmtDate(b.updated))}`:''}</span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="brand-cancel">Cancel</button><button type="button" class="btn primary" data-act="brand-save" ${BM.busy?'disabled':''}>Save guide</button></div></footer></div>`}));
   prefNavInView();
 }
 const BRAND_PARTS=[['colors','colors'],['fonts','fonts'],['captions','captions'],['logo','logo'],['endcard','end card'],['cta','call to action'],['music','music'],['loudness','loudness'],['dos',"do's"],['donts',"don'ts"],['tone','tone'],['links','links'],['pdfs','PDFs']];
