@@ -1924,6 +1924,47 @@ function scheduleRender(fromSnap){
     if(fromSnap&&S.ui.openTask){const d=$('#drawer');const a=document.activeElement;if(!(d.contains(a)&&/INPUT|TEXTAREA/.test(a.tagName)))renderDrawer()}
   });
 }
+/* ================= undo / redo in text boxes =================
+   ⌘Z / Ctrl+Z and ⇧⌘Z / Ctrl+Y work the same in every text field: our own history per field (typing is grouped into
+   words), so it survives the app redrawing a field and covers text the app inserts (formatting buttons, list
+   continuation). Fields are keyed by data-fk (plus the open task inside the task panel), else by id. */
+const UNDO=new Map();let UNDO_APPLYING=false;
+const isTextField=el=>!!el&&(el.tagName==='TEXTAREA'||(el.tagName==='INPUT'&&/^(text|search|url|email|tel|password|)$/.test(el.type||'')))&&!el.readOnly&&!el.disabled;
+function undoKey(el){const k=el.dataset?.fk||el.id;if(!k)return null;return el.closest?.('#drawer')?k+'|'+(S.ui.openTask||''):k}
+function undoSnap(el){let s=0,e=0;try{s=el.selectionStart;e=el.selectionEnd}catch(x){}return {v:el.value,s,e}}
+function undoHist(el){
+  const k=undoKey(el);let h=k?UNDO.get(k):el._undo;
+  if(!h){h={stack:[undoSnap(el)],i:0,t:0,type:''};if(k)UNDO.set(k,h);else el._undo=h}
+  return h;
+}
+function undoRecord(el,type){
+  const h=undoHist(el),now=Date.now(),snap=undoSnap(el);
+  if(h.stack[h.i].v===snap.v)return;
+  const word=(type==='insertText'||type==='insertCompositionText')&&h.type===type&&now-h.t<1200&&!/\s/.test(snap.v.slice(Math.max(0,snap.s-1),snap.s));
+  const del=type&&type.startsWith('delete')&&h.type===type&&now-h.t<1200;
+  if((word||del)&&h.i>0)h.stack[h.i]=snap;
+  else{h.stack=h.stack.slice(0,h.i+1);h.stack.push(snap);if(h.stack.length>300)h.stack.shift();h.i=h.stack.length-1}
+  h.t=now;h.type=type||'';
+}
+function undoApply(el,snap){
+  UNDO_APPLYING=true;
+  el.value=snap.v;try{el.setSelectionRange(snap.s,snap.e)}catch(x){}
+  el.dispatchEvent(new Event('input',{bubbles:true}));
+  UNDO_APPLYING=false;
+  if(el.tagName==='TEXTAREA'&&(el.classList.contains('d-name')||el.classList.contains('notes')))autosize(el);
+}
+document.addEventListener('focusin',e=>{const el=e.target;if(!isTextField(el))return;const h=undoHist(el);if(h.stack[h.i].v!==el.value){h.stack=[undoSnap(el)];h.i=0;h.type=''}});
+document.addEventListener('input',e=>{const el=e.target;if(UNDO_APPLYING||!isTextField(el))return;undoRecord(el,e.inputType)},true);
+document.addEventListener('keydown',e=>{
+  const el=e.target;if(!isTextField(el)||!(e.metaKey||e.ctrlKey)||e.altKey)return;
+  const k=e.key.toLowerCase(),redo=(k==='z'&&e.shiftKey)||(k==='y'&&!e.metaKey&&!e.shiftKey),undo=k==='z'&&!e.shiftKey;
+  if(!undo&&!redo)return;
+  e.preventDefault();e.stopPropagation();
+  const h=undoHist(el);
+  if(h.stack[h.i].v!==el.value){h.stack=h.stack.slice(0,h.i+1);h.stack.push(undoSnap(el));h.i=h.stack.length-1}
+  if(undo&&h.i>0){h.i--;h.type='';undoApply(el,h.stack[h.i])}
+  else if(redo&&h.i<h.stack.length-1){h.i++;h.type='';undoApply(el,h.stack[h.i])}
+},true);
 function withFocus(fn){
   const a=document.activeElement,key=a&&a.dataset?a.dataset.fk:null;let v,s,e;
   if(key){v=a.value;try{s=a.selectionStart;e=a.selectionEnd}catch(x){}}
@@ -2738,7 +2779,10 @@ function jumpItems(q){
 function focusSearch(){const q=$('#q'),ts=$('#top-search');if(q&&ts&&!ts.hidden&&q.offsetParent){q.focus();q.select()}else openJump()}
 /* Keyboard shortcuts (listed in Settings → Keyboard shortcuts). Never fire while typing in a field. */
 const SHORTCUTS=[['N','New task'],['A','Switch Details / Activity (with a task open)'],['Esc','Close the task, dialog or menu'],['/','Search tasks (top-right search box)'],[MODKEY,'Quick search: jump to any task, job, client or page']];
-function shortcutSettingsHtml(){return `<div class="field"><p class="hint" style="margin:0">They work anywhere in the app, except while you're typing in a field.</p><div class="keys-list">${SHORTCUTS.map(([k,d])=>`<div class="key-row"><span>${k.split(' ').map(x=>`<kbd>${x}</kbd>`).join(' ')}</span><span>${esc(d)}</span></div>`).join('')}</div></div>`}
+const TYPING_KEYS=[[IS_MAC?'⌘Z':'Ctrl Z','Undo typing'],[IS_MAC?'⇧⌘Z':'Ctrl Y','Redo typing'],[IS_MAC?'⌘B ⌘I':'Ctrl B Ctrl I','Bold / italic in notes and updates'],[IS_MAC?'⌘↩':'Ctrl ↩','Post an update or reply']];
+const keyRows=list=>list.map(([k,d])=>`<div class="key-row"><span>${k.split(' ').map(x=>`<kbd>${x}</kbd>`).join(' ')}</span><span>${esc(d)}</span></div>`).join('');
+function shortcutSettingsHtml(){return `<div class="field"><p class="hint" style="margin:0">They work anywhere in the app, except while you're typing in a field.</p><div class="keys-list">${keyRows(SHORTCUTS)}</div></div>
+  <div class="field"><span class="lbl">While typing in a text box</span><div class="keys-list">${keyRows(TYPING_KEYS)}</div></div>`}
 function openJump(){JUMP={q:'',i:0};renderJump();$('#jump-q')?.focus()}
 function closeJump(){JUMP=null;const e=$('#jump');if(e){e.hidden=true;e.innerHTML=''}}
 function renderJump(){
