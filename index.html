@@ -1501,6 +1501,39 @@ body.side-mini .office-cat{display:none}
 .ld-reel{width:34px;height:34px;color:var(--accent);animation:reelSpin 1.4s linear infinite}
 @keyframes reelSpin{to{transform:rotate(360deg)}}
 :root[data-motion="reduce"] .ld-reel{animation:none}
+
+/* ---------- cat moods, plant, visitors, photo strip ---------- */
+.cat-sill{align-self:flex-end;position:relative;display:flex;align-items:flex-end;gap:10px;margin:-44px 14px 0 0;height:44px}
+.cat-sill .office-cat{margin:0}
+.sill-plant{width:22px;height:40px;display:block;position:relative;z-index:1}
+.sill-plant svg{width:22.5px;height:40px;display:block}
+.office-cat .cat-sweat,.office-cat .cat-smile{display:none}
+.office-cat.worried .cat-sweat{display:inline;animation:sweat 2.4s ease-in infinite}
+.office-cat.happy:not(.worried) .cat-smile{display:inline}
+@keyframes sweat{0%,60%{transform:translateY(0);opacity:1}100%{transform:translateY(2px);opacity:0}}
+.office-cat .cat-eyes{transition:transform .15s ease-out}
+.visitor{position:absolute;right:34px;bottom:47px;border:0;padding:0;background:none;cursor:pointer;z-index:3}
+.visitor.v-bird svg{width:20px;height:12.5px;display:block}
+.visitor.v-butterfly{right:24px;bottom:30px}
+.visitor.v-butterfly svg{width:12.5px;height:10px;display:block;animation:flap .25s steps(2) infinite}
+@keyframes flap{50%{transform:scaleX(.4)}}
+.photo-strip{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;padding:4px 4px 10px;margin-top:auto}
+.photo-strip.with-cat{padding-bottom:60px}
+.photo-strip + .side-foot{margin-top:0}
+.polaroid{width:52px;padding:4px 4px 12px;background:#fff;border:0;border-radius:2px;box-shadow:0 2px 6px rgba(0,0,0,.18);transform:rotate(var(--r));transition:transform .2s ease;cursor:zoom-in}
+.polaroid img{width:44px;height:44px;object-fit:cover;display:block;background:#ddd}
+.polaroid:hover,.polaroid:focus-visible{transform:rotate(0) scale(1.12);z-index:2;position:relative}
+.photo-slots{display:flex;gap:8px;flex-wrap:wrap}
+.photo-slot{width:56px;height:56px;border-radius:8px;border:1px dashed var(--line-strong);position:relative;display:grid;place-items:center;background:var(--surface-2);color:var(--muted);overflow:hidden}
+.photo-slot.has{border-style:solid}
+.photo-slot img{width:100%;height:100%;object-fit:cover}
+.photo-slot .icon-btn{position:absolute;top:2px;right:2px;width:20px;height:20px;background:rgba(0,0,0,.55);color:#fff;border-radius:50%}
+.photo-slot .icon-btn .i{width:12px;height:12px}
+.photo-slot.add{cursor:pointer}
+.photo-slot.add:hover{color:var(--text);border-color:var(--accent)}
+.pr-num{width:90px}
+body.side-mini .cat-sill,body.side-mini .photo-strip{display:none}
+:root[data-motion="reduce"] .polaroid{transition:none}
 </style>
 
 <div class="app">
@@ -1552,6 +1585,7 @@ body.side-mini .office-cat{display:none}
 <input type="file" id="import-in" accept=".csv,text/csv,.tsv,text/tab-separated-values,text/plain" hidden>
 <input type="file" id="pdf-in" accept="application/pdf,.pdf" hidden>
 <input type="file" id="logo-in" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+<input type="file" id="photo-in" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
 <input type="file" id="upd-pics-in" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden>
 <div class="lightbox" id="lightbox" hidden></div>
 
@@ -1716,7 +1750,7 @@ const MONTH_FULL=['January','February','March','April','May','June','July','Augu
 const PREF_DEF={dateRel:false,dateFmt:'md',weekStart:'mon',hideWeekends:false,confetti:true,motion:'system',contrast:'normal',trashDays:30,darkShade:'standard',pillStyle:'tint',tips:true,
   iconWeight:'regular',depth:'soft',sideStyle:'colored',thinScroll:false,toastPos:'bottom',nameWrap:false,doneStyle:'struck',overdueTint:false,statusIcons:false,prioColors:{},logoShape:'rounded',numFont:'mono',readSpacing:'normal',sideCounts:true,
   compactHeader:false,greeting:true,greetName:'',drawerBand:true,boardTint:false,dueStyle:'text',jobProgress:'bar',calGrid:'lines',todayMark:'dot',
-  pomoFocus:25,pomoShort:5,pomoLong:15,pomoEvery:4,pomoAutoBreak:false,pomoAutoFocus:false,pomoSound:'chime',pomoPopup:false,allClear:true,seasonal:true,officeCat:true,catSky:true};
+  pomoFocus:25,pomoShort:5,pomoLong:15,pomoEvery:4,pomoAutoBreak:false,pomoAutoFocus:false,pomoSound:'chime',pomoPopup:false,allClear:true,seasonal:true,officeCat:true,catSky:true,catPlant:true,plantGoal:20,catVisitors:true};
 const pref=k=>{let o=null;try{o=SM}catch(e){/* Settings state not set up yet */}o=o||S.settings?.app||{};return o[k]!==undefined&&o[k]!==null?o[k]:PREF_DEF[k]};
 const reducedMotion=()=>pref('motion')==='reduce'||matchMedia('(prefers-reduced-motion:reduce)').matches;
 function absDate(s){
@@ -2377,6 +2411,7 @@ function renderSide(){
   }
   html+=`<button class="nav-item nav-new" data-act="new-job"${tt('New job')}>${I.plus}<span class="name">New job</span></button></nav>
   <nav class="nav" aria-label="More"><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived"${tt('Archived')}>${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item ${u.tab==='activity'?'on':''}" data-act="nav" data-tab="activity"${tt('Activity')}>${I.clock}<span class="name">Activity</span></button><button class="nav-item ${u.tab==='trash'?'on':''}" data-act="nav" data-tab="trash"${tt('Trash')}>${I.trash}<span class="name">Trash</span><span class="count">${S.ready&&trashed().length?trashed().length:''}</span></button></nav>
+  ${u.sideMini?'':photoStripHtml()}
   <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='cloud'&&(B.offline||Object.keys(OUT).length)?`<span class="sync-dot local"></span>Offline · ${Object.keys(OUT).length?`${Object.keys(OUT).length} change${Object.keys(OUT).length===1?'':'s'} waiting to sync`:'changes will sync'}`:B.mode==='db'||B.mode==='cloud'?'<span class="sync-dot"></span>Saved to your account':B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
     ${B.mode==='cloud'&&B.syncedAt?`<small class="synced" title="Last time this device heard back from your account">Last synced ${syncedAgo()}</small>`:''}
     <button class="nav-item foot-settings ${u.tab==='help'?'on':''}" data-act="nav" data-tab="help"${tt('Help & tips')}>${HELP_IC}<span class="name">Help &amp; tips</span></button>
@@ -3583,9 +3618,13 @@ function seasonFx(force){
 /* ================= office cat (pref officeCat): a pixel cat perched on the sidebar footer =================
    Sits and blinks; sleeps during focus-timer breaks and after 3 minutes with no activity; stretches when a task is done
    (celebrate() calls catStretch); purrs when clicked. One element (CAT) is moved back into each redrawn sidebar. */
-let CAT=null,CAT_WAKE=0,CAT_ACT=Date.now();
+let CAT=null,CAT_WAKE=0,CAT_ACT=Date.now(),CAT_OVER=0,VISITOR=null;
 const CAT_PAL={o:'#e8964a',d:'#b8651f',e:'#1b1b1b',p:'#ff8fa3',w:'#fff4e6',k:'#5a3a22',R:'#d62839',W:'#ffffff',Y:'#f5c542',B:'#4c8dff',K:'#262130',V:'#8e4bd6'};
-function pixSvg(rows,cls){let r='';rows.forEach((row,y)=>{for(let x=0;x<row.length;x++){const c=row[x];if(c==='.')continue;let n=1;while(row[x+n]===c)n++;r+=`<rect x="${x}" y="${y}" width="${n}" height="1" fill="${CAT_PAL[c]}"${c==='e'?' class="cat-eye"':''}/>`;x+=n-1}});return `<g class="${cls}">${r}</g>`}
+function pixSvg(rows,cls,extra=''){let r='',eyes='';rows.forEach((row,y)=>{for(let x=0;x<row.length;x++){const c=row[x];if(c==='.')continue;if(c==='e'){r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${CAT_PAL.o}"/>`;eyes+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${CAT_PAL.e}" class="cat-eye"/>`;continue}let n=1;while(row[x+n]===c)n++;r+=`<rect x="${x}" y="${y}" width="${n}" height="1" fill="${CAT_PAL[c]}"/>`;x+=n-1}});return `<g class="${cls}">${r}${extra}${eyes?`<g class="cat-eyes">${eyes}</g>`:''}</g>`}
+const px1=(x,y,c,cls)=>`<rect x="${x}" y="${y}" width="1" height="1" fill="${c}"${cls?` class="${cls}"`:''}/>`;
+/* mood overlays: sweat drop when something is overdue, smile + blush on an all-clear day */
+const CAT_SIT_MOOD=`<g class="cat-sweat">${px1(10,2,'#6cc4ff')}${px1(9,3,'#6cc4ff')}${px1(10,3,'#6cc4ff')}</g><g class="cat-smile">${px1(4,6,CAT_PAL.k)}${px1(6,6,CAT_PAL.k)}${px1(5,7,CAT_PAL.k)}${px1(3,5,'#ff9db0')}${px1(7,5,'#ff9db0')}</g>`;
+const CAT_SLEEP_MOOD=`<g class="cat-sweat">${px1(8,3,'#6cc4ff')}${px1(8,4,'#6cc4ff')}</g>`;
 const CAT_SIT=['.............','..o.....o....','..oo...oo....','..ooooooo....','..oeoooeo....','..oowpwoo....','...ooooo.....','..ooddooo....','..ooooooo..o.','..oodoodo..o.','..ooooooo.oo.','..oooooooooo.','..ww.ww......'];
 const CAT_SLEEP=['................','................','................','..o...o.........','..oo.oo.........','.ooooooodoodo...','.okkokkoooooooo.','.oopwooooodoooo.','..oooooooooooooo','..ooooooooooooo.','..ww.......ww...','................','................'];
 /* hats for the day (seasonal pref): rows start 3 above the head; x from 1 */
@@ -3616,7 +3655,7 @@ function skySvg(ph){
 function catDraw(){
   const hat=catHat(),ph=skyPhase(),key=hat+'|'+ph;if(CAT._key===key)return;CAT._key=key;
   const hg=hat?pixSvg(CAT_HATS[hat],'cat-hat'):'';
-  CAT.innerHTML=`${skySvg(ph)}<svg class="cat-body" viewBox="0 -3 16 16" shape-rendering="crispEdges" aria-hidden="true">${pixSvg(CAT_SIT,'pose-sit')}${pixSvg(CAT_SLEEP,'pose-sleep')}${hg?`<g class="pose-sit" transform="translate(1,-3)">${hg}</g><g class="pose-sleep" transform="translate(0,-1)">${hg}</g>`:''}</svg><span class="cat-z" aria-hidden="true"><i>z</i><i>z</i><i>Z</i></span>`;
+  CAT.innerHTML=`${skySvg(ph)}<svg class="cat-body" viewBox="0 -3 16 16" shape-rendering="crispEdges" aria-hidden="true">${pixSvg(CAT_SIT,'pose-sit',CAT_SIT_MOOD)}${pixSvg(CAT_SLEEP,'pose-sleep',CAT_SLEEP_MOOD)}${hg?`<g class="pose-sit" transform="translate(1,-3)">${hg}</g><g class="pose-sleep" transform="translate(0,-1)">${hg}</g>`:''}</svg><span class="cat-z" aria-hidden="true"><i>z</i><i>z</i><i>Z</i></span>`;
   CAT.classList.toggle('has-sky',!!ph);
 }
 function catEl(){
@@ -3626,13 +3665,18 @@ function catEl(){
   CAT.addEventListener('click',e=>{e.stopPropagation();catPurr()});
   return CAT;
 }
+let SILL=null;
 function placeCat(){
-  if(!pref('officeCat')){CAT?.remove();return}
-  const f=$('#side .side-foot');if(!f)return;const c=catEl();if(c.parentNode!==f)f.prepend(c);catTick();
+  if(!pref('officeCat')){SILL?.remove();return}
+  const f=$('#side .side-foot');if(!f)return;
+  if(!SILL){SILL=document.createElement('div');SILL.className='cat-sill';SILL.innerHTML='<span class="sill-plant" aria-hidden="false"></span>';SILL.appendChild(catEl())}
+  if(SILL.parentNode!==f)f.prepend(SILL);catTick();plantDraw();visitSoon(true);
 }
 function catTick(){
   if(!CAT||!CAT.isConnected)return;
   catDraw();
+  if(S.ready){const t0=today(),open=live().filter(t=>!isClosed(t)),over=open.filter(t=>t.due&&t.due<t0).length;CAT_OVER=over;
+    CAT.classList.toggle('worried',over>0);CAT.classList.toggle('happy',!over&&open.length>0&&!open.some(t=>t.due===t0));plantDraw()}
   const T=pomoState(),now=Date.now();
   const sleep=now>CAT_WAKE&&((T.run==='running'&&T.mode!=='focus')||now-CAT_ACT>180000);
   CAT.classList.toggle('sleep',sleep);CAT.title=sleep?'Shh… the cat is napping (click to pet)':'Pet the cat';
@@ -3658,6 +3702,76 @@ function catPurr(){
     const src=ac.createBufferSource();src.buffer=buf;const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=320;const am=ac.createGain(),lfo=ac.createOscillator(),lg=ac.createGain();lfo.frequency.value=24;lg.gain.value=.5;am.gain.value=.5;lfo.connect(lg).connect(am.gain);
     const g=ac.createGain();g.gain.setValueAtTime(0,ac.currentTime);g.gain.linearRampToValueAtTime(.35,ac.currentTime+.15);g.gain.linearRampToValueAtTime(0,ac.currentTime+len);
     src.connect(lp).connect(am).connect(g).connect(ac.destination);lfo.start();src.start();src.stop(ac.currentTime+len);lfo.stop(ac.currentTime+len)}catch(e){}
+}
+/* eyes follow the pointer when it's near, or a visitor on the sill */
+function catLook(tx,ty){
+  const g=CAT?.querySelectorAll('.cat-eyes');if(!g||!g.length||CAT.classList.contains('sleep'))return;
+  let dx=0,dy=0;
+  if(tx!=null){const r=CAT.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,d=Math.hypot(tx-cx,ty-cy);if(d<380){dx=Math.max(-1,Math.min(1,(tx-cx)/90))*.6;dy=Math.max(-1,Math.min(1,(ty-cy)/90))*.45}}
+  g.forEach(x=>x.setAttribute('transform',`translate(${dx.toFixed(2)},${dy.toFixed(2)})`));
+}
+let lookRaf=0;
+document.addEventListener('pointermove',e=>{if(!CAT||!CAT.isConnected||VISITOR||lookRaf)return;lookRaf=requestAnimationFrame(()=>{lookRaf=0;catLook(e.clientX,e.clientY)})},{passive:true});
+/* windowsill plant: a leaf per task done this month, blooms at plantGoal, droops with 3+ overdue */
+function plantDraw(){
+  const el=SILL?.querySelector('.sill-plant');if(!el)return;
+  if(!pref('catPlant')){el.hidden=true;return}el.hidden=false;
+  const m=today().slice(0,7),n=Object.values(S.tasks).filter(t=>!t._draft&&!t.deleted&&t.doneAt&&String(t.doneAt).slice(0,7)===m).length;
+  const goal=Math.max(1,+pref('plantGoal')||20),leaves=Math.min(10,Math.floor(n/goal*10)),bloom=n>=goal,droop=CAT_OVER>=3;
+  const key=[leaves,bloom,droop].join('|');
+  el.title=`${n} task${n===1?'':'s'} done this month · blooms at ${goal}${bloom?' · in bloom 🌸':''}${droop?' · drooping: catch up on overdue tasks':''}`;
+  if(el._key===key)return;el._key=key;
+  const G=droop?'#9aa84a':'#3fa55a',g2=droop?'#7f8c3a':'#2e8a47';let r='';
+  r+=`<rect x="2" y="13" width="5" height="1" fill="#b5532e"/><rect x="2" y="14" width="5" height="1" fill="#d0683c"/><rect x="3" y="15" width="3" height="1" fill="#d0683c"/>`;
+  const h=Math.max(1,leaves+1),top=12-h;
+  r+=`<rect x="4" y="${top+1}" width="1" height="${h}" fill="${g2}"/>`;
+  if(!leaves){r+=px1(3,11,G)+px1(5,11,G)}
+  for(let i=0;i<leaves;i++){const y=11-i,left=i%2===0;r+=droop?px1(left?3:5,y+1,G)+px1(left?2:6,y+2,G):px1(left?3:5,y,G)+px1(left?2:6,y-(i>2?1:0),G)}
+  if(bloom){const y=top;r+=px1(4,y,'#ffd84d')+px1(3,y,'#ff7aa8')+px1(5,y,'#ff7aa8')+px1(4,y-1,'#ff7aa8')+px1(4,y+1,'#ff7aa8')}
+  el.innerHTML=`<svg viewBox="0 0 9 16" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
+}
+/* visitors: now and then a bird lands on the window frame or a butterfly flutters past (not at night) */
+const BIRD=['..BB....','.YeBB...','..BBBBBB','..BBBB..','...k.k..'];
+let visitT=0;
+function visitSoon(first){if(visitT)return;visitT=setTimeout(()=>{visitT=0;visit()},first?60000+Math.random()*120000:(6+Math.random()*6)*60000)}
+function visit(kind){
+  visitSoon();
+  if(!kind&&(document.hidden||reducedMotion()||!pref('catVisitors')||!pref('officeCat')||skyPhase()==='night'||VISITOR||!SILL?.isConnected||document.body.classList.contains('side-mini')))return;
+  kind=kind||(Math.random()<.65?'bird':'butterfly');
+  const v=document.createElement('button');v.type='button';v.className='visitor v-'+kind;v.title=kind==='bird'?'A bird! (click to shoo it)':'A butterfly';v.setAttribute('aria-label',v.title);
+  if(kind==='bird'){const col=['#4c8dff','#e5484d','#f5b400','#2fb8a8'][Math.floor(Math.random()*4)];v.innerHTML=`<svg viewBox="0 0 8 5" shape-rendering="crispEdges" aria-hidden="true">${BIRD.map((row,y)=>[...row].map((c,x)=>c==='.'?'':px1(x,y,c==='B'?col:c==='Y'?'#f5a623':c==='e'?'#1b1b1b':'#6b4a2e')).join('')).join('')}</svg>`}
+  else v.innerHTML=`<svg viewBox="0 0 5 4" shape-rendering="crispEdges" aria-hidden="true">${px1(0,0,'#ff7aa8')+px1(1,0,'#ff9f43')+px1(3,0,'#ff9f43')+px1(4,0,'#ff7aa8')+px1(0,1,'#ff9f43')+px1(1,1,'#ff7aa8')+px1(2,1,'#3a2a1a')+px1(3,1,'#ff7aa8')+px1(4,1,'#ff9f43')+px1(1,2,'#ff7aa8')+px1(2,2,'#3a2a1a')+px1(3,2,'#ff7aa8')+px1(2,3,'#3a2a1a')}</svg>`;
+  SILL.appendChild(v);VISITOR=v;
+  const look=()=>{if(!v.isConnected)return;const r=v.getBoundingClientRect();catLook(r.left+r.width/2,r.top+r.height/2)};
+  const leave=()=>{if(v._gone)return;v._gone=true;const a=v.animate([{transform:'translate(0,0)'},{transform:'translate(-140px,-90px)'}],{duration:900,easing:'ease-in'});a.onfinish=()=>{v.remove();if(VISITOR===v)VISITOR=null;catLook(null)}};
+  v.addEventListener('click',e=>{e.stopPropagation();catBubble('!');leave()});
+  if(kind==='bird'){
+    v.animate([{transform:'translate(110px,-70px)'},{transform:'translate(0,0)'}],{duration:1300,easing:'ease-out'}).onfinish=look;
+    const hop=setInterval(()=>{if(!v.isConnected||v._gone){clearInterval(hop);return}v.animate([{transform:'translateY(0)'},{transform:'translateY(-3px)'},{transform:'translateY(0)'}],{duration:320});look()},5000);
+    setTimeout(()=>{clearInterval(hop);leave()},28000);
+  }else{
+    const a=v.animate([{transform:'translate(70px,-10px)'},{transform:'translate(20px,-30px)'},{transform:'translate(-10px,-5px)'},{transform:'translate(-40px,-35px)'},{transform:'translate(-90px,-15px)'}],{duration:8000,easing:'ease-in-out'});
+    const lk=setInterval(look,400);a.onfinish=()=>{clearInterval(lk);v.remove();if(VISITOR===v)VISITOR=null;catLook(null)};
+  }
+}
+/* photo strip in the sidebar: up to 4 of your own pictures (settings/app.photos), saved right away */
+const PHOTO_TILT=[-6,4,-3,6];
+function photos(){return (appSettings().photos||[]).filter(Boolean).slice(0,4)}
+function photoStripHtml(){
+  const ps=photos();if(!ps.length)return '';
+  return `<div class="photo-strip ${pref('officeCat')?'with-cat':''}" aria-label="Your photos">${ps.map((v,i)=>`<button type="button" class="polaroid" data-act="photo-view" data-i="${i}" style="--r:${PHOTO_TILT[i]}deg" title="Open photo"><img src="${esc(imgSrc(v)||'')}" alt="" loading="lazy"></button>`).join('')}</div>`;
+}
+function savePhotos(list){if(S.settings.app)patch('settings','app',{photos:list});else create('settings',{photos:list},'app');render();if(SM)renderSettings()}
+let PHOTO_SLOT=0,PHOTO_BUSY=false;
+async function addPhoto(file){
+  if(!file)return;PHOTO_BUSY=true;if(SM)renderSettings();
+  try{const ref=await storeImage(file,900,480,'image/jpeg');const list=photos();if(list[PHOTO_SLOT])dropImage(list[PHOTO_SLOT]);list[PHOTO_SLOT]=ref;PHOTO_BUSY=false;savePhotos(list.filter(Boolean));toast('Photo added to the sidebar')}
+  catch(e){PHOTO_BUSY=false;if(SM)renderSettings();toast(uploadError(e))}
+}
+function photoSettingsHtml(){
+  const ps=photos();
+  return `<div class="pref-row photo-row"><span class="pr-l">Photo strip in the sidebar<small>Up to 4 of your own pictures: pets, family, a view you like. Saved right away.</small></span>
+    <div class="photo-slots">${[0,1,2,3].map(i=>ps[i]?`<span class="photo-slot has"><img src="${esc(imgSrc(ps[i])||'')}" alt=""><button type="button" class="icon-btn" data-act="photo-rm" data-i="${i}" title="Remove photo" aria-label="Remove photo">${I.x}</button></span>`:i===ps.length?`<button type="button" class="photo-slot add" data-act="photo-add" data-i="${i}" ${PHOTO_BUSY?'disabled':''} title="Add a photo">${PHOTO_BUSY?'…':I.plus}</button>`:`<span class="photo-slot"></span>`).join('')}</div></div>`;
 }
 const LOAD_LINES=['Rendering at 1 frame per hour…','Relinking media…','Waiting on client feedback…','Conforming the timeline…','Syncing audio by the clap…','Building peak files…','Exporting final_FINAL_v7…','Transcoding proxies…','Finding that one missing font…','Color grading the loading screen…','Asking the client which version they meant…','Nudging a keyframe by one frame…','Clearing the media cache…','Looking for the offline media…','Waiting for the render bar to move…'];
 const LOAD_LINE=LOAD_LINES[Math.floor(Math.random()*LOAD_LINES.length)];
@@ -3817,7 +3931,7 @@ const HELP=[
  ['Getting work done','Type it all in the name',`When you add a task, type the client, the day and the priority right in the name: “Reel 7 Band fri !high”. A line under the name shows what will be picked up, and it's filled in when you save. Days: today, tomorrow, mon–sun, +3d, in 2 weeks, oct 2, 10/2. Priority: !urgent, !high, !low. Use @name to pick a client or job by its first letters.`,null],
  ['Getting work done','Focus timer',`A Pomodoro timer top-right, next to the bell: 25 minutes of focus, then a 5-minute break, and a 15-minute break after every 4 (change them in Settings). Press P or the tomato at the top of a task to focus on that task; each finished session adds 🍅 1 to it and a line to its activity. The same timer shows on all your devices and in the floating task window. Turn on the desktop pop-up in Settings to be told when time's up while you're in Premiere.`,['pomo','Focus timer']],
  ['Getting work done','Recent project folders',`On your Mac, quick search (⌘K) lists the last 5 project folders you opened from the app, from tasks, jobs or notes. Pick one to open it in Finder again; type to search older ones by task, job or folder name.`,null],
- ['Look and feel','Little extras',`An “All clear” moment on the Overview when nothing is overdue or due today; emoji reactions on client updates (the smiley under an update); film-look color schemes (Portra, Fuji, Noir, Teal & Orange, Technicolor); the office cat on the sidebar (it naps during breaks and when you're away, stretches when you finish a task, and purrs when you click it; a little window behind it shows the sky for your time of day, and it dresses up in December, on New Year's Day and on Halloween); and seasonal touches: a Christmas countdown from September, snow in December, fireworks on New Year's Day, bats on Halloween and hearts on Valentine's. Turn them off in Appearance.`,['appearance','Appearance']],
+ ['Look and feel','Little extras',`An “All clear” moment on the Overview when nothing is overdue or due today; emoji reactions on client updates (the smiley under an update); film-look color schemes (Portra, Fuji, Noir, Teal & Orange, Technicolor); the office cat on the sidebar (it naps during breaks and when you're away, stretches when you finish a task, and purrs when you click it; a little window behind it shows the sky for your time of day, and it dresses up in December, on New Year's Day and on Halloween; it sweats when something's overdue, smiles on all-clear days and watches your mouse; a plant on the sill grows a leaf per task done this month; birds and butterflies drop by); a photo strip of your own pictures in the sidebar (add them in Appearance → Details); and seasonal touches: a Christmas countdown from September, snow in December, fireworks on New Year's Day, bats on Halloween and hearts on Valentine's. Turn them off in Appearance.`,['appearance','Appearance']],
  ['Getting work done','Save & add another',`Next to Save task: saves it and opens a fresh task for the same job, client and format, for entering a batch of reels in a row.`,null],
  ['Getting work done','Up next',`Your own queue across every job. Add a task from the right-click menu or the queue icon at the top of a task. The queue sits at the top of the Overview; drag to reorder. Finished tasks leave it on their own.`,null],
  ['Getting work done','Push due dates back',`Select tasks, then Push back… in the bar at the bottom: +1 day, +2 days, +1 week, or workdays that skip weekends. Undo puts the old dates back.`,null],
@@ -4087,6 +4201,10 @@ function renderSettings(){
       ${prefRow('sideCounts','Counts in the sidebar',[[true,'Show'],[false,'Hide']])}
       ${prefRow('officeCat','Office cat',[[true,'Show'],[false,'Hide']],'Naps at the bottom of the sidebar; wakes when you finish a task')}
       ${SM.officeCat?prefRow('catSky','Sky behind the cat',[[true,'Show'],[false,'Hide']],'Follows your clock: sunrise, day, sunset and stars at night'):''}
+      ${SM.officeCat?prefRow('catPlant','Windowsill plant',[[true,'Show'],[false,'Hide']],'Grows a leaf for each task done this month; droops when 3+ tasks are overdue'):''}
+      ${SM.officeCat&&SM.catPlant?`<div class="pref-row"><label class="pr-l" for="s-plantGoal">Plant blooms at<small>Tasks done in a month</small></label><input type="number" id="s-plantGoal" class="pr-input pr-num" min="1" max="500" data-pk="plantGoal" data-fk="s-plantGoal" value="${esc(String(SM.plantGoal))}"></div>`:''}
+      ${SM.officeCat?prefRow('catVisitors','Visitors',[[true,'On'],[false,'Off']],'A bird or butterfly drops by now and then (not at night)'):''}
+      ${photoSettingsHtml()}
       <p class="pref-group">Dates</p>
       ${prefPick('dateRel','Dates in lists and cards',[[false,absDate(addDays(today(),3)),'The date itself'],[true,'in 3 days','How far away, like “2 days late”']])}
       ${prefPick('dateFmt','Date format',[['md','Oct 1','Month first'],['dm','1 Oct','Day first']])}
@@ -4990,6 +5108,9 @@ document.addEventListener('click',e=>{
     case 'tpl-del':{const t=S.tasks[u.openTask],h=tplHome(t);if(!h)break;if(TPL.del!==el.dataset.tid){TPL.del=el.dataset.tid;renderDrawer();break}
       patch(h.col,h.id,{templates:(h.doc.templates||[]).filter(y=>y.id!==el.dataset.tid)});TPL.del=null;renderDrawer();toast('Template deleted');break}
     case 'd-upnext':toggleUpNext(u.openTask);break;
+    case 'photo-view':LB={list:photos(),i:+el.dataset.i||0};renderLightbox();break;
+    case 'photo-add':PHOTO_SLOT=+el.dataset.i||0;$('#photo-in').click();break;
+    case 'photo-rm':{const list=photos(),i=+el.dataset.i;if(list[i]){dropImage(list[i]);list.splice(i,1);savePhotos(list)}break}
     case 'clear-hide':lsSet('cutroom.clear',today());render();break;
     case 'react-open':REACT_AT=REACT_AT===el.dataset.at?null:el.dataset.at;renderDrawer();break;
     case 'note-react':{const at=el.dataset.at,em=el.dataset.e;REACT_AT=null;updateNote(at,x=>{const r=x.reacts||[];return {...x,reacts:r.includes(em)?r.filter(y=>y!==em):[...r,em]}});renderDrawer();break}
@@ -5158,6 +5279,7 @@ document.addEventListener('change',e=>{
   if(el.id==='f-sort'){u.sort=el.value;saveUi();render();return}
   if(el.id==='backup-in'){const f=el.files[0];el.value='';readBackup(f);return}
   if(el.id==='import-in'){const f=el.files[0];el.value='';readImport(f);return}
+  if(el.id==='photo-in'){const f=el.files[0];el.value='';addPhoto(f);return}
   if(el.id==='upd-pics-in'){const fs=[...el.files];el.value='';attAdd(fs,ATT_FOR);return}
   if(el.id==='imp-job'&&SM){SM.impJob=el.value;renderSettings();return}
   if(el.id==='hol-add'&&SM&&el.value){if(!SM.holidays.includes(el.value))SM.holidays.push(el.value);SM.holAuto=false;renderSettings();return}
@@ -5193,7 +5315,7 @@ document.addEventListener('input',e=>{
   if(el.id==='jump-q'&&JUMP){JUMP.q=el.value;JUMP.i=0;renderJump();return}
   if(el.id==='s-name'&&SM){SM.name=el.value;return}
   if(el.id==='s-greet'&&SM){SM.greetName=el.value;render();return}
-  if(SM&&el.dataset.pk){const k=el.dataset.pk,v=parseInt(el.value,10);if(v>=1&&v<=(k==='pomoEvery'?12:180))SM[k]=v;return}
+  if(SM&&el.dataset.pk){const k=el.dataset.pk,v=parseInt(el.value,10);if(v>=1&&v<=(k==='pomoEvery'?12:k==='plantGoal'?500:180)){SM[k]=v;if(k==='plantGoal')render()}return}
   if(el.id==='s-limit'&&SM){SM.dayLimit=el.value;return}
   if(SM&&el.dataset.stLabel!=null){const x=SM.statuses[+el.dataset.stLabel];if(x)x.label=el.value;return}
   if(SM&&el.matches('[data-st-to]')){SM.stTo=el.value;return}
