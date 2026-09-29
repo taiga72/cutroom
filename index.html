@@ -1534,6 +1534,18 @@ body.side-mini .office-cat{display:none}
 .pr-num{width:90px}
 body.side-mini .cat-sill,body.side-mini .photo-strip{display:none}
 :root[data-motion="reduce"] .polaroid{transition:none}
+
+/* ---------- installed app: title bar area (Window Controls Overlay) ---------- */
+.wco-drag{display:none}
+@media (display-mode: window-controls-overlay){
+  .wco-drag{display:block;position:fixed;left:env(titlebar-area-x,0);top:env(titlebar-area-y,0);width:env(titlebar-area-width,100%);height:env(titlebar-area-height,32px);-webkit-app-region:drag;app-region:drag;z-index:4}
+  .side{padding-top:calc(env(titlebar-area-height,32px) + 8px)}
+  .main{padding-top:calc(env(titlebar-area-height,32px) + 10px)}
+  .drawer{top:env(titlebar-area-height,32px)}
+  #d-resize{top:env(titlebar-area-height,32px)}
+  .side-toggle{top:calc(env(titlebar-area-height,32px) + 6px)}
+  .drawer,.modal,.jump,#ctx,.notes-pop,.toast,.bulk,.lightbox,#side-resize{-webkit-app-region:no-drag;app-region:no-drag}
+}
 </style>
 
 <div class="app">
@@ -1585,6 +1597,7 @@ body.side-mini .cat-sill,body.side-mini .photo-strip{display:none}
 <input type="file" id="import-in" accept=".csv,text/csv,.tsv,text/tab-separated-values,text/plain" hidden>
 <input type="file" id="pdf-in" accept="application/pdf,.pdf" hidden>
 <input type="file" id="logo-in" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+<div class="wco-drag" aria-hidden="true"></div>
 <input type="file" id="photo-in" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
 <input type="file" id="upd-pics-in" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden>
 <div class="lightbox" id="lightbox" hidden></div>
@@ -2390,7 +2403,7 @@ function render(){
   document.title=(a.name||'').trim()||APP_NAME;pomoTitle();
   const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
   withFocus(()=>{renderSide();renderMain()});
-  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();
+  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();
   if(S.ready&&!SEASON_RAN){SEASON_RAN=true;setTimeout(()=>seasonFx(),900)}
 }
 
@@ -2495,15 +2508,36 @@ function urlOf(){
   const t=u.openTask&&S.tasks[u.openTask];if(t&&!t._draft)p.push('task',t.id);
   return '#/'+p.map(encodeURIComponent).join('/');
 }
+/* Dock shortcuts of the installed app (manifest "shortcuts"): #/new, #/calendar, #/search */
+function appAction(a){
+  const u=S.ui;
+  if(a==='new'){const id=newTask();if(id){render();openTask(id);setTimeout(()=>$('.d-name')?.focus(),60)}}
+  else if(a==='calendar'){if(u.openTask&&!DRAFT)closeDrawer();u.tab='overview';u.client='all';u.pane='tasks';u.view='calendar';u.views={...(u.views||{}),overview:'calendar'};saveUi();render()}
+  else if(a==='search'){render();openJump()}
+  else render();
+}
+/* opened from a link or a Dock shortcut while the app is already running (launch_handler: focus-existing) */
+if('launchQueue' in window)window.launchQueue.setConsumer(p=>{if(!p.targetURL||!S.ready||!URL_READY)return;try{const o=parseUrl(new URL(p.targetURL).hash);if(o)applyUrl(o)}catch(e){}});
+/* number on the Dock icon: open tasks overdue or due today (installed app only) */
+let BADGE_N=-1;
+function appBadge(){
+  if(!('setAppBadge' in navigator)||!S.ready)return;
+  const t0=today(),n=live().filter(t=>!isClosed(t)&&t.due&&t.due<=t0).length;
+  if(n===BADGE_N)return;BADGE_N=n;
+  (n?navigator.setAppBadge(n):navigator.clearAppBadge()).catch(()=>{});
+}
 function parseUrl(h){
   if(!/^#\/./.test(h||''))return null;
   const a=h.slice(2).split('/').map(x=>{try{return decodeURIComponent(x)}catch(e){return x}}),o={};let i=0;
+  if(['new','calendar','search'].includes(a[0])){o.action=a[0];return o}
   if(PAGES.includes(a[0])){o.tab=a[0];i=1}
   for(;i<a.length;i+=2){const k=a[i],v=a[i+1];if(k==='job')o.tab=v;else if(k==='client')o.client=v;else if(k==='pane')o.pane=v;else if(k==='task')o.task=v}
   return o;
 }
 function applyUrl(o,first){
-  const u=S.ui;URL_APPLYING=true;
+  const u=S.ui;
+  if(o.action){appAction(o.action);return}
+  URL_APPLYING=true;
   try{
     const task=o.task&&S.tasks[o.task]&&!S.tasks[o.task].deleted?S.tasks[o.task]:null;
     let tab=o.tab;if(!tab&&task)tab=task.archived?'archived':task.jobId;
@@ -3932,6 +3966,7 @@ const HELP=[
  ['Getting work done','Focus timer',`A Pomodoro timer top-right, next to the bell: 25 minutes of focus, then a 5-minute break, and a 15-minute break after every 4 (change them in Settings). Press P or the tomato at the top of a task to focus on that task; each finished session adds 🍅 1 to it and a line to its activity. The same timer shows on all your devices and in the floating task window. Turn on the desktop pop-up in Settings to be told when time's up while you're in Premiere.`,['pomo','Focus timer']],
  ['Getting work done','Recent project folders',`On your Mac, quick search (⌘K) lists the last 5 project folders you opened from the app, from tasks, jobs or notes. Pick one to open it in Finder again; type to search older ones by task, job or folder name.`,null],
  ['Look and feel','Little extras',`An “All clear” moment on the Overview when nothing is overdue or due today; emoji reactions on client updates (the smiley under an update); film-look color schemes (Portra, Fuji, Noir, Teal & Orange, Technicolor); the office cat on the sidebar (it naps during breaks and when you're away, stretches when you finish a task, and purrs when you click it; a little window behind it shows the sky for your time of day, and it dresses up in December, on New Year's Day and on Halloween; it sweats when something's overdue, smiles on all-clear days and watches your mouse; a plant on the sill grows a leaf per task done this month; birds and butterflies drop by); a photo strip of your own pictures in the sidebar (add them in Appearance → Details); and seasonal touches: a Christmas countdown from September, snow in December, fireworks on New Year's Day, bats on Halloween and hearts on Valentine's. Turn them off in Appearance.`,['appearance','Appearance']],
+ ['Getting work done','Installed app (Chrome)',`Install Splice & Co. from Chrome's address bar (the install icon) to get its own window and Dock icon. The Dock icon shows how many tasks are overdue or due today; right-click it for New task, Overview, Calendar and Quick search. The app's colors reach into the title bar (Chrome's chevron at the top right switches that off). To have task links from Slack or email open in the app, turn on "Open supported links" in the app's settings (⋮ menu in the app window → App info or Settings).`,null],
  ['Getting work done','Save & add another',`Next to Save task: saves it and opens a fresh task for the same job, client and format, for entering a batch of reels in a row.`,null],
  ['Getting work done','Up next',`Your own queue across every job. Add a task from the right-click menu or the queue icon at the top of a task. The queue sits at the top of the Overview; drag to reorder. Finished tasks leave it on their own.`,null],
  ['Getting work done','Push due dates back',`Select tasks, then Push back… in the bar at the bottom: +1 day, +2 days, +1 week, or workdays that skip weekends. Undo puts the old dates back.`,null],

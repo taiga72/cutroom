@@ -2,7 +2,7 @@
    The page itself is network-first (so updates show up right away) with the last copy as a fallback;
    icons and the supabase-js library are cache-first. /api and Supabase calls are never cached:
    the page keeps its own data snapshot and outbox for offline use. */
-const CACHE = 'splice-v1';
+const CACHE = 'splice-v2';
 const SHELL = ['/', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png'];
 
 const LIB = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
