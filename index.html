@@ -1471,6 +1471,30 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 @keyframes seaBurst{0%{opacity:1;transform:translate(0,0) scale(1)}80%{opacity:.9}100%{opacity:0;transform:translate(var(--dx),calc(var(--dy) + 30px)) scale(.4)}}
 :root[data-theme="light"] .season-fx.s-december i{color:#9cc3e6}
 @media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .season-fx.s-december i{color:#9cc3e6}}
+
+/* ---------- office cat + loading ---------- */
+.office-cat{align-self:flex-end;position:relative;margin:-30px 10px 0 0;width:40px;height:32px;padding:0;border:0;background:none;cursor:pointer;flex:none}
+.office-cat svg{width:40px;height:32.5px;display:block;transform-origin:50% 100%;image-rendering:pixelated}
+.office-cat .pose-sleep{display:none}
+.office-cat.sleep .pose-sleep{display:inline}
+.office-cat.sleep .pose-sit{display:none}
+.office-cat .cat-eye{transform-box:fill-box;transform-origin:center;animation:catBlink 5s infinite}
+@keyframes catBlink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+.cat-z{position:absolute;right:-2px;top:-6px;display:none;font:700 calc(10px*var(--ts)) var(--mono);color:var(--faint);pointer-events:none}
+.office-cat.sleep .cat-z{display:block}
+.cat-z i{position:absolute;font-style:normal;opacity:0;animation:catZ 3s infinite}
+.cat-z i:nth-child(2){animation-delay:1s}.cat-z i:nth-child(3){animation-delay:2s}
+@keyframes catZ{0%{opacity:0;transform:translate(0,6px)}30%{opacity:1}100%{opacity:0;transform:translate(8px,-10px)}}
+.cat-bubble{position:absolute;left:50%;top:-14px;transform:translate(-50%,0);white-space:nowrap;font:600 calc(11px*var(--ts)) var(--body);color:#e5484d;pointer-events:none}
+body.side-mini .office-cat{display:none}
+:root[data-motion="reduce"] .office-cat .cat-eye,:root[data-motion="reduce"] .cat-z i{animation:none}
+:root[data-motion="reduce"] .cat-z i{opacity:.8}
+.loading{display:flex;flex-direction:column;align-items:center;gap:8px}
+.loading b{color:var(--text);font-weight:600}
+.loading small{color:var(--faint);font-size:calc(12px*var(--ts))}
+.ld-reel{width:34px;height:34px;color:var(--accent);animation:reelSpin 1.4s linear infinite}
+@keyframes reelSpin{to{transform:rotate(360deg)}}
+:root[data-motion="reduce"] .ld-reel{animation:none}
 </style>
 
 <div class="app">
@@ -1686,7 +1710,7 @@ const MONTH_FULL=['January','February','March','April','May','June','July','Augu
 const PREF_DEF={dateRel:false,dateFmt:'md',weekStart:'mon',hideWeekends:false,confetti:true,motion:'system',contrast:'normal',trashDays:30,darkShade:'standard',pillStyle:'tint',tips:true,
   iconWeight:'regular',depth:'soft',sideStyle:'colored',thinScroll:false,toastPos:'bottom',nameWrap:false,doneStyle:'struck',overdueTint:false,statusIcons:false,prioColors:{},logoShape:'rounded',numFont:'mono',readSpacing:'normal',sideCounts:true,
   compactHeader:false,greeting:true,greetName:'',drawerBand:true,boardTint:false,dueStyle:'text',jobProgress:'bar',calGrid:'lines',todayMark:'dot',
-  pomoFocus:25,pomoShort:5,pomoLong:15,pomoEvery:4,pomoAutoBreak:false,pomoAutoFocus:false,pomoSound:'chime',pomoPopup:false,allClear:true,seasonal:true};
+  pomoFocus:25,pomoShort:5,pomoLong:15,pomoEvery:4,pomoAutoBreak:false,pomoAutoFocus:false,pomoSound:'chime',pomoPopup:false,allClear:true,seasonal:true,officeCat:true};
 const pref=k=>{let o=null;try{o=SM}catch(e){/* Settings state not set up yet */}o=o||S.settings?.app||{};return o[k]!==undefined&&o[k]!==null?o[k]:PREF_DEF[k]};
 const reducedMotion=()=>pref('motion')==='reduce'||matchMedia('(prefers-reduced-motion:reduce)').matches;
 function absDate(s){
@@ -2352,13 +2376,14 @@ function renderSide(){
     <button class="nav-item foot-settings ${u.tab==='help'?'on':''}" data-act="nav" data-tab="help"${tt('Help & tips')}>${HELP_IC}<span class="name">Help &amp; tips</span></button>
     <button class="nav-item foot-settings" data-act="open-settings"${tt('Settings')}>${I.gear}<span class="name">Settings</span></button></div>`;
   $('#side').innerHTML=html;
+  placeCat();
   $('#mbrand').innerHTML=`${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b>`;
 }
 
 function renderMain(){
   const u=S.ui;
   $('#subnav').innerHTML='';
-  if(!S.ready){$('#view').innerHTML='<div class="loading">Loading your tasks…</div>';$('#toolbar').hidden=true;return}
+  if(!S.ready){$('#view').innerHTML=`<div class="loading"><svg class="ld-reel" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="20" cy="20" r="3.5" fill="currentColor"/>${[0,72,144,216,288].map(a=>`<circle cx="${(20+9.5*Math.cos(a*Math.PI/180)).toFixed(2)}" cy="${(20+9.5*Math.sin(a*Math.PI/180)).toFixed(2)}" r="4.2" fill="currentColor" opacity=".55"/>`).join('')}</svg><b>${esc(LOAD_LINE)}</b><small>Loading your tasks</small></div>`;$('#toolbar').hidden=true;return}
   if(u.tab!=='overview'&&u.tab!=='archived'&&u.tab!=='activity'&&u.tab!=='trash'&&u.tab!=='help'&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
   if(u.client!=='all'&&!S.clients[u.client]) u.client='all';
   const job=u.tab==='overview'?null:S.jobs[u.tab];
@@ -3369,6 +3394,7 @@ function renderPomo(){
 }
 function pomoTick(){
   if(!S.ready)return;
+  catTick();
   pomoCheck();
   const T=pomoState();if(T.run==='idle'&&!POMO_OPEN)return;
   const left=pomoClock(pomoLeft(T)),bt=$('#pomo .pb-t');if(bt)bt.textContent=left;
@@ -3548,7 +3574,57 @@ function seasonFx(force){
     for(let i=0;i<22;i++){const a=i/22*Math.PI*2,v=60+Math.random()*50,e=document.createElement('b');e.style.cssText=`left:${cx}vw;top:${cy}vh;background:${col};--dx:${Math.round(Math.cos(a)*v)}px;--dy:${Math.round(Math.sin(a)*v)}px;animation-delay:${b*.55}s`;box.appendChild(e)}}}
   document.body.appendChild(box);setTimeout(()=>box.remove(),k==='december'?16000:8000);
 }
+/* ================= office cat (pref officeCat): a pixel cat perched on the sidebar footer =================
+   Sits and blinks; sleeps during focus-timer breaks and after 3 minutes with no activity; stretches when a task is done
+   (celebrate() calls catStretch); purrs when clicked. One element (CAT) is moved back into each redrawn sidebar. */
+let CAT=null,CAT_WAKE=0,CAT_ACT=Date.now();
+const CAT_PAL={o:'#e8964a',d:'#b8651f',e:'#1b1b1b',p:'#ff8fa3',w:'#fff4e6',k:'#5a3a22'};
+function pixSvg(rows,cls){let r='';rows.forEach((row,y)=>{for(let x=0;x<row.length;x++){const c=row[x];if(c==='.')continue;let n=1;while(row[x+n]===c)n++;r+=`<rect x="${x}" y="${y}" width="${n}" height="1" fill="${CAT_PAL[c]}"${c==='e'?' class="cat-eye"':''}/>`;x+=n-1}});return `<g class="${cls}">${r}</g>`}
+const CAT_SIT=['.............','..o.....o....','..oo...oo....','..ooooooo....','..oeoooeo....','..oowpwoo....','...ooooo.....','..ooddooo....','..ooooooo..o.','..oodoodo..o.','..ooooooo.oo.','..oooooooooo.','..ww.ww......'];
+const CAT_SLEEP=['................','................','................','..o...o.........','..oo.oo.........','.ooooooodoodo...','.okkokkoooooooo.','.oopwooooodoooo.','..oooooooooooooo','..ooooooooooooo.','..ww.......ww...','................','................'];
+function catEl(){
+  if(CAT)return CAT;
+  CAT=document.createElement('button');CAT.type='button';CAT.className='office-cat';CAT.setAttribute('aria-label','Office cat');CAT.title='Pet the cat';
+  CAT.innerHTML=`<svg viewBox="0 0 16 13" shape-rendering="crispEdges" aria-hidden="true">${pixSvg(CAT_SIT,'pose-sit')}${pixSvg(CAT_SLEEP,'pose-sleep')}</svg><span class="cat-z" aria-hidden="true"><i>z</i><i>z</i><i>Z</i></span>`;
+  CAT.addEventListener('click',e=>{e.stopPropagation();catPurr()});
+  return CAT;
+}
+function placeCat(){
+  if(!pref('officeCat')){CAT?.remove();return}
+  const f=$('#side .side-foot');if(!f)return;const c=catEl();if(c.parentNode!==f)f.prepend(c);catTick();
+}
+function catTick(){
+  if(!CAT||!CAT.isConnected)return;
+  const T=pomoState(),now=Date.now();
+  const sleep=now>CAT_WAKE&&((T.run==='running'&&T.mode!=='focus')||now-CAT_ACT>180000);
+  CAT.classList.toggle('sleep',sleep);CAT.title=sleep?'Shh… the cat is napping (click to pet)':'Pet the cat';
+}
+['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{CAT_ACT=Date.now()},{passive:true,capture:true}));
+function catBubble(txt){
+  if(!CAT||!CAT.isConnected)return;
+  const b=document.createElement('span');b.className='cat-bubble';b.textContent=txt;CAT.appendChild(b);
+  if(!reducedMotion())b.animate([{opacity:0,transform:'translate(-50%,4px)'},{opacity:1,transform:'translate(-50%,-4px)',offset:.2},{opacity:1,transform:'translate(-50%,-8px)',offset:.8},{opacity:0,transform:'translate(-50%,-14px)'}],{duration:1600,easing:'ease-out'});
+  setTimeout(()=>b.remove(),1600);
+}
+function catStretch(){
+  if(!CAT||!CAT.isConnected)return;
+  CAT_WAKE=Date.now()+20000;catTick();
+  setTimeout(()=>{if(!CAT)return;if(!reducedMotion())CAT.querySelector('svg').animate([{transform:'scale(1,1)'},{transform:'scale(1.22,.78) translateY(2px)'},{transform:'scale(.94,1.12) translateY(-2px)'},{transform:'scale(1,1)'}],{duration:900,easing:'ease-in-out'});catBubble('♥')},120);
+}
+function catPurr(){
+  CAT_WAKE=Date.now()+30000;CAT_ACT=Date.now();catTick();
+  catBubble(['purr ♥','prrr…','♥ ♥','mrrp!'][Math.floor(Math.random()*4)]);
+  if(!reducedMotion())CAT.querySelector('svg').animate([{transform:'rotate(0)'},{transform:'rotate(-4deg)'},{transform:'rotate(4deg)'},{transform:'rotate(0)'}],{duration:500});
+  if(pref('pomoSound')==='off')return;
+  try{pomoAudio();const ac=POMO_AC;if(!ac)return;const len=.9,buf=ac.createBuffer(1,ac.sampleRate*len,ac.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+    const src=ac.createBufferSource();src.buffer=buf;const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=320;const am=ac.createGain(),lfo=ac.createOscillator(),lg=ac.createGain();lfo.frequency.value=24;lg.gain.value=.5;am.gain.value=.5;lfo.connect(lg).connect(am.gain);
+    const g=ac.createGain();g.gain.setValueAtTime(0,ac.currentTime);g.gain.linearRampToValueAtTime(.35,ac.currentTime+.15);g.gain.linearRampToValueAtTime(0,ac.currentTime+len);
+    src.connect(lp).connect(am).connect(g).connect(ac.destination);lfo.start();src.start();src.stop(ac.currentTime+len);lfo.stop(ac.currentTime+len)}catch(e){}
+}
+const LOAD_LINES=['Rendering at 1 frame per hour…','Relinking media…','Waiting on client feedback…','Conforming the timeline…','Syncing audio by the clap…','Building peak files…','Exporting final_FINAL_v7…','Transcoding proxies…','Finding that one missing font…','Color grading the loading screen…','Asking the client which version they meant…','Nudging a keyframe by one frame…','Clearing the media cache…','Looking for the offline media…','Waiting for the render bar to move…'];
+const LOAD_LINE=LOAD_LINES[Math.floor(Math.random()*LOAD_LINES.length)];
 function celebrate(){
+  catStretch();
   if(!pref('confetti')||reducedMotion())return;
   const near=lastPt&&Date.now()-lastPt.at<3000,x=near?lastPt.x:innerWidth/2,y=near?lastPt.y:innerHeight/2;
   const sc=SEASON_COLS[season()],cols=sc||[stColor('done'),'var(--accent)','#f5b400','#e8515d','#4c8dff','#9b6bff'];
@@ -3703,7 +3779,7 @@ const HELP=[
  ['Getting work done','Type it all in the name',`When you add a task, type the client, the day and the priority right in the name: “Reel 7 Band fri !high”. A line under the name shows what will be picked up, and it's filled in when you save. Days: today, tomorrow, mon–sun, +3d, in 2 weeks, oct 2, 10/2. Priority: !urgent, !high, !low. Use @name to pick a client or job by its first letters.`,null],
  ['Getting work done','Focus timer',`A Pomodoro timer top-right, next to the bell: 25 minutes of focus, then a 5-minute break, and a 15-minute break after every 4 (change them in Settings). Press P or the tomato at the top of a task to focus on that task; each finished session adds 🍅 1 to it and a line to its activity. The same timer shows on all your devices and in the floating task window. Turn on the desktop pop-up in Settings to be told when time's up while you're in Premiere.`,['pomo','Focus timer']],
  ['Getting work done','Recent project folders',`On your Mac, quick search (⌘K) lists the last 5 project folders you opened from the app, from tasks, jobs or notes. Pick one to open it in Finder again; type to search older ones by task, job or folder name.`,null],
- ['Look and feel','Little extras',`An “All clear” moment on the Overview when nothing is overdue or due today; emoji reactions on client updates (the smiley under an update); film-look color schemes (Portra, Fuji, Noir, Teal & Orange, Technicolor); and seasonal touches: a Christmas countdown from September, snow in December, fireworks on New Year's Day, bats on Halloween and hearts on Valentine's. Turn them off in Appearance.`,['appearance','Appearance']],
+ ['Look and feel','Little extras',`An “All clear” moment on the Overview when nothing is overdue or due today; emoji reactions on client updates (the smiley under an update); film-look color schemes (Portra, Fuji, Noir, Teal & Orange, Technicolor); the office cat on the sidebar (it naps during breaks and when you're away, stretches when you finish a task, and purrs when you click it); and seasonal touches: a Christmas countdown from September, snow in December, fireworks on New Year's Day, bats on Halloween and hearts on Valentine's. Turn them off in Appearance.`,['appearance','Appearance']],
  ['Getting work done','Save & add another',`Next to Save task: saves it and opens a fresh task for the same job, client and format, for entering a batch of reels in a row.`,null],
  ['Getting work done','Up next',`Your own queue across every job. Add a task from the right-click menu or the queue icon at the top of a task. The queue sits at the top of the Overview; drag to reorder. Finished tasks leave it on their own.`,null],
  ['Getting work done','Push due dates back',`Select tasks, then Push back… in the bar at the bottom: +1 day, +2 days, +1 week, or workdays that skip weekends. Undo puts the old dates back.`,null],
@@ -3971,6 +4047,7 @@ function renderSettings(){
       ${prefRow('logoShape','Logo shape',[['rounded','Rounded'],['circle','Circle']])}
       ${prefRow('numFont','Dates and numbers',[['mono','Typewriter'],['regular','Regular']])}
       ${prefRow('sideCounts','Counts in the sidebar',[[true,'Show'],[false,'Hide']])}
+      ${prefRow('officeCat','Office cat',[[true,'Show'],[false,'Hide']],'Naps at the bottom of the sidebar; wakes when you finish a task')}
       <p class="pref-group">Dates</p>
       ${prefPick('dateRel','Dates in lists and cards',[[false,absDate(addDays(today(),3)),'The date itself'],[true,'in 3 days','How far away, like “2 days late”']])}
       ${prefPick('dateFmt','Date format',[['md','Oct 1','Month first'],['dm','1 Oct','Day first']])}
