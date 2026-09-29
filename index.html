@@ -1546,6 +1546,20 @@ body.side-mini .cat-sill,body.side-mini .photo-strip{display:none}
   .side-toggle{top:calc(env(titlebar-area-height,32px) + 6px)}
   .drawer,.modal,.jump,#ctx,.notes-pop,.toast,.bulk,.lightbox,#side-resize{-webkit-app-region:no-drag;app-region:no-drag}
 }
+
+/* ---------- board columns on medium screens + pull to refresh ---------- */
+@media (min-width:821px){
+  .board{grid-auto-columns:minmax(236px,1fr)}
+  .card-top .tmark{width:26px;height:26px}
+  .card .t-name{overflow-wrap:break-word;word-break:normal}
+}
+html{overscroll-behavior-y:contain}
+.ptr{position:fixed;left:50%;top:calc(env(titlebar-area-height,0px) + env(safe-area-inset-top,0px) + 6px);z-index:90;display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow-lg);font-size:calc(12px*var(--ts));font-weight:600;color:var(--muted);transform:translate(-50%,calc(var(--d,0px) - 40px));opacity:var(--k,0);pointer-events:none}
+.ptr-ic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);color:var(--accent)}
+.ptr-ic .i{width:15px;height:15px;transform:rotate(calc(var(--k,0)*300deg))}
+.ptr.ready{color:var(--text)}
+.ptr.ready .ptr-ic{background:var(--accent);color:var(--accent-ink)}
+.ptr.go .ptr-ic .i{animation:reelSpin .8s linear infinite}
 </style>
 
 <div class="app">
@@ -2772,7 +2786,7 @@ function rowsAttrs(){
 }
 const rowHtml=(t,job,showJob)=>`<div class="row ${isClosed(t)?'done-row':''} ${dueClass(t)==='over'?'is-over':''} ${S.ui.openTask===t.id?'focus':''} ${SEL.has(t.id)?'picked':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="mark-wrap">${taskMark(t)}${selBox(t)}</div>
-        <div class="t-main"><div class="t-name" title="Double-click to rename">${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${hlText(t.name||'Untitled task',qNow())}</div>${metaLine(t,job,showJob)}${searchHit(t)}</div>
+        <div class="t-main"><div class="t-name" title="Double-click to rename">${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</div>${metaLine(t,job,showJob)}${searchHit(t)}</div>
         <div class="c-status" data-stop>${statusSelect(t,'row-status')}${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
         <div class="c-prio pedit" title="Change priority">${prioHtml(t.priority)}<select class="cell-sel" data-act="row-prio" data-id="${t.id}" aria-label="Priority">${PRIORITIES.map(p=>`<option value="${p.id}" ${(t.priority||'normal')===p.id?'selected':''}>${p.label}</option>`).join('')}</select></div>
         <div class="c-start date ${t.start?'':'none'}"${relTitle(t.start)}>${t.start?fmtRel(t.start):'—'}</div>
@@ -2801,7 +2815,7 @@ function boardView(list,job){
     const cards=list.filter(t=>stOf(t)===s.id);
     return `<div class="col" data-drop="${s.id}" style="--sc:${stColor(s.id)}"><div class="col-head"><span class="pill" ${pillStyle(s.id)}><span class="pl">${esc(s.label)}</span></span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
       ${cards.map(t=>`<div class="card ${SEL.has(t.id)?'picked':''} ${isClosed(t)?'is-done':''} ${dueClass(t)==='over'?'is-over':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
-        <div class="card-top"><div class="mark-wrap">${taskMark(t)}${selBox(t)}</div><div class="t-name" title="Double-click to rename">${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${hlText(t.name||'Untitled task',qNow())}</div></div>${metaLine(t,job,!job)}${searchHit(t)}
+        <div class="card-top"><div class="mark-wrap">${taskMark(t)}${selBox(t)}</div><div class="t-name" title="Double-click to rename">${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</div></div>${metaLine(t,job,!job)}${searchHit(t)}
         <div class="card-foot"><span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,!isClosed(t)):'No date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
       </div>`;
   }).join('')}</div></div>`;
@@ -3807,6 +3821,32 @@ function photoSettingsHtml(){
   return `<div class="pref-row photo-row"><span class="pr-l">Photo strip in the sidebar<small>Up to 4 of your own pictures: pets, family, a view you like. Saved right away.</small></span>
     <div class="photo-slots">${[0,1,2,3].map(i=>ps[i]?`<span class="photo-slot has"><img src="${esc(imgSrc(ps[i])||'')}" alt=""><button type="button" class="icon-btn" data-act="photo-rm" data-i="${i}" title="Remove photo" aria-label="Remove photo">${I.x}</button></span>`:i===ps.length?`<button type="button" class="photo-slot add" data-act="photo-add" data-i="${i}" ${PHOTO_BUSY?'disabled':''} title="Add a photo">${PHOTO_BUSY?'…':I.plus}</button>`:`<span class="photo-slot"></span>`).join('')}</div></div>`;
 }
+/* ================= pull to refresh =================
+   Touch: pull down from the top of the page. Trackpad/mouse wheel: at the top of the page, keep scrolling up
+   (only counts after resting at the top for a moment, so a fast scroll's momentum doesn't trigger it).
+   Reloads the page, which picks up app updates and the latest data. */
+let PTR=null;const PTR_MAX=90,PTR_GO=70;
+function ptrBusy(){return !$('#drawer').hidden||!$('#modal').hidden||!!JUMP||!!LB||document.body.classList.contains('typing')}
+function ptrShow(d,state){
+  let e=$('#ptr');if(!e){e=document.createElement('div');e.id='ptr';e.className='ptr';e.setAttribute('aria-hidden','true');e.innerHTML='<span class="ptr-ic"><svg class="i" viewBox="0 0 16 16"><path d="M13 8a5 5 0 1 1-1.5-3.6M13 2.5v3h-3"/></svg></span><span class="ptr-t"></span>';document.body.appendChild(e)}
+  e.hidden=d<=0&&state!=='go';
+  const k=Math.min(1,d/PTR_GO);e.style.setProperty('--d',Math.min(d,PTR_MAX)+'px');e.style.setProperty('--k',k);
+  e.classList.toggle('ready',state==='ready');e.classList.toggle('go',state==='go');
+  e.querySelector('.ptr-t').textContent=state==='go'?'Refreshing…':state==='ready'?'Release to refresh':'Pull to refresh';
+}
+function ptrGo(){ptrShow(PTR_GO,'go');haptic(10);setTimeout(()=>location.reload(),350)}
+document.addEventListener('touchstart',e=>{if(window.scrollY>0||e.touches.length>1||ptrBusy()||e.target.closest('.side,.drawer,.modal,#tabbar,.board-wrap .card'))return;PTR={y:e.touches[0].clientY,d:0}},{passive:true});
+document.addEventListener('touchmove',e=>{if(!PTR)return;const d=(e.touches[0].clientY-PTR.y)*.55;if(window.scrollY>0||d<0){PTR.d=0;ptrShow(0);return}PTR.d=d;ptrShow(d,d>=PTR_GO?'ready':'pull')},{passive:true});
+document.addEventListener('touchend',()=>{if(!PTR)return;const go=PTR.d>=PTR_GO;PTR=null;if(go)ptrGo();else ptrShow(0)},{passive:true});
+let WPT={top:0,acc:0,t:0};
+window.addEventListener('scroll',()=>{if(window.scrollY>0){WPT.top=0;WPT.acc=0}else if(!WPT.top)WPT.top=Date.now()},{passive:true});
+window.addEventListener('wheel',e=>{
+  if(window.scrollY>0||e.deltaY>=0||ptrBusy()||e.ctrlKey||e.target.closest?.('.side,.drawer,.modal,.notes-pop,.jump,.board-wrap')){if(WPT.acc&&e.deltaY>0){WPT.acc=0;ptrShow(0)}return}
+  if(!WPT.top)WPT.top=Date.now();
+  if(Date.now()-WPT.top<450)return;               // momentum from scrolling up; not a deliberate pull
+  WPT.acc+=-e.deltaY*.35;const d=WPT.acc;ptrShow(d,d>=PTR_GO?'ready':'pull');
+  clearTimeout(WPT.t);WPT.t=setTimeout(()=>{const go=WPT.acc>=PTR_GO;WPT.acc=0;if(go)ptrGo();else ptrShow(0)},260);
+},{passive:true});
 const LOAD_LINES=['Rendering at 1 frame per hour…','Relinking media…','Waiting on client feedback…','Conforming the timeline…','Syncing audio by the clap…','Building peak files…','Exporting final_FINAL_v7…','Transcoding proxies…','Finding that one missing font…','Color grading the loading screen…','Asking the client which version they meant…','Nudging a keyframe by one frame…','Clearing the media cache…','Looking for the offline media…','Waiting for the render bar to move…'];
 const LOAD_LINE=LOAD_LINES[Math.floor(Math.random()*LOAD_LINES.length)];
 function celebrate(){
@@ -3967,6 +4007,7 @@ const HELP=[
  ['Getting work done','Recent project folders',`On your Mac, quick search (⌘K) lists the last 5 project folders you opened from the app, from tasks, jobs or notes. Pick one to open it in Finder again; type to search older ones by task, job or folder name.`,null],
  ['Look and feel','Little extras',`An “All clear” moment on the Overview when nothing is overdue or due today; emoji reactions on client updates (the smiley under an update); film-look color schemes (Portra, Fuji, Noir, Teal & Orange, Technicolor); the office cat on the sidebar (it naps during breaks and when you're away, stretches when you finish a task, and purrs when you click it; a little window behind it shows the sky for your time of day, and it dresses up in December, on New Year's Day and on Halloween; it sweats when something's overdue, smiles on all-clear days and watches your mouse; a plant on the sill grows a leaf per task done this month; birds and butterflies drop by); a photo strip of your own pictures in the sidebar (add them in Appearance → Details); and seasonal touches: a Christmas countdown from September, snow in December, fireworks on New Year's Day, bats on Halloween and hearts on Valentine's. Turn them off in Appearance.`,['appearance','Appearance']],
  ['Getting work done','Installed app (Chrome)',`Install Splice & Co. from Chrome's address bar (the install icon) to get its own window and Dock icon. The Dock icon shows how many tasks are overdue or due today; right-click it for New task, Overview, Calendar and Quick search. The app's colors reach into the title bar (Chrome's chevron at the top right switches that off). To have task links from Slack or email open in the app, turn on "Open supported links" in the app's settings (⋮ menu in the app window → App info or Settings).`,null],
+ ['Getting work done','Pull to refresh',`At the top of any page, pull down (on a phone or tablet) or keep scrolling up with two fingers on the trackpad. When it says “Release to refresh”, let go and the app reloads with the latest data and any app updates.`,null],
  ['Getting work done','Save & add another',`Next to Save task: saves it and opens a fresh task for the same job, client and format, for entering a batch of reels in a row.`,null],
  ['Getting work done','Up next',`Your own queue across every job. Add a task from the right-click menu or the queue icon at the top of a task. The queue sits at the top of the Overview; drag to reorder. Finished tasks leave it on their own.`,null],
  ['Getting work done','Push due dates back',`Select tasks, then Push back… in the bar at the bottom: +1 day, +2 days, +1 week, or workdays that skip weekends. Undo puts the old dates back.`,null],
