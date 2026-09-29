@@ -3917,7 +3917,7 @@ const HELP=[
  ['Tasks','Statuses and Done',`Move a task along with the › button or the ✓ in the task panel. Moving to In progress fills in today as the start date if it's empty; moving to Revisions adds a revision round; Done gets a little confetti. Every status change can be undone from the message.`,['statuses','Statuses']],
  ['Tasks','Split into tasks',`In a task's panel (or the right-click menu), Split into tasks turns one task into several: one name per line, each with the same job, client, links, dates and notes, and the checklist unticked.`,null],
  ['Tasks','Select several',`Turn on Select in the toolbar, tick tasks (Shift-click for a range), then set status, priority, due date, move them to another job or client, archive or delete them together.`,null],
- ['Tasks','Pins, templates and duplicates',`Pin a task to keep it at the top of the Overview. Save checklist steps as a template per client. Duplicate makes an unsaved copy to edit.`,null],
+ ['Tasks','Pins, templates and duplicates',`Pin a task to keep it at the top of the Overview. Save checklist steps as a template per client. Duplicate makes an unsaved copy to edit: same client (so the same brand guide), due date, links, notes and checklist (unticked), with a fresh status.`,null],
  ['Updates and notes','Updates and revision notes',`In a task's Activity tab, post updates with formatting, timecodes and pictures (paste a screenshot or drop it in). Tick an update when it's done, reply to it, or edit it. Tasks with open updates show a speech-bubble count in lists.`,null],
  ['Updates and notes','Notes formatting',`Notes support bold (${IS_MAC?'⌘':'Ctrl '}B), italic (${IS_MAC?'⌘':'Ctrl '}I), bullet and numbered lists and links. ${IS_MAC?'⌘':'Ctrl '}Z undoes typing in any text box.`,['keys','Keyboard shortcuts']],
  ['Links and files','Finder folders and Chrome profiles',`Paste a Finder path into a task's Project folder (Mac) and it opens in Finder through a one-time Shortcuts setup. A job can open its links in its own Chrome profile or Google account.`,['finder','Finder & Chrome']],
@@ -3990,13 +3990,13 @@ function addClientFromPanel(){
   NEWCL=null;render();renderDrawer();toast(made?`Added ${n} to ${j.name}`:`${c.name} is already a client of ${j.name}; picked it`);
 }
 function discardDraft(){if(!DRAFT)return;delete S.tasks[DRAFT.id];DRAFT=null}
-/* Duplicate: opens an unsaved copy (same job, client, format, length, priority, notes, storage folder, checklist
-   unticked) with fresh status, dates, revision and task/review links. */
+/* Duplicate: opens an unsaved copy (same job, client, due date, format, length, priority, notes, every link, checklist
+   unticked) with a fresh status, start date and revision. The brand guide follows the client, so it carries over too. */
 function duplicateTask(id){
   const src=S.tasks[id];if(!src||src._draft)return;
   discardDraft();const nid=uid();
-  DRAFT=S.tasks[nid]={jobId:src.jobId,clientId:src.clientId||null,name:(src.name||'Untitled task')+' (copy)',status:ST.not_started?'not_started':STATUSES[0].id,priority:src.priority||'normal',start:'',due:'',format:src.format||'16:9',length:src.length||'',revision:0,
-    links:{task:'',upload:'',file:src.links?.file||'',project:''},thumb:null,notes:src.notes||'',checklist:(src.checklist||[]).map(c=>({id:uid().slice(0,12),text:c.text,done:false})),copiedFrom:src.id,id:nid,_draft:true};
+  DRAFT=S.tasks[nid]={jobId:src.jobId,clientId:src.clientId||null,name:(src.name||'Untitled task')+' (copy)',status:ST.not_started?'not_started':STATUSES[0].id,priority:src.priority||'normal',start:'',due:src.due||'',format:src.format||'16:9',length:src.length||'',revision:0,
+    links:{task:src.links?.task||'',upload:src.links?.upload||'',file:src.links?.file||'',project:src.links?.project||''},thumb:null,notes:src.notes||'',checklist:(src.checklist||[]).map(c=>({id:uid().slice(0,12),text:c.text,done:false})),copiedFrom:src.id,id:nid,_draft:true};
   openTask(nid);setTimeout(()=>{const n=$('.d-name');if(n){n.focus();n.select()}},30);
 }
 function saveDraft(again){
