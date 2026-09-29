@@ -3068,12 +3068,25 @@ function renderBulk(){
 }
 let JUMP=null;
 const MODKEY=IS_MAC?'⌘K':'Ctrl K';
+/* Recent project folders: Mac paths opened from the app (task project folders, job folders, paths in notes), newest first, per device */
+const LS_PATHS='cutroom.paths.v1';
+function notePathOpen(p){
+  p=localPath(p);if(!p)return;
+  const t=Object.values(S.tasks).find(x=>!x._draft&&!x.deleted&&localPath(x.links?.project)===p),j=!t&&Object.values(S.jobs).find(x=>localPath(x.folder)===p);
+  const item={p,label:t?t.name||'Untitled task':j?j.name:pathName(p),sub:t?[S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '):j?'Job folder':'',taskId:t?.id||null,at:Date.now()};
+  lsSet(LS_PATHS,[item,...(lsGet(LS_PATHS)||[]).filter(x=>x.p!==p)].slice(0,8));
+}
+document.addEventListener('click',e=>{
+  const a=e.target.closest?.('a[href^="shortcuts://run-shortcut"]');if(!a)return;
+  try{const txt=new URL(a.href).searchParams.get('text')||'';if(!/^chrome:/.test(txt))notePathOpen(txt)}catch(x){}
+},true);
 function jumpItems(q){
   q=q.trim().toLowerCase();
   const out=[],score=(txt)=>{txt=(txt||'').toLowerCase();if(!q)return 1;const i=txt.indexOf(q);return i<0?0:i===0?3:(txt[i-1]===' '?2:1)};
   const pages=[['overview','Overview',I.grid],['activity','Activity',I.clock],['archived','Archived',I.archive],['trash','Trash',I.trash],['help','Help & tips',HELP_IC]];
   for(const [id,l,ic] of pages){const sc=score(l);if(sc)out.push({sc:sc+.5,icon:ic,label:l,sub:'Page',act:'nav',tab:id})}
   if(!q){(S.ui.recent||[]).map(id=>S.tasks[id]).filter(t=>t&&!t._draft).forEach((t,k)=>out.push({sc:10-k*.1,icon:`<span class="jdot" ${pillStyle(stOf(t))}></span>`,label:t.name||'Untitled task',sub:['Recent',S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '),act:'open',id:t.id}))}
+  if(IS_MAC){(lsGet(LS_PATHS)||[]).slice(0,q?8:5).forEach((x,k)=>{const sc=q?Math.max(score(x.label),score(pathName(x.p)),score(x.sub)*.6):1;if(sc)out.push({sc:q?sc+.1:8-k*.1,icon:I.folder,label:x.label===pathName(x.p)?x.label:`${x.label} · ${pathName(x.p)}`,sub:['Recent folder',x.sub].filter(Boolean).join(' · '),act:'path',p:x.p})})}
   if(!q||score('new task'))out.push({sc:q?3:.9,icon:I.plus,label:'New task',sub:'Action',act:'new-task'});
   if(q&&score('settings'))out.push({sc:3,icon:I.gear,label:'Settings',sub:'Action',act:'open-settings'});
   for(const j of jobsSorted()){const sc=score(j.name);if(sc)out.push({sc:sc+.4,icon:jobMark(j,16),label:j.name,sub:j.type==='agency'?'Agency':'Direct client',act:'nav',tab:j.id})}
@@ -3105,6 +3118,7 @@ function jumpGo(k){
   else if(x.act==='open')openTask(x.id);
   else if(x.act==='new-task'){const id=newTask();if(id){openTask(id);setTimeout(()=>$('.d-name')?.focus(),30)}}
   else if(x.act==='open-settings')openSettings();
+  else if(x.act==='path'){notePathOpen(x.p);location.href=pathOpenUrl(x.p)}
 }
 /* "Assigned 12 days ago" under the dates (or how long a finished task took) */
 function ageNote(t){
@@ -3597,6 +3611,7 @@ const HELP=[
  ['Look and feel','Appearance',`Theme, color scheme, dark shade, status style, card depth, sidebar style, compact header, greeting, job card rings, due date badges, tinted board columns, calendar grid and today marker, dates, week start and many more. Everything previews live.`,['appearance','Appearance']],
  ['Getting work done','Type it all in the name',`When you add a task, type the client, the day and the priority right in the name: “Reel 7 Band fri !high”. A line under the name shows what will be picked up, and it's filled in when you save. Days: today, tomorrow, mon–sun, +3d, in 2 weeks, oct 2, 10/2. Priority: !urgent, !high, !low. Use @name to pick a client or job by its first letters.`,null],
  ['Getting work done','Focus timer',`A Pomodoro timer top-right, next to the bell: 25 minutes of focus, then a 5-minute break, and a 15-minute break after every 4 (change them in Settings). Press P or the tomato at the top of a task to focus on that task; each finished session adds 🍅 1 to it and a line to its activity. The same timer shows on all your devices and in the floating task window. Turn on the desktop pop-up in Settings to be told when time's up while you're in Premiere.`,['pomo','Focus timer']],
+ ['Getting work done','Recent project folders',`On your Mac, quick search (⌘K) lists the last 5 project folders you opened from the app, from tasks, jobs or notes. Pick one to open it in Finder again; type to search older ones by task, job or folder name.`,null],
  ['Getting work done','Save & add another',`Next to Save task: saves it and opens a fresh task for the same job, client and format, for entering a batch of reels in a row.`,null],
  ['Getting work done','Up next',`Your own queue across every job. Add a task from the right-click menu or the queue icon at the top of a task. The queue sits at the top of the Overview; drag to reorder. Finished tasks leave it on their own.`,null],
  ['Getting work done','Push due dates back',`Select tasks, then Push back… in the bar at the bottom: +1 day, +2 days, +1 week, or workdays that skip weekends. Undo puts the old dates back.`,null],
