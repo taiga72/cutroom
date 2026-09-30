@@ -2875,7 +2875,7 @@ function render(){
   document.title=(a.name||'').trim()||APP_NAME;pomoTitle();
   const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
   withFocus(()=>{renderSide();renderMain()});
-  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();renderUpNextPage();document.body.classList.toggle('cal-page',S.ui.view==='calendar'&&!['archived','activity','trash','help'].includes(S.ui.tab));
+  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();renderUpNextPage();boardRestore();document.body.classList.toggle('cal-page',S.ui.view==='calendar'&&!['archived','activity','trash','help'].includes(S.ui.tab));
   if(S.ready&&!SEASON_RAN){SEASON_RAN=true;setTimeout(()=>seasonFx(),900)}
 }
 
@@ -3832,6 +3832,10 @@ document.addEventListener('touchend',()=>{
 },{passive:true});
 /* on phones the search sheet fills the visible area, so its search bar sits right above the keyboard */
 function jumpVV(){const e=$('#jump'),v=window.visualViewport;if(!e)return;if(e.hidden||!v||!narrow.matches){e.style.top='';e.style.height='';document.body.classList.remove('kb-open');return}e.style.top=v.offsetTop+'px';e.style.height=v.height+'px';document.body.classList.toggle('kb-open',innerHeight-v.height>120)}
+/* phones: while the keyboard is up, the task sheet ends above it, so the box you're typing in can scroll into view */
+function drawerVV(){const d=$('#drawer'),v=window.visualViewport;if(!d||!v)return;const kb=narrow.matches&&!d.hidden?Math.max(0,innerHeight-v.height-v.offsetTop):0;d.style.bottom=kb>80?kb+'px':'';
+  if(kb>80){const a=document.activeElement;if(a&&d.contains(a)&&a.matches('textarea,input'))requestAnimationFrame(()=>a.scrollIntoView({block:'nearest'}))}}
+window.visualViewport?.addEventListener('resize',drawerVV);
 window.visualViewport?.addEventListener('resize',jumpVV);window.visualViewport?.addEventListener('scroll',jumpVV);
 function closeJump(){JUMP=null;const e=$('#jump');if(e){e.hidden=true;e.innerHTML=''}sheetLock()}
 function renderJump(){
@@ -4129,6 +4133,7 @@ function renderTopt(){
       ${row('delete-task',I.trash,deleteArmed?'Tap again to move to Trash':'Delete task','','danger')}
     </div></div>`;
 }
+let DRAW_ID='';
 function renderDrawer(){
   const t=S.tasks[S.ui.openTask];
   if(!t){if(S.ui.openTask)closeDrawer();return}
@@ -4136,6 +4141,7 @@ function renderDrawer(){
   const checklist=t.checklist||[];const doneN=checklist.filter(x=>x.done).length;
   const linkRow=(kind,icon)=>{const v=t.links?.[kind],u=linkHref(v,j);const label=linkLabel(j,kind);return `<div class="link-row"><label><span>${svcIcon(v)||icon}${esc(label)}</span><input type="${kind==='project'?'text':'url'}" data-field="links.${kind}" data-fk="d-link-${kind}" value="${esc(v||'')}" placeholder="${kind==='project'?'Paste the Finder path (⌥⌘C in Finder)':'Paste link'}" ${kind==='project'?'autocapitalize="off" spellcheck="false"':''}></label>
     <div class="acts"><a class="icon-btn ${u?'':'off'}" href="${esc(u||'#')}"${linkTarget(v,j)} title="${localPath(v)?'Open in Finder':'Open'}" aria-label="Open ${esc(label)}">${I.ext}</a><button class="icon-btn" data-act="copy" data-kind="${kind}" title="Copy" aria-label="Copy ${esc(label)}">${I.copy}</button></div>${kind==='project'?`<p class="hint path-hint" ${localPath(v)?'':'hidden'}>${pathHint()}</p>`:''}</div>`};
+  const DY=DRAW_ID===t.id+'|'+S.ui.dtab?$('#drawer').scrollTop:0;DRAW_ID=t.id+'|'+S.ui.dtab;
   withFocus(()=>{$('#drawer').innerHTML=`
   ${t._draft?`<div class="d-draft">${t.copiedFrom?I.copy:I.plus}<b>${t.copiedFrom?'Copy of a task':'New task'}</b><span>Not saved yet</span></div>`:''}
   <div class="d-top" style="--jc:${esc(j?.color||'transparent')}"><div class="crumb">${taskMark(t)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
@@ -4178,6 +4184,7 @@ function renderDrawer(){
       <span class="d-foot-btns" style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" data-act="d-duplicate">${I.copy}Duplicate</button><button class="btn sm" data-act="split-open">${SPLIT_IC}Split into tasks</button>${isClosed(t)&&!t.archived?`<button class="btn sm" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}<button class="btn sm danger ${deleteArmed?'armed':''}" data-act="delete-task">${I.trash}${deleteArmed?'Click again to move to Trash':'Delete task'}</button></span></div>`}
   </div>`}`});
   autosize($('.d-name'));
+  {const d=$('#drawer');if(d.scrollTop!==DY)d.scrollTop=DY}
   renderPip();
 }
 /* a hidden element measures 0, so leave the height alone until it can be measured */
@@ -4276,7 +4283,9 @@ function notesBlock(t){
 }
 function editNotes(){
   NOTES_EDIT=S.ui.openTask;renderDrawer();
-  const ta=$('#drawer textarea.notes');if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);autosize(ta)}
+  const ta=$('#drawer textarea.notes');if(ta){ta.focus({preventScroll:true});ta.setSelectionRange(ta.value.length,ta.value.length);autosize(ta);
+    /* bring the box into view above the phone keyboard once it has opened */
+    setTimeout(()=>{if(document.activeElement===ta)ta.scrollIntoView({block:'center'})},350)}
 }
 /* apply a toolbar format to the notes textarea around the selection */
 function notesFormat(f,target){
@@ -4295,7 +4304,8 @@ function notesFormat(f,target){
   }
   ta.focus();ta.dispatchEvent(new Event('input',{bubbles:true}));autosize(ta);
 }
-function autosize(el){if(!el||!el.offsetParent)return;el.style.height='auto';el.style.height=el.scrollHeight+'px'}
+/* grow a textarea to fit; the scrolling panel around it keeps its place (collapsing to 'auto' first used to snap it back up) */
+function autosize(el){if(!el||!el.offsetParent)return;const sc=el.closest('#drawer,.modal,.pref-body,.m-body'),y=sc?sc.scrollTop:0,wy=scrollY;el.style.minHeight=el.offsetHeight+'px';el.style.height='auto';const h=el.scrollHeight;el.style.minHeight='';el.style.height=h+'px';if(sc&&sc.scrollTop!==y)sc.scrollTop=y;if(scrollY!==wy)scrollTo(0,wy)}
 
 /* Every status change can be undone from its toast; bulk changes pass quiet and show one toast for all. */
 function setStatus(id,st,o={}){
@@ -5952,6 +5962,11 @@ document.addEventListener('touchend',e=>{const g=BSW;BSW=null;if(!g)return;const
   const list=shownClients(g.job),i=list.findIndex(c=>c.id===S.ui.client);if(i<0||list.length<2)return;
   const n=list[(i+(dx<0?1:-1)+list.length)%list.length];S.ui.client=n.id;saveUi();render();haptic(6);
   const el=$('.bp-swipe .brand-panel, .bp-swipe .empty');if(el&&!reducedMotion())el.animate([{transform:`translateX(${dx<0?40:-40}px)`,opacity:.4},{transform:'none',opacity:1}],{duration:200,easing:'ease-out'})},{passive:true});
+/* the board remembers how far it's scrolled sideways (per page), so redraws such as closing a task don't send it back to the first column */
+const BOARD_X={};
+const boardKey=()=>S.ui.tab+'|'+S.ui.client;
+document.addEventListener('scroll',e=>{const t=e.target;if(t&&t.classList&&t.classList.contains('board-wrap'))BOARD_X[boardKey()]=t.scrollLeft},{capture:true,passive:true});
+function boardRestore(){const w=$('.board-wrap'),x=BOARD_X[boardKey()];if(w&&x!=null&&Math.abs(w.scrollLeft-x)>2){w.style.scrollSnapType='none';w.scrollLeft=x;requestAnimationFrame(()=>{w.style.scrollSnapType=''})}}
 let SSW=null;
 const IS_STANDALONE=matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: window-controls-overlay)').matches||navigator.standalone===true;
 function sideScroller(el){for(let n=el;n&&n!==document.body;n=n.parentElement){if(n.scrollWidth>n.clientWidth+2){const ox=getComputedStyle(n).overflowX;if(ox==='auto'||ox==='scroll')return n}}return null}
