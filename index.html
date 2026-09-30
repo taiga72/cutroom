@@ -1988,6 +1988,35 @@ html{overscroll-behavior-y:contain}
   .drawer .d-activity .composer-foot [data-act="upd-attach"] .i{width:20px;height:20px}
   .drawer .d-activity .composer-foot [data-act="note-post"]{grid-column:3;grid-row:2;min-height:44px;border-radius:22px}
 }
+
+/* ---------- phones: task header, 50/50 tabs, ClickUp composer, + job tile, calendar filter ---------- */
+.job-add{align-items:center;justify-content:center;flex-direction:column;gap:6px;border-style:dashed;color:var(--muted);font-weight:600;min-height:110px;cursor:pointer}
+.job-add .i{width:22px;height:22px}
+.job-add:hover{color:var(--text)}
+.cal-filter,.np-ic{display:none}
+@media (max-width:820px){
+  .drawer .d-top{padding-top:22px;padding-bottom:14px}
+  .drawer .d-top .crumb{font-size:calc(17px*var(--ts));font-weight:600;gap:10px}
+  .drawer .d-top .crumb .tmark{width:34px;height:34px}
+  .drawer .d-top .icon-btn{width:44px!important;min-width:44px!important;height:44px}
+  .drawer .d-top .icon-btn .i{width:24px;height:24px}
+  .drawer .d-tabs{padding:0}
+  .drawer .d-tabs button{flex:1 1 50%;justify-content:center;padding:14px 8px;font-size:calc(16px*var(--ts))}
+  .drawer .d-activity .composer{padding-bottom:calc(26px + env(safe-area-inset-bottom,0px))}
+  .drawer .d-activity .composer-foot [data-act="note-post"]{display:none;width:44px;height:44px;min-height:44px;padding:0;border-radius:50%;justify-content:center}
+  .drawer .d-activity .composer.c-on .composer-foot [data-act="note-post"]{display:inline-flex}
+  .drawer .d-activity .composer:not(.c-on) textarea{grid-column:2/4}
+  .drawer .d-activity .np-l{display:none}
+  .drawer .d-activity .np-ic{display:block;width:20px;height:20px}
+  .jobs-grid .job-add{flex:0 0 auto;min-width:120px;min-height:0}
+  body.cal-page .toolbar{display:none!important}
+  body.cal-page .cal-filter{display:grid;place-items:center;flex:none;width:44px;height:44px;border:1px solid var(--line);border-radius:12px}
+  body.cal-page .cal-bar{flex-wrap:wrap;gap:6px}
+  body.cal-page .cal-bar .cal-mode button{padding:6px 12px;min-width:0}
+  body.cal-page .cal-bar > .btn{padding-inline:12px}
+  body.cal-page .cal-bar > .icon-btn:not(.cal-filter){min-width:34px;width:34px}
+  body.cal-page .cal-bar .cal-mode{margin-right:auto}
+}
 </style>
 
 <div class="app">
@@ -2919,7 +2948,7 @@ function renderMain(){
   const keys=statKeys(),labels=Object.fromEntries(statDefs());
   $('#stats').innerHTML=Object.keys(S.jobs).length?`<div class="stats-wrap"><div class="stats" style="grid-template-columns:repeat(${keys.length},minmax(0,1fr))">${keys.map(k=>statTile(k,labels[k],scope)).join('')}<button type="button" class="icon-btn stats-edit ${STATPOP?'on':''}" data-act="stat-edit" title="Choose tiles" aria-label="Choose which tiles show" aria-expanded="${STATPOP}">${I.pencil}</button></div>${statPopHtml()}</div>`:'';
 
-  $('#jobcards').innerHTML=(!job?allClearHtml()+upNextStrip():'')+(!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')}</div>`:'')+pinnedStrip(scope);
+  $('#jobcards').innerHTML=(!job?allClearHtml()+upNextStrip():'')+(!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')+`<button type="button" class="job-card job-add" data-act="new-job" title="New job">${I.plus}<span>New job</span></button>`}</div>`:'')+pinnedStrip(scope);
 
   const tb=$('#toolbar');tb.hidden=!Object.keys(S.jobs).length;
   $('#top-search').hidden=tb.hidden;$('#fdot').hidden=u.prio==='all'&&u.due==='all';
@@ -3288,7 +3317,8 @@ function weekView(list){
 }
 /* on a job's page, the job's work days (Set of 0-6), so the Calendar can shade the others */
 function workDaysHere(){const j=S.jobs[S.ui.tab];const d=j&&workOf(j).days;return d&&d.length&&d.length<7?new Set(d.map(Number)):null}
-const calModeSeg=()=>`<div class="seg cal-mode" role="tablist" aria-label="Calendar range"><button type="button" data-act="cal-mode" data-mode="month" class="${S.ui.calMode!=='week'?'on':''}">Month</button><button type="button" data-act="cal-mode" data-mode="week" class="${S.ui.calMode==='week'?'on':''}">Week</button></div>`;
+const calFilterBtn=()=>`<button type="button" class="icon-btn cal-filter" data-act="filters" aria-label="Filter and sort" title="Filter and sort"><svg class="i" viewBox="0 0 16 16"><path d="M2.5 3.5h11L9.2 8.6v4l-2.4 1.1V8.6z"/></svg></button>`;
+const calModeSeg=()=>calFilterBtn()+`<div class="seg cal-mode" role="tablist" aria-label="Calendar range"><button type="button" data-act="cal-mode" data-mode="month" class="${S.ui.calMode!=='week'?'on':''}">Month</button><button type="button" data-act="cal-mode" data-mode="week" class="${S.ui.calMode==='week'?'on':''}">Week</button></div>`;
 function calendarView(list){
   if(S.ui.calMode==='week')return weekView(list);
   const [y,m]=S.ui.month.split('-').map(Number);
@@ -3556,7 +3586,7 @@ function activityPane(t){
     <h2 class="d-act-title">${esc(t.name||'Untitled task')}</h2>
     <div class="composer" data-drop-pics="note">${fmtBar('note-in')}<textarea id="note-in" data-fk="note-in" rows="2" placeholder="Write an update…"></textarea>
       ${attHtml('note')}
-      <div class="composer-foot"><button type="button" class="btn sm ghost" data-act="upd-attach" data-for="note" title="Attach pictures">${I.image}Picture</button><span class="hint">⌘/Ctrl + Enter to post</span><button class="btn sm primary" data-act="note-post" ${ATT.busy?'disabled':''}>Post update</button></div></div>
+      <div class="composer-foot"><button type="button" class="btn sm ghost" data-act="upd-attach" data-for="note" title="Attach pictures">${I.image}Picture</button><span class="hint">⌘/Ctrl + Enter to post</span><button class="btn sm primary" data-act="note-post" ${ATT.busy?'disabled':''} aria-label="Post update" title="Post update"><span class="np-l">Post update</span>${SEND_IC}</button></div></div>
     ${notes.length?`<div class="notes-sum"><span><b>${notes.length-nDone}</b> open${nDone?` · <b>${nDone}</b> resolved`:''}</span>${nDone?`<button type="button" class="btn sm ghost" data-act="notes-hide-done">${S.ui.hideResolved?'Show resolved':'Hide resolved'}</button>`:''}</div>`:''}
     <div class="timeline">${rows||(S.ui.hideResolved&&nDone?'<p class="hint">Every update is resolved.</p>':'<p class="hint">Nothing yet. Changes to this task will show up here.</p>')}</div>
     ${h.length&&!logItems().some(e=>e.taskId===t.id&&e.kind!=='note')?'<p class="hint">Status, date and checklist changes are recorded from now on.</p>':''}
@@ -4068,8 +4098,14 @@ function pomoSettingsHtml(){
     <p class="hint">The timer is shared by all your devices: start it on your Mac and your phone shows the same countdown (other devices catch up within a minute). Each finished focus session adds 🍅 1 to the linked task and a line to its activity. On a phone, a locked screen can't play the sound; the timer still keeps time.</p>`;
 }
 /* phones: the task's options live in a ClickUp-style sheet behind ⋯ in the task panel's top bar */
+const SEND_IC='<svg class="i np-ic" viewBox="0 0 16 16"><path d="M2.5 8h9M8 3.5 12.5 8 8 12.5"/></svg>';
 const MORE_IC='<svg class="i" viewBox="0 0 16 16"><circle cx="3.5" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="12.5" cy="8" r="1.2" fill="currentColor" stroke="none"/></svg>';
 let TOPT=false;
+/* phones: the Post button only shows while the update box is in use or has text (ClickUp-style) */
+{let cT=0;const sync=()=>{const c=document.querySelector('#drawer .composer'),ta=document.getElementById('note-in');if(!c||!ta)return;c.classList.toggle('c-on',document.activeElement===ta||!!ta.value.trim()||!!(ATT.note&&ATT.note.length))};
+document.addEventListener('focusin',e=>{if(e.target.id==='note-in'){clearTimeout(cT);sync()}});
+document.addEventListener('focusout',e=>{if(e.target.id==='note-in')cT=setTimeout(sync,250)});
+document.addEventListener('input',e=>{if(e.target.id==='note-in')sync()});}
 function renderTopt(){
   let e=$('#topt');if(!e){e=document.createElement('div');e.id='topt';e.className='topt-wrap';document.body.appendChild(e)}
   const t=S.tasks[S.ui.openTask];
@@ -5981,7 +6017,9 @@ document.addEventListener('click',e=>{
     case 'row-due-pick':{const inp=el.querySelector('.cell-date');if(!inp)break;try{inp.showPicker()}catch(x){inp.style.pointerEvents='auto';inp.focus();inp.click()}break}
     case 'tb-overview': notesOpen=false;UPN=false;if(u.tab!=='overview')u.from=u.tab;u.tab='overview';u.client='all';u.pane='tasks';if(u.view==='calendar')u.view=(u.views?.overview&&u.views.overview!=='calendar')?u.views.overview:'list';(u.views=u.views||{}).overview=u.view;saveUi();render();window.scrollTo({top:0});break;
     case 'tb-jobs': u.jobsOpen=true;saveUi();renderSide();openSide();break;
-    case 'tb-cal': notesOpen=false;UPN=false;if(['archived','activity','trash','help'].includes(u.tab)){u.tab='overview';u.client='all'}u.pane='tasks';u.view='calendar';(u.views=u.views||{})[u.tab]='calendar';saveUi();render();window.scrollTo({top:0});break;
+    case 'tb-cal': if(u.view==='calendar'&&!notesOpen&&!UPN&&u.calPrev){const c=u.calPrev;u.calPrev=null;u.tab=S.jobs[c.tab]||c.tab==='overview'?c.tab:'overview';u.client=c.client||'all';u.pane=c.pane||'tasks';u.view=c.view;(u.views=u.views||{})[u.tab]=c.view;saveUi();render();requestAnimationFrame(()=>window.scrollTo({top:c.y||0}));break}
+      if(u.view!=='calendar')u.calPrev={tab:u.tab,client:u.client,pane:u.pane,view:u.view,y:scrollY};
+      notesOpen=false;UPN=false;if(['archived','activity','trash','help'].includes(u.tab)){u.tab='overview';u.client='all'}u.pane='tasks';u.view='calendar';(u.views=u.views||{})[u.tab]='calendar';saveUi();render();window.scrollTo({top:0});break;
     case 'tb-search': openJump();break;
     case 'tb-plus': PLUS=!PLUS;renderPlus();break;
     case 'pm-timer': PLUS=false;renderPlus();POMO_OPEN=true;notesOpen=false;renderBell();renderPomo();break;
