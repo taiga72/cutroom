@@ -1842,6 +1842,30 @@ html{overscroll-behavior-y:contain}
   .modal footer .btn{min-height:46px}
 }
 :root[data-motion="reduce"] .plus-menu,:root[data-motion="reduce"] body > #notes,:root[data-motion="reduce"] .jump{animation:none}
+
+/* ---------- phones: roomier view switch, client rows, work details, task panel footer; no scroll bleed ---------- */
+.cl-ic.on{color:var(--accent);background:var(--accent-soft)}
+@media (max-width:820px){
+  #v-calendar{display:none}
+  .toolbar .seg button{min-width:56px;min-height:44px;padding:8px 14px}
+  .toolbar .seg button .i{width:22px;height:22px}
+  .toolbar .filter-btn{min-width:52px;min-height:48px}
+  .modal,.m-body,.pref-body,.pref-nav,.side,.drawer,#notes,.jump-list,.notes-pop{overscroll-behavior:contain}
+  .client-list .cl{gap:8px}
+  .client-list .cl .icon-btn{flex:none;width:40px;height:40px}
+  .wf-grid{grid-template-columns:minmax(0,1fr);gap:14px}
+  .wf-grid input,.wf-grid select{min-width:0;width:100%;min-height:46px;padding:10px 12px}
+  .wf-grid input[type=time],.wf-grid input[type=date],.props2 input[type=date]{-webkit-appearance:none;appearance:none;text-align:left;display:block}
+  .work-form,.wf{padding:14px}
+  .props2 .date-ctl{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px;align-items:center}
+  .props2 .date-ctl input{min-width:0;width:100%}
+  .drawer .d-foot{padding-bottom:calc(18px + env(safe-area-inset-bottom,0px));margin-bottom:10px}
+  .drawer .d-body{padding-bottom:calc(30px + env(safe-area-inset-bottom,0px))}
+  .d-save{flex-wrap:nowrap;gap:10px}
+  .d-save .btn{flex:1 1 0;min-height:50px;justify-content:center;white-space:nowrap;padding-inline:10px}
+  .d-save [data-act="drawer-close"]{display:none}
+  .props2 .date-ctl input{padding:8px 6px}
+}
 </style>
 
 <div class="app">
@@ -3612,8 +3636,11 @@ function openJump(){JUMP={q:'',i:0};renderJump();sheetLock();jumpVV();if(!narrow
 /* while a phone sheet is open the page behind is pinned in place (position:fixed on <body>), so focusing
    the search box can't scroll the page; the scroll position comes back when it closes */
 let SHEET_Y=null;
+/* anything that covers the page (task panel, dialogs, the sidebar, the lightbox) pins it too, so a swipe inside them can't scroll what's behind */
+{const mo=new MutationObserver(()=>sheetLock());for(const id of ['modal','drawer','lightbox','side']){const el=document.getElementById(id);if(el)mo.observe(el,{attributes:true,attributeFilter:['hidden','class']})}}
 function sheetLock(){
-  const on=narrow.matches&&(!!JUMP||notesOpen),b=document.body;b.classList.toggle('sheet-open',on);
+  const sideOpen=$('#side')?.classList.contains('open'),covered=!$('#modal')?.hidden||!$('#drawer')?.hidden||!$('#lightbox')?.hidden||!!sideOpen;
+  const on=narrow.matches&&(!!JUMP||notesOpen||covered),b=document.body;b.classList.toggle('sheet-open',narrow.matches&&(!!JUMP||notesOpen));b.classList.toggle('page-locked',on);
   if(on&&SHEET_Y===null){SHEET_Y=scrollY;b.style.position='fixed';b.style.top=-SHEET_Y+'px';b.style.left='0';b.style.right='0'}
   else if(!on&&SHEET_Y!==null){const y=SHEET_Y;SHEET_Y=null;b.style.position='';b.style.top='';b.style.left='';b.style.right='';scrollTo(0,y)}
 }
@@ -4472,7 +4499,7 @@ function ptrShow(d,state){
   e.querySelector('.ptr-t').textContent=state==='go'?'Refreshing…':state==='ready'?'Release to refresh':'Pull to refresh';
 }
 function ptrGo(){ptrShow(PTR_GO,'go');haptic(10);setTimeout(()=>location.reload(),350)}
-document.addEventListener('touchstart',e=>{if(window.scrollY>0||e.touches.length>1||ptrBusy()||e.target.closest('.side,.drawer,.modal,#tabbar,.board-wrap .card,#notes,.jump-wrap,#plus-menu,#pomo-pop')||document.body.classList.contains('sheet-open'))return;PTR={y:e.touches[0].clientY,d:0}},{passive:true});
+document.addEventListener('touchstart',e=>{if(window.scrollY>0||e.touches.length>1||ptrBusy()||e.target.closest('.side,.drawer,.modal,#tabbar,.board-wrap .card,#notes,.jump-wrap,#plus-menu,#pomo-pop,#lightbox')||document.body.classList.contains('page-locked')||document.body.classList.contains('sheet-open'))return;PTR={y:e.touches[0].clientY,d:0}},{passive:true});
 document.addEventListener('touchmove',e=>{if(!PTR)return;const d=(e.touches[0].clientY-PTR.y)*.55;if(window.scrollY>0||d<0){PTR.d=0;ptrShow(0);return}PTR.d=d;ptrShow(d,d>=PTR_GO?'ready':'pull')},{passive:true});
 document.addEventListener('touchend',()=>{if(!PTR)return;const go=PTR.d>=PTR_GO;PTR=null;if(go)ptrGo();else ptrShow(0)},{passive:true});
 let WPT={top:0,acc:0,t:0};
@@ -5115,7 +5142,7 @@ function renderModal(){
       <button type="button" data-act="m-type" data-type="direct" class="${M.type==='direct'?'on':''}" aria-pressed="${M.type==='direct'}"><b>Direct client</b><small>You work straight with one client</small></button></div></div>
     <div class="field"><span class="lbl">Color</span><div class="swatches">${COLORS.map(c=>`<button type="button" data-act="m-color" data-color="${c}" style="--c:${c}" class="${M.color===c?'on':''}" aria-label="Color ${c}" aria-pressed="${M.color===c}"></button>`).join('')}</div>${B.mode==='cloud'&&B.cfg?.calendar?'<p class="hint">Also colors this job\'s events in Google Calendar.</p>':''}</div>
 `},
-    ...(M.type==='agency'?[{id:'clients',label:'Clients',icon:I.user,badge:M.clients.filter(c=>c.name.trim()).length||'',html:M.type==='agency'?`<div class="field"><span class="lbl">Clients</span><div class="client-list">${M.clients.map((c,i)=>`<div class="cl ${c.hidden?'cl-hidden':''}"><button type="button" class="logo-box sm ${c.logo?'has':''}" data-act="m-client-logo" data-i="${i}" title="${c.logo?'Replace':'Add'} picture for ${esc(c.name||'this client')}" aria-label="${c.logo?'Replace':'Add'} client picture">${c.logo?`<img src="${esc(imgSrc(c.logo))}" alt="">`:I.image}</button><input type="text" data-m-client="${i}" data-fk="m-cl-${c.id||'n'+i}" value="${esc(c.name)}" placeholder="Client name" aria-label="Client name">${c.logo?`<button type="button" class="btn sm ghost" data-act="m-client-logo-remove" data-i="${i}">Remove picture</button>`:''}${c.id?`<button type="button" class="btn sm ${c.hidden?'':'ghost'} cl-hide" data-act="m-hide-client" data-i="${i}" title="${c.hidden?'Show this client again':'Hide this client: it leaves the tabs and pickers, and its tasks move to Archived'}">${c.hidden?'Hidden · Show':'Hide'}</button>`:''}<button type="button" class="icon-btn" data-act="m-del-client" data-i="${i}" aria-label="Remove client">${I.x}</button></div>`).join('')}
+    ...(M.type==='agency'?[{id:'clients',label:'Clients',icon:I.user,badge:M.clients.filter(c=>c.name.trim()).length||'',html:M.type==='agency'?`<div class="field"><span class="lbl">Clients</span><div class="client-list">${M.clients.map((c,i)=>`<div class="cl ${c.hidden?'cl-hidden':''}"><button type="button" class="logo-box sm ${c.logo?'has':''}" data-act="m-client-logo" data-i="${i}" title="${c.logo?'Replace':'Add'} picture for ${esc(c.name||'this client')}" aria-label="${c.logo?'Replace':'Add'} client picture">${c.logo?`<img src="${esc(imgSrc(c.logo))}" alt="">`:I.image}</button><input type="text" data-m-client="${i}" data-fk="m-cl-${c.id||'n'+i}" value="${esc(c.name)}" placeholder="Client name" aria-label="Client name">${c.logo?`<button type="button" class="icon-btn cl-ic" data-act="m-client-logo-remove" data-i="${i}" title="Remove picture" aria-label="Remove picture">${IMG_X_IC}</button>`:''}${c.id?`<button type="button" class="icon-btn cl-ic cl-hide ${c.hidden?'on':''}" data-act="m-hide-client" data-i="${i}" title="${c.hidden?'Hidden. Show this client again':'Hide this client: it leaves the tabs and pickers, and its tasks move to Archived'}" aria-label="${c.hidden?'Show client':'Hide client'}" aria-pressed="${!!c.hidden}">${c.hidden?EYE_OFF_IC:EYE_IC}</button>`:''}<button type="button" class="icon-btn" data-act="m-del-client" data-i="${i}" aria-label="Remove client">${I.x}</button></div>`).join('')}
       <button type="button" class="btn sm" data-act="m-add-client" style="align-self:flex-start">${I.plus}Add client</button></div>
       <p class="hint">Click the square next to a client to add their logo or picture. Removing a client keeps its tasks in this job without a client. Hide a client you've finished with: it leaves the tabs and pickers, its tasks move to Archived, and you can show it again here.</p></div>`:''}]:[]),
     {id:'tools',label:'Tools & folders',icon:I.grid,html:`    <div class="field"><span class="lbl">Tools for this job</span><div class="tool-grid">${TOOL_ROLES.map(r=>{const v=M.tools[r.id];const custom=v&&!r.opts.includes(v);return `<div class="tool-cell"><span class="lbl">${r.label}</span>
@@ -5453,6 +5480,9 @@ function runRestore(){
 function pathHint(){return IS_MAC?`Opens in Finder through your “${esc(OPEN_SHORTCUT)}” shortcut. First time? Set it up in Settings → Finder & Chrome.`:'Finder paths open only on your Mac. On this device the button copies the path.'}
 /* Settings-style layout: section list on the left, one section shown on the right. All sections stay
    in the page (hidden), so switching keeps what was typed. key: s (Settings), m (job), b (brand guide). */
+const EYE_IC='<svg class="i" viewBox="0 0 16 16"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8 12.1 12.5 8 12.5 1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/></svg>';
+const EYE_OFF_IC='<svg class="i" viewBox="0 0 16 16"><path d="M2.5 2.5l11 11M6.6 4a6.8 6.8 0 0 1 1.4-.5c4.1 0 6.5 4.5 6.5 4.5a11 11 0 0 1-1.7 2.2M10.5 11.9A6 6 0 0 1 8 12.5C3.9 12.5 1.5 8 1.5 8a11.6 11.6 0 0 1 2.4-3"/><path d="M6.6 6.6a2 2 0 0 0 2.8 2.8"/></svg>';
+const IMG_X_IC='<svg class="i" viewBox="0 0 16 16"><rect x="2" y="2.5" width="12" height="11" rx="1.5"/><path d="M6 6.5l4 4M10 6.5l-4 4"/></svg>';
 const PREF_SUBS={m:{general:'Name, logo, type and color',clients:'Agency clients, logos, hide',tools:'Chat, tracker, review, storage, Mac folder',accounts:'Work email and Chrome profile',work:'Schedule, pay, location, contact'},
   b:{colors:'Palette and fonts',graphics:'Captions, logo, end card, CTA',audio:'Music and loudness',dos:'Rules for every edit',tone:'Tone and guideline links',files:'Brand PDFs',history:'What changed and when'}};
 function prefLayout(key,active,sections,tag='div',attrs=''){
