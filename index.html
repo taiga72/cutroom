@@ -2017,6 +2017,63 @@ html{overscroll-behavior-y:contain}
   body.cal-page .cal-bar > .icon-btn:not(.cal-filter){min-width:34px;width:34px}
   body.cal-page .cal-bar .cal-mode{margin-right:auto}
 }
+
+/* ---------- resume builder: an A4 sheet laid out like the user's own resume ---------- */
+.rs-acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.rs-wrap{overflow-x:hidden;padding:4px 0 30px}
+.rs-sheet{--ink:#000;--grey:#7d7d7d;width:210mm;min-height:297mm;margin:0 auto;background:#fff;color:var(--ink);box-shadow:0 6px 30px rgba(10,12,16,.25);border-radius:4px;padding:40pt 50pt 40pt 48pt;box-sizing:border-box;font-family:'Martel Sans',var(--body);position:relative}
+.rs-sheet,.rs-sheet *{color-scheme:light}
+.rs-name{margin:0 0 0 12pt;font:700 26pt/1.15 'Open Sans',var(--body);letter-spacing:-.2pt}
+.rs-title{margin:0 0 6pt 12pt;font:700 14pt/1.3 'Open Sans',var(--body)}
+.rs-contact{margin-left:12pt;display:grid;grid-template-columns:238pt 1fr;row-gap:1pt;font:700 11pt/1.35 'Open Sans',var(--body)}
+.rs-c{display:grid;grid-template-columns:62pt 1fr;align-items:baseline}
+.rs-cv,.rs-a{color:var(--grey)}
+.rs-links{grid-column:1/-1;grid-row:2}
+.rs-links .rs-cv{display:flex;flex-wrap:wrap;gap:4pt 10pt;align-items:center}
+.rs-a{text-decoration:underline;text-underline-offset:2pt}
+.rs-link{display:inline-flex;align-items:center;gap:3pt}
+.rs-lk{border:0;background:none;padding:2pt;color:#999;cursor:pointer;display:inline-grid}
+.rs-lk .i{width:12px;height:12px}
+.rs-url{font:400 9pt var(--body);border:1px solid #ccc;border-radius:4px;padding:2pt 4pt;width:180pt;color:#000;background:#fff}
+.rs-sec{margin-top:18pt}
+.rs-h{display:inline-block;margin:0 0 12pt 4pt;padding:0 6pt 1pt 0;border-bottom:3pt solid #000;font:700 12pt/1.3 'Open Sans',var(--body);text-transform:uppercase}
+.rs-item{display:grid;grid-template-columns:152pt 1fr;position:relative;margin-bottom:6pt}
+.rs-dates{padding-top:9pt;font:700 10pt/1.3 'Open Sans',var(--body);white-space:nowrap}
+.rs-it{font:700 11pt/1.35 'Open Sans',var(--body)}
+.k-edu .rs-it{display:flex;align-items:baseline;gap:4pt}
+.rs-place{margin-left:auto;padding-left:20pt;font:italic 400 8pt 'Open Sans',var(--body)}
+.rs-bul{margin:8pt 0 0;padding-left:22pt;font:400 9pt/12pt 'Martel Sans',var(--body)}
+.rs-bul li{margin:0}
+.k-edu .rs-item{grid-template-columns:150pt 1fr}
+.rs-skills{margin-left:148pt;columns:2;column-gap:20pt;font:700 9pt/12pt 'Martel Sans',var(--body)}
+.rs-skill{break-inside:avoid;position:relative}
+.rs-e{outline:none;border-radius:2px;min-width:1ch}
+.rs-e:empty::before{content:attr(data-ph);color:#b8b8b8;font-weight:400}
+.rs-e:hover{background:rgba(80,120,255,.08)}
+.rs-e:focus{background:rgba(80,120,255,.14);box-shadow:0 0 0 2px rgba(80,120,255,.25)}
+.rs-ctl{position:absolute;left:-40pt;top:0;display:flex;flex-direction:column;gap:2px;opacity:0;transition:opacity .15s}
+.rs-skill .rs-ctl{left:auto;right:-4pt;flex-direction:row;top:-1pt}
+.rs-item:hover > .rs-ctl,.rs-skill:hover > .rs-ctl,.rs-item:focus-within > .rs-ctl,.rs-skill:focus-within > .rs-ctl{opacity:1}
+.rs-ctl button{width:22px;height:22px;border-radius:6px;border:1px solid #ddd;background:#fff;color:#555;font:600 12px/1 var(--body);cursor:pointer;padding:0}
+.rs-ctl button:hover{background:#f1f1f1;color:#000}
+.rs-add{border:1px dashed #c9c9c9;background:#fafafa;color:#666;border-radius:6px;padding:3pt 8pt;font:600 8.5pt var(--body);cursor:pointer;margin:4pt 0}
+.rs-add.sm{padding:1pt 6pt;margin:2pt 0 0 22pt;font-size:7.5pt;opacity:.0;transition:opacity .15s}
+.rs-links .rs-add.sm{margin:0;opacity:.8}
+.rs-item:hover .rs-add.sm,.rs-item:focus-within .rs-add.sm{opacity:1}
+.rs-sec-add{display:flex;gap:8px;flex-wrap:wrap;margin-left:152pt}
+.k-skills > .rs-add{margin-left:148pt}
+select.rs-add{appearance:auto}
+@media (hover:none){.rs-ctl,.rs-add.sm{opacity:1}.rs-ctl{left:-34pt}}
+@media (max-width:820px){.rs-acts{flex-wrap:nowrap;width:100%}.rs-acts .btn{flex:1 1 0;padding-inline:8px;white-space:nowrap;font-size:calc(14px*var(--ts))}.rs-acts .btn .i{display:none}.rs-wrap{margin:0 -8px}}
+#print-root{display:none}
+@media print{
+  @page{size:A4;margin:0}
+  html.print-resume body > *:not(#print-root){display:none!important}
+  html.print-resume body{position:static!important;background:#fff!important;padding:0!important;margin:0!important}
+  html.print-resume #print-root{display:block}
+  html.print-resume .rs-sheet{box-shadow:none;border-radius:0;margin:0;zoom:1!important}
+  html.print-resume .rs-e{background:none!important;box-shadow:none!important}
+}
 </style>
 
 <div class="app">
@@ -2875,7 +2932,7 @@ function render(){
   document.title=(a.name||'').trim()||APP_NAME;pomoTitle();
   const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
   withFocus(()=>{renderSide();renderMain()});
-  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();renderUpNextPage();boardRestore();document.body.classList.toggle('cal-page',S.ui.view==='calendar'&&!['archived','activity','trash','help'].includes(S.ui.tab));
+  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();renderUpNextPage();boardRestore();document.body.classList.toggle('cal-page',S.ui.view==='calendar'&&!['archived','activity','trash','help','resume'].includes(S.ui.tab));
   if(S.ready&&!SEASON_RAN){SEASON_RAN=true;setTimeout(()=>seasonFx(),900)}
 }
 
@@ -2899,6 +2956,7 @@ function renderSide(){
   ${u.sideMini?'':corkHtml()}
   <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='cloud'&&(B.offline||Object.keys(OUT).length)?`<span class="sync-dot local"></span>Offline · ${Object.keys(OUT).length?`${Object.keys(OUT).length} change${Object.keys(OUT).length===1?'':'s'} waiting to sync`:'changes will sync'}`:B.mode==='db'||B.mode==='cloud'?'<span class="sync-dot"></span>Saved to your account':B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
     ${B.mode==='cloud'&&B.syncedAt?`<small class="synced" title="Last time this device heard back from your account">Last synced ${syncedAgo()}</small>`:''}
+    <button class="nav-item foot-settings ${u.tab==='resume'?'on':''}" data-act="nav" data-tab="resume"${tt('Resume')}>${RS_IC}<span class="name">Resume</span></button>
     <button class="nav-item foot-settings ${u.tab==='help'?'on':''}" data-act="nav" data-tab="help"${tt('Help & tips')}>${HELP_IC}<span class="name">Help &amp; tips</span></button>
     <button class="nav-item foot-settings" data-act="open-settings"${tt('Settings')}>${I.gear}<span class="name">Settings</span></button></div>`;
   $('#side').innerHTML=html;
@@ -2910,7 +2968,7 @@ function renderMain(){
   const u=S.ui;
   $('#subnav').innerHTML='';
   if(!S.ready){$('#view').innerHTML=`<div class="loading"><svg class="ld-reel" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="20" cy="20" r="3.5" fill="currentColor"/>${[0,72,144,216,288].map(a=>`<circle cx="${(20+9.5*Math.cos(a*Math.PI/180)).toFixed(2)}" cy="${(20+9.5*Math.sin(a*Math.PI/180)).toFixed(2)}" r="4.2" fill="currentColor" opacity=".55"/>`).join('')}</svg><b>${esc(LOAD_LINE)}</b><small>Loading your tasks</small></div>`;$('#toolbar').hidden=true;return}
-  if(u.tab!=='overview'&&u.tab!=='archived'&&u.tab!=='activity'&&u.tab!=='trash'&&u.tab!=='help'&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
+  if(u.tab!=='overview'&&u.tab!=='archived'&&u.tab!=='activity'&&u.tab!=='trash'&&u.tab!=='help'&&u.tab!=='resume'&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
   if(u.client!=='all'&&!S.clients[u.client]) u.client='all';
   const job=u.tab==='overview'?null:S.jobs[u.tab];
 
@@ -2921,6 +2979,7 @@ function renderMain(){
   if(u.tab==='activity'){renderActivity();return}
   if(u.tab==='trash'){renderTrash();return}
   if(u.tab==='help'){renderHelp();return}
+  if(u.tab==='resume'){renderResume();return}
   const scope=tasksOfScope();
   if(!job){
     $('#head').innerHTML=`<div class="head head-ov"><div class="head-title">${greetHtml()}<h1>Overview</h1><div class="sub">${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients${(()=>{const h=jobsSorted().reduce((a,j)=>a+weeklyHours(workOf(j)),0);return h?` · ${fmtNum(h)} h/week scheduled`:''})()} <span class="sub-tail">· everything due across your work</span></div></div>
@@ -2969,7 +3028,7 @@ function renderMain(){
 /* ================= address bar: Back button and task links =================
    The page's place is kept in the URL hash (#/overview, #/job/<id>/client/<id>/pane/brand, …/task/<id>), so the
    browser's Back closes the task panel or returns to the previous page, and a task link opens that task. */
-const PAGES=['overview','archived','activity','trash','help'];
+const PAGES=['overview','archived','activity','trash','help','resume'];
 let URL_READY=false,URL_LAST=null,URL_TASK_PUSHED=false,URL_APPLYING=false;
 const LINK_IC='<svg class="i" viewBox="0 0 16 16"><path d="M6.8 9.2a2.8 2.8 0 0 0 4 0l2.2-2.2a2.8 2.8 0 0 0-4-4l-.9.9"/><path d="M9.2 6.8a2.8 2.8 0 0 0-4 0L3 9a2.8 2.8 0 0 0 4 4l.9-.9"/></svg>';
 function urlOf(){
@@ -3063,7 +3122,7 @@ function renderPlus(){
     <button type="button" class="btn primary pm-task" data-act="new-task">${I.plus}New task</button>`;
 }
 function renderTabbar(){
-  const e=$('#tabbar');if(!e)return;const u=S.ui,cal=u.view==='calendar'&&!['archived','activity','trash','help'].includes(u.tab);
+  const e=$('#tabbar');if(!e)return;const u=S.ui,cal=u.view==='calendar'&&!['archived','activity','trash','help','resume'].includes(u.tab);
   const b=(act,label,icon,on,extra='')=>`<button type="button" data-act="${act}" class="${on?'on':''} ${extra} tb-${act.slice(3)}" aria-label="${label}" ${on?'aria-current="page"':''}>${icon}<span>${label}</span></button>`;
   const busy=notesOpen||UPN;
   e.innerHTML=`<div class="tb-pill">${b('tb-overview','Overview',I.grid,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Notifications','<svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg>'+(()=>{const n=$('#bell-n');return n&&!n.hidden?`<i class="tb-badge">${esc(n.textContent)}</i>`:''})(),notesOpen)+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-upnext','Up next',UP_IC+(()=>{const n=upNextList().length;return n?`<i class="tb-badge tb-count">${n}</i>`:''})(),UPN)}</div>`
@@ -3772,7 +3831,7 @@ document.addEventListener('click',e=>{
 function jumpItems(q){
   q=q.trim().toLowerCase();
   const out=[],score=(txt)=>{txt=(txt||'').toLowerCase();if(!q)return 1;const i=txt.indexOf(q);return i<0?0:i===0?3:(txt[i-1]===' '?2:1)};
-  const pages=[['overview','Overview',I.grid],['activity','Activity',I.clock],['archived','Archived',I.archive],['trash','Trash',I.trash],['help','Help & tips',HELP_IC]];
+  const pages=[['overview','Overview',I.grid],['activity','Activity',I.clock],['archived','Archived',I.archive],['trash','Trash',I.trash],['resume','Resume',RS_IC],['help','Help & tips',HELP_IC]];
   for(const [id,l,ic] of pages){const sc=score(l);if(sc)out.push({grp:'Pages',sc:sc+.5,icon:ic,label:l,sub:'Page',act:'nav',tab:id})}
   if(!q){(S.ui.recent||[]).map(id=>S.tasks[id]).filter(t=>t&&!t._draft).forEach((t,k)=>out.push({grp:'Recently opened',sc:10-k*.1,icon:`<span class="jdot" ${pillStyle(stOf(t))}></span>`,label:t.name||'Untitled task',sub:['Recent',S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '),act:'open',id:t.id}))}
   if(IS_MAC){(lsGet(LS_PATHS)||[]).slice(0,q?8:5).forEach((x,k)=>{const sc=q?Math.max(score(x.label),score(pathName(x.p)),score(x.sub)*.6):1;if(sc)out.push({grp:'Recent folders',sc:q?sc+.1:8-k*.1,icon:I.folder,label:x.label===pathName(x.p)?x.label:`${x.label} · ${pathName(x.p)}`,sub:['Recent folder',x.sub].filter(Boolean).join(' · '),act:'path',p:x.p})})}
@@ -3850,7 +3909,7 @@ function renderJump(){
 }
 function jumpGo(k){
   const x=JUMP?.items?.[k];closeJump();if(!x)return;const u=S.ui;
-  if(x.act==='nav'){if(x.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash','help'].includes(u.tab))u.from=u.tab}u.tab=x.tab;u.client=x.client||'all';saveUi();render();window.scrollTo({top:0});closeSide()}
+  if(x.act==='nav'){if(x.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash','help','resume'].includes(u.tab))u.from=u.tab}u.tab=x.tab;u.client=x.client||'all';saveUi();render();window.scrollTo({top:0});closeSide()}
   else if(x.act==='open')openTask(x.id);
   else if(x.act==='new-task'){const id=newTask();if(id){openTask(id);setTimeout(()=>$('.d-name')?.focus(),30)}}
   else if(x.act==='open-settings')openSettings();
@@ -4852,6 +4911,7 @@ function exportCSV(jobId){
 const HELP_IC='<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.6 1.6c-.6.3-.9.7-.9 1.3M8 11.3h.01"/></svg>';
 const HELP=[
  ['Getting around','Pages and views',`The sidebar has the Overview, each job, Archived, Activity and Trash. On a job page, client tabs sit under the name, with Tasks, Details and Brand guide. Switch List, Board or Calendar in the toolbar; each job remembers its own view. The browser's Back button closes the task panel or goes to the previous page, and on a phone the tab bar at the bottom has Overview, Jobs, New task, Calendar and Search.`,null],
+ ['Your work','Resume',`The Resume page (sidebar footer) is an A4 page laid out like your own resume. Tap any text to change it; Enter adds a new bullet and Backspace on an empty one removes it. Use + to add a job, school, skill or link, the arrows and × to reorder or remove, and "Add from my jobs" to start an entry from one of your jobs here. Download PDF saves just the page (choose "Save as PDF"). Import loads a resume file, and Save a copy downloads one.`,null],
  ['Getting around','On your phone',`Swipe right anywhere to open the sidebar (from the very left edge when you're on the board or other things that scroll sideways), and swipe left to close it. The bar at the bottom has Overview, Notifications and Calendar (your jobs are in the sidebar); Notifications opens as a full-height sheet you can drag down to close (swipe a notification left to dismiss it), and Search opens full screen like Slack's, with the search bar at the bottom. The round + above the search button opens a menu with the focus timer, New job and New task.`,null],
  ['Getting around','Search',`The box top-right (press /) filters the current list and also searches notes, checklist steps and links. Quick search (${MODKEY}) jumps to any task, job, client or page, archived tasks included.`,null],
  ['Getting around','Right-click menu',`Right-click a task (or press and hold on a phone) to change its status or priority, pin, duplicate, split, copy its link, archive or delete it.`,null],
@@ -4888,6 +4948,87 @@ const HELP=[
  ['Look and feel','Accessibility',`Text size, density, reduce motion, high contrast, relaxed line spacing and hover labels.`,['a11y','Accessibility']],
  ['Look and feel','Stat tiles and list columns',`The pencil on the numbers at the top picks which tiles show. In the List view, the sliders button hides columns and folds every group. Drag the sidebar's or task panel's edge to resize them.`,null],
 ];
+
+/* ================= resume builder (tab 'resume', settings/resume) =================
+   One A4 sheet laid out like the user's own resume (their Canva design): name, title, contact grid,
+   numbered sections with thick underlines, dates on the left, "Role at Company" + bullets on the right,
+   education with a place, and two columns of skills. Every text on the sheet is edited in place
+   (contenteditable, data-rk = path into the resume doc). Download PDF prints just the sheet. */
+const RS_IC='<svg class="i" viewBox="0 0 16 16"><path d="M4 1.5h5.5L13 5v9.5H4z"/><path d="M9.5 1.5V5H13"/><circle cx="7.2" cy="7.2" r="1.3"/><path d="M5.5 11c.4-1.2 1-1.8 1.7-1.8S8.5 9.8 8.9 11M10 8h1.5M10 10h1.5"/></svg>';
+const RS_DEF=()=>({name:'Your Name',title:'Video Editor',contacts:[{label:'Phone',value:''},{label:'Email',value:''}],links:[{label:'Portfolio',url:''}],
+  sections:[{id:'s1',kind:'jobs',title:'02 EMPLOYMENT HISTORY',items:[{start:'01/2024',end:'Present',role:'Video Editor',company:'Company name',bullets:['What you edited and for whom','A result you are proud of']}]},
+    {id:'s2',kind:'edu',title:'03 EDUCATION',items:[{start:'',end:'',school:'School or university',place:'City',bullets:['Degree or course']}]},
+    {id:'s3',kind:'skills',title:'04 SKILLS',skills:['Adobe Premiere Pro','Adobe After Effects','DaVinci Resolve','Videography']}]});
+let RS=null,RS_T=0,RS_LINK=null;
+function rsDoc(){if(!RS)RS=JSON.parse(JSON.stringify(S.settings.resume&&S.settings.resume.sections?S.settings.resume:RS_DEF()));return RS}
+function rsSave(now){clearTimeout(RS_T);const go=()=>{RS_T=0;const d={...rsDoc()};delete d.id;delete d.updated;if(S.settings.resume)patch('settings','resume',d);else create('settings',d,'resume')};if(now)go();else RS_T=setTimeout(go,600)}
+function rsGet(path){return path.split('.').reduce((o,k)=>o==null?o:o[k],rsDoc())}
+function rsSet(path,v){const ks=path.split('.'),last=ks.pop();const o=ks.reduce((o,k)=>o[k],rsDoc());o[last]=v}
+function rsFonts(){if(document.getElementById('rs-fonts'))return;const l=document.createElement('link');l.id='rs-fonts';l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,700;1,400&family=Martel+Sans:wght@400;700&display=swap';document.head.appendChild(l)}
+const rsE=(path,cls='',ph='')=>`<span class="rs-e ${cls}" contenteditable="true" spellcheck="true" data-rk="${path}" data-ph="${esc(ph)}">${esc(rsGet(path)||'')}</span>`;
+const rsCtl=(path,i,n)=>`<span class="rs-ctl" data-noprint>${i>0?`<button type="button" data-act="rs-move" data-p="${path}" data-i="${i}" data-d="-1" title="Move up" aria-label="Move up">↑</button>`:''}${i<n-1?`<button type="button" data-act="rs-move" data-p="${path}" data-i="${i}" data-d="1" title="Move down" aria-label="Move down">↓</button>`:''}<button type="button" data-act="rs-del" data-p="${path}" data-i="${i}" title="Remove" aria-label="Remove">×</button></span>`;
+function rsSheet(){
+  const r=rsDoc();let h=`<div class="rs-sheet" id="rs-sheet"><h1 class="rs-name">${rsE('name','','Your name')}</h1><div class="rs-title">${rsE('title','','Your title')}</div>
+    <div class="rs-contact">${r.contacts.map((c,i)=>`<div class="rs-c">${rsE(`contacts.${i}.label`,'rs-cl','Label')}${rsE(`contacts.${i}.value`,'rs-cv','Add')}</div>`).join('')}
+    <div class="rs-c rs-links"><span class="rs-cl">Links</span><span class="rs-cv">${r.links.map((l,i)=>`<span class="rs-link">${rsE(`links.${i}.label`,'rs-a','Link name')}<button type="button" class="rs-lk" data-act="rs-link" data-i="${i}" data-noprint title="Link address" aria-label="Edit the link address">${LINK_IC}</button>${RS_LINK===i?`<input type="url" class="rs-url" data-rurl="${i}" data-fk="rs-url-${i}" value="${esc(l.url||'')}" placeholder="https://…" data-noprint>`:''}</span>`).join(' ')}<button type="button" class="rs-add sm" data-act="rs-add-link" data-noprint>+ link</button></span></div></div>`;
+  r.sections.forEach((sec,si)=>{
+    const P=`sections.${si}`;
+    h+=`<section class="rs-sec k-${sec.kind}"><h2 class="rs-h">${rsE(P+'.title','','Section title')}</h2>`;
+    if(sec.kind==='skills'){h+=`<div class="rs-skills">${(sec.skills||[]).map((k,i)=>`<div class="rs-skill">${rsE(`${P}.skills.${i}`,'','Skill')}${rsCtl(P+'.skills',i,sec.skills.length)}</div>`).join('')}</div><button type="button" class="rs-add" data-act="rs-add" data-p="${P}.skills" data-noprint>+ Add skill</button>`}
+    else{
+      h+=(sec.items||[]).map((it,i)=>{const Q=`${P}.items.${i}`;return `<div class="rs-item">${rsCtl(P+'.items',i,sec.items.length)}<div class="rs-dates">${rsE(Q+'.start','','MM/YYYY')} - ${rsE(Q+'.end','','Present')}</div>
+        <div class="rs-main"><div class="rs-it">${sec.kind==='jobs'?`${rsE(Q+'.role','','Role')} at ${rsE(Q+'.company','','Company')}`:`${rsE(Q+'.school','','School')}<i class="rs-place">${rsE(Q+'.place','','City')}</i>`}</div>
+        <ul class="rs-bul">${(it.bullets||[]).map((b,k)=>`<li>${rsE(`${Q}.bullets.${k}`,'rs-b','What you did')}</li>`).join('')}</ul><button type="button" class="rs-add sm" data-act="rs-add" data-p="${Q}.bullets" data-noprint>+ bullet</button></div></div>`}).join('');
+      h+=`<div class="rs-sec-add" data-noprint><button type="button" class="rs-add" data-act="rs-add" data-p="${P}.items" data-kind="${sec.kind}">+ Add ${sec.kind==='jobs'?'job':'school'}</button>${sec.kind==='jobs'&&jobsSorted().length?`<select class="rs-add" id="rs-fromjob" data-si="${si}" aria-label="Add from one of your jobs"><option value="">+ Add from my jobs…</option>${jobsSorted().map(j=>`<option value="${j.id}">${esc(j.name)}</option>`).join('')}</select>`:''}</div>`;
+    }
+    h+='</section>';
+  });
+  return h+'</div>';
+}
+function rsFit(){const w=$('.rs-wrap'),sh=$('#rs-sheet');if(!w||!sh)return;const z=Math.min(1,(w.clientWidth-2)/sh.offsetWidth);sh.style.zoom=z<1?String(z):''}
+addEventListener('resize',()=>{if(S.ui.tab==='resume')rsFit()});
+function renderResume(){
+  rsFonts();
+  $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${RS_IC.replace('class="i"','class="i" style="width:28px;height:28px"')}Resume</h1><div class="sub">Tap any text on the page to change it. Saved to your account as you type.</div></div>
+    <div class="rs-acts"><button type="button" class="btn primary" data-act="rs-print">${I.download}Download PDF</button><button type="button" class="btn" data-act="rs-import">Import</button><button type="button" class="btn ghost" data-act="rs-export">Save a copy</button></div></div>`;
+  $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
+  const a=document.activeElement;if(a&&a.closest&&a.closest('#rs-sheet')&&$('#rs-sheet'))return;  /* don't redraw under the caret */
+  if(!RS_T)RS=null;  /* pick up changes made on another device */
+  $('#view').innerHTML=`<div class="rs-wrap">${rsSheet()}</div><input type="file" id="rs-file" accept="application/json,.json" hidden>`;
+  rsFit();
+}
+function rsRedraw(focusPath){const w=$('.rs-wrap');if(!w)return;w.innerHTML=rsSheet();rsFit();if(focusPath){const e=document.querySelector(`[data-rk="${focusPath}"]`);if(e){e.focus();const g=getSelection(),rg=document.createRange();rg.selectNodeContents(e);rg.collapse(false);g.removeAllRanges();g.addRange(rg)}}}
+function rsPrint(){
+  document.activeElement?.blur?.();rsSave(true);
+  const sh=$('#rs-sheet');if(!sh)return;
+  let root=document.getElementById('print-root');if(!root){root=document.createElement('div');root.id='print-root';document.body.appendChild(root)}
+  const c=sh.cloneNode(true);c.style.zoom='';c.querySelectorAll('[data-noprint]').forEach(x=>x.remove());c.querySelectorAll('[contenteditable]').forEach(x=>x.removeAttribute('contenteditable'));
+  c.querySelectorAll('.rs-e').forEach(x=>{if(!x.textContent.trim())x.closest('li')?x.closest('li').remove():x.remove()});
+  const r=rsDoc();c.querySelectorAll('.rs-link').forEach((x,i)=>{const u=r.links[i]&&safeUrl(r.links[i].url);if(u){const a=document.createElement('a');a.href=u;a.className='rs-a';a.textContent=x.textContent.trim();x.replaceWith(a)}});
+  root.innerHTML='';root.appendChild(c);
+  const t=document.title;document.title=(r.name||'Resume').trim()+' Resume';document.documentElement.classList.add('print-resume');
+  const done=()=>{document.documentElement.classList.remove('print-resume');document.title=t;root.innerHTML='';removeEventListener('afterprint',done)};
+  addEventListener('afterprint',done);setTimeout(()=>window.print(),60);
+}
+function rsExport(){const b=new Blob([JSON.stringify({resume:rsDoc()},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='resume.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+async function rsImport(file){
+  try{const d=JSON.parse(await file.text()),r=d.resume||d;if(!r||!Array.isArray(r.sections))throw 0;RS=JSON.parse(JSON.stringify(r));delete RS.id;rsSave(true);RS_LINK=null;rsRedraw();toast('Resume imported')}
+  catch(e){toast("That file isn't a resume saved from this app.")}
+}
+/* typing: update the resume doc and save (no redraw, so the caret stays put) */
+document.addEventListener('input',e=>{const el=e.target;
+  if(el.dataset&&el.dataset.rk){rsSet(el.dataset.rk,el.textContent.replace(/\s+/g,' ').trimStart());rsSave();return}
+  if(el.dataset&&el.dataset.rurl!=null){rsDoc().links[+el.dataset.rurl].url=el.value.trim();rsSave()}
+});
+document.addEventListener('paste',e=>{const el=e.target.closest?.('[data-rk]');if(!el)return;e.preventDefault();document.execCommand('insertText',false,(e.clipboardData.getData('text/plain')||'').replace(/\s*\n\s*/g,' '))});
+document.addEventListener('keydown',e=>{const el=e.target.closest?.('[data-rk]');if(!el)return;
+  const m=el.dataset.rk.match(/^(.*\.bullets)\.(\d+)$/);
+  if(e.key==='Enter'){e.preventDefault();if(m){const arr=rsGet(m[1]),i=+m[2];arr.splice(i+1,0,'');rsSave();rsRedraw(`${m[1]}.${i+1}`)}else el.blur();return}
+  if(e.key==='Backspace'&&m&&!el.textContent){e.preventDefault();const arr=rsGet(m[1]),i=+m[2];arr.splice(i,1);rsSave();rsRedraw(i>0?`${m[1]}.${i-1}`:null)}
+});
+function rsFromJob(si,jid){const j=S.jobs[jid];if(!j)return;const w=workOf(j),since=w.since||'';const mm=since.match(/^(\d{4})-(\d{2})/);
+  rsDoc().sections[si].items.push({start:mm?`${mm[2]}/${mm[1]}`:'',end:'Present',role:'Video Editor',company:j.name,bullets:j.type==='agency'&&shownClients(j.id).length?[`Edited videos for ${shownClients(j.id).map(c=>c.name).join(', ')}`]:['']});
+  rsSave(true);rsRedraw();toast(`Added ${j.name}. Tap the text to adjust it.`)}
 function renderHelp(){
   const u=S.ui,q=(u.hq||'').trim().toLowerCase();
   $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${HELP_IC.replace('class="i"','class="i" style="width:28px;height:28px"')}Help &amp; tips</h1><div class="sub">How everything in ${esc((appSettings().name||'').trim()||APP_NAME)} works.</div></div></div>`;
@@ -6025,7 +6166,7 @@ document.addEventListener('click',e=>{
   if(a!=='cal-disconnect'&&CAL.disArmed){CAL.disArmed=false;if(SM)renderSettings()}
   if(SM&&SM.stArm&&!/^st-(del|del-go)$/.test(a)&&!el.closest('.st-del-box')){SM.stArm=null;renderSettings()}
   switch(a){
-    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash','help'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';{const v=u.views?.[u.tab];if(v)u.view=v}saveUi();render();window.scrollTo({top:0});break;
+    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash','help','resume'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';{const v=u.views?.[u.tab];if(v)u.view=v}saveUi();render();window.scrollTo({top:0});break;
     case 'view': u.view=el.dataset.view;(u.views=u.views||{})[u.tab]=u.view;saveUi();render();break;
     case 'vopt': VOPT=!VOPT;renderVopt();break;
     case 'cx': ctxDo(el.dataset.do,el.dataset.v);break;
@@ -6034,7 +6175,7 @@ document.addEventListener('click',e=>{
     case 'tb-jobs': u.jobsOpen=true;saveUi();renderSide();openSide();break;
     case 'tb-cal': if(u.view==='calendar'&&!notesOpen&&!UPN&&u.calPrev){const c=u.calPrev;u.calPrev=null;u.tab=S.jobs[c.tab]||c.tab==='overview'?c.tab:'overview';u.client=c.client||'all';u.pane=c.pane||'tasks';u.view=c.view;(u.views=u.views||{})[u.tab]=c.view;saveUi();render();requestAnimationFrame(()=>window.scrollTo({top:c.y||0}));break}
       if(u.view!=='calendar')u.calPrev={tab:u.tab,client:u.client,pane:u.pane,view:u.view,y:scrollY};
-      notesOpen=false;UPN=false;if(['archived','activity','trash','help'].includes(u.tab)){u.tab='overview';u.client='all'}u.pane='tasks';u.view='calendar';(u.views=u.views||{})[u.tab]='calendar';saveUi();render();window.scrollTo({top:0});break;
+      notesOpen=false;UPN=false;if(['archived','activity','trash','help','resume'].includes(u.tab)){u.tab='overview';u.client='all'}u.pane='tasks';u.view='calendar';(u.views=u.views||{})[u.tab]='calendar';saveUi();render();window.scrollTo({top:0});break;
     case 'tb-search': openJump();break;
     case 'tb-plus': PLUS=!PLUS;renderPlus();break;
     case 'pm-timer': PLUS=false;renderPlus();POMO_OPEN=true;notesOpen=false;renderBell();renderPomo();break;
@@ -6042,6 +6183,15 @@ document.addEventListener('click',e=>{
     case 'tb-upnext': UPN=!UPN;if(UPN){notesOpen=false;renderBell();closeSide()}renderUpNextPage();renderTabbar();break;
     case 'tb-notes': UPN=false;renderUpNextPage();notesOpen=!notesOpen;if(notesOpen){saveNotes();POMO_OPEN=false;renderPomo();closeSide()}renderBell();break;
     case 'groups-all': {const open=el.dataset.open==='1';u.collapsed=u.collapsed||{};STATUSES.forEach(x=>{u.collapsed[x.id]=!open});saveUi();render();break}
+    case 'rs-print': rsPrint();break;
+    case 'rs-export': rsExport();break;
+    case 'rs-import': $('#rs-file')?.click();break;
+    case 'rs-link': RS_LINK=RS_LINK===+el.dataset.i?null:+el.dataset.i;rsRedraw();$(`[data-rurl="${el.dataset.i}"]`)?.focus();break;
+    case 'rs-add-link': rsDoc().links.push({label:'Link',url:''});rsSave(true);rsRedraw(`links.${rsDoc().links.length-1}.label`);break;
+    case 'rs-add':{const arr=rsGet(el.dataset.p);const k=el.dataset.kind;arr.push(k==='jobs'?{start:'',end:'Present',role:'Video Editor',company:'',bullets:['']}:k==='edu'?{start:'',end:'',school:'',place:'',bullets:['']}:'');rsSave(true);
+      rsRedraw(k==='jobs'?`${el.dataset.p}.${arr.length-1}.company`:k==='edu'?`${el.dataset.p}.${arr.length-1}.school`:`${el.dataset.p}.${arr.length-1}`);break}
+    case 'rs-del':{const arr=rsGet(el.dataset.p);arr.splice(+el.dataset.i,1);rsSave(true);rsRedraw();break}
+    case 'rs-move':{const arr=rsGet(el.dataset.p),i=+el.dataset.i,j=i+(+el.dataset.d);[arr[i],arr[j]]=[arr[j],arr[i]];rsSave(true);rsRedraw();break}
     case 'd-more': TOPT=!TOPT;deleteArmed=false;renderTopt();break;
     case 'topt-close': TOPT=false;renderTopt();break;
     case 'd-link': copyTaskLink(u.openTask);break;
@@ -6299,6 +6449,8 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('change',e=>{
   const el=e.target,u=S.ui;
+  if(el.id==='rs-file'){const f=el.files?.[0];el.value='';if(f)rsImport(f);return}
+  if(el.id==='rs-fromjob'){const v=el.value;el.value='';if(v)rsFromJob(+el.dataset.si,v);return}
   if(el.id==='f-prio'){u.prio=el.value;render();return}
   if(el.id==='f-due'){u.due=el.value;render();return}
   if(el.dataset.statKey){const k=el.dataset.statKey,cur=statKeys(),order=statDefs().map(d=>d[0]);let next=el.checked?[...cur,k]:cur.filter(x=>x!==k);if(!next.length){render();return}next=order.filter(x=>next.includes(x)).slice(0,STAT_MAX);saveStatKeys(next);return}
