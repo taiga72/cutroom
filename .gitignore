@@ -1,0 +1,4 @@
+# test screenshots never belong in the repo (the app icons do)
+/*.png
+!/apple-touch-icon.png
+!/icon-*.png

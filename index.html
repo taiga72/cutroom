@@ -1937,6 +1937,57 @@ html{overscroll-behavior-y:contain}
   .brand-panel .bv-colors .swatch{min-width:0}
   .brand-panel .bv-fonts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 }
+
+/* ---------- phones: calendar tab, bigger bottom bar, task options sheet, activity composer at the bottom ---------- */
+.d-more,.topt-wrap{display:none}
+@media (max-width:820px){
+  body.cal-page #stats,body.cal-page #jobcards,body.cal-page .demo-banner,body.cal-page .banner,body.cal-page #head,body.cal-page #subnav{display:none}
+  body.cal-page .toolbar .seg{display:none}
+  body.cal-page .main{padding-top:10px}
+  .tabbar{bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+  .tb-pill{padding:6px;min-height:70px}
+  .tb-pill button{padding:8px 0 7px;gap:4px}
+  .tb-pill button .i{width:26px;height:26px}
+  .tb-pill button span{font-size:calc(10px*var(--ts));font-weight:600;letter-spacing:-.02em}
+  .tb-search{width:66px;height:66px}
+  .tb-search .i{width:27px;height:27px}
+  .tb-fab{width:62px;height:62px;right:4px}
+  .main{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
+  /* task top bar: pin, up next, ⋯ */
+  .drawer .d-top [data-act="d-pomo"],.drawer .d-top [data-act="d-link"],.drawer .d-top [data-act="d-duplicate"],.drawer .d-top [data-act="d-pip"],.drawer .d-top .d-close{display:none}
+  .drawer .d-more{display:grid;place-items:center}
+  .drawer .d-foot-btns{display:none!important}
+  .drawer .d-foot:not(.d-save){border-top:0;padding-top:4px}
+  .topt-wrap{display:block;position:fixed;inset:0;z-index:50;background:rgba(10,12,16,.45);animation:jumpIn .15s ease-out}
+  .topt-wrap[hidden]{display:none}
+  .topt{position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:var(--surface);border-radius:20px 20px 0 0;padding:10px 14px calc(18px + env(safe-area-inset-bottom,0px));animation:sheetUp .25s cubic-bezier(.2,.8,.2,1)}
+  .to-head{display:flex;align-items:center;justify-content:center;position:relative;padding:8px 0 14px}
+  .to-head b{font-size:calc(17px*var(--ts))}
+  .to-x{position:absolute;right:0;top:2px;border-radius:50%;background:var(--surface-2)}
+  .to-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .to-tile{display:flex;flex-direction:column;align-items:center;gap:8px;border:0;background:none;color:var(--text);font:500 calc(13.5px*var(--ts)) var(--body);padding:0}
+  .to-tile > svg{box-sizing:content-box;width:24px;height:24px;padding:18px 0;width:100%;max-width:none;background:var(--surface-2);border-radius:14px}
+  .to-tile.on > svg{background:var(--accent-soft);color:var(--accent)}
+  .to-list{display:flex;flex-direction:column;padding:6px 0;border-bottom:1px solid var(--line)}
+  .to-list:last-child{border-bottom:0}
+  .to-row{display:flex;align-items:center;gap:16px;border:0;background:none;color:var(--text);text-align:left;padding:14px 4px;font:500 calc(16.5px*var(--ts)) var(--body)}
+  .to-row > svg{width:23px;height:23px;flex:none}
+  .to-row.danger{color:var(--danger)}
+  .to-row.to-info{color:var(--muted);font-size:calc(14.5px*var(--ts))}
+  /* activity: timeline first, the comment box pinned to the bottom (ClickUp-style) */
+  .drawer .d-activity{display:flex;flex-direction:column;padding-bottom:0;flex:1 0 auto}
+  .drawer .d-activity .composer{margin-top:auto!important}
+  .drawer .d-activity .composer{order:99;position:sticky;bottom:0;z-index:3;margin:12px -16px 0;border-radius:18px 18px 0 0;border:0;border-top:1px solid var(--line);background:var(--surface);padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 20px rgba(10,12,16,.18);display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:end;gap:8px}
+  .drawer .d-activity .composer > .fmt-bar{grid-column:1/-1;display:none}
+  .drawer .d-activity .composer:focus-within > .fmt-bar{display:flex}
+  .drawer .d-activity .composer textarea{grid-column:2;grid-row:2;min-height:44px;height:44px;max-height:30vh;border:1px solid var(--line);border-radius:22px;padding:11px 16px;background:var(--surface-2);resize:none}
+  .drawer .d-activity .composer .att-list{grid-column:1/-1;grid-row:1}
+  .drawer .d-activity .composer-foot{display:contents}
+  .drawer .d-activity .composer-foot .hint{display:none}
+  .drawer .d-activity .composer-foot [data-act="upd-attach"]{grid-column:1;grid-row:2;width:44px;height:44px;min-height:44px;border-radius:50%;padding:0;justify-content:center;background:var(--surface-2);font-size:0;gap:0}
+  .drawer .d-activity .composer-foot [data-act="upd-attach"] .i{width:20px;height:20px}
+  .drawer .d-activity .composer-foot [data-act="note-post"]{grid-column:3;grid-row:2;min-height:44px;border-radius:22px}
+}
 </style>
 
 <div class="app">
@@ -2795,7 +2846,7 @@ function render(){
   document.title=(a.name||'').trim()||APP_NAME;pomoTitle();
   const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
   withFocus(()=>{renderSide();renderMain()});
-  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();renderUpNextPage();
+  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();renderUpNextPage();document.body.classList.toggle('cal-page',S.ui.view==='calendar'&&!['archived','activity','trash','help'].includes(S.ui.tab));
   if(S.ready&&!SEASON_RAN){SEASON_RAN=true;setTimeout(()=>seasonFx(),900)}
 }
 
@@ -3483,7 +3534,7 @@ function renderArchive(){
 /* ================= drawer ================= */
 let deleteArmed=false, clearArmed=false;
 function openTask(id,tab){seenTask(id);if(NAP&&NAP.id===id)napEnd('wake');if(NOTES_EDIT!==id)NOTES_EDIT=null;if(S.tasks[id]&&!S.tasks[id]._draft){S.ui.recent=[id,...(S.ui.recent||[]).filter(x=>x!==id)].slice(0,8);saveUi()}if(S.ui.openTask!==id)TPL={open:false,naming:false,del:null};if(DRAFT&&DRAFT.id!==id)discardDraft();if(S.ui.openTask!==id||tab)S.ui.dtab=tab||'details';if(S.ui.openTask!==id){NEWCL=null;REACT_AT=null;REPLY_AT=null;replyDelArmed=null;EDIT_AT=null;SPLIT=null;if(ATT.task&&ATT.task!==id)attReset()}S.ui.openTask=id;noteDelArmed=null;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender();syncUrl()}
-function closeDrawer(){flushAll();discardDraft();S.ui.openTask=null;$('#drawer').hidden=true;$('#scrim').hidden=true;scheduleRender();syncUrl()}
+function closeDrawer(){TOPT=false;renderTopt();flushAll();discardDraft();S.ui.openTask=null;$('#drawer').hidden=true;$('#scrim').hidden=true;scheduleRender();syncUrl()}
 let LSHOW=new Set();
 /* Task activity: the task's log entries plus your own posted updates (kind 'note'), newest first */
 function taskActivity(t){
@@ -3503,7 +3554,7 @@ function activityPane(t){
   }
   return `<div class="d-body d-activity">
     <h2 class="d-act-title">${esc(t.name||'Untitled task')}</h2>
-    <div class="composer" data-drop-pics="note">${fmtBar('note-in')}<textarea id="note-in" data-fk="note-in" rows="2" placeholder="Post an update: what you sent, what the client said, what's next… Paste or drop a screenshot to attach it."></textarea>
+    <div class="composer" data-drop-pics="note">${fmtBar('note-in')}<textarea id="note-in" data-fk="note-in" rows="2" placeholder="Write an update…"></textarea>
       ${attHtml('note')}
       <div class="composer-foot"><button type="button" class="btn sm ghost" data-act="upd-attach" data-for="note" title="Attach pictures">${I.image}Picture</button><span class="hint">⌘/Ctrl + Enter to post</span><button class="btn sm primary" data-act="note-post" ${ATT.busy?'disabled':''}>Post update</button></div></div>
     ${notes.length?`<div class="notes-sum"><span><b>${notes.length-nDone}</b> open${nDone?` · <b>${nDone}</b> resolved`:''}</span>${nDone?`<button type="button" class="btn sm ghost" data-act="notes-hide-done">${S.ui.hideResolved?'Show resolved':'Hide resolved'}</button>`:''}</div>`:''}
@@ -4016,6 +4067,32 @@ function pomoSettingsHtml(){
     ${prefRow('pomoPopup','Desktop pop-up when time’s up',[[false,'Off'],[true,'On']],np==='denied'?'Blocked in this browser: allow notifications for this site in its settings first':np==='unsupported'?'Not available in this browser':'Only shows while you’re in another app or tab')}
     <p class="hint">The timer is shared by all your devices: start it on your Mac and your phone shows the same countdown (other devices catch up within a minute). Each finished focus session adds 🍅 1 to the linked task and a line to its activity. On a phone, a locked screen can't play the sound; the timer still keeps time.</p>`;
 }
+/* phones: the task's options live in a ClickUp-style sheet behind ⋯ in the task panel's top bar */
+const MORE_IC='<svg class="i" viewBox="0 0 16 16"><circle cx="3.5" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="12.5" cy="8" r="1.2" fill="currentColor" stroke="none"/></svg>';
+let TOPT=false;
+function renderTopt(){
+  let e=$('#topt');if(!e){e=document.createElement('div');e.id='topt';e.className='topt-wrap';document.body.appendChild(e)}
+  const t=S.tasks[S.ui.openTask];
+  if(!TOPT||!t||t._draft||$('#drawer').hidden){TOPT=false;e.hidden=true;e.innerHTML='';return}
+  const T=pomoState(),on=T.taskId===t.id&&T.mode==='focus'&&T.run!=='idle';
+  const row=(act,icon,label,extra='',cls='')=>`<button type="button" class="to-row ${cls}" data-act="${act}" ${extra}>${icon}<span>${label}</span></button>`;
+  e.hidden=false;
+  e.innerHTML=`<div class="topt" role="dialog" aria-label="Task options"><div class="to-head"><b>Task options</b><button type="button" class="icon-btn to-x" data-act="topt-close" aria-label="Close">${I.x}</button></div>
+    <div class="to-tiles">
+      <button type="button" class="to-tile" data-act="d-link">${LINK_IC}<span>Copy link</span></button>
+      ${isClosed(t)?'':`<button type="button" class="to-tile ${on?'on':''}" data-act="d-pomo">${TOMATO_IC}<span>${on&&T.run==='running'?'Pause focus':'Focus on it'}</span></button>`}
+      <button type="button" class="to-tile" data-act="d-duplicate">${I.copy}<span>Duplicate</span></button>
+    </div>
+    <div class="to-list">
+      ${row('split-open',SPLIT_IC,'Split into tasks')}
+      ${canPip()?row('d-pip',PIP_IC,'Float in its own window'):''}
+      ${t.pomos?`<div class="to-row to-info">${TOMATO_IC}<span>${t.pomos} focus session${t.pomos===1?'':'s'} so far</span></div>`:''}
+    </div>
+    <div class="to-list">
+      ${t.archived?'':row('archive',I.archive,'Archive',`data-id="${t.id}"`)}
+      ${row('delete-task',I.trash,deleteArmed?'Tap again to move to Trash':'Delete task','','danger')}
+    </div></div>`;
+}
 function renderDrawer(){
   const t=S.tasks[S.ui.openTask];
   if(!t){if(S.ui.openTask)closeDrawer();return}
@@ -4026,7 +4103,7 @@ function renderDrawer(){
   withFocus(()=>{$('#drawer').innerHTML=`
   ${t._draft?`<div class="d-draft">${t.copiedFrom?I.copy:I.plus}<b>${t.copiedFrom?'Copy of a task':'New task'}</b><span>Not saved yet</span></div>`:''}
   <div class="d-top" style="--jc:${esc(j?.color||'transparent')}"><div class="crumb">${taskMark(t)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
-    ${t._draft?'':`<button class="icon-btn ${t.pinned?'pin-on':''}" data-act="d-pin" aria-pressed="${!!t.pinned}" aria-label="${t.pinned?'Unpin':'Pin to the top'}" title="${t.pinned?'Unpin':'Pin to the top of the Overview'}">${I.pin}</button>${isClosed(t)?'':(()=>{const T=pomoState(),on=T.taskId===t.id&&T.mode==='focus'&&T.run!=='idle';return `<button class="icon-btn d-pomo ${on?'pin-on':''}" data-act="d-pomo" aria-pressed="${on}" aria-label="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task'}" title="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task (starts a focus session)'}${t.pomos?` · ${t.pomos} focus session${t.pomos===1?'':'s'} so far`:''}">${TOMATO_IC}${t.pomos?`<span class="dp-n">${t.pomos}</span>`:''}</button>`})()}${isClosed(t)?'':`<button class="icon-btn ${t.upNext?'pin-on':''}" data-act="d-upnext" aria-pressed="${!!t.upNext}" aria-label="${t.upNext?'Remove from Up next':'Add to Up next'}" title="${t.upNext?`Up next #${upNextPos(t)} · click to remove`:'Add to Up next (your queue on the Overview)'}">${UP_IC}</button>`}<button class="icon-btn" data-act="d-link" aria-label="Copy link to this task" title="Copy link to this task">${LINK_IC}</button><button class="icon-btn" data-act="d-duplicate" aria-label="Duplicate task" title="Duplicate (make a copy to edit)">${I.copy}</button>${canPip()?`<button class="icon-btn ${PIP.win&&PIP.id===t.id?'pin-on':''}" data-act="d-pip" aria-pressed="${!!(PIP.win&&PIP.id===t.id)}" aria-label="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task in its own window'}" title="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task over Premiere or Resolve'}">${PIP_IC}</button>`:''}`}<button class="icon-btn" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
+    ${t._draft?'':`<button class="icon-btn ${t.pinned?'pin-on':''}" data-act="d-pin" aria-pressed="${!!t.pinned}" aria-label="${t.pinned?'Unpin':'Pin to the top'}" title="${t.pinned?'Unpin':'Pin to the top of the Overview'}">${I.pin}</button>${isClosed(t)?'':(()=>{const T=pomoState(),on=T.taskId===t.id&&T.mode==='focus'&&T.run!=='idle';return `<button class="icon-btn d-pomo ${on?'pin-on':''}" data-act="d-pomo" aria-pressed="${on}" aria-label="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task'}" title="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task (starts a focus session)'}${t.pomos?` · ${t.pomos} focus session${t.pomos===1?'':'s'} so far`:''}">${TOMATO_IC}${t.pomos?`<span class="dp-n">${t.pomos}</span>`:''}</button>`})()}${isClosed(t)?'':`<button class="icon-btn ${t.upNext?'pin-on':''}" data-act="d-upnext" aria-pressed="${!!t.upNext}" aria-label="${t.upNext?'Remove from Up next':'Add to Up next'}" title="${t.upNext?`Up next #${upNextPos(t)} · click to remove`:'Add to Up next (your queue on the Overview)'}">${UP_IC}</button>`}<button class="icon-btn" data-act="d-link" aria-label="Copy link to this task" title="Copy link to this task">${LINK_IC}</button><button class="icon-btn" data-act="d-duplicate" aria-label="Duplicate task" title="Duplicate (make a copy to edit)">${I.copy}</button>${canPip()?`<button class="icon-btn ${PIP.win&&PIP.id===t.id?'pin-on':''}" data-act="d-pip" aria-pressed="${!!(PIP.win&&PIP.id===t.id)}" aria-label="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task in its own window'}" title="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task over Premiere or Resolve'}">${PIP_IC}</button>`:''}`}${t._draft?'':`<button class="icon-btn d-more" data-act="d-more" aria-label="Task options" title="Task options" aria-expanded="${!!TOPT}">${MORE_IC}</button>`}<button class="icon-btn d-close" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
   ${t._draft?'':`<div class="d-tabs" role="tablist"><button role="tab" data-act="d-tab" data-tab="details" class="${S.ui.dtab!=='activity'?'on':''}" aria-selected="${S.ui.dtab!=='activity'}">${I.info}Details</button><button role="tab" data-act="d-tab" data-tab="activity" class="${S.ui.dtab==='activity'?'on':''}" aria-selected="${S.ui.dtab==='activity'}">${I.clock}Activity<span class="mono">${taskActivity(t).length}</span></button></div>`}
   ${!t._draft&&S.ui.dtab==='activity'?activityPane(t):`  <div class="d-body">
     ${SPLIT&&SPLIT.id===t.id?splitHtml(t):''}
@@ -4625,6 +4702,7 @@ let swp=null;
     if(!swp)return;const p=e.changedTouches[0],dx=p.clientX-swp.x,dy=p.clientY-swp.y,dt=Date.now()-swp.t;swp=null;
     if(dt>600||Math.abs(dx)<70||Math.abs(dy)>Math.abs(dx)*.6)return;
     const t=S.tasks[S.ui.openTask];if(!t||t._draft)return;
+    if(matchMedia('(max-width:820px)').matches){const want=dx<0?'activity':'details';if(S.ui.dtab===want||(want==='details'&&S.ui.dtab!=='activity'))return;S.ui.dtab=want;noteDelArmed=null;haptic(6);renderDrawer();d.scrollTop=0;const b=d.querySelector('.d-body');if(b&&!reducedMotion())b.animate([{transform:`translateX(${dx<0?40:-40}px)`,opacity:.4},{transform:'none',opacity:1}],{duration:200,easing:'ease-out'});return}
     const ids=taskOrder(),i=ids.indexOf(t.id);if(i<0||ids.length<2)return;
     const j=dx<0?i+1:i-1;if(j<0||j>=ids.length){toast(dx<0?'That was the last task in this list':'That was the first task in this list');return}
     haptic(6);d.classList.remove('swipe-l','swipe-r');void d.offsetWidth;d.classList.add(dx<0?'swipe-l':'swipe-r');
@@ -5879,6 +5957,7 @@ document.addEventListener('click',e=>{
   if(notesOpen&&!e.target.closest('.bell-wrap,#notes,[data-act="tb-notes"]')){notesOpen=false;renderBell()}
   if(POMO_OPEN&&!e.target.closest('.pomo-wrap,#pomo-pop,[data-act="pm-timer"]')){POMO_OPEN=false;renderPomo()}
   if(PLUS&&!e.target.closest('#plus-menu,[data-act="tb-plus"]')){PLUS=false;renderPlus()}
+  if(TOPT){const a=e.target.closest('[data-act]')?.dataset.act;if(!e.target.closest('#topt .topt')||(a&&a!=='delete-task'&&a!=='d-pomo'))setTimeout(()=>{if(a!=='d-more'){TOPT=false;renderTopt()}},0);else setTimeout(renderTopt,0)}
   if(PLUS&&e.target.closest('#plus-menu [data-act="new-task"]')){PLUS=false;renderPlus()}
   if(VOPT&&!e.target.closest('#vopt-wrap')){VOPT=false;renderVopt()}
   if(STATPOP&&!e.target.closest('.stats-wrap')){STATPOP=false;render()}
@@ -5910,6 +5989,8 @@ document.addEventListener('click',e=>{
     case 'tb-upnext': UPN=!UPN;if(UPN){notesOpen=false;renderBell();closeSide()}renderUpNextPage();renderTabbar();break;
     case 'tb-notes': UPN=false;renderUpNextPage();notesOpen=!notesOpen;if(notesOpen){saveNotes();POMO_OPEN=false;renderPomo();closeSide()}renderBell();break;
     case 'groups-all': {const open=el.dataset.open==='1';u.collapsed=u.collapsed||{};STATUSES.forEach(x=>{u.collapsed[x.id]=!open});saveUi();render();break}
+    case 'd-more': TOPT=!TOPT;deleteArmed=false;renderTopt();break;
+    case 'topt-close': TOPT=false;renderTopt();break;
     case 'd-link': copyTaskLink(u.openTask);break;
     case 'link-add': LSHOW.add(u.openTask+':'+el.dataset.kind);renderDrawer();$(`#drawer [data-field="links.${el.dataset.kind}"]`)?.focus();break;
     case 'log-more': u.lmore=(u.lmore||200)+200;render();break;
