@@ -1577,6 +1577,27 @@ html{overscroll-behavior-y:contain}
 }
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 :root[data-motion="reduce"] .drawer:not([hidden]){animation:none}
+
+/* ---------- brand guide in the floating window ---------- */
+.pip-brand .pb-row{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.pip-brand .pb-l{font-size:calc(11px*var(--ts));font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.05em}
+.pb-colors{display:flex;flex-wrap:wrap;gap:6px}
+.pb-sw{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:4px 8px 4px 4px;color:var(--text);text-align:left;position:relative}
+.pb-sw i{width:22px;height:22px;border-radius:5px;border:1px solid rgba(0,0,0,.12);flex:none}
+.pb-sw span{display:flex;flex-direction:column;line-height:1.15}
+.pb-sw b{font-size:calc(12px*var(--ts))}
+.pb-sw small{font:500 calc(10.5px*var(--ts)) var(--mono);color:var(--muted)}
+.pb-sw:hover,.pip-copy:hover{border-color:var(--accent)}
+.pb-vals{display:flex;flex-wrap:wrap;gap:6px}
+.pip-copy{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:4px 8px;color:var(--text);font-size:calc(12px*var(--ts));font-weight:600;position:relative}
+.pip-copy .i{width:13px;height:13px;color:var(--muted)}
+.pb-text{position:relative;padding:6px 30px 6px 8px;border-radius:8px;background:var(--surface-2);white-space:pre-wrap;font-size:calc(12.5px*var(--ts));line-height:1.4}
+.pb-text .pb-cp{position:absolute;top:3px;right:3px;width:24px;height:24px}
+.pb-more{align-self:flex-start;margin-top:-2px}
+.pb-list{margin:0;padding-left:18px;font-size:calc(12.5px*var(--ts));line-height:1.45}
+.pb-list.do li::marker{color:var(--st-done)}
+.pb-list.dont li::marker{color:var(--danger)}
+.pb-sw.copied::after,.pip-copy.copied::after,.pb-cp.copied::after{content:"Copied";position:absolute;right:4px;top:-18px;font:600 calc(10.5px*var(--ts)) var(--body);color:#fff;background:var(--st-done);padding:1px 6px;border-radius:5px;white-space:nowrap}
 </style>
 
 <div class="app">
@@ -3352,11 +3373,37 @@ function renderPip(){
     <h1 class="pip-name">${esc(t.name||'Untitled task')}</h1>
     <div class="pip-st"><span class="pill" ${pillStyle(stOf(t))}><span class="pl">${esc(stLabel(stOf(t)))}</span></span>${nx&&!isClosed(t)?`<button type="button" class="btn sm" data-pa="next" title="Move to ${esc(nx.label)}">${esc(nx.label)} ›</button>`:''}${t.due?`<span class="date ${dueClass(t)}">Due ${esc(fmtDate(t.due))}</span>`:''}${t.revision?`<span class="chip rev">R${t.revision}</span>`:''}</div>
     ${links?`<div class="pip-links">${links}</div>`:''}
+    ${pipBrandHtml(t,j)}
     ${cl.length?`<section><h2>Checklist <small>${cl.filter(x=>x.done).length}/${cl.length}</small></h2>${cl.map(x=>`<label class="pip-ck ${x.done?'done':''}"><input type="checkbox" data-pa="check" data-cid="${esc(x.id)}" ${x.done?'checked':''}><span>${esc(x.text||'')}</span></label>`).join('')}</section>`:''}
     <section><h2>Updates <small>${open.length} open</small>${notes.length>open.length?`<button type="button" class="btn sm ghost" data-pa="done-toggle">${PIP.showDone?'Hide resolved':'Show resolved'}</button>`:''}</h2>
       ${shown.length?shown.map(e=>`<div class="tl-note pip-note ${e.done?'resolved':''}"><button type="button" class="icon-btn note-done ${e.done?'on':''}" data-pa="resolve" data-at="${esc(e.at)}" title="${e.done?'Mark as not done':'Mark as done'}" aria-label="${e.done?'Mark as not done':'Mark as done'}">${ck}</button><div class="note-body md">${noteText(e.text,j)}</div></div>`).join(''):`<p class="hint">${notes.length?'Every update is resolved.':'No updates yet. Post them from the task’s Activity tab.'}</p>`}
     </section>
   </div>`;
+}
+/* the task's brand guide in the floating window: colors, fonts and short text, each click-to-copy */
+function pipBrandHtml(t,j){
+  const home=brandHome(t);if(!home)return '';
+  const b=brandOf(home.doc);
+  if(!hasBrand(b))return `<section class="pip-brand"><h2>Brand guide</h2><p class="hint">No brand guide for ${esc(home.name)} yet. Add one from the task panel.</p></section>`;
+  const open=lsGet('cutroom.pipbrand')!==false;
+  const cp=(v,label,cls='')=>`<button type="button" class="pip-copy ${cls}" data-pa="copy" data-v="${esc(v)}" title="Copy ${esc(label||v)}">${I.copy}<span>${esc(label||v)}</span></button>`;
+  let body='';
+  if(b.colors.length)body+=`<div class="pb-row"><span class="pb-l">Colors</span><div class="pb-colors">${b.colors.map(c=>`<button type="button" class="pb-sw" data-pa="copy" data-v="${esc(c.hex)}" title="Copy ${esc(c.hex)}"><i style="background:${esc(c.hex)}"></i><span><b>${esc(c.name||c.hex)}</b>${c.name?`<small>${esc(c.hex)}</small>`:''}</span></button>`).join('')}</div></div>`;
+  if(b.fonts.head||b.fonts.body)body+=`<div class="pb-row"><span class="pb-l">Fonts</span><div class="pb-vals">${b.fonts.head?cp(b.fonts.head,'Headings: '+b.fonts.head):''}${b.fonts.body?cp(b.fonts.body,'Body: '+b.fonts.body):''}</div></div>`;
+  const more=lsGet('cutroom.pipbrandmore')===true;let rest='';
+  for(const [k,l] of BRAND_TEXT)if(b[k])rest+=`<div class="pb-row"><span class="pb-l">${esc(l)}</span><div class="pb-text">${esc(b[k])}<button type="button" class="icon-btn pb-cp" data-pa="copy" data-v="${esc(b[k])}" title="Copy" aria-label="Copy ${esc(l)}">${I.copy}</button></div></div>`;
+  const dos=lines(b.dos),donts=lines(b.donts);
+  if(dos.length)rest+=`<div class="pb-row"><span class="pb-l">Do</span><ul class="pb-list do">${dos.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`;
+  if(donts.length)rest+=`<div class="pb-row"><span class="pb-l">Don't</span><ul class="pb-list dont">${donts.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`;
+  const lk=[['guide','Brand guide'],['assets','Assets'],['refs','References']].map(([k,l])=>{const v=b.links[k],u=v&&linkHref(v,j);return u?`<a class="btn sm" href="${esc(u)}"${linkTarget(v,j)}>${I.ext}${l}</a>`:''}).join('');
+  if(lk)rest+=`<div class="pb-row"><span class="pb-l">Links</span><div class="pip-links">${lk}</div></div>`;
+  if(rest)body+=(more?rest:'')+`<button type="button" class="btn sm ghost pb-more" data-pa="brand-more">${more?'Less':'More: captions, CTA, music, do\'s & don\'ts…'}</button>`;
+  return `<section class="pip-brand"><h2>Brand guide <small>${esc(home.name)}</small><button type="button" class="btn sm ghost" data-pa="brand-toggle">${open?'Hide':'Show'}</button></h2>${open?body:''}</section>`;
+}
+function pipCopy(v,btn){
+  const done=()=>{if(!btn)return;btn.classList.add('copied');setTimeout(()=>btn.classList.remove('copied'),1100)};
+  const cb=PIP.win?.navigator?.clipboard||navigator.clipboard;
+  if(cb?.writeText)cb.writeText(v).then(done,()=>{navigator.clipboard?.writeText(v).then(done,()=>{})});
 }
 function pipClick(e){
   const b=e.target.closest('[data-pa]');if(!b||b.dataset.pa==='check')return;
@@ -3367,6 +3414,9 @@ function pipClick(e){
     case 'resolve':updateNote(b.dataset.at,x=>x.done?{...x,done:false,doneAt:null}:{...x,done:true,doneAt:new Date().toISOString()},t.id);NOTE_OPEN=null;render();if(S.ui.openTask===t.id)renderDrawer();break;
     case 'done-toggle':PIP.showDone=!PIP.showDone;renderPip();break;
     case 'pomo':pomoToggle();break;
+    case 'copy':pipCopy(b.dataset.v,b);break;
+    case 'brand-more':lsSet('cutroom.pipbrandmore',lsGet('cutroom.pipbrandmore')!==true);renderPip();break;
+    case 'brand-toggle':lsSet('cutroom.pipbrand',lsGet('cutroom.pipbrand')===false);renderPip();break;
   }
 }
 function pipChange(e){
@@ -4056,7 +4106,7 @@ const HELP=[
  ['Getting work done','Save & add another',`Next to Save task: saves it and opens a fresh task for the same job, client and format, for entering a batch of reels in a row.`,null],
  ['Getting work done','Up next',`Your own queue across every job. Add a task from the right-click menu or the queue icon at the top of a task. The queue sits at the top of the Overview; drag to reorder. Finished tasks leave it on their own.`,null],
  ['Getting work done','Push due dates back',`Select tasks, then Push back… in the bar at the bottom: +1 day, +2 days, +1 week, or workdays that skip weekends. Undo puts the old dates back.`,null],
- ['Editing','Floating task window',`The window icon at the top of a task opens it in a small window that stays on top of Premiere or Resolve (Chrome on a computer). Tick checklist steps, resolve client updates, move the status on and open the links from there. Click the icon again or close the window to stop.`,null],
+ ['Editing','Floating task window',`The window icon at the top of a task opens it in a small window that stays on top of Premiere or Resolve (Chrome on a computer). Tick checklist steps, resolve client updates, move the status on and open the links from there. The client's brand guide is there too: click a color to copy its hex code, or copy the fonts, CTA and end-card text. Click the icon again or close the window to stop.`,null],
  ['Editing','Safe-zone overlays',`See-through 1080×1920 PNG guides for TikTok, Reels and Shorts, plus one that combines all three. Put one on the top track of your timeline to keep text and faces clear of each app's buttons and captions, then turn it off before you export.`,['safezones','Safe-zone overlays']],
  ['Look and feel','Accessibility',`Text size, density, reduce motion, high contrast, relaxed line spacing and hover labels.`,['a11y','Accessibility']],
  ['Look and feel','Stat tiles and list columns',`The pencil on the numbers at the top picks which tiles show. In the List view, the sliders button hides columns and folds every group. Drag the sidebar's or task panel's edge to resize them.`,null],
