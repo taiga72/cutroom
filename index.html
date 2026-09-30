@@ -2020,12 +2020,53 @@ html{overscroll-behavior-y:contain}
 
 /* ---------- resume builder: an A4 sheet laid out like the user's own resume ---------- */
 .rs-acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.rs-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:start}
+.rs-page.show-form .rs-layout{grid-template-columns:340px minmax(0,1fr)}
+.rs-form{display:none;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 0 14px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;overscroll-behavior:contain}
+.rs-page.show-form .rs-form{display:block}
+.rs-mseg{display:none}
+.rs-sub-m{display:none}
+@media (max-width:820px){.rs-sub-d{display:none}.rs-sub-m{display:block}}
+.rf-row{display:flex;align-items:center;gap:14px;width:100%;border:0;background:none;text-align:left;padding:12px 16px;color:var(--text);border-bottom:1px solid var(--line)}
+.rf-row:hover{background:var(--surface-2)}
+.rf-row > span{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.rf-row b{font-weight:600;font-size:calc(15px*var(--ts))}
+.rf-row small{color:var(--muted);font-size:calc(12.5px*var(--ts));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rf-row .chev{color:var(--faint);font-size:calc(22px*var(--ts));font-style:normal}
+.rf-head{display:flex;align-items:center;gap:8px;padding:8px 12px 10px;border-bottom:1px solid var(--line)}
+.rf-head b{font-size:calc(16px*var(--ts))}
+.rf-back{display:inline-flex;align-items:center;gap:2px;border:0;background:none;color:var(--accent);font:600 calc(14px*var(--ts)) var(--body);padding:6px 4px}
+.rf-back .i{width:16px;height:16px}
+.rf-body{padding:12px 14px;display:flex;flex-direction:column;gap:12px}
+.rf-body label{display:flex;flex-direction:column;gap:4px;font-size:calc(12.5px*var(--ts));color:var(--muted);font-weight:600}
+.rf-body input,.rf-body textarea{width:100%;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:9px;padding:9px 11px;font:400 calc(14.5px*var(--ts)) var(--body);resize:vertical}
+.rf-body textarea{min-height:84px;line-height:1.45}
+.rf-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rf-card{border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--surface)}
+.rf-card-h{display:flex;align-items:center;gap:6px}
+.rf-card-h b{flex:1;min-width:0;font-size:calc(14px*var(--ts));overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rf-card-h .icon-btn{width:32px;height:32px}
+.rf-hint{margin:0;color:var(--faint);font-size:calc(12px*var(--ts))}
+.rf-toggle{display:flex;align-items:center;gap:12px;padding:12px 16px}
+.rf-toggle span{flex:1;display:flex;flex-direction:column}
+.rf-toggle small{color:var(--muted);font-size:calc(12.5px*var(--ts))}
+.rf-toggle input{width:22px;height:22px;accent-color:var(--accent)}
+@media (max-width:820px){
+  .rs-page .rs-layout{grid-template-columns:minmax(0,1fr)!important}
+  .rs-mseg{display:flex;margin:0 0 12px}
+  .rs-mseg button{flex:1}
+  .rs-page .rs-form{position:static;max-height:none;border-radius:14px}
+  .rs-page.m-form .rs-form{display:block}.rs-page.m-form .rs-wrap{display:none}
+  .rs-page.m-preview .rs-form{display:none}
+  .rs-acts [data-act="rs-formtoggle"]{display:none}
+  .rs-page .rf-body input,.rs-page .rf-body textarea{font-size:16px}
+}
 .rs-wrap{overflow-x:hidden;padding:4px 0 30px}
-.rs-sheet{--ink:#000;--grey:#7d7d7d;width:210mm;min-height:297mm;margin:0 auto;background:#fff;color:var(--ink);box-shadow:0 6px 30px rgba(10,12,16,.25);border-radius:4px;padding:40pt 50pt 40pt 48pt;box-sizing:border-box;font-family:'Martel Sans',var(--body);position:relative}
+.rs-sheet{--ink:#000;--grey:#7d7d7d;--f:1;--s:1;width:210mm;min-height:297mm;margin:0 auto;background:#fff;color:var(--ink);box-shadow:0 6px 30px rgba(10,12,16,.25);border-radius:4px;padding:calc(40pt*var(--s)) 50pt calc(36pt*var(--s)) 48pt;box-sizing:border-box;font-family:'Martel Sans',var(--body);position:relative}
 .rs-sheet,.rs-sheet *{color-scheme:light}
-.rs-name{margin:0 0 0 12pt;font:700 26pt/1.15 'Open Sans',var(--body);letter-spacing:-.2pt}
-.rs-title{margin:0 0 6pt 12pt;font:700 14pt/1.3 'Open Sans',var(--body)}
-.rs-contact{margin-left:12pt;display:grid;grid-template-columns:238pt 1fr;row-gap:1pt;font:700 11pt/1.35 'Open Sans',var(--body)}
+.rs-name{margin:0 0 0 12pt;font:700 calc(26pt*var(--f))/1.15 'Open Sans',var(--body);letter-spacing:-.2pt}
+.rs-title{margin:0 0 calc(6pt*var(--s)) 12pt;font:700 calc(14pt*var(--f))/1.3 'Open Sans',var(--body)}
+.rs-contact{margin-left:12pt;display:grid;grid-template-columns:238pt 1fr;row-gap:1pt;font:700 calc(11pt*var(--f))/1.35 'Open Sans',var(--body)}
 .rs-c{display:grid;grid-template-columns:62pt 1fr;align-items:baseline}
 .rs-cv,.rs-a{color:var(--grey)}
 .rs-links{grid-column:1/-1;grid-row:2}
@@ -2035,18 +2076,23 @@ html{overscroll-behavior-y:contain}
 .rs-lk{border:0;background:none;padding:2pt;color:#999;cursor:pointer;display:inline-grid}
 .rs-lk .i{width:12px;height:12px}
 .rs-url{font:400 9pt var(--body);border:1px solid #ccc;border-radius:4px;padding:2pt 4pt;width:180pt;color:#000;background:#fff}
-.rs-sec{margin-top:18pt}
-.rs-h{display:inline-block;margin:0 0 12pt 4pt;padding:0 6pt 1pt 0;border-bottom:3pt solid #000;font:700 12pt/1.3 'Open Sans',var(--body);text-transform:uppercase}
-.rs-item{display:grid;grid-template-columns:152pt 1fr;position:relative;margin-bottom:6pt}
-.rs-dates{padding-top:9pt;font:700 10pt/1.3 'Open Sans',var(--body);white-space:nowrap}
-.rs-it{font:700 11pt/1.35 'Open Sans',var(--body)}
+.rs-sec{margin-top:calc(18pt*var(--s))}
+.rs-h{display:inline-block;margin:0 0 calc(12pt*var(--s)) 4pt;padding:0 6pt 1pt 0;border-bottom:3pt solid #000;font:700 calc(12pt*var(--f))/1.3 'Open Sans',var(--body);text-transform:uppercase}
+.rs-item{display:grid;grid-template-columns:152pt 1fr;position:relative;margin-bottom:calc(6pt*var(--s))}
+.rs-dates{padding-top:calc(9pt*var(--s));font:700 calc(10pt*var(--f))/1.3 'Open Sans',var(--body);white-space:nowrap}
+.rs-it{font:700 calc(11pt*var(--f))/1.35 'Open Sans',var(--body)}
 .k-edu .rs-it{display:flex;align-items:baseline;gap:4pt}
-.rs-place{margin-left:auto;padding-left:20pt;font:italic 400 8pt 'Open Sans',var(--body)}
-.rs-bul{margin:8pt 0 0;padding-left:22pt;font:400 9pt/12pt 'Martel Sans',var(--body)}
+.rs-place{margin-left:auto;padding-left:20pt;font:italic 400 calc(8pt*var(--f)) 'Open Sans',var(--body)}
+.rs-bul{margin:calc(8pt*var(--s)) 0 0;padding-left:22pt;font:400 calc(9pt*var(--f))/calc(12pt*var(--f)) 'Martel Sans',var(--body)}
 .rs-bul li{margin:0}
 .k-edu .rs-item{grid-template-columns:150pt 1fr}
-.rs-skills{margin-left:148pt;columns:2;column-gap:20pt;font:700 9pt/12pt 'Martel Sans',var(--body)}
+.rs-skills{margin-left:148pt;columns:2;column-gap:20pt;font:700 calc(9pt*var(--f))/calc(12pt*var(--f)) 'Martel Sans',var(--body)}
 .rs-skill{break-inside:avoid;position:relative}
+.rs-break{position:absolute;left:0;right:0;border-top:2px dashed #e5484d;pointer-events:none}
+.rs-break span{position:absolute;right:8px;top:4px;font:600 11px var(--body);color:#e5484d;background:#fff;padding:0 4px}
+.rs-warn{max-width:210mm;margin:0 auto 12px;border:1px solid color-mix(in srgb,var(--warn) 50%,transparent);background:color-mix(in srgb,var(--warn) 12%,var(--surface));color:var(--text);border-radius:10px;padding:10px 12px;font-size:calc(13.5px*var(--ts))}
+.rs-warn[hidden]{display:none}
+.rs-measure [data-noprint]{display:none!important}
 .rs-e{outline:none;border-radius:2px;min-width:1ch}
 .rs-e:empty::before{content:attr(data-ph);color:#b8b8b8;font-weight:400}
 .rs-e:hover{background:rgba(80,120,255,.08)}
@@ -2069,7 +2115,7 @@ select.rs-add{appearance:auto}
 @media print{
   @page{size:A4;margin:0}
   html.print-resume body > *:not(#print-root){display:none!important}
-  html.print-resume body{position:static!important;background:#fff!important;padding:0!important;margin:0!important}
+  html.print-resume,html.print-resume body{position:static!important;height:auto!important;min-height:0!important;overflow:visible!important;background:#fff!important;padding:0!important;margin:0!important}
   html.print-resume #print-root{display:block}
   html.print-resume .rs-sheet{box-shadow:none;border-radius:0;margin:0;zoom:1!important}
   html.print-resume .rs-e{background:none!important;box-shadow:none!important}
@@ -4911,7 +4957,7 @@ function exportCSV(jobId){
 const HELP_IC='<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.6 1.6c-.6.3-.9.7-.9 1.3M8 11.3h.01"/></svg>';
 const HELP=[
  ['Getting around','Pages and views',`The sidebar has the Overview, each job, Archived, Activity and Trash. On a job page, client tabs sit under the name, with Tasks, Details and Brand guide. Switch List, Board or Calendar in the toolbar; each job remembers its own view. The browser's Back button closes the task panel or goes to the previous page, and on a phone the tab bar at the bottom has Overview, Jobs, New task, Calendar and Search.`,null],
- ['Your work','Resume',`The Resume page (sidebar footer) is an A4 page laid out like your own resume. Tap any text to change it; Enter adds a new bullet and Backspace on an empty one removes it. Use + to add a job, school, skill or link, the arrows and × to reorder or remove, and "Add from my jobs" to start an entry from one of your jobs here. Download PDF saves just the page (choose "Save as PDF"). Import loads a resume file, and Save a copy downloads one.`,null],
+ ['Your work','Resume',`The Resume page (sidebar footer) is an A4 page laid out like your own resume. Tap any text to change it; Enter adds a new bullet and Backspace on an empty one removes it. Use + to add a job, school, skill or link, the arrows and × to reorder or remove, and "Add from my jobs" to start an entry from one of your jobs here. Download PDF saves just the page (choose "Save as PDF"). Import loads a resume file, and Save a copy downloads one. Prefer text boxes? Show form (on a phone it's the Edit tab) lists each part with plain fields; bullets and skills go one per line. Keep to one page tightens the spacing, then the text size a little, when it runs long; a red dashed line marks where page 2 would start, and a note says how many lines to trim if it still doesn't fit.`,null],
  ['Getting around','On your phone',`Swipe right anywhere to open the sidebar (from the very left edge when you're on the board or other things that scroll sideways), and swipe left to close it. The bar at the bottom has Overview, Notifications and Calendar (your jobs are in the sidebar); Notifications opens as a full-height sheet you can drag down to close (swipe a notification left to dismiss it), and Search opens full screen like Slack's, with the search bar at the bottom. The round + above the search button opens a menu with the focus timer, New job and New task.`,null],
  ['Getting around','Search',`The box top-right (press /) filters the current list and also searches notes, checklist steps and links. Quick search (${MODKEY}) jumps to any task, job, client or page, archived tasks included.`,null],
  ['Getting around','Right-click menu',`Right-click a task (or press and hold on a phone) to change its status or priority, pin, duplicate, split, copy its link, archive or delete it.`,null],
@@ -4959,7 +5005,7 @@ const RS_DEF=()=>({name:'Your Name',title:'Video Editor',contacts:[{label:'Phone
   sections:[{id:'s1',kind:'jobs',title:'02 EMPLOYMENT HISTORY',items:[{start:'01/2024',end:'Present',role:'Video Editor',company:'Company name',bullets:['What you edited and for whom','A result you are proud of']}]},
     {id:'s2',kind:'edu',title:'03 EDUCATION',items:[{start:'',end:'',school:'School or university',place:'City',bullets:['Degree or course']}]},
     {id:'s3',kind:'skills',title:'04 SKILLS',skills:['Adobe Premiere Pro','Adobe After Effects','DaVinci Resolve','Videography']}]});
-let RS=null,RS_T=0,RS_LINK=null;
+let RS=null,RS_T=0,RS_LINK=null,RSF=null,RSP_T=0;
 function rsDoc(){if(!RS)RS=JSON.parse(JSON.stringify(S.settings.resume&&S.settings.resume.sections?S.settings.resume:RS_DEF()));return RS}
 function rsSave(now){clearTimeout(RS_T);const go=()=>{RS_T=0;const d={...rsDoc()};delete d.id;delete d.updated;if(S.settings.resume)patch('settings','resume',d);else create('settings',d,'resume')};if(now)go();else RS_T=setTimeout(go,600)}
 function rsGet(path){return path.split('.').reduce((o,k)=>o==null?o:o[k],rsDoc())}
@@ -4985,19 +5031,39 @@ function rsSheet(){
   });
   return h+'</div>';
 }
-function rsFit(){const w=$('.rs-wrap'),sh=$('#rs-sheet');if(!w||!sh)return;const z=Math.min(1,(w.clientWidth-2)/sh.offsetWidth);sh.style.zoom=z<1?String(z):''}
+/* fit the sheet to the screen, keep it to one A4 page when asked (tighter spacing first, then slightly smaller
+   type, never below a readable minimum), draw where each page ends, and say how much is left over */
+function rsFit(){
+  const w=$('.rs-wrap'),sh=$('#rs-sheet');if(!w||!sh||!sh.offsetWidth)return;
+  sh.style.zoom='';sh.classList.add('rs-measure');const A=297/210,over=()=>sh.scrollHeight/sh.offsetWidth-A;
+  sh.querySelectorAll('.rs-break').forEach(x=>x.remove());
+  let sc=1,f=1;sh.style.setProperty('--s','1');sh.style.setProperty('--f','1');
+  if(rsDoc().fit!==false){
+    while(over()>.002&&sc>.5){sc=Math.round((sc-.05)*100)/100;sh.style.setProperty('--s',sc)}
+    while(over()>.002&&f>.86){f=Math.round((f-.02)*100)/100;sh.style.setProperty('--f',f)}
+  }
+  const ex=over(),pages=Math.max(1,Math.ceil((sh.scrollHeight/sh.offsetWidth)/A-.002));sh.classList.remove('rs-measure');
+  for(let k=1;k<pages;k++){const b=document.createElement('div');b.className='rs-break';b.setAttribute('data-noprint','');b.style.top=`calc(${k}*297mm)`;b.innerHTML=`<span>Page ${k+1} starts here</span>`;sh.appendChild(b)}
+  const warn=$('#rs-warn');
+  if(warn){if(ex>.002){const lines=Math.ceil(ex*595.3/(12*f));warn.hidden=false;warn.innerHTML=rsDoc().fit!==false?`<b>Doesn't fit on one page.</b> Even at the smallest readable size it's about ${lines} line${lines===1?'':'s'} too long. Remove or shorten a few bullets to keep it to one page.`:`<b>This runs onto ${pages} pages.</b> Turn on “Keep to one page” to tighten it, or trim about ${lines} line${lines===1?'':'s'}.`}else warn.hidden=true}
+  const z=Math.min(1,(w.clientWidth-2)/sh.offsetWidth);sh.style.zoom=z<1?String(z):'';
+}
 addEventListener('resize',()=>{if(S.ui.tab==='resume')rsFit()});
 function renderResume(){
-  rsFonts();
-  $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${RS_IC.replace('class="i"','class="i" style="width:28px;height:28px"')}Resume</h1><div class="sub">Tap any text on the page to change it. Saved to your account as you type.</div></div>
-    <div class="rs-acts"><button type="button" class="btn primary" data-act="rs-print">${I.download}Download PDF</button><button type="button" class="btn" data-act="rs-import">Import</button><button type="button" class="btn ghost" data-act="rs-export">Save a copy</button></div></div>`;
+  rsFonts();const u=S.ui;
+  $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${RS_IC.replace('class="i"','class="i" style="width:28px;height:28px"')}Resume</h1><div class="sub rs-sub-d">Click any text on the page to change it, or use the form. Saved to your account as you type.</div><div class="sub rs-sub-m">Fill in each part below; Preview shows the page. Saved as you type.</div></div>
+    <div class="rs-acts"><button type="button" class="btn primary" data-act="rs-print">${I.download}Download PDF</button><button type="button" class="btn" data-act="rs-import">Import</button><button type="button" class="btn ghost" data-act="rs-export">Save a copy</button><button type="button" class="btn ghost" data-act="rs-formtoggle" aria-pressed="${!!S.ui.rsForm}">${S.ui.rsForm?'Hide form':'Show form'}</button></div></div>`;
   $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
-  const a=document.activeElement;if(a&&a.closest&&a.closest('#rs-sheet')&&$('#rs-sheet'))return;  /* don't redraw under the caret */
+  const a=document.activeElement;if(a&&a.closest&&a.closest('#rs-sheet,#rs-form')&&$('#rs-sheet'))return;  /* don't redraw under the caret */
   if(!RS_T)RS=null;  /* pick up changes made on another device */
-  $('#view').innerHTML=`<div class="rs-wrap">${rsSheet()}</div><input type="file" id="rs-file" accept="application/json,.json" hidden>`;
+  const mode=u.rsMode||'form';
+  $('#view').innerHTML=`<div class="rs-page ${u.rsForm?'show-form':''} m-${mode}"><div class="seg rs-mseg" role="tablist"><button type="button" data-act="rs-mode" data-m="form" class="${mode==='form'?'on':''}">Edit</button><button type="button" data-act="rs-mode" data-m="preview" class="${mode==='preview'?'on':''}">Preview</button></div>
+    <div class="rs-layout"><div class="rs-form" id="rs-form">${rsFormHtml()}</div><div class="rs-wrap"><div class="rs-warn" id="rs-warn" hidden></div>${rsSheet()}</div></div></div><input type="file" id="rs-file" accept="application/json,.json" hidden>`;
   rsFit();
 }
-function rsRedraw(focusPath){const w=$('.rs-wrap');if(!w)return;w.innerHTML=rsSheet();rsFit();if(focusPath){const e=document.querySelector(`[data-rk="${focusPath}"]`);if(e){e.focus();const g=getSelection(),rg=document.createRange();rg.selectNodeContents(e);rg.collapse(false);g.removeAllRanges();g.addRange(rg)}}}
+function rsRedrawSheet(){const w=$('.rs-wrap');if(!w)return;w.innerHTML='<div class="rs-warn" id="rs-warn" hidden></div>'+rsSheet();rsFit()}
+function rsRedrawForm(){const f=$('#rs-form');if(f)withFocus(()=>{f.innerHTML=rsFormHtml()})}
+function rsRedraw(focusPath){const w=$('.rs-wrap');if(!w)return;w.innerHTML='<div class="rs-warn" id="rs-warn" hidden></div>'+rsSheet();rsRedrawForm();rsFit();if(focusPath){const e=document.querySelector(`[data-rk="${focusPath}"]`);if(e){e.focus();const g=getSelection(),rg=document.createRange();rg.selectNodeContents(e);rg.collapse(false);g.removeAllRanges();g.addRange(rg)}}}
 function rsPrint(){
   document.activeElement?.blur?.();rsSave(true);
   const sh=$('#rs-sheet');if(!sh)return;
@@ -5017,7 +5083,7 @@ async function rsImport(file){
 }
 /* typing: update the resume doc and save (no redraw, so the caret stays put) */
 document.addEventListener('input',e=>{const el=e.target;
-  if(el.dataset&&el.dataset.rk){rsSet(el.dataset.rk,el.textContent.replace(/\s+/g,' ').trimStart());rsSave();return}
+  if(el.dataset&&el.dataset.rk){rsSet(el.dataset.rk,el.textContent.replace(/\s+/g,' ').trimStart());rsSave();clearTimeout(RSP_T);RSP_T=setTimeout(()=>{rsFit();rsRedrawForm()},400);return}
   if(el.dataset&&el.dataset.rurl!=null){rsDoc().links[+el.dataset.rurl].url=el.value.trim();rsSave()}
 });
 document.addEventListener('paste',e=>{const el=e.target.closest?.('[data-rk]');if(!el)return;e.preventDefault();document.execCommand('insertText',false,(e.clipboardData.getData('text/plain')||'').replace(/\s*\n\s*/g,' '))});
@@ -5026,6 +5092,39 @@ document.addEventListener('keydown',e=>{const el=e.target.closest?.('[data-rk]')
   if(e.key==='Enter'){e.preventDefault();if(m){const arr=rsGet(m[1]),i=+m[2];arr.splice(i+1,0,'');rsSave();rsRedraw(`${m[1]}.${i+1}`)}else el.blur();return}
   if(e.key==='Backspace'&&m&&!el.textContent){e.preventDefault();const arr=rsGet(m[1]),i=+m[2];arr.splice(i,1);rsSave();rsRedraw(i>0?`${m[1]}.${i-1}`:null)}
 });
+/* the form: a Settings-style list, then one part at a time with plain text boxes (bullets and skills one per line) */
+function rsFormHtml(){
+  const r=rsDoc(),inp=(path,label,ph='',type='text')=>`<label>${label}<input type="${type}" data-rf="${path}" data-fk="rf-${path}" value="${esc(rsGet(path)||'')}" placeholder="${esc(ph)}"></label>`;
+  const lines=(path,label,ph)=>`<label>${label}<textarea data-rfl="${path}" data-fk="rf-${path}" placeholder="${esc(ph)}">${esc((rsGet(path)||[]).join('\n'))}</textarea></label>`;
+  const back=`<div class="rf-head"><button type="button" class="rf-back" data-act="rf-open" data-s="">${I.left}Resume</button>`;
+  if(RSF==='contact')return `${back}<b>Name & contact</b></div><div class="rf-body">${inp('name','Name')}${inp('title','Title','Video Editor')}
+    ${r.contacts.map((c,i)=>`<div class="rf-2">${inp(`contacts.${i}.label`,'Label','Phone')}${inp(`contacts.${i}.value`,'Value')}</div>`).join('')}
+    <p class="rf-hint">Links show under the contact details, underlined.</p>
+    ${r.links.map((l,i)=>`<div class="rf-card"><div class="rf-card-h"><b>${esc(l.label||'Link')}</b><button type="button" class="icon-btn" data-act="rs-del" data-p="links" data-i="${i}" title="Remove link" aria-label="Remove link">${I.trash}</button></div><div class="rf-2">${inp(`links.${i}.label`,'Shown as','Portfolio')}${inp(`links.${i}.url`,'Address','https://…','url')}</div></div>`).join('')}
+    <button type="button" class="btn sm" data-act="rs-add-link">${I.plus}Add link</button></div>`;
+  if(RSF!=null&&r.sections[RSF]){const si=RSF,sec=r.sections[si],P=`sections.${si}`;
+    let b=`${back}<b>${esc((sec.title||'Section').replace(/^\d+\s*/,''))}</b></div><div class="rf-body">${inp(P+'.title','Section heading')}`;
+    if(sec.kind==='skills')return b+lines(P+'.skills','Skills (one per line)','Adobe Premiere Pro')+'</div>';
+    b+=(sec.items||[]).map((it,i)=>{const Q=`${P}.items.${i}`,n=sec.items.length;return `<div class="rf-card"><div class="rf-card-h"><b>${esc(sec.kind==='jobs'?[it.role,it.company].filter(Boolean).join(' at ')||'New job':it.school||'New school')}</b>
+      ${i>0?`<button type="button" class="icon-btn" data-act="rs-move" data-p="${P}.items" data-i="${i}" data-d="-1" title="Move up" aria-label="Move up">↑</button>`:''}${i<n-1?`<button type="button" class="icon-btn" data-act="rs-move" data-p="${P}.items" data-i="${i}" data-d="1" title="Move down" aria-label="Move down">↓</button>`:''}<button type="button" class="icon-btn" data-act="rs-del" data-p="${P}.items" data-i="${i}" title="Remove" aria-label="Remove">${I.trash}</button></div>
+      ${sec.kind==='jobs'?`<div class="rf-2">${inp(Q+'.role','Role','Video Editor')}${inp(Q+'.company','Company')}</div>`:`${inp(Q+'.school','School')}${inp(Q+'.place','Place','City')}`}
+      <div class="rf-2">${inp(Q+'.start','From','06/2022')}${inp(Q+'.end','To','Present')}</div>
+      ${lines(Q+'.bullets','Bullet points (one per line)','What you did')}</div>`}).join('');
+    return b+`<button type="button" class="btn sm" data-act="rs-add" data-p="${P}.items" data-kind="${sec.kind}">${I.plus}Add ${sec.kind==='jobs'?'job':'school'}</button>${sec.kind==='jobs'&&jobsSorted().length?`<select class="sel" id="rs-fromjob" data-si="${si}" aria-label="Add from one of your jobs"><option value="">+ Add from my jobs…</option>${jobsSorted().map(j=>`<option value="${j.id}">${esc(j.name)}</option>`).join('')}</select>`:''}</div>`}
+  RSF=null;
+  const row=(k,title,sub)=>`<button type="button" class="rf-row" data-act="rf-open" data-s="${k}"><span><b>${esc(title)}</b><small>${esc(sub)}</small></span><i class="chev">›</i></button>`;
+  return `${row('contact','Name & contact',[r.name,r.title].filter(Boolean).join(' · '))}
+    ${r.sections.map((sec,si)=>row(si,(sec.title||'Section').replace(/^\d+\s*/,''),sec.kind==='skills'?`${(sec.skills||[]).length} skills`:`${(sec.items||[]).length} ${sec.kind==='jobs'?'job':'school'}${(sec.items||[]).length===1?'':'s'}`)).join('')}
+    <label class="rf-toggle"><span><b>Keep to one page</b><small>Tightens spacing, then text size a little, when it runs long</small></span><input type="checkbox" id="rs-fit" ${r.fit!==false?'checked':''}></label>`;
+}
+document.addEventListener('input',e=>{const el=e.target;if(!el.dataset)return;
+  if(el.dataset.rf){rsSet(el.dataset.rf,el.value);rsSave()}
+  else if(el.dataset.rfl){rsSet(el.dataset.rfl,el.value.split('\n').map(x=>x.trim()));rsSave()}
+  else return;
+  clearTimeout(RSP_T);RSP_T=setTimeout(rsRedrawSheet,180);
+});
+/* leaving a one-per-line box drops its empty lines */
+document.addEventListener('focusout',e=>{const k=e.target.dataset&&e.target.dataset.rfl;if(!k)return;const v=rsGet(k);if(Array.isArray(v)){const c=v.filter(x=>x);if(c.length!==v.length){rsSet(k,c);rsSave();rsRedrawSheet()}}});
 function rsFromJob(si,jid){const j=S.jobs[jid];if(!j)return;const w=workOf(j),since=w.since||'';const mm=since.match(/^(\d{4})-(\d{2})/);
   rsDoc().sections[si].items.push({start:mm?`${mm[2]}/${mm[1]}`:'',end:'Present',role:'Video Editor',company:j.name,bullets:j.type==='agency'&&shownClients(j.id).length?[`Edited videos for ${shownClients(j.id).map(c=>c.name).join(', ')}`]:['']});
   rsSave(true);rsRedraw();toast(`Added ${j.name}. Tap the text to adjust it.`)}
@@ -6184,6 +6283,9 @@ document.addEventListener('click',e=>{
     case 'tb-notes': UPN=false;renderUpNextPage();notesOpen=!notesOpen;if(notesOpen){saveNotes();POMO_OPEN=false;renderPomo();closeSide()}renderBell();break;
     case 'groups-all': {const open=el.dataset.open==='1';u.collapsed=u.collapsed||{};STATUSES.forEach(x=>{u.collapsed[x.id]=!open});saveUi();render();break}
     case 'rs-print': rsPrint();break;
+    case 'rs-mode': u.rsMode=el.dataset.m;saveUi();render();break;
+    case 'rs-formtoggle': u.rsForm=!u.rsForm;saveUi();render();break;
+    case 'rf-open': RSF=el.dataset.s===''?null:el.dataset.s==='contact'?'contact':+el.dataset.s;rsRedrawForm();$('#rs-form')?.scrollTo(0,0);if(narrow.matches)window.scrollTo({top:0});break;
     case 'rs-export': rsExport();break;
     case 'rs-import': $('#rs-file')?.click();break;
     case 'rs-link': RS_LINK=RS_LINK===+el.dataset.i?null:+el.dataset.i;rsRedraw();$(`[data-rurl="${el.dataset.i}"]`)?.focus();break;
@@ -6449,6 +6551,7 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('change',e=>{
   const el=e.target,u=S.ui;
+  if(el.id==='rs-fit'){rsDoc().fit=el.checked;rsSave(true);rsFit();return}
   if(el.id==='rs-file'){const f=el.files?.[0];el.value='';if(f)rsImport(f);return}
   if(el.id==='rs-fromjob'){const v=el.value;el.value='';if(v)rsFromJob(+el.dataset.si,v);return}
   if(el.id==='f-prio'){u.prio=el.value;render();return}
