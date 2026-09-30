@@ -1806,15 +1806,20 @@ html{overscroll-behavior-y:contain}
   #notes .note-main span span{font-size:calc(14px*var(--ts))}
   #notes .note-main small{font-size:calc(12.5px*var(--ts))}
   #notes .note .icon-btn{width:38px;height:38px}
-  /* search: a full-height sheet like a task, the search box at the top */
-  .jump-wrap{background:rgba(10,12,16,.35);padding:calc(env(safe-area-inset-top,0px) + 12px) 0 0}
-  .jump{border-radius:18px 18px 0 0;background:var(--surface);animation:sheetUp .3s cubic-bezier(.2,.8,.2,1);transition:transform .2s ease;box-shadow:0 -8px 30px rgba(0,0,0,.25)}
-  .jump-top{position:relative;padding:24px 20px 8px;background:none;border:0}
-  .jump-top::before{content:"";position:absolute;top:8px;left:50%;width:38px;height:5px;margin-left:-19px;border-radius:3px;background:var(--line-strong)}
-  .jump-bar{order:1;padding:4px 14px 10px}
-  .jump-list{order:2;border-top:1px solid var(--line)}
-  .jump-in{box-shadow:none;background:var(--surface-2);border-color:var(--line)}
-  .jump-x{box-shadow:none;background:var(--surface-2);border-color:var(--line)}
+  /* search: full screen like Slack: colored header, results, the search bar at the bottom (above the keyboard) */
+  .jump-wrap{background:var(--bg);padding:0}
+  .jump{border-radius:0;background:var(--bg);box-shadow:none;animation:jumpIn .18s ease-out}
+  @keyframes jumpIn{from{opacity:0}to{opacity:1}}
+  .jump-top{position:relative;padding:calc(env(safe-area-inset-top,0px) + 22px) 22px 20px;background:linear-gradient(160deg,var(--side-bg),color-mix(in srgb,var(--side-bg) 78%,#000));border:0}
+  :root[data-scheme] .jump-top{color:#fff}
+  .jump-top h2{font-size:calc(30px*var(--ts))}
+  .jump-list{order:1;border-top:0;padding:10px 8px}
+  .jump-bar{order:2;padding:10px 16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--bg) 70%,transparent)}
+  body.kb-open .jump-bar{padding-bottom:10px}
+  .jump-in{background:var(--surface-2);border:1px solid var(--line-strong);border-radius:999px;padding:13px 18px;box-shadow:0 6px 20px rgba(10,12,16,.18)}
+  .jump-x{width:52px;height:52px;background:var(--surface-2);border:1px solid var(--line-strong);box-shadow:0 6px 20px rgba(10,12,16,.18)}
+  .jump-g{font-size:calc(15px*var(--ts));margin:12px 12px 8px}
+  .jump-item{padding:11px 12px}
   /* settings-style dialogs: roomier rows */
   .pref-s .pref-nav button{padding:14px 18px}
   .modal footer .btn{min-height:46px}
@@ -3560,10 +3565,17 @@ const TYPING_KEYS=[[IS_MAC?'⌘Z':'Ctrl Z','Undo typing'],[IS_MAC?'⇧⌘Z':'Ctr
 const keyRows=list=>list.map(([k,d])=>`<div class="key-row"><span>${k.split(' ').map(x=>`<kbd>${x}</kbd>`).join(' ')}</span><span>${esc(d)}</span></div>`).join('');
 function shortcutSettingsHtml(){return `<div class="field"><p class="hint" style="margin:0">They work anywhere in the app, except while you're typing in a field.</p><div class="keys-list">${keyRows(SHORTCUTS)}</div></div>
   <div class="field"><span class="lbl">While typing in a text box</span><div class="keys-list">${keyRows(TYPING_KEYS)}</div></div>`}
-function openJump(){JUMP={q:'',i:0};renderJump();jumpVV();$('#jump-q')?.focus();sheetLock()}
+function openJump(){JUMP={q:'',i:0};renderJump();sheetLock();jumpVV();if(!narrow.matches)$('#jump-q')?.focus()}
 /* phones: notifications and search open as full-height sheets like a task; drag the top down to close.
    Swipe a notification left to dismiss it. */
-function sheetLock(){document.body.classList.toggle('sheet-open',narrow.matches&&(!!JUMP||notesOpen))}
+/* while a phone sheet is open the page behind is pinned in place (position:fixed on <body>), so focusing
+   the search box can't scroll the page; the scroll position comes back when it closes */
+let SHEET_Y=null;
+function sheetLock(){
+  const on=narrow.matches&&(!!JUMP||notesOpen),b=document.body;b.classList.toggle('sheet-open',on);
+  if(on&&SHEET_Y===null){SHEET_Y=scrollY;b.style.position='fixed';b.style.top=-SHEET_Y+'px';b.style.left='0';b.style.right='0'}
+  else if(!on&&SHEET_Y!==null){const y=SHEET_Y;SHEET_Y=null;b.style.position='';b.style.top='';b.style.left='';b.style.right='';scrollTo(0,y)}
+}
 let SHD=null,SHD_EAT=0;
 /* a drag that closed a sheet or dismissed a notification shouldn't also count as a tap on what's underneath */
 document.addEventListener('click',e=>{if(Date.now()<SHD_EAT){e.stopPropagation();e.preventDefault();SHD_EAT=0}},true);
@@ -3591,7 +3603,7 @@ document.addEventListener('touchend',()=>{
   else{el.style.transform='';el.style.opacity=''}
 },{passive:true});
 /* on phones the search sheet fills the visible area, so its search bar sits right above the keyboard */
-function jumpVV(){const e=$('#jump'),v=window.visualViewport;if(!e)return;if(e.hidden||!v||!narrow.matches){e.style.top='';e.style.height='';return}e.style.top=v.offsetTop+'px';e.style.height=v.height+'px'}
+function jumpVV(){const e=$('#jump'),v=window.visualViewport;if(!e)return;if(e.hidden||!v||!narrow.matches){e.style.top='';e.style.height='';document.body.classList.remove('kb-open');return}e.style.top=v.offsetTop+'px';e.style.height=v.height+'px';document.body.classList.toggle('kb-open',innerHeight-v.height>120)}
 window.visualViewport?.addEventListener('resize',jumpVV);window.visualViewport?.addEventListener('scroll',jumpVV);
 function closeJump(){JUMP=null;const e=$('#jump');if(e){e.hidden=true;e.innerHTML=''}sheetLock()}
 function renderJump(){
@@ -3600,7 +3612,7 @@ function renderJump(){
   e.hidden=false;
   let lastG='';
   const list=items.map((x,k)=>`${!JUMP.q.trim()&&x.grp&&x.grp!==lastG?`<h3 class="jump-g">${esc(lastG=x.grp)}</h3>`:''}<button type="button" class="jump-item ${k===JUMP.i?'on':''}" data-act="jump-go" data-k="${k}"><span class="jic">${x.icon}</span><span class="jl">${esc(x.label)}</span><span class="js">${esc(x.sub)}</span></button>`).join('')||`<p class="hint" style="padding:14px">Nothing matches “${esc(JUMP.q)}”.</p>`;
-  if(!$('#jump-q')){e.innerHTML=`<div class="jump" role="dialog" aria-modal="true" aria-label="Quick search"><div class="jump-top" data-sheet-grab><h2>Search</h2></div><div class="jump-bar"><label class="jump-in"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="jump-q" placeholder="Quick search: tasks, jobs, clients, pages…" autocomplete="off" spellcheck="false"><kbd>Esc</kbd></label><button type="button" class="jump-x" data-act="jump-close" aria-label="Close search" title="Close">${I.x}</button></div><div class="jump-list" id="jump-list">${list}</div><div class="jump-foot"><span>↑↓ to move</span><span>Enter to open</span></div></div>`}
+  if(!$('#jump-q')){e.innerHTML=`<div class="jump" role="dialog" aria-modal="true" aria-label="Quick search"><div class="jump-top"><h2>Search</h2></div><div class="jump-bar"><label class="jump-in"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="jump-q" placeholder="Search tasks, jobs, clients…" autocomplete="off" spellcheck="false"><kbd>Esc</kbd></label><button type="button" class="jump-x" data-act="jump-close" aria-label="Close search" title="Close">${I.x}</button></div><div class="jump-list" id="jump-list">${list}</div><div class="jump-foot"><span>↑↓ to move</span><span>Enter to open</span></div></div>`}
   else $('#jump-list').innerHTML=list;
   $('#jump-list .on')?.scrollIntoView({block:'nearest'});
 }
@@ -4596,7 +4608,7 @@ function exportCSV(jobId){
 const HELP_IC='<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.6 1.6c-.6.3-.9.7-.9 1.3M8 11.3h.01"/></svg>';
 const HELP=[
  ['Getting around','Pages and views',`The sidebar has the Overview, each job, Archived, Activity and Trash. On a job page, client tabs sit under the name, with Tasks, Details and Brand guide. Switch List, Board or Calendar in the toolbar; each job remembers its own view. The browser's Back button closes the task panel or goes to the previous page, and on a phone the tab bar at the bottom has Overview, Jobs, New task, Calendar and Search.`,null],
- ['Getting around','On your phone',`Swipe right anywhere to open the sidebar (from the very left edge when you're on the board or other things that scroll sideways), and swipe left to close it. The bar at the bottom has Overview, Notifications and Calendar (your jobs are in the sidebar); Notifications and Search open as full-height sheets you can drag down to close, and you can swipe a notification left to dismiss it. The round + above the search button opens a menu with the focus timer, New job and New task.`,null],
+ ['Getting around','On your phone',`Swipe right anywhere to open the sidebar (from the very left edge when you're on the board or other things that scroll sideways), and swipe left to close it. The bar at the bottom has Overview, Notifications and Calendar (your jobs are in the sidebar); Notifications opens as a full-height sheet you can drag down to close (swipe a notification left to dismiss it), and Search opens full screen like Slack's, with the search bar at the bottom. The round + above the search button opens a menu with the focus timer, New job and New task.`,null],
  ['Getting around','Search',`The box top-right (press /) filters the current list and also searches notes, checklist steps and links. Quick search (${MODKEY}) jumps to any task, job, client or page, archived tasks included.`,null],
  ['Getting around','Right-click menu',`Right-click a task (or press and hold on a phone) to change its status or priority, pin, duplicate, split, copy its link, archive or delete it.`,null],
  ['Tasks','New tasks',`New task opens an unsaved draft; nothing is created until you click Save task. Double-click a name in the list or on the board to rename it. In the list, click the due date or priority to change it right there.`,null],
