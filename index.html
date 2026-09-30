@@ -1791,21 +1791,38 @@ html{overscroll-behavior-y:contain}
   .tb-fab .i{transition:transform .2s ease}
   .tb-fab.on .i{transform:rotate(45deg)}
   body.sheet-open{overflow:hidden}
-  /* notifications: a full-height sheet like a task */
-  body > #notes{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);bottom:0;left:0;right:0;width:auto;max-height:none;border:0;border-radius:18px 18px 0 0;z-index:45;overflow:auto;overscroll-behavior:contain;box-shadow:0 -8px 30px rgba(0,0,0,.25);animation:sheetUp .3s cubic-bezier(.2,.8,.2,1);transition:transform .2s ease}
-  #notes .notes-head{padding:24px 12px 12px 18px;z-index:2}
-  #notes .notes-head::before{content:"";position:absolute;top:8px;left:50%;width:38px;height:5px;margin-left:-19px;border-radius:3px;background:var(--line-strong)}
-  #notes .notes-head b{flex:1;min-width:0;font-size:calc(23px*var(--ts))}
-  #notes .notes-head .btn,#notes .notes-x{flex:none}
-  #notes .notes-head{padding-right:14px}
-  #notes .notes-x{display:grid;place-items:center}
-  #notes .notes-tip{display:block;margin:10px 18px 6px;color:var(--faint);font-size:calc(12.5px*var(--ts))}
-  #notes .note{background:var(--surface);transition:transform .2s ease,opacity .2s ease;padding-right:8px}
-  #notes .note-main{padding:14px 8px 14px 18px;gap:12px}
-  #notes .note-main b{font-size:calc(15.5px*var(--ts))}
-  #notes .note-main span span{font-size:calc(14px*var(--ts))}
-  #notes .note-main small{font-size:calc(12.5px*var(--ts))}
-  #notes .note .icon-btn{width:38px;height:38px}
+  /* notifications: a full page like Slack's Activity, under the bottom bar */
+  body > #notes{position:fixed;inset:0;width:auto;max-height:none;border:0;border-radius:0;z-index:17;overflow:auto;overscroll-behavior:contain;background:var(--bg);box-shadow:none;animation:jumpIn .18s ease-out;padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+  .na-head{display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 22px) 18px 20px 22px;background:linear-gradient(160deg,var(--side-bg),color-mix(in srgb,var(--side-bg) 78%,#000))}
+  :root[data-scheme] .na-head{color:#fff}
+  .na-head h2{flex:1;min-width:0;margin:0;font:700 calc(28px*var(--ts))/1.1 var(--display)}
+  .na-read{border:1px solid color-mix(in srgb,currentColor 30%,transparent);background:color-mix(in srgb,currentColor 10%,transparent);color:inherit;border-radius:999px;padding:8px 14px;font:600 calc(13.5px*var(--ts)) var(--body);white-space:nowrap;flex:none}
+  .na-chips{display:flex;gap:8px;overflow-x:auto;padding:14px 16px;border-bottom:1px solid var(--line);scrollbar-width:none;position:sticky;top:0;background:var(--bg);z-index:2}
+  .na-chip{flex:none;border:1px solid var(--line-strong);background:none;color:var(--text);border-radius:12px;padding:10px 18px;font:500 calc(15px*var(--ts)) var(--body)}
+  .na-chip small{color:var(--muted);font-size:calc(12px*var(--ts))}
+  .na-chip.on{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 60%,transparent);color:var(--text);font-weight:700}
+  #notes .na-item{display:block;border-top:0;border-bottom:1px solid var(--line);padding:0;background:var(--bg);transition:transform .2s ease,opacity .2s ease}
+  .na-main{display:flex;gap:14px;width:100%;border:0;background:none;text-align:left;padding:16px 18px;color:var(--text)}
+  .na-main:active{background:var(--surface-2)}
+  .na-av{position:relative;flex:none;width:46px;height:46px}
+  .na-av .tmark{width:46px;height:46px;border-radius:12px}
+  .na-av .tmark .i,.na-ic svg{width:22px;height:22px}
+  .na-ic{display:grid;place-items:center;color:var(--muted);background:var(--surface-2)}
+  .na-badge{position:absolute;right:-5px;bottom:-5px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--bg);color:var(--muted);box-shadow:0 0 0 2px var(--bg)}
+  .na-badge svg{width:14px;height:14px}
+  .na-badge.k-danger{color:var(--danger)}.na-badge.k-warn{color:var(--warn)}.na-badge.k-info{color:var(--accent)}
+  .na-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+  .na-top{display:flex;align-items:baseline;gap:10px}
+  .na-top b{flex:1;min-width:0;font-size:calc(17px*var(--ts));font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .na-top time{flex:none;color:var(--muted);font-size:calc(13.5px*var(--ts))}
+  .na-what{color:var(--muted);font-size:calc(14.5px*var(--ts));display:flex;align-items:center;gap:6px}
+  .na-item.danger .na-what{color:var(--danger)}
+  .na-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .na-text{font-size:calc(16px*var(--ts));line-height:1.35;color:var(--text);opacity:.88}
+  .na-meta{color:var(--faint);font-size:calc(13px*var(--ts))}
+  .na-item:not(.unread) .na-top b{font-weight:600}
+  .na-tip,.na-empty{margin:16px 20px;color:var(--faint);font-size:calc(13px*var(--ts))}
+  .na-empty{font-size:calc(15px*var(--ts));color:var(--muted);text-align:center;margin-top:40px}
   /* search: full screen like Slack: colored header, results, the search bar at the bottom (above the keyboard) */
   .jump-wrap{background:var(--bg);padding:0}
   .jump{border-radius:0;background:var(--bg);box-shadow:none;animation:jumpIn .18s ease-out}
@@ -3231,9 +3248,33 @@ function renderBell(){
   b.setAttribute('aria-label',unread?`Notifications, ${unread} unread`:'Notifications');
   renderTabbar();sheetLock();
   const pop=$('#notes');pop.hidden=!notesOpen;if(!notesOpen)return;
+  if(narrow.matches){pop.innerHTML=notesPageHtml(list,unread);return}
   pop.innerHTML=`<div class="notes-head" data-sheet-grab><b>Notifications</b>${unread?'<button type="button" class="btn sm ghost" data-act="notes-read">Mark all as read</button>':''}<button type="button" class="icon-btn notes-x" data-act="notes-close" aria-label="Close" title="Close">${I.x}</button></div>${list.length?'<p class="notes-tip">Swipe a notification left to dismiss it.</p>':''}
     ${list.length?`<div class="notes-list">${list.map(n=>`<div data-nkey="${esc(n.key)}" class="note ${n.kind} ${NS.read[n.key]?'':'unread'}"><button type="button" class="note-main" data-act="note-open" data-key="${esc(n.key)}">${I[n.icon]}<span><b>${esc(n.title)}</b>${n.body?`<span>${esc(n.body)}</span>`:''}<small>${esc(n.sub)}</small></span></button><button type="button" class="icon-btn" data-act="note-hide" data-key="${esc(n.key)}" aria-label="Dismiss" title="Dismiss">${I.x}</button></div>`).join('')}</div>`
     :`<p class="notes-empty">You're all caught up. Deadlines, busy days and tasks that need a nudge will show up here.</p>`}`;
+}
+/* phones: notifications as a full page like Slack's Activity: colored header, filter chips,
+   rows with the task's logo, a kind badge, what happened, when, and the job; swipe a row left to dismiss */
+let NF='all';
+const NA_LBL={over:'Overdue',today:'Due today',tmrw:'Due tomorrow',start:'Starts today',stale:'Needs a nudge',rev:'Many revisions',nodate:'No due date',busy:'Busy day',backup:'Backup'};
+const NA_DEAD=new Set(['over','today','tmrw','busy']);
+function notesPageHtml(list,unread){
+  const kindOf=n=>n.key.split(':')[0];
+  const f={all:list,unread:list.filter(n=>!NS.read[n.key]),deadlines:list.filter(n=>NA_DEAD.has(kindOf(n))),followups:list.filter(n=>!NA_DEAD.has(kindOf(n)))};
+  const chips=[['all','All'],['unread','Unread'],['deadlines','Deadlines'],['followups','Follow-ups']].map(([k,l])=>`<button type="button" class="na-chip ${NF===k?'on':''}" data-act="na-filter" data-f="${k}">${l}${k!=='all'&&f[k].length?` <small>${f[k].length}</small>`:''}</button>`).join('');
+  const rows=(f[NF]||list).map(n=>{
+    const t=n.task,k=kindOf(n),j=t&&S.jobs[t.jobId],c=t&&S.clients[t.clientId];
+    const av=t?taskMark(t):`<div class="tmark na-ic">${I[n.icon]}</div>`;
+    const when=t?.due?fmtRel(t.due,k==='over'):n.day?fmtDate(n.day):'';
+    return `<div data-nkey="${esc(n.key)}" class="note na-item ${n.kind} ${NS.read[n.key]?'':'unread'}"><button type="button" class="na-main" data-act="note-open" data-key="${esc(n.key)}">
+      <span class="na-av">${av}<i class="na-badge k-${n.kind}">${I[n.icon]}</i></span>
+      <span class="na-body"><span class="na-top"><b>${esc(t?(t.name||'Untitled task'):n.title)}</b>${when?`<time>${esc(when)}</time>`:''}</span>
+        <span class="na-what">${esc(NA_LBL[k]||'')}${NS.read[n.key]?'':'<i class="na-dot"></i>'}</span>
+        ${n.body?`<span class="na-text">${esc(n.body)}</span>`:''}
+        ${t?`<span class="na-meta">${esc([j?.name,c?.name].filter(Boolean).join(' · '))}</span>`:n.sub?`<span class="na-meta">${esc(n.sub)}</span>`:''}</span></button></div>`}).join('');
+  return `<div class="na-head"><h2>Notifications</h2>${unread?'<button type="button" class="na-read" data-act="notes-read">Mark all read</button>':''}</div>
+    <div class="na-chips" role="tablist" aria-label="Filter">${chips}</div>
+    ${rows?`<div class="notes-list na-list">${rows}</div>${list.length?'<p class="na-tip">Swipe a notification left to dismiss it.</p>':''}`:`<p class="na-empty">${list.length?'Nothing here.':"You're all caught up. Deadlines, busy days and tasks that need a nudge will show up here."}</p>`}`;
 }
 /* Backup reminder: 30+ days since the last download (or since the first real task, if never) */
 const BACKUP_DAYS=30;
@@ -5767,9 +5808,9 @@ document.addEventListener('click',e=>{
     case 'vopt': VOPT=!VOPT;renderVopt();break;
     case 'cx': ctxDo(el.dataset.do,el.dataset.v);break;
     case 'row-due-pick':{const inp=el.querySelector('.cell-date');if(!inp)break;try{inp.showPicker()}catch(x){inp.style.pointerEvents='auto';inp.focus();inp.click()}break}
-    case 'tb-overview': if(u.tab!=='overview')u.from=u.tab;u.tab='overview';u.client='all';u.pane='tasks';if(u.view==='calendar')u.view=(u.views?.overview&&u.views.overview!=='calendar')?u.views.overview:'list';(u.views=u.views||{}).overview=u.view;saveUi();render();window.scrollTo({top:0});break;
+    case 'tb-overview': notesOpen=false;if(u.tab!=='overview')u.from=u.tab;u.tab='overview';u.client='all';u.pane='tasks';if(u.view==='calendar')u.view=(u.views?.overview&&u.views.overview!=='calendar')?u.views.overview:'list';(u.views=u.views||{}).overview=u.view;saveUi();render();window.scrollTo({top:0});break;
     case 'tb-jobs': u.jobsOpen=true;saveUi();renderSide();openSide();break;
-    case 'tb-cal': if(['archived','activity','trash','help'].includes(u.tab)){u.tab='overview';u.client='all'}u.pane='tasks';u.view='calendar';(u.views=u.views||{})[u.tab]='calendar';saveUi();render();window.scrollTo({top:0});break;
+    case 'tb-cal': notesOpen=false;if(['archived','activity','trash','help'].includes(u.tab)){u.tab='overview';u.client='all'}u.pane='tasks';u.view='calendar';(u.views=u.views||{})[u.tab]='calendar';saveUi();render();window.scrollTo({top:0});break;
     case 'tb-search': openJump();break;
     case 'tb-plus': PLUS=!PLUS;renderPlus();break;
     case 'pm-timer': PLUS=false;renderPlus();POMO_OPEN=true;notesOpen=false;renderBell();renderPomo();break;
@@ -5781,6 +5822,7 @@ document.addEventListener('click',e=>{
     case 'log-more': u.lmore=(u.lmore||200)+200;render();break;
     case 'bell': notesOpen=!notesOpen;if(notesOpen)saveNotes();renderBell();break;
     case 'notes-close': notesOpen=false;renderBell();break;
+    case 'na-filter': NF=el.dataset.f;renderBell();break;
     case 'notes-read': notifications().forEach(n=>NS.read[n.key]=1);saveNotes();renderBell();break;
     case 'note-open': openNote(el.dataset.key);break;
     case 'note-hide': NS.hidden[el.dataset.key]=1;NS.read[el.dataset.key]=1;saveNotes();renderBell();break;
