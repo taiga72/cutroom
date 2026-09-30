@@ -1691,7 +1691,7 @@ const TOOL_ROLES=[
   {id:'comms',label:'Communication',opts:['Slack','WhatsApp','Email','Discord','Microsoft Teams','Other']},
   {id:'tracker',label:'Task tracker',opts:['ClickUp','Custom website','Asana','Trello','Notion','Monday.com','None']},
   {id:'upload',label:'Review / upload',opts:['Frame.io','Google Drive','Dropbox','Vimeo','Other']},
-  {id:'storage',label:'File storage',opts:['Google Drive','OneDrive','Dropbox','LucidLink','Other']}];
+  {id:'storage',label:'File storage',opts:['Google Drive','OneDrive','Dropbox','LucidLink','Descript','Other']}];
 const FORMATS=['16:9','9:16','1:1','4:5'];
 const COLORS=['#2f73e8','#0b7f93','#2b9348','#e07b00','#d9362b','#c2417a','#8b5cf6','#6b7280'];
 const COLS=['jobs','clients','tasks','settings'];
@@ -2287,7 +2287,7 @@ const linkLabel=(job,kind)=>{
   if(kind==='task') return tl.tracker&&tl.tracker!=='None'?`${tl.tracker} task`:'Task link';
   if(kind==='upload') return `${tl.upload||'Upload'} link`;
   if(kind==='project') return 'Project folder (Mac)';
-  return `${tl.storage||'Files'} folder`;
+  return tl.storage==='Descript'?'Descript files':`${tl.storage||'Files'} folder`;
 };
 
 /* ================= rendering ================= */
@@ -2790,6 +2790,7 @@ const SVC=[
   [/(^|\.)(onedrive\.live\.com|1drv\.ms|sharepoint\.com|onedrive\.com)$/,'<svg class="svc" viewBox="0 0 16 16"><path d="M4.3 12.6a3.1 3.1 0 0 1-.5-6.2 4.2 4.2 0 0 1 7.9-1.3 3.4 3.4 0 0 1 .8 7.5z" fill="#0f78d4"/></svg>'],
   [/(^|\.)clickup\.com$|(^|\.)sharing\.clickup\.com$/,'<svg class="svc" viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"><path d="M3 9.6 8 5.4l5 4.2" stroke="#ff02f0"/><path d="M3.4 12.2c2.6 2.2 6.6 2.2 9.2 0" stroke="#8930fd"/></svg>'],
   [/(^|\.)lucidlink\.com$|(^|\.)lucidlink\.app$/,'<svg class="svc" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#5b2ee8"/><path d="M6 4.5v6.8h4.4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'],
+  [/(^|\.)descript\.com$/,'<svg class="svc" viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" rx="3.5" fill="#1b1b1f"/><path d="M5 4h3.2a4 4 0 0 1 0 8H5z" fill="#fff"/><path d="M7 6h1.1a2 2 0 0 1 0 4H7z" fill="#1b1b1f"/></svg>'],
   [/(^|\.)dropbox\.com$|(^|\.)db\.tt$/,'<svg class="svc" viewBox="0 0 16 16"><path d="M4.6 1.8 1 4.1l3.6 2.3L8 4.1zM11.4 1.8 8 4.1l3.4 2.3L15 4.1zM1 8.7l3.6 2.3L8 8.7 4.6 6.4zM11.4 6.4 8 8.7l3.4 2.3L15 8.7zM4.7 11.8 8 14l3.3-2.2L8 9.6z" fill="#0061ff"/></svg>'],
   [/(^|\.)vimeo\.com$/,'<svg class="svc" viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" rx="3.5" fill="#1ab7ea"/><path d="M4.3 6.4 5 7c.5-.4.9-.6 1.1-.1l1.3 4.1c.6 1.2 1.2 1.3 2.1.2 1.4-1.8 2.3-3.2 2.4-4.4.1-1.6-1.3-1.7-2.5-.9.5-1.6 2.5-1.9 2.5-1.9" fill="none" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'],
   [/(^|\.)(youtube\.com|youtu\.be)$/,'<svg class="svc" viewBox="0 0 16 16"><rect x="1" y="3" width="14" height="10" rx="3" fill="#ff0000"/><path d="M6.6 5.7v4.6L10.4 8z" fill="#fff"/></svg>']];
@@ -4083,6 +4084,7 @@ const HELP=[
  ['Getting around','Right-click menu',`Right-click a task (or press and hold on a phone) to change its status or priority, pin, duplicate, split, copy its link, archive or delete it.`,null],
  ['Tasks','New tasks',`New task opens an unsaved draft; nothing is created until you click Save task. Double-click a name in the list or on the board to rename it. In the list, click the due date or priority to change it right there.`,null],
  ['Tasks','Statuses and Done',`Move a task along with the › button or the ✓ in the task panel. Moving to In progress fills in today as the start date if it's empty; moving to Revisions adds a revision round; Done gets a little confetti. Every status change can be undone from the message.`,['statuses','Statuses']],
+ ['Tasks','Where footage comes from',`Each task has a files link for the raw footage. Its name follows the job's File storage tool (Edit job → Tools & folders): pick Descript there if a job sends its shoots as Descript links, and the task's link becomes "Descript files" with a Descript icon. For one job-wide link, paste it in the storage box of Tools & folders instead.`,null],
  ['Tasks','Split into tasks',`In a task's panel (or the right-click menu), Split into tasks turns one task into several: one name per line, each with the same job, client, links, dates and notes, and the checklist unticked.`,null],
  ['Tasks','Select several',`Turn on Select in the toolbar, tick tasks (Shift-click for a range), then set status, priority, due date, move them to another job or client, archive or delete them together.`,null],
  ['Tasks','Pins, templates and duplicates',`Pin a task to keep it at the top of the Overview. Save checklist steps as a template per client. Duplicate makes an unsaved copy to edit: same client (so the same brand guide), due date, links, notes and checklist (unticked), with a fresh status.`,null],
@@ -4953,7 +4955,7 @@ function parseCSV(text){
   return rows.map(r=>r.map(v=>v.trim()));
 }
 const IMP_COLS=[['job',/^(job|agency)$/],['client',/client|brand|account|company/],['revision',/draft|revision|round|version/],['start',/assign|start|received|brief(ed)? on/],['due',/deadline|due/],['status',/status|stage|progress/],['notes',/note|comment|remark/],
-  ['file',/drive|onedrive|dropbox|lucid|storage|raw|footage|folder|box\b|wetransfer/],['task',/clickup|asana|trello|notion|monday|tracker|jira|task link|brief/],['upload',/frame|review|vimeo|upload|wipster|final|export|youtube|preview/],['name',/title|task|name|reel|video|project|content/]];
+  ['file',/drive|onedrive|dropbox|lucid|descript|storage|raw|footage|folder|box\b|wetransfer/],['task',/clickup|asana|trello|notion|monday|tracker|jira|task link|brief/],['upload',/frame|review|vimeo|upload|wipster|final|export|youtube|preview/],['name',/title|task|name|reel|video|project|content/]];
 function impColumns(head){
   const map={};head.forEach((h,i)=>{const x=h.toLowerCase().replace(/\s+/g,' ').trim();if(!x)return;for(const [k,re] of IMP_COLS)if(re.test(x)){if(!(k in map))map[k]=i;break}});
   return map;
@@ -5085,7 +5087,7 @@ const TOOL_ICON={
   tracker:I.task,upload:I.film,
   storage:'<svg class="i" viewBox="0 0 16 16"><path d="M4.5 12.5a3 3 0 0 1-.3-6A4 4 0 0 1 12 6a3.2 3.2 0 0 1 .2 6.5z"/></svg>',
   folder:I.mac};
-const TOOL_COLORS={slack:'#4a154b',whatsapp:'#25d366',email:'#6b7280',discord:'#5865f2','microsoft teams':'#6264a7',clickup:'#7b68ee',asana:'#f06a6a',trello:'#0079bf',notion:'#191919','monday.com':'#ff3d57','frame.io':'#5b53ff','google drive':'#1fa463',dropbox:'#0061ff',vimeo:'#1ab7ea',onedrive:'#0364b8',lucidlink:'#5b2ee8'};
+const TOOL_COLORS={slack:'#4a154b',whatsapp:'#25d366',email:'#6b7280',discord:'#5865f2','microsoft teams':'#6264a7',clickup:'#7b68ee',asana:'#f06a6a',trello:'#0079bf',notion:'#191919','monday.com':'#ff3d57','frame.io':'#5b53ff','google drive':'#1fa463',dropbox:'#0061ff',vimeo:'#1ab7ea',onedrive:'#0364b8',lucidlink:'#5b2ee8',descript:'#1b1b1f'};
 const toolTile=(role,name)=>{const c=TOOL_COLORS[String(name||'').toLowerCase()];return `<span class="tool-ic ${c?'':'plain'}" ${c?`style="--tc:${c}"`:''}>${TOOL_ICON[role]}</span>`};
 function toolsHtml(job){
   const box=(tag,attrs,role,name,label,value,end)=>`<${tag} class="tool" ${attrs}>${toolTile(role,name)}<span class="tool-txt"><small>${label}</small><span>${value}${end||''}</span></span></${tag}>`;
