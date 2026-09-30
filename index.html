@@ -1286,6 +1286,33 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
   body.typing .tabbar{display:none}
   body.typing .main{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
 }
+.s-back{display:none}
+@media (max-width:820px){
+  .cal-bar{flex-wrap:wrap;row-gap:8px}
+  .cal-bar .cal-mode{margin-right:auto}
+  .cal-bar h2{order:9;flex-basis:100%;margin:0}
+  .pick-row:not(.two):not(.three){grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pick-row button{min-width:0;overflow:hidden}
+  .pick-row .pill-demo{max-width:100%}
+  .s-back{display:inline-flex;align-items:center;gap:4px}
+  .modal:has(.pref-s.m-list) .s-back,.modal:has(.pref-s:not(.m-list)) .s-cancel{display:none}
+  .mtop .top-search,.mtop #bell{display:none}
+  .mtop .bell-wrap{display:none}
+  .mtop{flex-direction:row;align-items:center}
+  .mtop .mtop-row{flex:1;min-width:0}
+  .mtop .top-right{width:auto}
+  #mtop-slot{flex:none}
+  body > #notes{position:fixed;left:12px;right:12px;top:auto;bottom:calc(86px + env(safe-area-inset-bottom,0px));width:auto;max-height:min(68vh,560px);z-index:30;border-radius:18px}
+  .tb-pill button{position:relative}
+  .tb-badge{position:absolute;top:2px;left:calc(50% + 4px);min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--danger);color:#fff;font:700 calc(10px*var(--ts))/17px var(--body);font-style:normal;text-align:center}
+  .side .nav-item{padding:11px 12px;gap:14px;font-size:calc(16.5px*var(--ts));border-radius:10px}
+  .side .nav-item > svg.i{width:22px;height:22px}
+  .side .nav-item .logo,.side .nav-item .dot{transform:scale(1.2)}
+  .side .nav-item .count{font-size:calc(13px*var(--ts))}
+  .side .nav-row .edit{width:36px;height:36px}
+  #lightbox{touch-action:pinch-zoom}
+  #lightbox .lb-nav{display:none}
+}
 /* ---------- appearance extras (Settings → Appearance / Accessibility) ---------- */
 :root[data-icons="light"] svg.i{stroke-width:1.1}
 :root[data-icons="bold"] svg.i{stroke-width:2.1}
@@ -2767,8 +2794,9 @@ function renderVopt(){
 /* Phone tab bar (≤820px): Overview, Jobs (opens the sidebar's job list), New task, Calendar, Quick search */
 function renderTabbar(){
   const e=$('#tabbar');if(!e)return;const u=S.ui,cal=u.view==='calendar'&&!['archived','activity','trash','help'].includes(u.tab);
-  const b=(act,label,icon,on,extra='')=>`<button type="button" data-act="${act}" class="${on?'on':''} ${extra}" aria-label="${label}" ${on?'aria-current="page"':''}>${icon}<span>${label}</span></button>`;
-  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Overview',I.grid,u.tab==='overview'&&!cal)+b('tb-jobs','Jobs',I.briefcase,!!S.jobs[u.tab]&&!cal)+b('tb-cal','Calendar',I.cal,cal)}</div>`
+  const b=(act,label,icon,on,extra='')=>`<button type="button" data-act="${act}" class="${on?'on':''} ${extra} tb-${act.slice(3)}" aria-label="${label}" ${on?'aria-current="page"':''}>${icon}<span>${label}</span></button>`;
+  const busy=notesOpen;
+  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Overview',I.grid,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Notifications','<svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg>'+(()=>{const n=$('#bell-n');return n&&!n.hidden?`<i class="tb-badge">${esc(n.textContent)}</i>`:''})(),notesOpen)+b('tb-cal','Calendar',I.cal,cal&&!busy)}</div>`
     +`<button type="button" data-act="tb-search" class="tb-search" aria-label="Search" title="Search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 14 14"/></svg></button>`
     +`<button type="button" data-act="new-task" class="tb-fab" aria-label="New task" title="New task">${I.plus}</button>`;
 }
@@ -3121,6 +3149,7 @@ function renderBell(){
   const c=$('#bell-n');c.hidden=!unread;c.textContent=unread>9?'9+':unread;
   b.classList.toggle('has',!!unread);b.setAttribute('aria-expanded',notesOpen);
   b.setAttribute('aria-label',unread?`Notifications, ${unread} unread`:'Notifications');
+  renderTabbar();
   const pop=$('#notes');pop.hidden=!notesOpen;if(!notesOpen)return;
   pop.innerHTML=`<div class="notes-head"><b>Notifications</b>${unread?'<button type="button" class="btn sm ghost" data-act="notes-read">Mark all as read</button>':''}</div>
     ${list.length?`<div class="notes-list">${list.map(n=>`<div class="note ${n.kind} ${NS.read[n.key]?'':'unread'}"><button type="button" class="note-main" data-act="note-open" data-key="${esc(n.key)}">${I[n.icon]}<span><b>${esc(n.title)}</b>${n.body?`<span>${esc(n.body)}</span>`:''}<small>${esc(n.sub)}</small></span></button><button type="button" class="icon-btn" data-act="note-hide" data-key="${esc(n.key)}" aria-label="Dismiss" title="Dismiss">${I.x}</button></div>`).join('')}</div>`
@@ -3293,6 +3322,21 @@ async function attAdd(files,k){
   const ta=$(k==='note'?'#note-in':'#reply-in');if(ta&&keep!=null&&!ta.value)ta.value=keep;ta?.focus();
 }
 function openLightbox(list,i){LB={list,i};renderLightbox()}
+/* touch: swipe down to close, sideways for the next / previous picture */
+let LBT=null;
+document.addEventListener('touchstart',e=>{const lb=e.target.closest?.('#lightbox');if(!lb||!LB||e.touches.length>1||e.target.closest('button,a'))return;const t=e.touches[0];LBT={x:t.clientX,y:t.clientY,at:Date.now(),dx:0,dy:0,lock:null}},{passive:true});
+document.addEventListener('touchmove',e=>{if(!LBT)return;const t=e.touches[0];LBT.dx=t.clientX-LBT.x;LBT.dy=t.clientY-LBT.y;
+  if(!LBT.lock&&(Math.abs(LBT.dx)>10||Math.abs(LBT.dy)>10))LBT.lock=Math.abs(LBT.dy)>Math.abs(LBT.dx)?(LBT.dy>0?'v':'x'):'h';
+  const img=$('#lightbox img'),lb=$('#lightbox');if(!img)return;
+  if(LBT.lock==='v'){const d=Math.max(0,LBT.dy);img.style.transform=`translateY(${d}px) scale(${1-Math.min(d,400)/1600})`;lb.style.background=`rgba(6,8,12,${Math.max(.2,.88-d/500)})`}
+  else if(LBT.lock==='h'&&LB.list.length>1)img.style.transform=`translateX(${LBT.dx}px)`;
+},{passive:true});
+document.addEventListener('touchend',()=>{const g=LBT;LBT=null;if(!g||!LB)return;const img=$('#lightbox img'),lb=$('#lightbox'),fast=Date.now()-g.at<300;if(!img)return;
+  const back=()=>{img.animate([{transform:img.style.transform||'none'},{transform:'none'}],{duration:200,easing:'ease-out'});img.style.transform='';lb.style.background=''};
+  if(g.lock==='v'&&(g.dy>110||(fast&&g.dy>40))){const a=img.animate([{transform:img.style.transform||'none',opacity:1},{transform:`translateY(${innerHeight}px)`,opacity:.4}],{duration:220,easing:'ease-in'});a.onfinish=()=>{lb.style.background='';LB=null;renderLightbox()};return}
+  if(g.lock==='h'&&LB.list.length>1&&(Math.abs(g.dx)>60||(fast&&Math.abs(g.dx)>30))){const d=g.dx<0?1:-1;LB.i=(LB.i+d+LB.list.length)%LB.list.length;renderLightbox();const n=$('#lightbox img');if(n&&!reducedMotion())n.animate([{transform:`translateX(${d*60}px)`,opacity:.3},{transform:'none',opacity:1}],{duration:220,easing:'ease-out'});haptic(6);return}
+  back();
+},{passive:true});
 function renderLightbox(){
   const e=$('#lightbox');if(!LB){e.hidden=true;e.innerHTML='';return}
   const n=LB.list.length;e.hidden=false;
@@ -4215,7 +4259,7 @@ function catPeek(){
 }
 /* ================= cork board in the sidebar (pref corkBoard): your photos plus sticky notes (settings/app.stickies) ================= */
 const STICKY_COLS=['yellow','pink','blue','green'],STICKY_TILT=[-4,3,-2,5,-5,2];
-let STICKY_EDIT=null;
+let STICKY_EDIT=null,STICKY_DRAFT=null;
 const stickies=()=>(appSettings().stickies||[]).slice(0,6);
 function saveStickies(list){saveApp({stickies:list});renderSide()}
 function corkHtml(){
@@ -4223,15 +4267,15 @@ function corkHtml(){
   const ps=photos(),st=stickies();
   return `<div class="cork ${pref('officeCat')?'with-cat':''}" aria-label="Cork board">
     ${ps.map((v,i)=>`<button type="button" class="polaroid" data-act="photo-view" data-i="${i}" style="--r:${PHOTO_TILT[i]}deg" title="Open photo"><img src="${esc(imgSrc(v)||'')}" alt="" loading="lazy"></button>`).join('')}
-    ${st.map((n,i)=>`<div class="sticky s-${esc(n.color||'yellow')}" style="--r:${STICKY_TILT[i%6]}deg"><i class="pin" aria-hidden="true"></i>${STICKY_EDIT===n.id?`<textarea id="sticky-in" data-fk="sticky-in" data-sid="${esc(n.id)}" maxlength="80" rows="3" aria-label="Sticky note">${esc(n.text||'')}</textarea>`:`<button type="button" class="st-text" data-act="sticky-edit" data-id="${esc(n.id)}" title="Edit note">${esc(n.text||'')}</button><button type="button" class="st-x" data-act="sticky-rm" data-id="${esc(n.id)}" title="Take down this note" aria-label="Take down this note">${I.x}</button>`}</div>`).join('')}
+    ${st.map((n,i)=>`<div class="sticky s-${esc(n.color||'yellow')}" style="--r:${STICKY_TILT[i%6]}deg"><i class="pin" aria-hidden="true"></i>${STICKY_EDIT===n.id?`<textarea id="sticky-in" data-fk="sticky-in" data-sid="${esc(n.id)}" maxlength="80" rows="3" aria-label="Sticky note">${esc(STICKY_DRAFT??n.text??'')}</textarea>`:`<button type="button" class="st-text" data-act="sticky-edit" data-id="${esc(n.id)}" title="Edit note">${esc(n.text||'')}</button><button type="button" class="st-x" data-act="sticky-rm" data-id="${esc(n.id)}" title="Take down this note" aria-label="Take down this note">${I.x}</button>`}</div>`).join('')}
     ${st.length<6?`<button type="button" class="cork-add" data-act="sticky-add" title="Pin a sticky note">${I.plus}${st.length?'':'Pin a note'}</button>`:''}
   </div>`;
 }
-function stickyAdd(){const st=stickies(),used=st.map(n=>n.color),color=STICKY_COLS.find(c=>!used.includes(c))||STICKY_COLS[st.length%4],id=uid();STICKY_EDIT=id;saveStickies([...st,{id,text:'',color}]);setTimeout(()=>$('#sticky-in')?.focus(),20)}
+function stickyAdd(){const st=stickies(),used=st.map(n=>n.color),color=STICKY_COLS.find(c=>!used.includes(c))||STICKY_COLS[st.length%4],id=uid();STICKY_EDIT=id;STICKY_DRAFT='';saveStickies([...st,{id,text:'',color}]);setTimeout(()=>$('#sticky-in')?.focus(),20)}
 function stickySave(cancel){
   const el=$('#sticky-in'),id=STICKY_EDIT;if(!id)return;STICKY_EDIT=null;
   const st=stickies(),n=st.find(x=>x.id===id);if(!n){renderSide();return}
-  const v=cancel?n.text:(el?.value||'').trim();
+  const v=cancel?n.text:String(STICKY_DRAFT??el?.value??'').trim();STICKY_DRAFT=null;
   saveStickies(v?st.map(x=>x.id===id?{...x,text:v}:x):st.filter(x=>x.id!==id));
 }
 function stickyRm(id){const st=stickies(),n=st.find(x=>x.id===id);if(!n)return;saveStickies(st.filter(x=>x.id!==id));toast('Note taken down',{label:'Undo',fn:()=>saveStickies([...stickies(),n].slice(0,6))})}
@@ -4447,7 +4491,7 @@ function exportCSV(jobId){
 const HELP_IC='<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.6 1.6c-.6.3-.9.7-.9 1.3M8 11.3h.01"/></svg>';
 const HELP=[
  ['Getting around','Pages and views',`The sidebar has the Overview, each job, Archived, Activity and Trash. On a job page, client tabs sit under the name, with Tasks, Details and Brand guide. Switch List, Board or Calendar in the toolbar; each job remembers its own view. The browser's Back button closes the task panel or goes to the previous page, and on a phone the tab bar at the bottom has Overview, Jobs, New task, Calendar and Search.`,null],
- ['Getting around','On your phone',`Swipe right anywhere to open the sidebar (from the very left edge when you're on the board or other things that scroll sideways), and swipe left to close it. The bar at the bottom has Overview, Jobs and Calendar, the round search button opens a full-screen search with the search bar right above the keyboard, and the round + above it starts a new task.`,null],
+ ['Getting around','On your phone',`Swipe right anywhere to open the sidebar (from the very left edge when you're on the board or other things that scroll sideways), and swipe left to close it. The bar at the bottom has Overview, Notifications and Calendar (your jobs are in the sidebar), the round search button opens a full-screen search with the search bar right above the keyboard, and the round + above it starts a new task.`,null],
  ['Getting around','Search',`The box top-right (press /) filters the current list and also searches notes, checklist steps and links. Quick search (${MODKEY}) jumps to any task, job, client or page, archived tasks included.`,null],
  ['Getting around','Right-click menu',`Right-click a task (or press and hold on a phone) to change its status or priority, pin, duplicate, split, copy its link, archive or delete it.`,null],
  ['Tasks','New tasks',`New task opens an unsaved draft; nothing is created until you click Save task. Double-click a name in the list or on the board to rename it. In the list, click the due date or priority to change it right there.`,null],
@@ -4468,11 +4512,11 @@ const HELP=[
  ['Your data','Backups and restore points',`Download a backup file any time, and (when signed in) the app keeps a weekly restore point on the server. You'll get a reminder if you haven't downloaded a backup in 30 days.`,['backup','Backup']],
  ['Your data','Trash and Archived',`Deleted tasks wait in Trash (7, 30 or 90 days) before they're gone. Archived keeps finished tasks out of your lists; filter it by job, client or month and restore several at once.`,['backup','Trash time']],
  ['Your data','Import from a spreadsheet',`Download your tracker sheet as CSV and import it; you'll see a preview first and existing tasks are skipped.`,['import','Import CSV']],
- ['Look and feel','Appearance',`Theme, color scheme, dark shade, status style, card depth, sidebar style, compact header, greeting, job card rings, due date badges, tinted board columns, calendar grid and today marker, dates, week start and many more. Everything previews live.`,['appearance','Appearance']],
+ ['Look and feel','Appearance',`Theme, color scheme, dark shade, status style, card depth, sidebar style, compact header and job card rings in Appearance; due date badges, tinted board columns, calendar grid and today marker, date format and week start in Tasks & calendar; the greeting, the office cat and the cork board in Personalize & fun. Everything previews live.`,['appearance','Appearance']],
  ['Getting work done','Type it all in the name',`When you add a task, type the client, the day and the priority right in the name: “Reel 7 Band fri !high”. A line under the name shows what will be picked up, and it's filled in when you save. Days: today, tomorrow, mon–sun, +3d, in 2 weeks, oct 2, 10/2. Priority: !urgent, !high, !low. Use @name to pick a client or job by its first letters.`,null],
  ['Getting work done','Focus timer',`A Pomodoro timer top-right, next to the bell: 25 minutes of focus, then a 5-minute break, and a 15-minute break after every 4 (change them in Settings). Press P or the tomato at the top of a task to focus on that task; each finished session adds 🍅 1 to it and a line to its activity. The same timer shows on all your devices and in the floating task window. Turn on the desktop pop-up in Settings to be told when time's up while you're in Premiere.`,['pomo','Focus timer']],
  ['Getting work done','Recent project folders',`On your Mac, quick search (⌘K) lists the last 5 project folders you opened from the app, from tasks, jobs or notes. Pick one to open it in Finder again; type to search older ones by task, job or folder name.`,null],
- ['Look and feel','Little extras',`An “All clear” moment on the Overview when nothing is overdue or due today; emoji reactions on client updates (the smiley under an update); film-look color schemes (Portra, Fuji, Noir, Teal & Orange, Technicolor); the office cat on the sidebar (it wears headphones and nods along during a focus session, naps during breaks and when you're away, stretches when you finish a task, and purrs when you click it; a little window behind it shows the sky for your time of day, and it dresses up in December, on New Year's Day and on Halloween; it sweats when something's overdue, smiles on all-clear days and watches your mouse; a plant on the sill grows a leaf per task done this month; birds and butterflies drop by; now and then it naps on one of your tasks until you open it; it peeks over the updates you post; a treat jar fills with a treat per finished task (click it to feed the cat); and after 30 days a puppy, hamster or goldfish can join it on the sill); a cork board in the sidebar with your photos and sticky notes (click + to pin one, click a note to edit it); a photo strip of your own pictures in the sidebar (add them in Appearance → Details); and seasonal touches: a Christmas countdown from September, snow in December, fireworks on New Year's Day, bats on Halloween and hearts on Valentine's. Turn them off in Appearance.`,['appearance','Appearance']],
+ ['Look and feel','Little extras',`An “All clear” moment on the Overview when nothing is overdue or due today; emoji reactions on client updates (the smiley under an update); film-look color schemes (Portra, Fuji, Noir, Teal & Orange, Technicolor); the office cat on the sidebar (it wears headphones and nods along during a focus session, naps during breaks and when you're away, stretches when you finish a task, and purrs when you click it; a little window behind it shows the sky for your time of day, and it dresses up in December, on New Year's Day and on Halloween; it sweats when something's overdue, smiles on all-clear days and watches your mouse; a plant on the sill grows a leaf per task done this month; birds and butterflies drop by; now and then it naps on one of your tasks until you open it; it peeks over the updates you post; a treat jar fills with a treat per finished task (click it to feed the cat); and after 30 days a puppy, hamster or goldfish can join it on the sill); a cork board in the sidebar with your photos and sticky notes (click + to pin one, click a note to edit it); a photo strip of your own pictures in the sidebar (add them in Settings → Personalize & fun); and seasonal touches: a Christmas countdown from September, snow in December, fireworks on New Year's Day, bats on Halloween and hearts on Valentine's. Turn them off in Settings → Personalize & fun.`,['fun','Personalize & fun']],
  ['Getting work done','Installed app (Chrome)',`Install Splice & Co. from Chrome's address bar (the install icon) to get its own window and Dock icon. The Dock icon shows how many tasks are overdue or due today; right-click it for New task, Overview, Calendar and Quick search. The app's colors reach into the title bar (Chrome's chevron at the top right switches that off). To have task links from Slack or email open in the app, turn on "Open supported links" in the app's settings (⋮ menu in the app window → App info or Settings).`,null],
  ['Getting work done','Phone: pull the task down to close',`On a phone, a task opens as a sheet from the bottom. Pull it down from the top (or anywhere when it's scrolled to the top) to close it; swipe sideways to go to the next or previous task.`,null],
  ['Getting work done','Pull to refresh',`At the top of any page, pull down (on a phone or tablet) or keep scrolling up with two fingers on the trackpad. When it says “Release to refresh”, let go and the app reloads with the latest data and any app updates.`,null],
@@ -4725,13 +4769,13 @@ function renderSettings(){
       ${prefRow('toastPos','Messages like “Moved · Undo”',[['bottom','Bottom'],['right','Bottom right'],['top','Top']])}
       <p class="pref-group">Pages</p>
       ${prefRow('compactHeader','Page header',[[false,'Standard'],[true,'Compact']],'Compact fits more tasks before you scroll')}
-      ${prefRow('greeting','Greeting on the Overview',[[true,'Show'],[false,'Hide']],'“Good morning” and today’s date above the title')}
-      <div class="pref-row" ${SM.greeting?'':'hidden'}><label class="pr-l" for="s-greet">Name in the greeting<small>Leave it empty to use your account name${B.name?` (${esc(B.name.split(/\s+/)[0])})`:''}</small></label><input type="text" id="s-greet" data-fk="s-greet" class="pr-input" value="${esc(SM.greetName||'')}" maxlength="30" placeholder="${esc(B.name?B.name.split(/\s+/)[0]:'Your name')}"></div>
-      ${prefRow('allClear','“All clear” moment',[[true,'Show'],[false,'Hide']],'On the Overview when nothing is overdue or due today')}
-      ${prefRow('seasonal','Seasonal touches',[[true,'On'],[false,'Off']],'Christmas countdown, December snow, New Year fireworks and a few more')}
       ${prefRow('jobProgress','Job card progress',[['bar','Status bar'],['ring','Ring'],['numbers','Numbers only']])}
       ${prefRow('drawerBand','Task panel color band',[[true,'Show'],[false,'Hide']],'A strip in the job’s color along the top of the task panel')}
-      <p class="pref-group">Tasks</p>
+      <p class="pref-group">Details</p>
+      ${prefRow('logoShape','Logo shape',[['rounded','Rounded'],['circle','Circle']])}
+      ${prefRow('numFont','Dates and numbers',[['mono','Typewriter'],['regular','Regular']])}
+      ${prefRow('sideCounts','Counts in the sidebar',[[true,'Show'],[false,'Hide']])}`},
+    {id:'tasks',label:'Tasks & calendar',icon:I.cal,html:`<p class="pref-group" style="margin-top:0">Tasks</p>
       ${prefRow('nameWrap','Long task names',[[false,'One line'],[true,'Wrap']])}
       ${prefRow('doneStyle','Finished tasks',[['plain','Plain'],['struck','Crossed out'],['faded','Faded']])}
       ${prefRow('overdueTint','Overdue tasks',[[false,'Red date'],[true,'Red date + tint']])}
@@ -4739,10 +4783,20 @@ function renderSettings(){
       ${prefRow('dueStyle','Due dates',[['text','Text'],['badge','Colored badge']],'Badge: red when late, amber within 2 days')}
       ${prefRow('boardTint','Board columns',[[false,'Plain'],[true,'Tinted']],'A faint wash of each status color')}
       ${prioColorsHtml()}
-      <p class="pref-group">Details</p>
-      ${prefRow('logoShape','Logo shape',[['rounded','Rounded'],['circle','Circle']])}
-      ${prefRow('numFont','Dates and numbers',[['mono','Typewriter'],['regular','Regular']])}
-      ${prefRow('sideCounts','Counts in the sidebar',[[true,'Show'],[false,'Hide']])}
+      <p class="pref-group">Dates</p>
+      ${prefPick('dateRel','Dates in lists and cards',[[false,absDate(addDays(today(),3)),'The date itself'],[true,'in 3 days','How far away, like “2 days late”']])}
+      ${prefPick('dateFmt','Date format',[['md','Oct 1','Month first'],['dm','1 Oct','Day first']])}
+      ${prefPick('weekStart','Week starts on',[['mon','Monday',''],['sun','Sunday','']])}
+      ${prefRow('calGrid','Calendar grid',[['lines','Lines'],['subtle','Subtle'],['none','None']])}
+      ${prefRow('todayMark','Today on the Calendar',[['dot','Filled date'],['outline','Outline'],['column','Tinted']])}
+      ${prefPick('hideWeekends','Weekends on the Calendar',[[false,'Full width','Same size as weekdays'],[true,'Narrow','More room for Monday to Friday']])}`},
+    {id:'fun',label:'Personalize & fun',icon:'<svg class="i" viewBox="0 0 16 16"><path d="M8 1.8l1.7 3.9 4.2.4-3.2 2.8.9 4.1L8 10.9 4.4 13l.9-4.1-3.2-2.8 4.2-.4z"/></svg>',html:`<p class="pref-group" style="margin-top:0">Overview</p>
+      ${prefRow('greeting','Greeting on the Overview',[[true,'Show'],[false,'Hide']],'“Good morning” and today’s date above the title')}
+      <div class="pref-row" ${SM.greeting?'':'hidden'}><label class="pr-l" for="s-greet">Name in the greeting<small>Leave it empty to use your account name${B.name?` (${esc(B.name.split(/\s+/)[0])})`:''}</small></label><input type="text" id="s-greet" data-fk="s-greet" class="pr-input" value="${esc(SM.greetName||'')}" maxlength="30" placeholder="${esc(B.name?B.name.split(/\s+/)[0]:'Your name')}"></div>
+      ${prefRow('allClear','“All clear” moment',[[true,'Show'],[false,'Hide']],'On the Overview when nothing is overdue or due today')}
+      ${prefRow('seasonal','Seasonal touches',[[true,'On'],[false,'Off']],'Christmas countdown, December snow, New Year fireworks and a few more')}
+      ${prefPick('confetti','Celebrate finished tasks',[[true,'On','A little confetti when a task moves to Done'],[false,'Off','']])}
+      <p class="pref-group">Office cat</p>
       ${prefRow('officeCat','Office cat',[[true,'Show'],[false,'Hide']],'Naps at the bottom of the sidebar; wakes when you finish a task')}
       ${SM.officeCat?prefRow('catSky','Sky behind the cat',[[true,'Show'],[false,'Hide']],'Follows your clock: sunrise, day, sunset and stars at night'):''}
       ${SM.officeCat?prefRow('catPlant','Windowsill plant',[[true,'Show'],[false,'Hide']],'Grows a leaf for each task done this month; droops when 3+ tasks are overdue'):''}
@@ -4752,16 +4806,9 @@ function renderSettings(){
       ${SM.officeCat?prefRow('catTreats','Treat jar',[[true,'Show'],[false,'Hide']],'Each finished task earns a treat; click the jar to feed the cat'):''}
       ${SM.officeCat?prefRow('catPeek','Cat reads your updates',[[true,'On'],[false,'Off']],'Peeks over a new update when you post it'):''}
       ${SM.officeCat?(petUnlocked()?prefRow('sillPet','A friend on the sill',[['none','None'],['puppy','Puppy'],['hamster','Hamster'],['fish','Goldfish']],'Click it to say hi'):`<div class="pref-row"><span class="pr-l">A friend on the sill<small>A puppy, hamster or goldfish to keep the cat company. Unlocks after 30 days of using ${esc((appSettings().name||'').trim()||APP_NAME)} (${Math.max(1,30-daysUsed())} day${30-daysUsed()===1?'':'s'} to go).</small></span><span class="pet-lock" aria-hidden="true">🔒</span></div>`):''}
+      <p class="pref-group">Sidebar</p>
       ${prefRow('corkBoard','Cork board',[[true,'Show'],[false,'Hide']],'Your photos and sticky notes pinned to a cork board in the sidebar')}
-      ${photoSettingsHtml()}
-      <p class="pref-group">Dates</p>
-      ${prefPick('dateRel','Dates in lists and cards',[[false,absDate(addDays(today(),3)),'The date itself'],[true,'in 3 days','How far away, like “2 days late”']])}
-      ${prefPick('dateFmt','Date format',[['md','Oct 1','Month first'],['dm','1 Oct','Day first']])}
-      ${prefPick('weekStart','Week starts on',[['mon','Monday',''],['sun','Sunday','']])}
-      ${prefRow('calGrid','Calendar grid',[['lines','Lines'],['subtle','Subtle'],['none','None']])}
-      ${prefRow('todayMark','Today on the Calendar',[['dot','Filled date'],['outline','Outline'],['column','Tinted']])}
-      ${prefPick('hideWeekends','Weekends on the Calendar',[[false,'Full width','Same size as weekdays'],[true,'Narrow','More room for Monday to Friday']])}
-      ${prefPick('confetti','Celebrate finished tasks',[[true,'On','A little confetti when a task moves to Done'],[false,'Off','']])}`},
+      ${photoSettingsHtml()}`},
     {id:'a11y',label:'Accessibility',icon:I.a11y,html:`<div class="field"><span class="lbl" id="s-ts-lbl">Text size</span>
       <div class="pick-row" role="group" aria-labelledby="s-ts-lbl">${TEXT_SIZES.map(([v,l])=>`<button type="button" data-act="s-ts" data-v="${v}" class="${+SM.textSize===v?'on':''}" aria-pressed="${+SM.textSize===v}"><span class="aa" style="font-size:${Math.round(16*v)}px">Aa</span>${l}<small>${Math.round(v*100)}%</small></button>`).join('')}</div></div>
       <div class="field"><span class="lbl" id="s-dens-lbl">Density</span>
@@ -4785,13 +4832,13 @@ function renderSettings(){
     {id:'safezones',label:'Safe-zone overlays',icon:SZ_IC,html:safeZonesHtml()},
     {id:'import',label:'Import CSV',icon:I.upload,html:importSettingsHtml()},
     {id:'backup',label:'Backup',icon:I.download,html:backupSettingsHtml()}];
-  const META={appearance:['Look & feel','Theme, colors, the office cat'],a11y:['Look & feel','Text size, motion, contrast'],statuses:['Your work','Rename, recolor and reorder'],workload:['Your work','When a day counts as busy'],holidays:['Your work','Public holidays on the Calendar'],pomo:['Your work','Focus and break lengths, sounds'],safezones:['Your work','TikTok, Reels and Shorts overlays'],branding:['App','Your own name and logo'],finder:['App','Mac folders and Chrome profiles'],account:['App','Google Calendar and sign out'],keys:['App','Shortcuts on a keyboard'],import:['Your data','Bring in a tracker sheet'],backup:['Your data','Download, restore, trash']};
+  const META={appearance:['Look & feel','Theme, colors, surfaces'],tasks:['Look & feel','Task rows, due dates, the Calendar'],fun:['Look & feel','Greeting, the office cat, cork board'],a11y:['Look & feel','Text size, motion, contrast'],statuses:['Your work','Rename, recolor and reorder'],workload:['Your work','When a day counts as busy'],holidays:['Your work','Public holidays on the Calendar'],pomo:['Your work','Focus and break lengths, sounds'],safezones:['Your work','TikTok, Reels and Shorts overlays'],branding:['App','Your own name and logo'],finder:['App','Mac folders and Chrome profiles'],account:['App','Google Calendar and sign out'],keys:['App','Shortcuts on a keyboard'],import:['Your data','Bring in a tracker sheet'],backup:['Your data','Download, restore, trash']};
   secs.forEach(x=>{const m=META[x.id];if(m){x.group=m[0];x.sub=m[1]}});
   const GORD=['Look & feel','Your work','App','Your data'];secs.sort((x,y)=>GORD.indexOf(x.group)-GORD.indexOf(y.group));
   keepScroll('#modal',()=>withFocus(()=>{$('#modal').innerHTML=`<div class="modal pref-modal" role="dialog" aria-modal="true" aria-labelledby="s-title">
   <header><h2 id="s-title">Settings</h2><button class="icon-btn" data-act="s-cancel" aria-label="Close">${I.x}</button></header>
   ${prefLayout('s',SM.sec,secs,'form','data-act="s-save" id="s-form"')}
-  <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="s-cancel">Cancel</button><button type="submit" form="s-form" class="btn primary">Save</button></div></footer></div>`}));
+  <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn s-back" data-act="pref-back" data-key="s">${I.left}Back</button><button type="button" class="btn s-cancel" data-act="s-cancel">Cancel</button><button type="submit" form="s-form" class="btn primary">Save</button></div></footer></div>`}));
   prefNavInView();
 }
 async function setAppLogo(file){
@@ -5253,7 +5300,7 @@ function prefLayout(key,active,sections,tag='div',attrs=''){
   /* Settings on a phone: a Slack-style grouped list first, then one section at a time with a back button */
   const mlist=key==='s'&&SM&&SM.mv!=='sec';let g='';
   return `<${tag} class="pref ${key==='s'?'pref-s':''} ${mlist?'m-list':''}" ${attrs}><nav class="pref-nav" role="tablist" aria-label="Sections">${sections.map(x=>`${x.group&&x.group!==g?`<p class="pref-g">${esc(g=x.group)}</p>`:''}<button type="button" role="tab" data-act="pref-sec" data-key="${key}" data-sec="${x.id}" class="${x.id===active?'on':''}" aria-selected="${x.id===active}">${x.icon||''}<span>${x.label}${x.sub?`<em class="pn-sub">${esc(x.sub)}</em>`:''}</span>${x.badge?`<small>${x.badge}</small>`:''}<i class="pn-chev" aria-hidden="true">›</i></button>`).join('')}</nav>
-    <div class="pref-body">${key==='s'?`<div class="pref-mback"><button type="button" data-act="pref-back" data-key="s">${I.left}<span>All settings</span></button></div>`:''}${sections.map(x=>`<section class="pref-sec" data-sec="${x.id}" role="tabpanel" ${x.id===active?'':'hidden'}><h3 class="pref-h">${x.label}</h3>${x.html}</section>`).join('')}${key==='b'?`<label class="bm-note">What changed? (optional, goes in the change log)<input type="text" data-bm-note data-fk="bm-note" value="${esc(BM.note)}" placeholder="e.g. New end card from October"></label>`:''}</div></${tag}>`;
+    <div class="pref-body">${sections.map(x=>`<section class="pref-sec" data-sec="${x.id}" role="tabpanel" ${x.id===active?'':'hidden'}><h3 class="pref-h">${x.label}</h3>${x.html}</section>`).join('')}${key==='b'?`<label class="bm-note">What changed? (optional, goes in the change log)<input type="text" data-bm-note data-fk="bm-note" value="${esc(BM.note)}" placeholder="e.g. New end card from October"></label>`:''}</div></${tag}>`;
 }
 function showPrefSec(el){
   const st={s:SM,m:M,b:BM}[el.dataset.key];if(st){st.sec=el.dataset.sec;st.mv='sec'}
@@ -5529,6 +5576,8 @@ function placeTopRight(){
   const tr=$('.top-right');if(!tr)return;
   const home=$('.head-row'),slot=$('#mtop-slot');
   if(narrow.matches){if(tr.parentNode!==slot)slot.append(tr)}else if(tr.parentNode!==home)home.append(tr);
+  /* phones: the notifications panel opens from the bottom bar, so it lives on <body> as a sheet */
+  const np=$('#notes'),bw=$('.bell-wrap');if(np&&bw){if(narrow.matches){if(np.parentNode!==document.body)document.body.append(np)}else if(np.parentNode!==bw)bw.append(np)}
   if(!narrow.matches){closeSide();closeFilters()}
 }
 function openFilters(){$('#fs-slot').append($('#filters'));$('#filter-sheet').hidden=false}
@@ -5570,8 +5619,8 @@ function toast(msg,action){
 
 /* ================= events ================= */
 document.addEventListener('click',e=>{
-  if(narrow.matches&&$('#side').classList.contains('open')&&e.target.closest('#side [data-act]:not([data-act=toggle-jobs])'))setTimeout(closeSide,0);
-  if(notesOpen&&!e.target.closest('.bell-wrap')){notesOpen=false;renderBell()}
+  if(narrow.matches&&$('#side').classList.contains('open')&&e.target.closest('#side [data-act]:not([data-act=toggle-jobs]):not([data-act^=sticky]):not([data-act=cat-feed]):not([data-act=pet-poke]):not([data-act=photo-view])'))setTimeout(closeSide,0);
+  if(notesOpen&&!e.target.closest('.bell-wrap,#notes,[data-act="tb-notes"]')){notesOpen=false;renderBell()}
   if(POMO_OPEN&&!e.target.closest('.pomo-wrap')){POMO_OPEN=false;renderPomo()}
   if(SCRATCH&&!e.target.closest('#scratch,[data-act="scratch"],#toast')){closeScratch()}
   if(VOPT&&!e.target.closest('#vopt-wrap')){VOPT=false;renderVopt()}
@@ -5598,6 +5647,7 @@ document.addEventListener('click',e=>{
     case 'tb-jobs': u.jobsOpen=true;saveUi();renderSide();openSide();break;
     case 'tb-cal': if(['archived','activity','trash','help'].includes(u.tab)){u.tab='overview';u.client='all'}u.pane='tasks';u.view='calendar';(u.views=u.views||{})[u.tab]='calendar';saveUi();render();window.scrollTo({top:0});break;
     case 'tb-search': openJump();break;
+    case 'tb-notes': notesOpen=!notesOpen;if(notesOpen){saveNotes();POMO_OPEN=false;renderPomo();closeSide()}renderBell();break;
     case 'groups-all': {const open=el.dataset.open==='1';u.collapsed=u.collapsed||{};STATUSES.forEach(x=>{u.collapsed[x.id]=!open});saveUi();render();break}
     case 'd-link': copyTaskLink(u.openTask);break;
     case 'link-add': LSHOW.add(u.openTask+':'+el.dataset.kind);renderDrawer();$(`#drawer [data-field="links.${el.dataset.kind}"]`)?.focus();break;
@@ -5679,7 +5729,7 @@ document.addEventListener('click',e=>{
     case 'cat-feed': catFeed();break;
     case 'pet-poke': petPoke();break;
     case 'sticky-add': stickyAdd();break;
-    case 'sticky-edit': STICKY_EDIT=el.dataset.id;renderSide();setTimeout(()=>{const i=$('#sticky-in');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},20);break;
+    case 'sticky-edit': STICKY_EDIT=el.dataset.id;STICKY_DRAFT=stickies().find(x=>x.id===el.dataset.id)?.text||'';renderSide();setTimeout(()=>{const i=$('#sticky-in');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},20);break;
     case 'sticky-rm': stickyRm(el.dataset.id);break;
     case 'scratch': if(SCRATCH===el.dataset.job)closeScratch();else openScratch(el.dataset.job);break;
     case 'scratch-close': closeScratch();break;
@@ -5797,7 +5847,7 @@ document.addEventListener('click',e=>{
     case 'setup-local': $('#auth').hidden=true;$('#auth').innerHTML='';$('.app').hidden=false;localBoot();break;
     case 'auth-reset': showAuth({sent:null,error:''});$('#auth-email')?.focus();break;
     case 'pref-sec': showPrefSec(el);break;
-    case 'pref-back': if(SM){SM.mv='list';el.closest('.pref')?.classList.add('m-list');$('#modal .pref-nav')?.scrollTo(0,0)}break;
+    case 'pref-back': if(SM){SM.mv='list';$('#modal .pref-s')?.classList.add('m-list');$('#modal .pref-nav')?.scrollTo(0,0)}break;
     case 'st-add':{const used=new Set(SM.statuses.map(x=>x.color));SM.statuses.splice(Math.max(0,SM.statuses.findIndex(x=>x.id==='done')),0,{id:'st'+Date.now().toString(36),label:'New status',color:STATUS_COLORS.find(c=>!used.has(c))||STATUS_COLORS[0]});renderSettings();const ins=[...document.querySelectorAll('[data-st-label]')];const n=ins.find(x=>x.value==='New status');if(n){n.focus();n.select()}break}
     case 'st-move':{const i=+el.dataset.i,j=i+ +el.dataset.d,a=SM.statuses;if(j<0||j>=a.length)break;[a[i],a[j]]=[a[j],a[i]];SM.stPick=null;renderSettings();break}
     case 'st-color': SM.stPick=SM.stPick===+el.dataset.i?null:+el.dataset.i;renderSettings();break;
@@ -5904,6 +5954,7 @@ document.addEventListener('input',e=>{
   if(el.id==='arch-q'){u.aq=el.value;render();return}
   if(el.id==='log-q'){u.lq=el.value;render();return}
   if(el.id==='help-q'){u.hq=el.value;render();return}
+  if(el.id==='sticky-in'){STICKY_DRAFT=el.value;return}
   if(el.id==='scratch-in'){if(SCRATCH)patch('jobs',SCRATCH,{scratch:el.value},600);return}
   if(el.id==='xn-in'){const t=S.tasks[u.openTask],pv=$('#xn-prev');if(t&&pv)pv.textContent=exportName(t,el.value.trim()||XN_DEF);return}
   if(el.id==='jump-q'&&JUMP){JUMP.q=el.value;JUMP.i=0;renderJump();return}
