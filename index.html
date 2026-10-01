@@ -429,6 +429,9 @@ select.pill::before{display:none}
 .day .dn b{font-weight:500}
 .ev{display:flex;align-items:center;gap:5px;border:0;text-align:left;font-size:calc(12px*var(--ts));font-weight:600;padding:3px 6px;border-radius:5px;background:color-mix(in srgb,var(--c) 14%,var(--surface));color:var(--text);border-left:3px solid var(--c);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%}
 .ev span{overflow:hidden;text-overflow:ellipsis}
+[data-caldrag]{cursor:grab}
+[data-caldrag].dragging{opacity:.45}
+.day.cal-drop,.wday.cal-drop{box-shadow:inset 0 0 0 2px var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--surface))}
 .ev.is-done span{text-decoration:line-through;color:var(--muted)}
 .more{font-size:calc(11px*var(--ts));color:var(--muted);padding-left:4px}
 
@@ -1471,6 +1474,10 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .smart-hint .sh-chip{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:999px;background:var(--accent-soft);color:var(--text);font-weight:600}
 .smart-hint .sh-chip .i{width:12px;height:12px}
 .smart-hint .sh-name{color:var(--faint)}
+.dup-warn{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:2px 0 8px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--st-rev) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--st-rev) 40%,var(--line));font-size:calc(13px*var(--ts));color:var(--text)}
+.dup-warn>.i{width:16px;height:16px;color:var(--st-rev);flex:none}
+.dup-warn>span{flex:1;min-width:180px}
+.dup-warn .dw-btns{display:flex;gap:6px;margin-left:auto}
 .newcl{display:flex;gap:6px;align-items:center;flex-wrap:wrap;width:100%}
 .newcl input{flex:1;min-width:120px}
 .upnext{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
@@ -2339,7 +2346,7 @@ const MONTH_FULL=['January','February','March','April','May','June','July','Augu
 const PREF_DEF={dateRel:false,dateFmt:'md',weekStart:'mon',hideWeekends:false,confetti:true,motion:'system',contrast:'normal',trashDays:30,darkShade:'standard',pillStyle:'tint',tips:true,
   iconWeight:'regular',depth:'soft',sideStyle:'colored',thinScroll:false,toastPos:'bottom',nameWrap:false,doneStyle:'struck',overdueTint:false,statusIcons:false,prioColors:{},logoShape:'rounded',numFont:'mono',readSpacing:'normal',sideCounts:true,
   compactHeader:false,greeting:true,greetName:'',drawerBand:true,boardTint:false,dueStyle:'text',jobProgress:'bar',calGrid:'lines',todayMark:'dot',
-  pomoFocus:25,pomoShort:5,pomoLong:15,pomoEvery:4,pomoAutoBreak:false,pomoAutoFocus:false,pomoSound:'chime',pomoPopup:false,allClear:true,seasonal:true,officeCat:true,catSky:true,catPlant:true,plantGoal:20,catVisitors:true,catNaps:true,catTreats:true,catPeek:true,sillPet:'none',corkBoard:true};
+  pomoFocus:25,pomoShort:5,pomoLong:15,pomoEvery:4,pomoAutoBreak:false,pomoAutoFocus:false,pomoSound:'chime',pomoPopup:false,allClear:true,seasonal:true,officeCat:true,catSky:true,catPlant:true,plantGoal:20,catVisitors:true,catNaps:true,catTreats:true,catPeek:true,sillPet:'none',corkBoard:true,autoArchive:0};
 const pref=k=>{let o=null;try{o=SM}catch(e){/* Settings state not set up yet */}o=o||S.settings?.app||{};return o[k]!==undefined&&o[k]!==null?o[k]:PREF_DEF[k]};
 const reducedMotion=()=>pref('motion')==='reduce'||matchMedia('(prefers-reduced-motion:reduce)').matches;
 function absDate(s){
@@ -2963,7 +2970,7 @@ function applyLook(o){
   const pc=g('prioColors')||{};for(const p of ['urgent','high','low']){if(pc[p])r.style.setProperty('--pr-'+p,pc[p]);else r.style.removeProperty('--pr-'+p)}
 }
 function migrateStatuses(){
-  pruneLog();purgeOldTrash();
+  pruneLog();purgeOldTrash();setTimeout(autoArchive,1500);
   for(const t of Object.values(S.tasks)){
     if(t.status==='dropped')patch('tasks',t.id,{status:'done',doneAt:t.doneAt||today()});
     // Finder paths briefly went into the files link; they belong in the project folder now
@@ -3424,8 +3431,8 @@ function weekView(list){
     const tot=parts.reduce((a,x)=>a+x[1],0);return tot?`<span class="wd-hrs" title="${esc(parts.map(([n,h])=>`${n}: ${fmtNum(h)} h`).join('\n'))}">${I.clock}${fmtNum(tot)} h</span>`:''};
   let cols='';
   for(let i=0;i<7;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=ymd(d),evs=byDay[k]||[],heavy=(load[k]||0)>=lim,hs=hol[k]||[];
-    cols+=`<div class="wday ${k===t0?'today':''} ${heavy?'busy':''} ${hs.length?'holiday':''} ${pref('hideWeekends')&&isWeekend(d)?'wk-min':''} ${wd&&!wd.has(d.getDay())?'offday':''}" ${wd&&!wd.has(d.getDay())?'title="Not a work day for this job"':''}><div class="wd-head"><span>${WEEKDAY[d.getDay()]}</span><b>${d.getDate()}</b>${hoursOn(d)}${heavy?`<span class="busy-tag" title="${load[k]} tasks due across all jobs">${I.warn}${load[k]}</span>`:''}</div>${holHtml(hs)}${shiftsOn(d)}
-      ${evs.map(t=>`<div class="wcard ${isClosed(t)?'is-done':''}" style="--c:${stColor(stOf(t))}" data-act="open" data-id="${t.id}" tabindex="0"><b>${esc(t.name||'Untitled task')}</b><small>${esc([S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '))}</small><span class="wc-st">${esc(stLabel(stOf(t)))}</span></div>`).join('')||'<span class="wd-empty">—</span>'}</div>`}
+    cols+=`<div data-calday="${k}" class="wday ${k===t0?'today':''} ${heavy?'busy':''} ${hs.length?'holiday':''} ${pref('hideWeekends')&&isWeekend(d)?'wk-min':''} ${wd&&!wd.has(d.getDay())?'offday':''}" ${wd&&!wd.has(d.getDay())?'title="Not a work day for this job"':''}><div class="wd-head"><span>${WEEKDAY[d.getDay()]}</span><b>${d.getDate()}</b>${hoursOn(d)}${heavy?`<span class="busy-tag" title="${load[k]} tasks due across all jobs">${I.warn}${load[k]}</span>`:''}</div>${holHtml(hs)}${shiftsOn(d)}
+      ${evs.map(t=>`<div class="wcard ${isClosed(t)?'is-done':''}" style="--c:${stColor(stOf(t))}" data-act="open" data-id="${t.id}" data-caldrag draggable="true" tabindex="0"><b>${esc(t.name||'Untitled task')}</b><small>${esc([S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '))}</small><span class="wc-st">${esc(stLabel(stOf(t)))}</span></div>`).join('')||'<span class="wd-empty">—</span>'}</div>`}
   const lbl=start.getMonth()===end.getMonth()?`${MONTH_FULL[start.getMonth()]} ${start.getDate()}–${end.getDate()}`:`${MONTH_FULL[start.getMonth()].slice(0,3)} ${start.getDate()} – ${MONTH_FULL[end.getMonth()].slice(0,3)} ${end.getDate()}`;
   return `<div class="cal-bar">${calModeSeg()}<h2>${lbl}, ${end.getFullYear()}</h2><button class="icon-btn" data-act="cal" data-step="-1" aria-label="Previous week">${I.left}</button><button class="btn sm" data-act="cal" data-step="0">Today</button><button class="icon-btn" data-act="cal" data-step="1" aria-label="Next week">${I.left.replace('<svg','<svg style="transform:scaleX(-1)"')}</button></div>
     <div class="week" style="grid-template-columns:${weekCols()}">${cols}</div>`;
@@ -3450,8 +3457,8 @@ function calendarView(list){
     const d=new Date(start);d.setDate(start.getDate()+i);const k=ymd(d);
     const evs=byDay[k]||[],hs=hol[k]||[];
     const heavy=(load[k]||0)>=lim;
-    cells+=`<div class="day ${d.getMonth()!==m-1?'out':''} ${k===t0?'today':''} ${heavy?'busy':''} ${hs.length?'holiday':''} ${pref('hideWeekends')&&isWeekend(d)?'wk-min':''} ${wd&&!wd.has(d.getDay())?'offday':''}"><div class="dn"><b>${d.getDate()}</b>${heavy?`<span class="busy-tag" title="${load[k]} tasks due across all jobs">${I.warn}${load[k]}</span>`:''}</div>${holHtml(hs.slice(0,2))}${hs.length>2?`<div class="hol" title="${esc(hs.slice(2).map(h=>h.cc+': '+h.name).join('\n'))}"><span>+${hs.length-2} more</span></div>`:''}
-      ${evs.slice(0,4).map(t=>`<button class="ev ${isClosed(t)?'is-done':''}" style="--c:${stColor(stOf(t))}" data-act="open" data-id="${t.id}"><span>${esc(t.name||'Untitled task')}</span></button>`).join('')}
+    cells+=`<div data-calday="${k}" class="day ${d.getMonth()!==m-1?'out':''} ${k===t0?'today':''} ${heavy?'busy':''} ${hs.length?'holiday':''} ${pref('hideWeekends')&&isWeekend(d)?'wk-min':''} ${wd&&!wd.has(d.getDay())?'offday':''}"><div class="dn"><b>${d.getDate()}</b>${heavy?`<span class="busy-tag" title="${load[k]} tasks due across all jobs">${I.warn}${load[k]}</span>`:''}</div>${holHtml(hs.slice(0,2))}${hs.length>2?`<div class="hol" title="${esc(hs.slice(2).map(h=>h.cc+': '+h.name).join('\n'))}"><span>+${hs.length-2} more</span></div>`:''}
+      ${evs.slice(0,4).map(t=>`<button class="ev ${isClosed(t)?'is-done':''}" style="--c:${stColor(stOf(t))}" data-act="open" data-id="${t.id}" data-caldrag draggable="true"><span>${esc(t.name||'Untitled task')}</span></button>`).join('')}
       ${evs.length>4?`<span class="more">+${evs.length-4} more</span>`:''}</div>`;
   }
   const noDate=list.filter(t=>!t.due&&!isClosed(t)).length;
@@ -3601,9 +3608,20 @@ function archiveTasks(ids){
   if(ids.includes(S.ui.openTask))renderDrawer();
   toast(ids.length===1?`Archived “${S.tasks[ids[0]].name||'task'}”`:`Archived ${ids.length} tasks`,{label:'Undo',fn:()=>restoreTasks(ids,true)});
 }
+/* Settings → Tasks & calendar → Archive finished tasks: done tasks go to Archived on their own N days after doneAt.
+   Runs on load (migrateStatuses), after Settings are saved and with the 60s re-render. */
+const autoArchiveDays=()=>{const d=+pref('autoArchive');return [3,7,14].includes(d)?d:0};
+function autoArchive(){
+  const n=autoArchiveDays();if(!n||!S.ready)return;const t0=today();
+  const ids=live().filter(t=>stOf(t)==='done'&&!t.archived&&t.doneAt&&diffDays(t0,t.restoredAt>t.doneAt?t.restoredAt:t.doneAt)>=n&&t.id!==S.ui.openTask).map(t=>t.id);
+  if(!ids.length)return;
+  ids.forEach(id=>{patch('tasks',id,{archived:true,archivedAt:t0});logAct('archive',`Archived automatically (done ${n}+ days)`,{task:S.tasks[id]})});
+  toast(ids.length===1?`Archived “${S.tasks[ids[0]].name||'task'}” (done ${n}+ days)`:`Archived ${ids.length} tasks finished ${n}+ days ago`,{label:'Undo',fn:()=>{restoreTasks(ids,true);render()}});
+  scheduleRender();
+}
 function restoreTasks(ids,quiet){
   ids=ids.filter(id=>S.tasks[id]);
-  ids.forEach(id=>{patch('tasks',id,{archived:false,archivedAt:null});logAct('restore','Restored from the archive',{task:S.tasks[id]})});
+  ids.forEach(id=>{patch('tasks',id,{archived:false,archivedAt:null,restoredAt:today()});logAct('restore','Restored from the archive',{task:S.tasks[id]})});
   if(ids.includes(S.ui.openTask))renderDrawer();
   if(!quiet)toast(ids.length===1?`Restored “${S.tasks[ids[0]].name||'task'}”`:`Restored ${ids.length} tasks`);
 }
@@ -4266,7 +4284,7 @@ function renderDrawer(){
     ${SPLIT&&SPLIT.id===t.id?splitHtml(t):''}
     ${t.deleted?`<div class="d-archived">${I.trash}<span><b>In Trash</b> since ${fmtDate(t.deletedAt)}. It's deleted for good after ${trashDays()} days.</span><button class="btn sm" data-act="trash-restore" data-id="${t.id}">Restore</button></div>`:''}
     ${t.archived?`<div class="d-archived">${I.archive}<span><b>Archived</b>${t.archivedAt?' '+fmtDate(t.archivedAt):''}. Hidden from Overview and job tabs.</span><button class="btn sm" data-act="restore" data-id="${t.id}">Restore</button></div>`:''}
-    <textarea class="d-name" rows="1" data-field="name" data-fk="d-name" aria-label="Task name" placeholder="${t._draft?'Task name, e.g. Reel 7 Band fri !high':'Task name'}">${esc(t.name)}</textarea>${t._draft?`<div class="smart-hint" id="smart-hint">${smartHintHtml(t)}</div>`:''}
+    <textarea class="d-name" rows="1" data-field="name" data-fk="d-name" aria-label="Task name" placeholder="${t._draft?'Task name, e.g. Reel 7 Band fri !high':'Task name'}">${esc(t.name)}</textarea>${t._draft?`<div class="smart-hint" id="smart-hint">${smartHintHtml(t)}</div><div id="dup-slot">${dupWarnHtml(t)}</div>`:''}
     ${(()=>{
       const cur=stOf(t),idx=STATUSES.findIndex(x=>x.id===cur),nxt=STATUSES[idx+1],prio=t.priority||'normal';
       const f=(icon,label,body,forId,wide)=>`<div class="pf${wide?' pf-wide':''}">${forId?`<label for="${forId}">`:'<span class="pf-l">'}${icon}${label}${forId?'</label>':'</span>'}<div class="pf-v">${body}</div></div>`;
@@ -4977,6 +4995,9 @@ const HELP=[
  ['Tasks','Paste a link to add it',`With a task open, press ${IS_MAC?'⌘V':'Ctrl+V'} anywhere in the panel (not inside a text box) and the link goes into the right slot: Frame.io or Vimeo into the review link, Drive, OneDrive, Dropbox, LucidLink or Descript into the files link, ClickUp or Asana into the task link, and a Mac path into the project folder. The job's own tools (Edit job → Tools & folders) decide first. Undo is in the message that pops up.`,null],
  ['Tasks','Export file names',`Each task panel shows an export name, like 260930_Client_Title_V2, with a copy button (it's in the floating window too). Click Pattern to set the naming for that client, or for the job when a task has no client: {date} today, {due}, {client}, {job}, {title}, {v} version (revision round + 1), {r}, {format} and {length}.`,null],
  ['Tasks','Split into tasks',`In a task's panel (or the right-click menu), Split into tasks turns one task into several: one name per line, each with the same job, client, links, dates and notes, and the checklist unticked.`,null],
+ ['Tasks','Drag on the Calendar',`On a computer, drag a task in the Calendar (month or week) onto another day to move its due date. A toast says when the new day is busy and has Undo. On a phone, change the date in the task panel.`,null],
+ ['Tasks','Archive finished tasks on their own',`Done tasks can move to Archived by themselves 3, 7 or 14 days after they were finished, so the Done column stays short. It's off until you pick a time. Each one is logged, and Undo brings them back. Set it in Settings → Tasks & calendar.`,['tasks','Tasks & calendar']],
+ ['Tasks','Same name twice',`If you save a new task with the same name as an open one in that job, the panel asks whether to open the one you already have or save the new one anyway.`,null],
  ['Tasks','Select several',`Turn on Select in the toolbar, tick tasks (Shift-click for a range), then set status, priority, due date, move them to another job or client, archive or delete them together.`,null],
  ['Tasks','Pins, templates and duplicates',`Pin a task to keep it at the top of the Overview. Save checklist steps as a template per client. Duplicate makes an unsaved copy to edit: same client (so the same brand guide), due date, links, notes and checklist (unticked), with a fresh status.`,null],
  ['Updates and notes','Updates and revision notes',`In a task's Activity tab, post updates with formatting, timecodes and pictures (paste a screenshot or drop it in). Tick an update when it's done, reply to it, or edit it. Tasks with open updates show a speech-bubble count in lists.`,null],
@@ -5197,11 +5218,22 @@ function duplicateTask(id){
     links:{task:src.links?.task||'',upload:src.links?.upload||'',file:src.links?.file||'',project:src.links?.project||''},thumb:null,notes:src.notes||'',checklist:(src.checklist||[]).map(c=>({id:uid().slice(0,12),text:c.text,done:false})),copiedFrom:src.id,id:nid,_draft:true};
   openTask(nid);setTimeout(()=>{const n=$('.d-name');if(n){n.focus();n.select()}},30);
 }
-function saveDraft(again){
+/* an open task in the same job with the same name (case, spaces and _/- ignored) */
+const dupKey=x=>String(x||'').toLowerCase().replace(/[\s_\-]+/g,' ').trim();
+function dupOf(name,jobId,exceptId){const k=dupKey(name);if(!k)return null;return live().find(t=>t.id!==exceptId&&t.jobId===jobId&&!t.archived&&!isClosed(t)&&dupKey(t.name)===k)||null}
+let DUP=null;
+function dupWarnHtml(t){
+  const d=DUP&&DUP.draft===t.id&&S.tasks[DUP.id];if(!d)return '';
+  return `<div class="dup-warn" role="alert">${I.warn}<span>You already have <b>“${esc(d.name)}”</b> open in ${esc(S.jobs[d.jobId]?.name||'this job')}${d.clientId&&S.clients[d.clientId]?' · '+esc(S.clients[d.clientId].name):''} (${esc(stLabel(stOf(d)))}). Open that one instead?</span><div class="dw-btns"><button type="button" class="btn sm primary" data-act="dup-open">Open it</button><button type="button" class="btn sm" data-act="dup-save">Save anyway</button></div></div>`;
+}
+function saveDraft(again,force){
   if(!DRAFT)return;
   const nm=$('.d-name');if(nm)DRAFT.name=nm.value.replace(/\n/g,' ');
   if(!DRAFT.name.trim()){toast('Give the task a name first.');$('.d-name')?.focus();return}
   const sp=parseSmart(DRAFT.name,DRAFT);
+  if(!force){const nn=(sp.found&&sp.name?sp.name:DRAFT.name).trim(),jid=sp.jobId!==undefined?sp.jobId:DRAFT.jobId,d=dupOf(nn,jid,DRAFT.id);
+    if(d){DUP={id:d.id,draft:DRAFT.id,again:!!again};renderDrawer();$('.dup-warn .primary')?.focus({preventScroll:true});$('.dup-warn')?.scrollIntoView({block:'nearest'});return}}
+  DUP=null;
   if(sp.found){if(sp.name)DRAFT.name=sp.name;for(const k of ['due','priority','jobId','clientId'])if(sp[k]!==undefined)DRAFT[k]=sp[k]}
   const {_draft,_any,id,...data}=DRAFT;data.name=data.name.trim();data.created=Date.now();
   delete S.tasks[id];DRAFT=null;
@@ -5354,7 +5386,7 @@ function closeSettings(save){
     const keep=new Set(data.statuses.map(x=>x.id)),dest=id=>{let d=id,n=0;while(!keep.has(d)&&sm.stMoves[d]&&n++<20)d=sm.stMoves[d];return keep.has(d)?d:data.statuses[0].id};
     for(const t of Object.values(S.tasks))if(!t._draft&&t.status&&!keep.has(t.status)&&t.status!=='dropped'){const to=dest(t.status);patch('tasks',t.id,{status:to,...(to==='done'&&!t.doneAt?{doneAt:today()}:{})})}
     [sm.orig,...sm.uploaded].forEach(v=>{if(v&&v!==sm.logo)dropImage(v)});
-    toast('Settings saved');
+    toast('Settings saved');setTimeout(autoArchive,600);
   }else sm.uploaded.forEach(dropImage);
   $('#modal').hidden=true;$('#modal').innerHTML='';render();
 }
@@ -5392,6 +5424,7 @@ function renderSettings(){
       ${prefRow('statusIcons','Status marker',[[false,'Dot'],[true,'Icon']],'Icons for the built-in statuses; your own keep the dot')}
       ${prefRow('dueStyle','Due dates',[['text','Text'],['badge','Colored badge']],'Badge: red when late, amber within 2 days')}
       ${prefRow('boardTint','Board columns',[[false,'Plain'],[true,'Tinted']],'A faint wash of each status color')}
+      ${prefRow('autoArchive','Archive finished tasks',[[0,'Off'],[3,'3 days'],[7,'7 days'],[14,'14 days']],'Done tasks move to Archived on their own this long after they were finished')}
       ${prioColorsHtml()}
       <p class="pref-group">Dates</p>
       ${prefPick('dateRel','Dates in lists and cards',[[false,absDate(addDays(today(),3)),'The date itself'],[true,'in 3 days','How far away, like “2 days late”']])}
@@ -6347,6 +6380,8 @@ document.addEventListener('click',e=>{
     case 'filters-close': if(el.id==='filter-sheet'&&e.target!==el)break;closeFilters();break;
     case 'save-draft': saveDraft();break;
     case 'save-draft-again': saveDraft(true);break;
+    case 'dup-save': saveDraft(DUP?.again,true);break;
+    case 'dup-open':{const id=DUP?.id;DUP=null;if(id&&S.tasks[id]){discardDraft();openTask(id)}break}
     case 'newcl-cancel': NEWCL=null;renderDrawer();break;
     case 'toggle-jobs': u.jobsOpen=u.jobsOpen===false;saveUi();renderSide();break;
     case 'group': u.collapsed[el.dataset.status]=!u.collapsed[el.dataset.status];saveUi();render();break;
@@ -6646,7 +6681,7 @@ document.addEventListener('input',e=>{
   if(f&&u.openTask&&el.type!=='date'&&el.tagName!=='SELECT'){
     const p=f.startsWith('links.')?{links:{[f.slice(6)]:el.value.trim()}}:{[f]:f==='name'?el.value.replace(/\n/g,' '):el.value};
     patch('tasks',u.openTask,p,600);
-    if(f==='name'){autosize(el);const h=$('#smart-hint'),d=S.tasks[u.openTask];if(h&&d?._draft)h.innerHTML=smartHintHtml({...d,name:el.value})}
+    if(f==='name'){autosize(el);const h=$('#smart-hint'),d=S.tasks[u.openTask];if(h&&d?._draft)h.innerHTML=smartHintHtml({...d,name:el.value});if(DUP){DUP=null;const ds=$('#dup-slot');if(ds)ds.innerHTML=''}}
     if(f.startsWith('links.')){const row=el.closest('.link-row'),a=row?.querySelector('a.icon-btn');const tj=S.jobs[S.tasks[u.openTask]?.jobId];const url=linkHref(el.value,tj),lp=localPath(el.value);const h=row?.querySelector('.path-hint');if(h)h.hidden=!lp;if(a){if(lp||viaProfile(tj)){a.removeAttribute('target');a.title=lp?'Open in Finder':'Open'}else{a.target='_blank';a.title='Open'}a.href=url||'#';a.classList.toggle('off',!url)}}
   }
 });
@@ -6790,7 +6825,20 @@ document.addEventListener('drop',e=>{
     render()}
 });
 
-setInterval(()=>{if(S.ready&&!document.hidden&&$('#modal').hidden)scheduleRender()},60000);
+/* Calendar: drag a task (month entry or week card) onto another day to move its due date; logged, with Undo */
+let calDrag=null;
+function moveDue(id,day){
+  const t=S.tasks[id];if(!t||!day||t.due===day)return;const old=t.due||'';
+  patch('tasks',id,{due:day});logAct('date',`Due date moved to ${fmtDate(day)}`,{task:t});render();
+  const heavy=(dueLoad()[day]||0)>=dayLimit()&&!isClosed(t);
+  toast(`“${t.name||'Task'}” due ${fmtDate(day)}${heavy?' · busy day':''}`,{label:'Undo',fn:()=>{const x=S.tasks[id];if(!x)return;patch('tasks',id,{due:old});logAct('date',old?`Due date set back to ${fmtDate(old)}`:'Due date removed',{task:x});render()}});
+}
+document.addEventListener('dragstart',e=>{const c=e.target.closest?.('[data-caldrag]');if(!c)return;calDrag=c.dataset.id;c.classList.add('dragging');document.body.classList.add('cal-dragging');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',calDrag)}catch(x){}});
+document.addEventListener('dragover',e=>{if(!calDrag)return;const d=e.target.closest?.('[data-calday]');document.querySelectorAll('.cal-drop').forEach(x=>x!==d&&x.classList.remove('cal-drop'));if(d){e.preventDefault();e.dataTransfer.dropEffect='move';d.classList.add('cal-drop')}});
+document.addEventListener('dragend',()=>{if(!calDrag)return;calDrag=null;document.body.classList.remove('cal-dragging');document.querySelectorAll('.cal-drop,[data-caldrag].dragging').forEach(x=>x.classList.remove('cal-drop','dragging'))});
+document.addEventListener('drop',e=>{if(!calDrag)return;const d=e.target.closest?.('[data-calday]'),id=calDrag;calDrag=null;document.body.classList.remove('cal-dragging');document.querySelectorAll('.cal-drop').forEach(x=>x.classList.remove('cal-drop'));if(!d)return;e.preventDefault();moveDue(id,d.dataset.calday)});
+
+setInterval(()=>{if(S.ready&&!document.hidden&&$('#modal').hidden){autoArchive();scheduleRender()}},60000);
 document.addEventListener('toggle',e=>{if(e.target.classList?.contains('d-brand')){S.ui.brandTaskOpen=e.target.open;saveUi()}},true);
 placeTopRight();
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('/sw.js').catch(()=>{});
