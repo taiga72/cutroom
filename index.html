@@ -2120,6 +2120,8 @@ select.rs-add{appearance:auto}
   html.print-resume .rs-sheet{box-shadow:none;border-radius:0;margin:0;zoom:1!important}
   html.print-resume .rs-e{background:none!important;box-shadow:none!important}
 }
+.upn-tab .upnext h3{display:none}
+.upn-tab .upnext{max-width:900px}
 </style>
 
 <div class="app">
@@ -2978,7 +2980,7 @@ function render(){
   document.title=(a.name||'').trim()||APP_NAME;pomoTitle();
   const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
   withFocus(()=>{renderSide();renderMain()});
-  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();renderUpNextPage();boardRestore();document.body.classList.toggle('cal-page',S.ui.view==='calendar'&&!['archived','activity','trash','help','resume'].includes(S.ui.tab));
+  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();renderUpNextPage();boardRestore();document.body.classList.toggle('cal-page',S.ui.view==='calendar'&&!['archived','activity','trash','help','resume','upnext'].includes(S.ui.tab));
   if(S.ready&&!SEASON_RAN){SEASON_RAN=true;setTimeout(()=>seasonFx(),900)}
 }
 
@@ -2990,7 +2992,7 @@ function renderSide(){
   document.body.classList.toggle('side-mini',!!u.sideMini);
   const tt=n=>u.sideMini?` title="${n}"`:'';
   let html=`<button type="button" class="icon-btn side-toggle" data-act="side-mini" aria-label="${u.sideMini?'Expand sidebar':'Collapse sidebar'}" title="${u.sideMini?'Expand sidebar':'Collapse sidebar'}">${I.left}</button><button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Overview">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
-  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview"${tt('Overview')}>${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button>
+  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview"${tt('Overview')}>${I.grid}<span class="name">Overview</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='upnext'?'on':''}" data-act="nav" data-tab="upnext"${tt('Up next')}>${UP_IC}<span class="name">Up next</span><span class="count">${S.ready?upNextList().length||'':''}</span></button>
   <button class="nav-item jobs-toggle ${jobsOpen?'open':''}"${tt('Jobs')} data-act="toggle-jobs" aria-expanded="${jobsOpen}" aria-controls="nav-jobs">${I.briefcase}<span class="name">Jobs</span><span class="count">${S.ready?jobsSorted().length:''}</span>${I.chev}</button></nav>
   <nav class="nav jobs" id="nav-jobs" aria-label="Jobs" ${jobsOpen?'':'hidden'}>`;
   for(const j of jobsSorted()){
@@ -3014,7 +3016,7 @@ function renderMain(){
   const u=S.ui;
   $('#subnav').innerHTML='';
   if(!S.ready){$('#view').innerHTML=`<div class="loading"><svg class="ld-reel" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="20" cy="20" r="3.5" fill="currentColor"/>${[0,72,144,216,288].map(a=>`<circle cx="${(20+9.5*Math.cos(a*Math.PI/180)).toFixed(2)}" cy="${(20+9.5*Math.sin(a*Math.PI/180)).toFixed(2)}" r="4.2" fill="currentColor" opacity=".55"/>`).join('')}</svg><b>${esc(LOAD_LINE)}</b><small>Loading your tasks</small></div>`;$('#toolbar').hidden=true;return}
-  if(u.tab!=='overview'&&u.tab!=='archived'&&u.tab!=='activity'&&u.tab!=='trash'&&u.tab!=='help'&&u.tab!=='resume'&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
+  if(u.tab!=='overview'&&u.tab!=='archived'&&u.tab!=='activity'&&u.tab!=='trash'&&u.tab!=='help'&&u.tab!=='resume'&&u.tab!=='upnext'&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
   if(u.client!=='all'&&!S.clients[u.client]) u.client='all';
   const job=u.tab==='overview'?null:S.jobs[u.tab];
 
@@ -3026,6 +3028,7 @@ function renderMain(){
   if(u.tab==='trash'){renderTrash();return}
   if(u.tab==='help'){renderHelp();return}
   if(u.tab==='resume'){renderResume();return}
+  if(u.tab==='upnext'){renderUpNextTab();return}
   const scope=tasksOfScope();
   if(!job){
     $('#head').innerHTML=`<div class="head head-ov"><div class="head-title">${greetHtml()}<h1>Overview</h1><div class="sub">${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients${(()=>{const h=jobsSorted().reduce((a,j)=>a+weeklyHours(workOf(j)),0);return h?` · ${fmtNum(h)} h/week scheduled`:''})()} <span class="sub-tail">· everything due across your work</span></div></div>
@@ -3053,7 +3056,7 @@ function renderMain(){
   const keys=statKeys(),labels=Object.fromEntries(statDefs());
   $('#stats').innerHTML=Object.keys(S.jobs).length?`<div class="stats-wrap"><div class="stats" style="grid-template-columns:repeat(${keys.length},minmax(0,1fr))">${keys.map(k=>statTile(k,labels[k],scope)).join('')}<button type="button" class="icon-btn stats-edit ${STATPOP?'on':''}" data-act="stat-edit" title="Choose tiles" aria-label="Choose which tiles show" aria-expanded="${STATPOP}">${I.pencil}</button></div>${statPopHtml()}</div>`:'';
 
-  $('#jobcards').innerHTML=(!job?allClearHtml()+upNextStrip():'')+(!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')+`<button type="button" class="job-card job-add" data-act="new-job" title="New job">${I.plus}<span>New job</span></button>`}</div>`:'')+pinnedStrip(scope);
+  $('#jobcards').innerHTML=(!job?allClearHtml():'')+(!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')+`<button type="button" class="job-card job-add" data-act="new-job" title="New job">${I.plus}<span>New job</span></button>`}</div>`:'')+pinnedStrip(scope);
 
   const tb=$('#toolbar');tb.hidden=!Object.keys(S.jobs).length;
   $('#top-search').hidden=tb.hidden;$('#fdot').hidden=u.prio==='all'&&u.due==='all';
@@ -3074,7 +3077,7 @@ function renderMain(){
 /* ================= address bar: Back button and task links =================
    The page's place is kept in the URL hash (#/overview, #/job/<id>/client/<id>/pane/brand, …/task/<id>), so the
    browser's Back closes the task panel or returns to the previous page, and a task link opens that task. */
-const PAGES=['overview','archived','activity','trash','help','resume'];
+const PAGES=['overview','upnext','archived','activity','trash','help','resume','upnext'];
 let URL_READY=false,URL_LAST=null,URL_TASK_PUSHED=false,URL_APPLYING=false;
 const LINK_IC='<svg class="i" viewBox="0 0 16 16"><path d="M6.8 9.2a2.8 2.8 0 0 0 4 0l2.2-2.2a2.8 2.8 0 0 0-4-4l-.9.9"/><path d="M9.2 6.8a2.8 2.8 0 0 0-4 0L3 9a2.8 2.8 0 0 0 4 4l.9-.9"/></svg>';
 function urlOf(){
@@ -3168,7 +3171,7 @@ function renderPlus(){
     <button type="button" class="btn primary pm-task" data-act="new-task">${I.plus}New task</button>`;
 }
 function renderTabbar(){
-  const e=$('#tabbar');if(!e)return;const u=S.ui,cal=u.view==='calendar'&&!['archived','activity','trash','help','resume'].includes(u.tab);
+  const e=$('#tabbar');if(!e)return;const u=S.ui,cal=u.view==='calendar'&&!['archived','activity','trash','help','resume','upnext'].includes(u.tab);
   const b=(act,label,icon,on,extra='')=>`<button type="button" data-act="${act}" class="${on?'on':''} ${extra} tb-${act.slice(3)}" aria-label="${label}" ${on?'aria-current="page"':''}>${icon}<span>${label}</span></button>`;
   const busy=notesOpen||UPN;
   e.innerHTML=`<div class="tb-pill">${b('tb-overview','Overview',I.grid,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Notifications','<svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg>'+(()=>{const n=$('#bell-n');return n&&!n.hidden?`<i class="tb-badge">${esc(n.textContent)}</i>`:''})(),notesOpen)+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-upnext','Up next',UP_IC+(()=>{const n=upNextList().length;return n?`<i class="tb-badge tb-count">${n}</i>`:''})(),UPN)}</div>`
@@ -3246,6 +3249,13 @@ function toggleUpNext(id){
 }
 /* phones: Up next is its own tab in the bottom bar, a full page like Notifications */
 let UPN=false;
+/* the Up next page (desktop sidebar item; phones also have the bottom-bar tab) */
+function renderUpNextTab(){
+  const n=upNextList().length;
+  $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${UP_IC.replace('class="i"','class="i" style="width:28px;height:28px"')}Up next</h1><div class="sub">${n?`${n} task${n===1?'':'s'} queued across your jobs. Drag to reorder; finished tasks leave on their own.`:'Your own queue across every job.'}</div></div></div>`;
+  $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
+  $('#view').innerHTML=n?`<div class="upn-tab">${upNextStrip()}</div>`:`<div class="empty"><h3>Nothing queued yet</h3><p>Right-click a task and choose Up next, or use the queue icon at the top of a task, to line up what you'll work on next.</p></div>`;
+}
 function renderUpNextPage(){
   let e=$('#upnext-page');if(!e){e=document.createElement('div');e.id='upnext-page';e.className='upn-page';e.setAttribute('role','dialog');e.setAttribute('aria-label','Up next');document.body.appendChild(e)}
   const on=UPN&&narrow.matches;e.hidden=!on;if(!on){e.innerHTML='';sheetLock();return}
@@ -3877,7 +3887,7 @@ document.addEventListener('click',e=>{
 function jumpItems(q){
   q=q.trim().toLowerCase();
   const out=[],score=(txt)=>{txt=(txt||'').toLowerCase();if(!q)return 1;const i=txt.indexOf(q);return i<0?0:i===0?3:(txt[i-1]===' '?2:1)};
-  const pages=[['overview','Overview',I.grid],['activity','Activity',I.clock],['archived','Archived',I.archive],['trash','Trash',I.trash],['resume','Resume',RS_IC],['help','Help & tips',HELP_IC]];
+  const pages=[['overview','Overview',I.grid],['activity','Activity',I.clock],['archived','Archived',I.archive],['trash','Trash',I.trash],['upnext','Up next',UP_IC],['resume','Resume',RS_IC],['help','Help & tips',HELP_IC]];
   for(const [id,l,ic] of pages){const sc=score(l);if(sc)out.push({grp:'Pages',sc:sc+.5,icon:ic,label:l,sub:'Page',act:'nav',tab:id})}
   if(!q){(S.ui.recent||[]).map(id=>S.tasks[id]).filter(t=>t&&!t._draft).forEach((t,k)=>out.push({grp:'Recently opened',sc:10-k*.1,icon:`<span class="jdot" ${pillStyle(stOf(t))}></span>`,label:t.name||'Untitled task',sub:['Recent',S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '),act:'open',id:t.id}))}
   if(IS_MAC){(lsGet(LS_PATHS)||[]).slice(0,q?8:5).forEach((x,k)=>{const sc=q?Math.max(score(x.label),score(pathName(x.p)),score(x.sub)*.6):1;if(sc)out.push({grp:'Recent folders',sc:q?sc+.1:8-k*.1,icon:I.folder,label:x.label===pathName(x.p)?x.label:`${x.label} · ${pathName(x.p)}`,sub:['Recent folder',x.sub].filter(Boolean).join(' · '),act:'path',p:x.p})})}
@@ -3955,7 +3965,7 @@ function renderJump(){
 }
 function jumpGo(k){
   const x=JUMP?.items?.[k];closeJump();if(!x)return;const u=S.ui;
-  if(x.act==='nav'){if(x.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash','help','resume'].includes(u.tab))u.from=u.tab}u.tab=x.tab;u.client=x.client||'all';saveUi();render();window.scrollTo({top:0});closeSide()}
+  if(x.act==='nav'){if(x.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash','help','resume','upnext'].includes(u.tab))u.from=u.tab}u.tab=x.tab;u.client=x.client||'all';saveUi();render();window.scrollTo({top:0});closeSide()}
   else if(x.act==='open')openTask(x.id);
   else if(x.act==='new-task'){const id=newTask();if(id){openTask(id);setTimeout(()=>$('.d-name')?.focus(),30)}}
   else if(x.act==='open-settings')openSettings();
@@ -4250,7 +4260,7 @@ function renderDrawer(){
   withFocus(()=>{$('#drawer').innerHTML=`
   ${t._draft?`<div class="d-draft">${t.copiedFrom?I.copy:I.plus}<b>${t.copiedFrom?'Copy of a task':'New task'}</b><span>Not saved yet</span></div>`:''}
   <div class="d-top" style="--jc:${esc(j?.color||'transparent')}"><div class="crumb">${taskMark(t)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
-    ${t._draft?'':`<button class="icon-btn ${t.pinned?'pin-on':''}" data-act="d-pin" aria-pressed="${!!t.pinned}" aria-label="${t.pinned?'Unpin':'Pin to the top'}" title="${t.pinned?'Unpin':'Pin to the top of the Overview'}">${I.pin}</button>${isClosed(t)?'':(()=>{const T=pomoState(),on=T.taskId===t.id&&T.mode==='focus'&&T.run!=='idle';return `<button class="icon-btn d-pomo ${on?'pin-on':''}" data-act="d-pomo" aria-pressed="${on}" aria-label="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task'}" title="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task (starts a focus session)'}${t.pomos?` · ${t.pomos} focus session${t.pomos===1?'':'s'} so far`:''}">${TOMATO_IC}${t.pomos?`<span class="dp-n">${t.pomos}</span>`:''}</button>`})()}${isClosed(t)?'':`<button class="icon-btn ${t.upNext?'pin-on':''}" data-act="d-upnext" aria-pressed="${!!t.upNext}" aria-label="${t.upNext?'Remove from Up next':'Add to Up next'}" title="${t.upNext?`Up next #${upNextPos(t)} · click to remove`:'Add to Up next (your queue on the Overview)'}">${UP_IC}</button>`}<button class="icon-btn" data-act="d-link" aria-label="Copy link to this task" title="Copy link to this task">${LINK_IC}</button><button class="icon-btn" data-act="d-duplicate" aria-label="Duplicate task" title="Duplicate (make a copy to edit)">${I.copy}</button>${canPip()?`<button class="icon-btn ${PIP.win&&PIP.id===t.id?'pin-on':''}" data-act="d-pip" aria-pressed="${!!(PIP.win&&PIP.id===t.id)}" aria-label="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task in its own window'}" title="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task over Premiere or Resolve'}">${PIP_IC}</button>`:''}`}${t._draft?'':`<button class="icon-btn d-more" data-act="d-more" aria-label="Task options" title="Task options" aria-expanded="${!!TOPT}">${MORE_IC}</button>`}<button class="icon-btn d-close" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
+    ${t._draft?'':`<button class="icon-btn ${t.pinned?'pin-on':''}" data-act="d-pin" aria-pressed="${!!t.pinned}" aria-label="${t.pinned?'Unpin':'Pin to the top'}" title="${t.pinned?'Unpin':'Pin to the top of the Overview'}">${I.pin}</button>${isClosed(t)?'':(()=>{const T=pomoState(),on=T.taskId===t.id&&T.mode==='focus'&&T.run!=='idle';return `<button class="icon-btn d-pomo ${on?'pin-on':''}" data-act="d-pomo" aria-pressed="${on}" aria-label="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task'}" title="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task (starts a focus session)'}${t.pomos?` · ${t.pomos} focus session${t.pomos===1?'':'s'} so far`:''}">${TOMATO_IC}${t.pomos?`<span class="dp-n">${t.pomos}</span>`:''}</button>`})()}${isClosed(t)?'':`<button class="icon-btn ${t.upNext?'pin-on':''}" data-act="d-upnext" aria-pressed="${!!t.upNext}" aria-label="${t.upNext?'Remove from Up next':'Add to Up next'}" title="${t.upNext?`Up next #${upNextPos(t)} · click to remove`:'Add to Up next (your queue across jobs)'}">${UP_IC}</button>`}<button class="icon-btn" data-act="d-link" aria-label="Copy link to this task" title="Copy link to this task">${LINK_IC}</button><button class="icon-btn" data-act="d-duplicate" aria-label="Duplicate task" title="Duplicate (make a copy to edit)">${I.copy}</button>${canPip()?`<button class="icon-btn ${PIP.win&&PIP.id===t.id?'pin-on':''}" data-act="d-pip" aria-pressed="${!!(PIP.win&&PIP.id===t.id)}" aria-label="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task in its own window'}" title="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task over Premiere or Resolve'}">${PIP_IC}</button>`:''}`}${t._draft?'':`<button class="icon-btn d-more" data-act="d-more" aria-label="Task options" title="Task options" aria-expanded="${!!TOPT}">${MORE_IC}</button>`}<button class="icon-btn d-close" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
   ${t._draft?'':`<div class="d-tabs" role="tablist"><button role="tab" data-act="d-tab" data-tab="details" class="${S.ui.dtab!=='activity'?'on':''}" aria-selected="${S.ui.dtab!=='activity'}">${I.info}Details</button><button role="tab" data-act="d-tab" data-tab="activity" class="${S.ui.dtab==='activity'?'on':''}" aria-selected="${S.ui.dtab==='activity'}">${I.clock}Activity<span class="mono">${taskActivity(t).length}</span></button></div>`}
   ${!t._draft&&S.ui.dtab==='activity'?activityPane(t):`  <div class="d-body">
     ${SPLIT&&SPLIT.id===t.id?splitHtml(t):''}
@@ -4987,7 +4997,7 @@ const HELP=[
  ['Getting work done','Phone: pull the task down to close',`On a phone, a task opens as a sheet from the bottom. Pull it down from the top (or anywhere when it's scrolled to the top) to close it; swipe sideways to go to the next or previous task.`,null],
  ['Getting work done','Pull to refresh',`At the top of any page, pull down (on a phone or tablet) or keep scrolling up with two fingers on the trackpad. When it says “Release to refresh”, let go and the app reloads with the latest data and any app updates.`,null],
  ['Getting work done','Save & add another',`Next to Save task: saves it and opens a fresh task for the same job, client and format, for entering a batch of reels in a row.`,null],
- ['Getting work done','Up next',`Your own queue across every job. Add a task from the right-click menu or the queue icon at the top of a task. The queue sits at the top of the Overview; drag to reorder. Finished tasks leave it on their own.`,null],
+ ['Getting work done','Up next',`Your own queue across every job. Add a task from the right-click menu or the queue icon at the top of a task. The queue has its own page (Up next in the sidebar, or the Up next tab on a phone); drag to reorder. Finished tasks leave it on their own.`,null],
  ['Getting work done','Push due dates back',`Select tasks, then Push back… in the bar at the bottom: +1 day, +2 days, +1 week, or workdays that skip weekends. Undo puts the old dates back.`,null],
  ['Editing','Floating task window',`The window icon at the top of a task opens it in a small window that stays on top of Premiere or Resolve (Chrome on a computer). Tick checklist steps, resolve client updates, move the status on and open the links from there. The client's brand guide is there too: click a color to copy its hex code, or copy the fonts, CTA and end-card text. Click the icon again or close the window to stop.`,null],
  ['Editing','Safe-zone overlays',`See-through 1080×1920 PNG guides for TikTok, Reels and Shorts, plus one that combines all three. Put one on the top track of your timeline to keep text and faces clear of each app's buttons and captions, then turn it off before you export.`,['safezones','Safe-zone overlays']],
@@ -6265,7 +6275,7 @@ document.addEventListener('click',e=>{
   if(a!=='cal-disconnect'&&CAL.disArmed){CAL.disArmed=false;if(SM)renderSettings()}
   if(SM&&SM.stArm&&!/^st-(del|del-go)$/.test(a)&&!el.closest('.st-del-box')){SM.stArm=null;renderSettings()}
   switch(a){
-    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash','help','resume'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';{const v=u.views?.[u.tab];if(v)u.view=v}saveUi();render();window.scrollTo({top:0});break;
+    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash','help','resume','upnext'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';{const v=u.views?.[u.tab];if(v)u.view=v}saveUi();render();window.scrollTo({top:0});break;
     case 'view': u.view=el.dataset.view;(u.views=u.views||{})[u.tab]=u.view;saveUi();render();break;
     case 'vopt': VOPT=!VOPT;renderVopt();break;
     case 'cx': ctxDo(el.dataset.do,el.dataset.v);break;
@@ -6274,7 +6284,7 @@ document.addEventListener('click',e=>{
     case 'tb-jobs': u.jobsOpen=true;saveUi();renderSide();openSide();break;
     case 'tb-cal': if(u.view==='calendar'&&!notesOpen&&!UPN&&u.calPrev){const c=u.calPrev;u.calPrev=null;u.tab=S.jobs[c.tab]||c.tab==='overview'?c.tab:'overview';u.client=c.client||'all';u.pane=c.pane||'tasks';u.view=c.view;(u.views=u.views||{})[u.tab]=c.view;saveUi();render();requestAnimationFrame(()=>window.scrollTo({top:c.y||0}));break}
       if(u.view!=='calendar')u.calPrev={tab:u.tab,client:u.client,pane:u.pane,view:u.view,y:scrollY};
-      notesOpen=false;UPN=false;if(['archived','activity','trash','help','resume'].includes(u.tab)){u.tab='overview';u.client='all'}u.pane='tasks';u.view='calendar';(u.views=u.views||{})[u.tab]='calendar';saveUi();render();window.scrollTo({top:0});break;
+      notesOpen=false;UPN=false;if(['archived','activity','trash','help','resume','upnext'].includes(u.tab)){u.tab='overview';u.client='all'}u.pane='tasks';u.view='calendar';(u.views=u.views||{})[u.tab]='calendar';saveUi();render();window.scrollTo({top:0});break;
     case 'tb-search': openJump();break;
     case 'tb-plus': PLUS=!PLUS;renderPlus();break;
     case 'pm-timer': PLUS=false;renderPlus();POMO_OPEN=true;notesOpen=false;renderBell();renderPomo();break;
