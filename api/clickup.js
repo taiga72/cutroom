@@ -6,7 +6,7 @@ const { whoAmI, getLink, saveLink, syncUser, NeedsToken } = require('./_clickup'
 
 const readBody = req => new Promise(ok => { let s = ''; req.on('data', c => { s += c; if (s.length > 1e4) req.destroy(); }); req.on('end', () => { try { ok(JSON.parse(s || '{}')); } catch (e) { ok({}); } }); });
 // tokens never leave the server: teams are sent without them
-const view = l => l ? { connected: true, name: l.cu_name, email: l.cu_email, lastSync: l.last_sync, error: l.last_error,
+const view = l => l ? { connected: true, name: l.cu_name, email: l.cu_email, lastSync: l.last_sync, error: l.last_error, errorMsg: l.last_error ? ((l.state || {}).lastErr || '') : '',
   teams: (l.teams || []).map(t => ({ id: t.id, name: t.name, color: t.color, sum: ((l.state || {}).sum || {})[t.id] || null })) } : { connected: false };
 
 module.exports = async (req, res) => {
