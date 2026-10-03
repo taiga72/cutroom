@@ -2750,7 +2750,7 @@ async function cuApi(action,body){
   if(!r.ok) throw Object.assign(new Error(j.error||'failed'),{code:j.error});
   return j;
 }
-function cuSet(j){Object.assign(CU,{loaded:true,connected:!!j.connected,name:j.name||'',email:j.email||'',teams:j.teams||[],lastSync:j.lastSync||null,error:j.error||null});if(SM)renderSettings()}
+function cuSet(j){Object.assign(CU,{loaded:true,connected:!!j.connected,name:j.name||'',email:j.email||'',teams:j.teams||[],lastSync:j.lastSync||null,error:j.error||null,errorMsg:j.errorMsg||j.msg||''});if(SM)renderSettings()}
 async function cuStatus(){try{cuSet(await cuApi('status'));if(CU.connected)cuSoon(3000)}catch(e){CU.loaded=true;if(SM)renderSettings()}}
 const cuJobs=()=>jobsSorted().filter(j=>j.clickup&&j.clickup.team);
 let cuT=null,cuRunning=false;
@@ -2775,7 +2775,7 @@ async function cuSync(manual,redo){
     if(j.more&&!j.error){clearTimeout(cuT);cuT=setTimeout(()=>cuSync(),65000);CU.more=true}else CU.more=false;
     if(j.error==='token')toast('ClickUp stopped accepting your token. Paste a new one in Settings → ClickUp.');
     else if(j.teamErrors&&manual)toast('One workspace’s token was rejected. Settings → ClickUp shows which.');
-    else if(j.error&&manual)toast("Couldn't reach ClickUp. Try again in a minute.");
+    else if(j.error&&manual)toast(j.msg?`The ClickUp check failed: ${j.msg}`:"Couldn't reach ClickUp. Try again in a minute.");
     else if(made)toast(`${made} new task${made===1?'':'s'} from ClickUp`);
     else if(manual)toast(j.more?`Updated ${changed} task${changed===1?'':'s'} from ClickUp. Bringing in the rest in a minute…`:changed?`Updated ${changed} task${changed===1?'':'s'} from ClickUp`:'Everything from ClickUp is already here');
   }catch(e){if(manual)toast("Couldn't reach ClickUp. Try again in a minute.")}
@@ -2802,8 +2802,9 @@ async function cuDisconnect(){
 }
 /* one job per workspace; picking a job for a workspace takes it off any other workspace */
 function cuLink(team,jobId){
-  for(const j of Object.values(S.jobs))if(j.clickup&&String(j.clickup.team)===String(team)&&j.id!==jobId){patch('jobs',j.id,{clickup:null});logAct('job',`ClickUp workspace unlinked from ${j.name}`,{jobId:j.id})}
-  if(jobId&&S.jobs[jobId]){const j=S.jobs[jobId];patch('jobs',jobId,{clickup:{team:String(team),mode:j.clickup?.mode||'main'}});logAct('job',`ClickUp workspace linked to ${j.name}`,{jobId});cuSoon(800)}
+  for(const j of Object.values(S.jobs))if(j.clickup&&String(j.clickup.team)===String(team)&&j.id!==jobId){patch('jobs',j.id,{clickup:{team:'',mode:j.clickup.mode||'main',was:String(team)}});logAct('job',`ClickUp workspace unlinked from ${j.name}`,{jobId:j.id})}
+  if(jobId&&S.jobs[jobId]){const j=S.jobs[jobId],t=(CU.teams||[]).find(x=>String(x.id)===String(team)),guess=t?.sum?.subShare>60?'sub':'main';
+    patch('jobs',jobId,{clickup:{team:String(team),mode:j.clickup?.mode&&(!j.clickup.was||j.clickup.was===String(team))?j.clickup.mode:guess}});logAct('job',`ClickUp workspace linked to ${j.name}`,{jobId});cuSoon(800)}
   renderSettings();
 }
 function clickupSettingsHtml(){
@@ -2824,8 +2825,9 @@ function clickupSettingsHtml(){
     return `<div class="cu-ws"><div class="cu-ws-h"><span class="cu-dot" style="--c:${esc(t.color||'var(--accent)')}"></span><b>${esc(t.name)}</b><button type="button" class="btn sm ghost cu-rm ${CU.rmArmed===t.id?'danger armed':''}" data-act="cu-remove" data-team="${esc(t.id)}" ${busy?'disabled':''}>${CU.rmArmed===t.id?'Click again to remove':'Remove'}</button></div>${sm}
       <label class="cu-row"><span>Job</span><select class="sel" data-act="cu-job" data-team="${esc(t.id)}" aria-label="Job for ${esc(t.name)}"><option value="">Don't sync</option>${jobs.map(x=>`<option value="${x.id}" ${j&&j.id===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
       ${j?`<div class="cu-row"><span>Each video is</span><div class="seg" role="group" aria-label="How tasks are set up in ${esc(t.name)}"><button type="button" data-act="cu-mode" data-job="${j.id}" data-v="main" class="${mode==='main'?'on':''}" aria-pressed="${mode==='main'}">The main task</button><button type="button" data-act="cu-mode" data-job="${j.id}" data-v="sub" class="${mode==='sub'?'on':''}" aria-pressed="${mode==='sub'}">A subtask</button></div></div>
+      ${mode==='main'&&su.subShare>60?`<p class="hint acct-warn">${su.subShare}% of the tasks assigned to you here are subtasks, so “A subtask” is probably right for this workspace.</p>`:''}
       <p class="hint">${mode==='main'?'Main tasks become tasks here; their subtasks and ClickUp checklists become checklist steps.':'Main tasks are batches (like “W2 Aug Reels”) and are skipped; each subtask assigned to you becomes its own task. The client comes from the batch above it.'}</p>`:''}</div>`}).join('');
-  return `<div class="field"><span class="lbl">ClickUp</span><p class="acct-line">${c.error==='token'?'<b class="acct-warn">ClickUp stopped accepting your token. Paste a new one below.</b>':`Connected as <b>${esc(c.name||c.email||'you')}</b>. ${c.lastSync?`Checked ${esc(calAgo(c.lastSync))}.`:'Not checked yet.'}${c.error?' <b class="acct-warn">The last check failed.</b>':''}`}</p>
+  return `<div class="field"><span class="lbl">ClickUp</span><p class="acct-line">${c.error==='token'?'<b class="acct-warn">ClickUp stopped accepting your token. Paste a new one below.</b>':`Connected as <b>${esc(c.name||c.email||'you')}</b>. ${c.lastSync?`Checked ${esc(calAgo(c.lastSync))}.`:'Not checked yet.'}${c.error?` <b class="acct-warn">The last check failed${c.errorMsg?`: ${esc(c.errorMsg)}`:'.'}</b>`:''}`}</p>
     ${c.error==='token'?`<div class="acct-btns"><input type="password" id="cu-token" class="cu-token" data-fk="cu-token" placeholder="pk_…" autocomplete="off" aria-label="ClickUp API token"><button type="button" class="btn sm primary" data-act="cu-connect" ${busy?'disabled':''}>${busy==='connect'?'Checking…':'Reconnect'}</button></div>`:''}
     <div class="acct-btns"><button type="button" class="btn sm" data-act="cu-sync" ${busy||!cuJobs().length?'disabled':''}>${busy==='sync'?'Checking ClickUp…':'Check now'}</button><button type="button" class="btn sm ghost" data-act="cu-resync" title="Read every linked task again, comments included" ${busy||!cuJobs().length?'disabled':''}>Re-read everything</button><button type="button" class="btn sm ${c.disArmed?'danger armed':''}" data-act="cu-disconnect" ${busy?'disabled':''}>${busy==='disconnect'?'Disconnecting…':c.disArmed?'Click again to disconnect':'Disconnect'}</button></div></div>
     <div class="field"><span class="lbl">Workspaces</span>${rows||'<p class="hint">This token can’t see any workspaces.</p>'}

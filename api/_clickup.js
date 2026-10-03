@@ -130,8 +130,8 @@ async function syncUser(uid) {
     const jobs = Object.entries(D.jobs).filter(([, j]) => j.clickup && j.clickup.team);
 
     // a task up the chain (cached between runs); used for the client and for main tasks not assigned to you
-    async function parentInfo(id) {
-      if (state.parents[id] && state.parents[id].at > now - 7 * DAY) return state.parents[id];
+    async function parentInfo(id, needTask) {
+      if (state.parents[id] && state.parents[id].at > now - 7 * DAY && (!needTask || state.parents[id].task)) return state.parents[id];
       if (calls >= BUDGET) return null;
       const t = await soft(`/task/${id}?include_markdown_description=true`, null);
       if (!t) return null;
@@ -143,9 +143,11 @@ async function syncUser(uid) {
       return c;
     }
     function findClient(jobId, name) {
-      const k = norm(name).replace(/\s*\(trial\)$/, '');
+      const key = x => norm(x).replace(/\s*\(trial\)$/, '').replace(/[^a-z0-9 ]+/g, '').replace(/\s+/g, ' ').trim();
+      const k = key(name);
       if (!k) return null;
-      return Object.entries(D.clients).find(([, c]) => c.jobId === jobId && norm(c.name).replace(/\s*\(trial\)$/, '') === k)?.[0] || null;
+      const mine = Object.entries(D.clients).filter(([, c]) => c.jobId === jobId);
+      return (mine.find(([, c]) => key(c.name) === k) || (k.length >= 4 && mine.find(([, c]) => { const a = key(c.name); return a.length >= 4 && (a.startsWith(k + ' ') || k.startsWith(a + ' ') || a.includes(' ' + k) || k.includes(' ' + a)); })))?.[0] || null;
     }
 
     state.sum = state.sum || {};
@@ -188,7 +190,7 @@ async function syncUser(uid) {
         if (linked && linked[1].cu && linked[1].cu.v === 2 && +(linked[1].cu.at || 0) >= (state.redo || 0) && +linked[1].cu.upd >= c.upd) continue;      // nothing new in ClickUp
         if (!linked && state.seen[cuId]) continue;                              // deleted in the app: don't bring it back
         if (calls >= BUDGET - 3) { res.more = true; continue; }
-        if (!c.t) { const info = await parentInfo(cuId); if (!info) { res.more = true; continue; } c.t = info.task; }
+        if (!c.t) { const info = await parentInfo(cuId, true); if (!info || !info.task) { res.more = true; continue; } c.t = info.task; }
         const t = c.t, st = statusId(t.status);
         // a match by name in the same job (added by hand or from the CSV import) is linked instead of duplicated
         let existing = linked;
@@ -272,7 +274,7 @@ async function syncUser(uid) {
       }
       const inApp = [...cands.keys()].filter(k => state.seen[k] && D.tasks[state.seen[k]]);
       const withComments = inApp.filter(k => ((D.tasks[state.seen[k]].cu || {}).feed || []).some(f => f.k === 'comment')).length;
-      state.sum[team] = { ...tsum, assigned: list.length, videos: cands.size, inApp: inApp.length, withComments };
+      state.sum[team] = { ...tsum, assigned: list.length, videos: cands.size, inApp: inApp.length, withComments, subShare: list.length ? Math.round(100 * list.filter(t => t.parent).length / list.length) : 0 };
       } catch (e) {
         if (e instanceof NeedsToken) { state.sum[team] = { ...(state.sum[team] || {}), at: now, error: 'token' }; res.teamErrors = (res.teamErrors || 0) + 1; continue; }  // other workspaces still sync
         if (!(e instanceof RateLimited)) throw e;
@@ -292,9 +294,9 @@ async function syncUser(uid) {
     return res;
   } catch (e) {
     console.error(e);
-    const code = e instanceof NeedsToken ? 'token' : 'failed';
-    await saveLink(uid, { last_error: code }).catch(() => {});
-    return { connected: true, error: code };
+    const code = e instanceof NeedsToken ? 'token' : 'failed', msg = String(e && e.message || e).slice(0, 200);
+    await saveLink(uid, { last_error: code, state: { ...state, lastErr: msg } }).catch(() => {});
+    return { connected: true, error: code, msg };
   }
 }
 
