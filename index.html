@@ -1491,6 +1491,16 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .cu-body{margin-top:3px;padding:7px 10px;border-radius:8px;background:var(--surface-2,var(--bg));border:1px solid var(--line);font-size:calc(13px*var(--ts));overflow-wrap:anywhere}
 .cu-body p{margin:0 0 4px}.cu-body p:last-child{margin:0}
 .l-ic.k-clickup{color:#7b68ee}
+.dm-g{border:1px solid var(--line);border-radius:10px;padding:6px;margin-bottom:10px;display:grid;gap:4px}
+.dm-row{display:flex;align-items:flex-start;gap:10px;padding:8px;border-radius:8px;cursor:pointer}
+.dm-row:hover{background:var(--hover,var(--accent-soft))}
+.dm-row.on{background:var(--accent-soft)}
+.dm-row input{margin-top:3px;accent-color:var(--accent)}
+.dm-main{flex:1;min-width:0;display:grid;gap:2px}
+.dm-main b{font-size:calc(14px*var(--ts));overflow-wrap:anywhere}
+.dm-main small{color:var(--muted);font-size:calc(12px*var(--ts))}
+.dm-tag{font-size:calc(11px*var(--ts));font-weight:700;color:var(--accent);padding:2px 8px;border-radius:999px;border:1px solid var(--accent)}
+.dm-foot{display:flex;justify-content:flex-end;padding:2px 4px 4px}
 .dup-warn{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:2px 0 8px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--st-rev) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--st-rev) 40%,var(--line));font-size:calc(13px*var(--ts));color:var(--text)}
 .dup-warn>.i{width:16px;height:16px;color:var(--st-rev);flex:none}
 .dup-warn>span{flex:1;min-width:180px}
@@ -2837,6 +2847,62 @@ function clickupSettingsHtml(){
     <p class="hint">Only tasks assigned to you come in: open ones updated in the last 60 days, then anything new. Finished ones stay in ClickUp. A task you already added by hand with the same name is linked, not copied. Delete one here and it won’t come back. The app checks every few minutes while it's open and once a day when it's closed.</p></div>`;
 }
 
+
+/* ================= duplicate tasks (Settings → Duplicate tasks) =================
+   Tasks in the same job with the same name (dupKey), not in Trash. Merging keeps one copy, fills its empty fields
+   from the others (links, client, dates, notes, checklist steps, ClickUp link and comments, updates and history),
+   then moves the other copies to Trash. */
+let DM={keep:{},armed:null};
+function dupeGroups(){
+  const m={};
+  for(const t of Object.values(S.tasks)){if(t._draft||t.deleted||!S.jobs[t.jobId])continue;const k=t.jobId+'|'+dupKey(t.name);if(!dupKey(t.name))continue;(m[k]=m[k]||[]).push(t)}
+  return Object.entries(m).filter(([,ts])=>ts.length>1).map(([k,ts])=>({k,ts:ts.sort((a,b)=>dupeScore(b)-dupeScore(a))}));
+}
+const dupeLog=t=>logItems().filter(e=>e.taskId===t.id).length;
+/* the fullest copy is kept by default: links, notes, steps, history, ClickUp; archived copies lose */
+function dupeScore(t){const l=t.links||{};return ['task','upload','file','project'].filter(k=>l[k]).length*3+(t.notes?3:0)+(t.checklist||[]).length+dupeLog(t)*2+(t.cu?2:0)+(t.clientId?1:0)+(t.due?1:0)-(t.archived?20:0)}
+function mergeTasks(keepId,ids){
+  const k=S.tasks[keepId];if(!k)return;
+  const p={links:{...(k.links||{})}},norm=x=>String(x||'').trim().toLowerCase();
+  let notes=k.notes||'',ck=(k.checklist||[]).map(c=>({...c})),cu=k.cu?{...k.cu,feed:[...(k.cu.feed||[])]}:null;
+  for(const id of ids){const d=S.tasks[id];if(!d||id===keepId)continue;
+    for(const f of ['task','upload','file','project'])if(!p.links[f]&&d.links?.[f])p.links[f]=d.links[f];
+    for(const f of ['clientId','due','start','length','doneAt'])if(!k[f]&&!p[f]&&d[f])p[f]=d[f];
+    if((!k.priority||k.priority==='normal')&&d.priority&&d.priority!=='normal')p.priority=d.priority;
+    if((d.revision||0)>(p.revision??k.revision??0))p.revision=d.revision;
+    if(d.pomos)p.pomos=(p.pomos??k.pomos??0)+d.pomos;
+    if(d.pinned&&!k.pinned)p.pinned=true;
+    if(d.upNext&&!k.upNext)p.upNext=d.upNext;
+    if(d.notes&&!norm(notes).includes(norm(d.notes)))notes=notes?notes+'\n\n'+d.notes:d.notes;
+    for(const c of d.checklist||[])if(!ck.some(x=>x.id===c.id||norm(x.text)===norm(c.text)))ck.push({...c});
+    if(d.cu){if(!cu)cu={...d.cu,feed:[...(d.cu.feed||[])]};else{const have=new Set(cu.feed.map(f=>f.cid||f.at+f.text));for(const f of d.cu.feed||[])if(!have.has(f.cid||f.at+f.text))cu.feed.push(f);cu.feed.sort((a,b)=>a.at.localeCompare(b.at));if(+d.cu.upd>+cu.upd)cu={...d.cu,feed:cu.feed}}}
+  }
+  if(notes!==(k.notes||''))p.notes=notes;
+  if(ck.length!==(k.checklist||[]).length)p.checklist=ck;
+  if(cu)p.cu=cu;
+  patch('tasks',keepId,p);
+  // history and updates move to the kept copy
+  for(const key of Object.keys(S.settings).filter(x=>x.startsWith('log-'))){const doc=S.settings[key];if(!(doc.items||[]).some(e=>ids.includes(e.taskId)&&e.taskId!==keepId))continue;
+    patch('settings',key,{items:doc.items.map(e=>ids.includes(e.taskId)&&e.taskId!==keepId?{...e,taskId:keepId,task:k.name||e.task}:e)})}
+  const others=ids.filter(id=>id!==keepId&&S.tasks[id]);
+  others.forEach(id=>{if(S.tasks[id].cu)patch('tasks',id,{cu:null})});   // the ClickUp link now lives on the kept copy
+  logAct('edit',`Merged ${others.length} duplicate${others.length===1?'':'s'} into this task`,{task:S.tasks[keepId]});
+  const was=S.ui.openTask;deleteTasks(others);if(was&&others.includes(was))openTask(keepId);
+}
+function dupesHtml(){
+  const gs=dupeGroups();
+  if(!gs.length)return `<div class="field"><span class="lbl">Duplicate tasks</span><p class="acct-line">No duplicates. Every job's task names are unique.</p></div>`;
+  const row=(t,g)=>{const keep=(DM.keep[g.k]||g.ts[0].id)===t.id,c=S.clients[t.clientId],l=t.links||{},nl=['task','upload','file','project'].filter(k=>l[k]).length,lg=dupeLog(t),cm=(t.cu?.feed||[]).filter(f=>f.k==='comment').length;
+    return `<label class="dm-row ${keep?'on':''}"><input type="radio" name="dm-${esc(g.k)}" data-act="dm-keep" data-g="${esc(g.k)}" data-id="${t.id}" ${keep?'checked':''}><span class="dm-main"><b>${esc(t.name||'Untitled task')}</b>
+      <small>${[c?esc(c.name):'No client',esc(stLabel(stOf(t))),t.due?'Due '+fmtDate(t.due):'No due date',t.archived?'Archived':''].filter(Boolean).join(' · ')}</small>
+      <small>${[nl?`${nl} link${nl===1?'':'s'}`:'',t.notes?'Notes':'',(t.checklist||[]).length?`${t.checklist.length} steps`:'',lg?`${lg} history`:'',t.cu?`ClickUp${cm?` · ${cm} comments`:''}`:'',t.created?'Added '+fmtDate(ymd(new Date(t.created))):''].filter(Boolean).join(' · ')||'Nothing extra'}</small></span>${keep?'<span class="dm-tag">Keep</span>':''}</label>`};
+  return `<div class="field"><span class="lbl">Duplicate tasks</span>
+    <p class="acct-line">${gs.length} task${gs.length===1?' has':'s have'} a copy with the same name in the same job. Merging keeps the one you pick, fills in anything it's missing from the others (links, client, dates, notes, checklist steps, the ClickUp link and comments, updates and history), then moves the others to Trash.</p>
+    <div class="acct-btns"><button type="button" class="btn sm ${DM.armed==='all'?'danger armed':'primary'}" data-act="dm-all">${DM.armed==='all'?`Click again to merge all ${gs.length}`:`Merge all ${gs.length}`}</button></div></div>
+    ${jobsSorted().map(j=>{const mine=gs.filter(g=>g.ts[0].jobId===j.id);return mine.length?`<div class="field"><span class="lbl">${jobMark(j,14)} ${esc(j.name)}</span>${mine.map(g=>`<div class="dm-g">${g.ts.map(t=>row(t,g)).join('')}<div class="dm-foot"><button type="button" class="btn sm" data-act="dm-merge" data-g="${esc(g.k)}">Merge into the kept one</button></div></div>`).join('')}</div>`:''}).join('')}`;
+}
+function dmMerge(k){const g=dupeGroups().find(x=>x.k===k);if(!g)return 0;mergeTasks(DM.keep[k]&&g.ts.some(t=>t.id===DM.keep[k])?DM.keep[k]:g.ts[0].id,g.ts.map(t=>t.id));delete DM.keep[k];return 1}
+
 /* ================= derived ================= */
 const jobsSorted=()=>Object.values(S.jobs).sort((a,b)=>(a.order??0)-(b.order??0)||a.name.localeCompare(b.name));
 const shownClients=jid=>clientsOf(jid).filter(c=>!c.hidden);
@@ -3147,7 +3213,8 @@ function renderMain(){
   const job=u.tab==='overview'?null:S.jobs[u.tab];
 
   const hasExamples=[...Object.values(S.jobs),...Object.values(S.clients),...Object.values(S.tasks)].some(x=>x.example);
-  $('#banner').innerHTML=hasExamples?`<div class="banner"><p><b>You're looking at example jobs and tasks.</b> Poke around, then clear them and add your own jobs.</p><button class="btn sm ${clearArmed?'danger armed':''}" data-act="clear-examples">${clearArmed?'Delete all example data':'Clear examples'}</button></div>`:'';
+  const nd=hasExamples||!S.ready?0:dupeGroups().length;
+  $('#banner').innerHTML=!hasExamples&&nd&&lsGet('cutroom.dupehide')!==nd?`<div class="banner"><p><b>${nd} task${nd===1?' has':'s have'} a duplicate</b> with the same name in the same job.</p><button class="btn sm" data-act="help-go" data-sec="dupes">Review and merge</button><button class="icon-btn" data-act="dupes-hide" title="Hide" aria-label="Hide">${I.x}</button></div>`:hasExamples?`<div class="banner"><p><b>You're looking at example jobs and tasks.</b> Poke around, then clear them and add your own jobs.</p><button class="btn sm ${clearArmed?'danger armed':''}" data-act="clear-examples">${clearArmed?'Delete all example data':'Clear examples'}</button></div>`:'';
 
   if(u.tab==='archived'){renderArchive();return}
   if(u.tab==='activity'){renderActivity();return}
@@ -5120,6 +5187,7 @@ const HELP=[
  ['Your work','ClickUp',`In Settings → ClickUp, paste your ClickUp API token (ClickUp → Settings → Apps), then pick a job for each workspace. Tasks assigned to you come in on their own, with the client, due date, priority and task link; ClickUp comments, status and due-date changes show in the task's Activity tab, and new comments from others show in notifications. ClickUp gives each workspace its own token, so use Connect another workspace for the second one. Choose whether each video is the main task (subtasks become checklist steps) or a subtask (main tasks are batches). Nothing is sent back to ClickUp.`,['clickup','ClickUp']],
  ['Tasks','Drag on the Calendar',`On a computer, drag a task in the Calendar (month or week) onto another day to move its due date. A toast says when the new day is busy and has Undo. On a phone, change the date in the task panel.`,null],
  ['Tasks','Archive finished tasks on their own',`Done tasks can move to Archived by themselves 3, 7 or 14 days after they were finished, so the Done column stays short. It's off until you pick a time. Each one is logged, and Undo brings them back. Set it in Settings → Tasks & calendar.`,['tasks','Tasks & calendar']],
+ ['Tasks','Merge duplicate tasks',`Settings → Duplicate tasks lists tasks in the same job with the same name. Pick the copy to keep and click Merge: it gets anything it was missing from the others (links, client, dates, notes, checklist steps, the ClickUp link and comments, updates and history), and the other copies go to Trash, where you can still restore them.`,['dupes','Duplicate tasks']],
  ['Tasks','Same name twice',`If you save a new task with the same name as an open one in that job, the panel asks whether to open the one you already have or save the new one anyway.`,null],
  ['Tasks','Select several',`Turn on Select in the toolbar, tick tasks (Shift-click for a range), then set status, priority, due date, move them to another job or client, archive or delete them together.`,null],
  ['Tasks','Pins, templates and duplicates',`Pin a task to keep it at the top of the Overview. Save checklist steps as a template per client. Duplicate makes an unsaved copy to edit: same client (so the same brand guide), due date, links, notes and checklist (unticked), with a fresh status.`,null],
@@ -5597,8 +5665,9 @@ function renderSettings(){
     {id:'pomo',label:'Focus timer',icon:TOMATO_IC,html:pomoSettingsHtml()},
     {id:'safezones',label:'Safe-zone overlays',icon:SZ_IC,html:safeZonesHtml()},
     {id:'import',label:'Import CSV',icon:I.upload,html:importSettingsHtml()},
+    {id:'dupes',label:'Duplicate tasks',icon:'<svg class="i" viewBox="0 0 16 16"><rect x="5" y="5" width="8.5" height="8.5" rx="1.5"/><path d="M10.5 3V2.5A1 1 0 0 0 9.5 1.5h-7a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1H3"/></svg>',html:dupesHtml()},
     {id:'backup',label:'Backup',icon:I.download,html:backupSettingsHtml()}];
-  const META={appearance:['Look & feel','Theme, colors, surfaces'],tasks:['Look & feel','Task rows, due dates, the Calendar'],fun:['Look & feel','Greeting, the office cat, cork board'],a11y:['Look & feel','Text size, motion, contrast'],statuses:['Your work','Rename, recolor and reorder'],workload:['Your work','When a day counts as busy'],holidays:['Your work','Public holidays on the Calendar'],pomo:['Your work','Focus and break lengths, sounds'],safezones:['Your work','TikTok, Reels and Shorts overlays'],branding:['App','Your own name and logo'],finder:['App','Mac folders and Chrome profiles'],account:['App','Google Calendar and sign out'],clickup:['App','Bring in tasks assigned to you'],keys:['App','Shortcuts on a keyboard'],import:['Your data','Bring in a tracker sheet'],backup:['Your data','Download, restore, trash']};
+  const META={appearance:['Look & feel','Theme, colors, surfaces'],tasks:['Look & feel','Task rows, due dates, the Calendar'],fun:['Look & feel','Greeting, the office cat, cork board'],a11y:['Look & feel','Text size, motion, contrast'],statuses:['Your work','Rename, recolor and reorder'],workload:['Your work','When a day counts as busy'],holidays:['Your work','Public holidays on the Calendar'],pomo:['Your work','Focus and break lengths, sounds'],safezones:['Your work','TikTok, Reels and Shorts overlays'],branding:['App','Your own name and logo'],finder:['App','Mac folders and Chrome profiles'],account:['App','Google Calendar and sign out'],clickup:['App','Bring in tasks assigned to you'],keys:['App','Shortcuts on a keyboard'],import:['Your data','Bring in a tracker sheet'],dupes:['Your data','Find and merge tasks with the same name'],backup:['Your data','Download, restore, trash']};
   secs.forEach(x=>{const m=META[x.id];if(m){x.group=m[0];x.sub=m[1]}});
   const GORD=['Look & feel','Your work','App','Your data'];secs.sort((x,y)=>GORD.indexOf(x.group)-GORD.indexOf(y.group));
   keepScroll('#modal',()=>withFocus(()=>{$('#modal').innerHTML=`<div class="modal pref-modal" role="dialog" aria-modal="true" aria-labelledby="s-title">
@@ -6657,6 +6726,9 @@ document.addEventListener('click',e=>{
     case 'cu-connect': cuConnect();break;
     case 'cu-sync': cuSync(true);break;
     case 'cu-resync': cuSync(true,true);break;
+    case 'dm-merge': if(dmMerge(el.dataset.g)){toast('Merged. The extra copy is in Trash.');renderSettings()}break;
+    case 'dm-all': if(DM.armed!=='all'){DM.armed='all';renderSettings();setTimeout(()=>{if(DM.armed==='all'){DM.armed=null;if(SM)renderSettings()}},4000)}else{DM.armed=null;let n=0;for(const g of dupeGroups())n+=dmMerge(g.k);toast(`Merged ${n} task${n===1?'':'s'}. The extra copies are in Trash.`);renderSettings()}break;
+    case 'dupes-hide': lsSet('cutroom.dupehide',dupeGroups().length);render();break;
     case 'cu-add': CU.adding=true;CU.err='';renderSettings();setTimeout(()=>$('#cu-token')?.focus(),30);break;
     case 'cu-add-cancel': CU.adding=false;CU.err='';renderSettings();break;
     case 'cu-remove': if(CU.rmArmed!==el.dataset.team){CU.rmArmed=el.dataset.team;renderSettings();setTimeout(()=>{if(CU.rmArmed===el.dataset.team){CU.rmArmed=null;if(SM)renderSettings()}},4000)}else cuRemove(el.dataset.team);break;
@@ -6758,6 +6830,7 @@ document.addEventListener('change',e=>{
   const act=el.dataset.act;
   if(act==='row-prio'){const t=S.tasks[el.dataset.id],v=el.value;if(t&&(t.priority||'normal')!==v){patch('tasks',t.id,{priority:v});logAct('edit',`Priority set to ${(PRIORITIES.find(x=>x.id===v)||{}).label||v}`,{task:t})}render();return}
   if(act==='cu-job'){cuLink(el.dataset.team,el.value);return}
+  if(act==='dm-keep'){DM.keep[el.dataset.g]=el.dataset.id;renderSettings();return}
   if(act==='row-due'){const t=S.tasks[el.dataset.id],v=el.value;if(t&&(t.due||'')!==v){patch('tasks',t.id,{due:v});logAct('date',v?`Due date set to ${fmtDate(v)}`:'Due date removed',{task:t});toast(v?`Due ${fmtDate(v)}`:'Due date removed')}render();return}
   if(act==='row-status'){setStatus(el.dataset.id,el.value);if(u.openTask===el.dataset.id)renderDrawer();return}
   if(act==='d-status'){setStatus(u.openTask,el.value);renderDrawer();return}

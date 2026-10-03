@@ -186,7 +186,7 @@ async function syncUser(uid) {
       }
 
       for (const [cuId, c] of cands) {
-        const linked = Object.entries(D.tasks).find(([, x]) => x.cu && x.cu.id === cuId) || (state.seen[cuId] && D.tasks[state.seen[cuId]] ? [state.seen[cuId], D.tasks[state.seen[cuId]]] : null);
+        const linked = Object.entries(D.tasks).find(([, x]) => x.cu && x.cu.id === cuId && !x.deleted) || Object.entries(D.tasks).find(([, x]) => x.cu && x.cu.id === cuId) || (state.seen[cuId] && D.tasks[state.seen[cuId]] ? [state.seen[cuId], D.tasks[state.seen[cuId]]] : null);
         if (linked && linked[1].cu && linked[1].cu.v === 2 && +(linked[1].cu.at || 0) >= (state.redo || 0) && +linked[1].cu.upd >= c.upd) continue;      // nothing new in ClickUp
         if (!linked && state.seen[cuId]) continue;                              // deleted in the app: don't bring it back
         if (calls >= BUDGET - 3) { res.more = true; continue; }
