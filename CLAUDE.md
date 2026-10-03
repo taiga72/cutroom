@@ -205,3 +205,4 @@ Open the file locally with Playwright to check a change. Chromium is at `/opt/pw
 
 - Separate tool links per agency client.
 - A checklist of assets received from the client.
+- Frame.io comments in their own task tab (scoped: needs an Adobe Developer Console OAuth app for the V4 API). The user shelved it as too much for now; don't build or suggest it again unless they bring it up.
