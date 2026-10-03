@@ -215,7 +215,7 @@ async function syncUser(uid) {
         const backfill = prev.v !== 2;
         const fresh = comments.filter(m => !seenC.has(String(m.id)) && (backfill || +m.date > (prev.lastComment || 0) || !existing))
           .sort((a, b) => +a.date - +b.date).slice(existing ? -40 : -12);
-        for (const m of fresh) feed.push({ at: new Date(+m.date).toISOString(), k: 'comment', cid: String(m.id), who: (m.user && m.user.username) || 'Someone', me: String(m.user && m.user.id) === me, text: String(m.comment_text || '').trim().slice(0, 4000) });
+        for (const m of fresh) feed.push({ at: new Date(+m.date).toISOString(), k: 'comment', cid: String(m.id), who: (m.user && m.user.username) || 'Someone', me: String(m.user && m.user.id) === me, mention: (m.comment || []).some(x => x && x.type === 'tag' && String(x.user && x.user.id) === me) || undefined, text: String(m.comment_text || '').trim().slice(0, 4000) });
         const iso = new Date(+t.date_updated || now).toISOString();
         if (existing && prev.status && prev.status !== statusName) feed.push({ at: iso, k: 'status', text: `Status in ClickUp: ${prev.status} → ${statusName}` });
         if (existing && prev.due !== undefined && prev.due !== due) feed.push({ at: iso, k: 'due', text: due ? `Due date in ClickUp: ${due}` : 'Due date removed in ClickUp' });
