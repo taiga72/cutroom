@@ -1,6 +1,7 @@
 // ClickUp → Splice & Co. (one way). Tasks assigned to you in the ClickUp workspaces you link to jobs
 // become tasks in the app; ClickUp comments, status and due-date changes land in the task's Activity tab.
 //
+// ClickUp tokens are per workspace, so each linked workspace keeps its own (teams[{id,name,color,token,uid}], server only).
 // Each job links one workspace (job.clickup = {team, mode}):
 //   mode 'main' — the main task is the video; its subtasks and ClickUp checklists become checklist steps.
 //   mode 'sub'  — main tasks are batches ("W2 Aug Reels"); each assigned subtask without assigned subtasks
@@ -16,12 +17,14 @@ const BUDGET = 70;          // ClickUp allows 100 requests a minute per token; s
 const FEED_MAX = 80;
 
 class NeedsToken extends Error {}
+class RateLimited extends Error {}   // ClickUp's 100-requests-a-minute limit: stop and come back in a minute
 
 function api(token) {
   return async function cu(path) {
     const r = await fetch(API + path, { headers: { Authorization: token } });
     const j = await r.json().catch(() => null);
     if (r.status === 401) throw new NeedsToken('ClickUp token was rejected');
+    if (r.status === 429) throw new RateLimited('ClickUp rate limit');
     if (!r.ok) { const e = new Error(`ClickUp ${path} ${r.status} ${j && j.err || ''}`); e.status = r.status; throw e; }
     return j;
   };
@@ -109,9 +112,11 @@ const putDocs = (uid, rows) => rows.length ? sb('docs', {
 async function syncUser(uid) {
   const link = await getLink(uid);
   if (!link) return { connected: false };
-  const cu = api(link.token);
+  let cu = api(link.token), me = String(link.cu_user_id);
   let calls = 0;
   const call = async p => { calls++; return cu(p); };
+  // a request that fails for any reason but the rate limit or the token counts as empty
+  const soft = (p, empty) => call(p).catch(e => { if (e instanceof RateLimited || e instanceof NeedsToken) throw e; return empty; });
   const state = Object.assign({ seen: {}, parents: {} }, link.state || {});
   const tz = link.tz || 'UTC';
   const now = Date.now();
@@ -128,7 +133,7 @@ async function syncUser(uid) {
     async function parentInfo(id) {
       if (state.parents[id] && state.parents[id].at > now - 7 * DAY) return state.parents[id];
       if (calls >= BUDGET) return null;
-      const t = await call(`/task/${id}?include_markdown_description=true`).catch(() => null);
+      const t = await soft(`/task/${id}?include_markdown_description=true`, null);
       if (!t) return null;
       return (state.parents[id] = { at: now, name: t.name, client: clientField(t), parent: t.parent || null, task: t });
     }
@@ -143,13 +148,17 @@ async function syncUser(uid) {
       return Object.entries(D.clients).find(([, c]) => c.jobId === jobId && norm(c.name).replace(/\s*\(trial\)$/, '') === k)?.[0] || null;
     }
 
+    state.sum = state.sum || {};
     for (const [jobId, job] of jobs) {
       const team = String(job.clickup.team), mode = job.clickup.mode === 'sub' ? 'sub' : 'main';
+      const ti = (link.teams || []).find(x => String(x.id) === team) || {};
+      cu = api(ti.token || link.token); me = String(ti.uid || link.cu_user_id);
+      try {
       // every task assigned to you, updated in the window (subtasks included, closed ones too)
       const list = [];
       for (let page = 0; page < 8; page++) {
         const q = new URLSearchParams({ page: String(page), subtasks: 'true', include_closed: 'true', include_markdown_description: 'true', order_by: 'updated', date_updated_gt: String(now - WINDOW_DAYS * DAY) });
-        q.append('assignees[]', link.cu_user_id);
+        q.append('assignees[]', me);
         const j = await call(`/team/${team}/task?${q}`);
         list.push(...(j.tasks || []));
         if (j.last_page || !(j.tasks || []).length) break;
@@ -175,7 +184,7 @@ async function syncUser(uid) {
 
       for (const [cuId, c] of cands) {
         const linked = Object.entries(D.tasks).find(([, x]) => x.cu && x.cu.id === cuId) || (state.seen[cuId] && D.tasks[state.seen[cuId]] ? [state.seen[cuId], D.tasks[state.seen[cuId]]] : null);
-        if (linked && linked[1].cu && +linked[1].cu.upd >= c.upd) continue;      // nothing new in ClickUp
+        if (linked && linked[1].cu && linked[1].cu.v === 2 && +linked[1].cu.upd >= c.upd) continue;      // nothing new in ClickUp
         if (!linked && state.seen[cuId]) continue;                              // deleted in the app: don't bring it back
         if (calls >= BUDGET - 3) { res.more = true; continue; }
         if (!c.t) { const info = await parentInfo(cuId); if (!info) { res.more = true; continue; } c.t = info.task; }
@@ -188,23 +197,24 @@ async function syncUser(uid) {
         }
         // details: subtasks and checklists for main tasks, comments for the Activity tab
         let detail = t;
-        if (mode === 'main' && (c.kids.length || t.subtasks === undefined)) detail = await call(`/task/${cuId}?include_subtasks=true&include_markdown_description=true`).catch(() => t);
-        const comments = ((await call(`/task/${cuId}/comment`).catch(() => ({ comments: [] }))).comments || []);
+        if (mode === 'main') detail = await soft(`/task/${cuId}?include_subtasks=true&include_markdown_description=true`, t);
+        const comments = ((await soft(`/task/${cuId}/comment`, { comments: [] })).comments || []);
         const clientName = job.type === 'agency' ? await clientNameFor(t) : '';
 
         const prev = (existing && existing[1].cu) || {};
         const due = ymdIn(t.due_date, tz), start = ymdIn(t.start_date, tz), statusName = (t.status && t.status.status) || '';
         const feed = (prev.feed || []).slice();
         const seenC = new Set(feed.filter(f => f.cid).map(f => f.cid));
-        const fresh = comments.filter(m => !seenC.has(String(m.id)) && (+m.date > (prev.lastComment || 0) || !existing))
-          .sort((a, b) => +a.date - +b.date).slice(existing ? -40 : -8);
-        for (const m of fresh) feed.push({ at: new Date(+m.date).toISOString(), k: 'comment', cid: String(m.id), who: (m.user && m.user.username) || 'Someone', me: String(m.user && m.user.id) === String(link.cu_user_id), text: String(m.comment_text || '').trim().slice(0, 4000) });
+        const backfill = prev.v !== 2;
+        const fresh = comments.filter(m => !seenC.has(String(m.id)) && (backfill || +m.date > (prev.lastComment || 0) || !existing))
+          .sort((a, b) => +a.date - +b.date).slice(existing ? -40 : -12);
+        for (const m of fresh) feed.push({ at: new Date(+m.date).toISOString(), k: 'comment', cid: String(m.id), who: (m.user && m.user.username) || 'Someone', me: String(m.user && m.user.id) === me, text: String(m.comment_text || '').trim().slice(0, 4000) });
         const iso = new Date(+t.date_updated || now).toISOString();
         if (existing && prev.status && prev.status !== statusName) feed.push({ at: iso, k: 'status', text: `Status in ClickUp: ${prev.status} → ${statusName}` });
         if (existing && prev.due !== undefined && prev.due !== due) feed.push({ at: iso, k: 'due', text: due ? `Due date in ClickUp: ${due}` : 'Due date removed in ClickUp' });
         feed.sort((a, b) => a.at.localeCompare(b.at));
         const lastComment = Math.max(prev.lastComment || 0, ...comments.map(m => +m.date || 0));
-        const cuInfo = { id: cuId, team, url: t.url, status: statusName, due, prio: prioOf(t), name: t.name, upd: c.upd, lastComment, feed: feed.slice(-FEED_MAX) };
+        const cuInfo = { v: 2, id: cuId, team, url: t.url, status: statusName, due, prio: prioOf(t), name: t.name, upd: c.upd, lastComment, feed: feed.slice(-FEED_MAX) };
 
         // checklist steps from subtasks (main mode) and ClickUp checklists
         const steps = [];
@@ -255,6 +265,12 @@ async function syncUser(uid) {
           D.tasks[id] = d; state.seen[cuId] = id; put('tasks', id, d); res.updated++;
         }
       }
+      const inApp = [...cands.keys()].filter(k => state.seen[k] && D.tasks[state.seen[k]]).length;
+      state.sum[team] = { at: now, assigned: list.length, videos: cands.size, inApp };
+      } catch (e) {
+        if (!(e instanceof RateLimited)) throw e;
+        res.more = true; res.wait = 65; break;     // keep what was done; the page asks again in a minute
+      }
     }
     const rows = [...writes.values()];
     await putDocs(uid, rows);
@@ -272,4 +288,4 @@ async function syncUser(uid) {
   }
 }
 
-module.exports = { api, whoAmI, getLink, saveLink, syncUser, statusId, clientField, notesFrom, ymdIn, NeedsToken };
+module.exports = { RateLimited, api, whoAmI, getLink, saveLink, syncUser, statusId, clientField, notesFrom, ymdIn, NeedsToken };
