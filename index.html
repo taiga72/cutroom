@@ -1478,6 +1478,9 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .cu-token{flex:1;min-width:180px;font-family:var(--mono)}
 .cu-ws{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:8px;margin-bottom:10px}
 .cu-ws-h{display:flex;align-items:center;gap:8px}
+.cu-ws-h .cu-rm{margin-left:auto}
+.cu-sum{margin:-4px 0 0!important}
+.cu-add{background:var(--accent-soft)}
 .cu-dot{width:10px;height:10px;border-radius:3px;background:var(--c)}
 .cu-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:calc(13px*var(--ts))}
 .cu-row>span{min-width:96px;color:var(--muted)}
@@ -2766,13 +2769,14 @@ async function cuSync(manual){
   cuRunning=true;if(manual){CU.busy='sync';if(SM)renderSettings()}
   try{
     flushAll();await Promise.allSettled(Object.values(chains));
-    let j,n=0,made=0,changed=0;
-    do{j=await cuApi('sync');cuMerge(j.docs);made+=j.created||0;changed+=j.updated||0}while(j.more&&!j.error&&++n<4);
+    const j=await cuApi('sync');cuMerge(j.docs);const made=j.created||0,changed=j.updated||0;
     cuSet(j);CU.at=Date.now();
+    /* ClickUp allows about 100 requests a minute, so the rest comes in a minute later */
+    if(j.more&&!j.error){clearTimeout(cuT);cuT=setTimeout(()=>cuSync(),65000);CU.more=true}else CU.more=false;
     if(j.error==='token')toast('ClickUp stopped accepting your token. Paste a new one in Settings → ClickUp.');
     else if(j.error&&manual)toast("Couldn't reach ClickUp. Try again in a minute.");
     else if(made)toast(`${made} new task${made===1?'':'s'} from ClickUp`);
-    else if(manual)toast(changed?`Updated ${changed} task${changed===1?'':'s'} from ClickUp`:'Everything from ClickUp is already here');
+    else if(manual)toast(j.more?`Updated ${changed} task${changed===1?'':'s'} from ClickUp. Bringing in the rest in a minute…`:changed?`Updated ${changed} task${changed===1?'':'s'} from ClickUp`:'Everything from ClickUp is already here');
   }catch(e){if(manual)toast("Couldn't reach ClickUp. Try again in a minute.")}
   CU.busy=null;cuRunning=false;if(SM)renderSettings();
 }
@@ -2780,9 +2784,15 @@ async function cuConnect(){
   const tok=($('#cu-token')?.value||'').trim();
   if(!/^pk_/.test(tok)){CU.err='That doesn’t look like a ClickUp token. It starts with pk_.';renderSettings();return}
   CU.busy='connect';CU.err='';renderSettings();
-  try{cuSet(await cuApi('connect',{token:tok}));toast(`ClickUp connected as ${CU.name||'you'}. Now pick a job for each workspace.`)}
+  const had=CU.connected;
+  try{const j=await cuApi('connect',{token:tok});cuSet(j);CU.adding=false;toast(had?`Added ${(j.added||[]).join(', ')||'the workspace'}. Pick its job below.`:`ClickUp connected as ${CU.name||'you'}. Now pick a job for each workspace.`)}
   catch(e){CU.err=e.code==='bad_token'?'ClickUp didn’t accept that token. Copy it again from ClickUp → Settings → Apps.':"Couldn't reach ClickUp. Try again in a minute."}
   CU.busy=null;if(SM)renderSettings();
+}
+async function cuRemove(team){
+  CU.busy='remove';renderSettings();
+  try{cuSet(await cuApi('remove',{team}));const j=Object.values(S.jobs).find(x=>x.clickup&&String(x.clickup.team)===String(team));if(j)cuLink(team,'');toast('Workspace removed. Tasks it brought in stay.')}catch(e){toast("Couldn't remove that workspace. Try again.")}
+  CU.busy=null;CU.rmArmed=null;if(SM)renderSettings();
 }
 async function cuDisconnect(){
   CU.busy='disconnect';CU.disArmed=false;renderSettings();
@@ -2802,19 +2812,23 @@ function clickupSettingsHtml(){
   if(!c.loaded)return '<p class="hint">Checking…</p>';
   if(!c.connected)return `<div class="field"><span class="lbl">Connect ClickUp</span>
     <p class="acct-line">Tasks assigned to you in ClickUp show up here on their own, with ClickUp comments and status changes in each task's Activity tab. Nothing is sent back to ClickUp.</p>
-    <ol class="cu-steps"><li>In ClickUp, click your avatar → <b>Settings</b> → <b>Apps</b>.</li><li>Under <b>API Token</b>, click <b>Generate</b> (or Copy). It starts with <code>pk_</code>.</li><li>Paste it here. One token covers every workspace you're in.</li></ol>
+    <ol class="cu-steps"><li>In ClickUp, click your avatar → <b>Settings</b> → <b>Apps</b>.</li><li>Under <b>API Token</b>, click <b>Generate</b> (or Copy). It starts with <code>pk_</code>.</li><li>Paste it here. ClickUp gives each workspace its own token; you can add the others after this one.</li></ol>
     <div class="acct-btns"><input type="password" id="cu-token" class="cu-token" data-fk="cu-token" placeholder="pk_…" autocomplete="off" spellcheck="false" aria-label="ClickUp API token"><button type="button" class="btn sm primary" data-act="cu-connect" ${busy?'disabled':''}>${CU_IC}${busy==='connect'?'Checking…':'Connect'}</button></div>
     ${c.err?`<p class="hint acct-warn">${esc(c.err)}</p>`:''}<p class="hint">The token is stored on the server only and never shown again. Disconnect any time.</p></div>`;
   const jobs=jobsSorted();
   const rows=(c.teams||[]).map(t=>{const j=jobs.find(x=>x.clickup&&String(x.clickup.team)===String(t.id)),mode=j?.clickup?.mode||'main';
-    return `<div class="cu-ws"><div class="cu-ws-h"><span class="cu-dot" style="--c:${esc(t.color||'var(--accent)')}"></span><b>${esc(t.name)}</b></div>
+    const sm=t.sum&&j?`<p class="hint cu-sum">Last check: ${t.sum.videos} task${t.sum.videos===1?'':'s'} assigned to you · ${t.sum.inApp} in the app${t.sum.videos>t.sum.inApp?` · ${t.sum.videos-t.sum.inApp} finished or older, left in ClickUp`:''}${CU.more?' · more coming in a minute':''}</p>`:'';
+    return `<div class="cu-ws"><div class="cu-ws-h"><span class="cu-dot" style="--c:${esc(t.color||'var(--accent)')}"></span><b>${esc(t.name)}</b><button type="button" class="btn sm ghost cu-rm ${CU.rmArmed===t.id?'danger armed':''}" data-act="cu-remove" data-team="${esc(t.id)}" ${busy?'disabled':''}>${CU.rmArmed===t.id?'Click again to remove':'Remove'}</button></div>${sm}
       <label class="cu-row"><span>Job</span><select class="sel" data-act="cu-job" data-team="${esc(t.id)}" aria-label="Job for ${esc(t.name)}"><option value="">Don't sync</option>${jobs.map(x=>`<option value="${x.id}" ${j&&j.id===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
       ${j?`<div class="cu-row"><span>Each video is</span><div class="seg" role="group" aria-label="How tasks are set up in ${esc(t.name)}"><button type="button" data-act="cu-mode" data-job="${j.id}" data-v="main" class="${mode==='main'?'on':''}" aria-pressed="${mode==='main'}">The main task</button><button type="button" data-act="cu-mode" data-job="${j.id}" data-v="sub" class="${mode==='sub'?'on':''}" aria-pressed="${mode==='sub'}">A subtask</button></div></div>
       <p class="hint">${mode==='main'?'Main tasks become tasks here; their subtasks and ClickUp checklists become checklist steps.':'Main tasks are batches (like “W2 Aug Reels”) and are skipped; each subtask assigned to you becomes its own task. The client comes from the batch above it.'}</p>`:''}</div>`}).join('');
-  return `<div class="field"><span class="lbl">ClickUp</span><p class="acct-line">${c.error==='token'?'<b class="acct-warn">ClickUp stopped accepting your token. Paste a new one below.</b>':`Connected as <b>${esc(c.name||c.email||'you')}</b>. Checked ${esc(calAgo(c.lastSync))}.${c.error?' <b class="acct-warn">The last check failed.</b>':''}`}</p>
+  return `<div class="field"><span class="lbl">ClickUp</span><p class="acct-line">${c.error==='token'?'<b class="acct-warn">ClickUp stopped accepting your token. Paste a new one below.</b>':`Connected as <b>${esc(c.name||c.email||'you')}</b>. ${c.lastSync?`Checked ${esc(calAgo(c.lastSync))}.`:'Not checked yet.'}${c.error?' <b class="acct-warn">The last check failed.</b>':''}`}</p>
     ${c.error==='token'?`<div class="acct-btns"><input type="password" id="cu-token" class="cu-token" data-fk="cu-token" placeholder="pk_…" autocomplete="off" aria-label="ClickUp API token"><button type="button" class="btn sm primary" data-act="cu-connect" ${busy?'disabled':''}>${busy==='connect'?'Checking…':'Reconnect'}</button></div>`:''}
     <div class="acct-btns"><button type="button" class="btn sm" data-act="cu-sync" ${busy||!cuJobs().length?'disabled':''}>${busy==='sync'?'Checking ClickUp…':'Check now'}</button><button type="button" class="btn sm ${c.disArmed?'danger armed':''}" data-act="cu-disconnect" ${busy?'disabled':''}>${busy==='disconnect'?'Disconnecting…':c.disArmed?'Click again to disconnect':'Disconnect'}</button></div></div>
     <div class="field"><span class="lbl">Workspaces</span>${rows||'<p class="hint">This token can’t see any workspaces.</p>'}
+    ${c.adding?`<div class="cu-ws cu-add"><b>Connect another workspace</b><p class="hint">ClickUp gives each workspace its own token. Switch to the other workspace in ClickUp (top left), open your avatar → <b>Settings</b> → <b>Apps</b>, copy its API token and paste it here.</p>
+      <div class="acct-btns"><input type="password" id="cu-token" class="cu-token" data-fk="cu-token" placeholder="pk_…" autocomplete="off" spellcheck="false" aria-label="ClickUp API token for another workspace"><button type="button" class="btn sm primary" data-act="cu-connect" ${busy?'disabled':''}>${busy==='connect'?'Checking…':'Add workspace'}</button><button type="button" class="btn sm ghost" data-act="cu-add-cancel">Cancel</button></div>${c.err?`<p class="hint acct-warn">${esc(c.err)}</p>`:''}</div>`
+    :`<div class="acct-btns"><button type="button" class="btn sm" data-act="cu-add">${I.plus}Connect another workspace</button></div>`}
     <p class="hint">Only tasks assigned to you come in: open ones updated in the last 60 days, then anything new. Finished ones stay in ClickUp. A task you already added by hand with the same name is linked, not copied. Delete one here and it won’t come back. The app checks every few minutes while it's open and once a day when it's closed.</p></div>`;
 }
 
@@ -5098,7 +5112,7 @@ const HELP=[
  ['Tasks','Paste a link to add it',`With a task open, press ${IS_MAC?'⌘V':'Ctrl+V'} anywhere in the panel (not inside a text box) and the link goes into the right slot: Frame.io or Vimeo into the review link, Drive, OneDrive, Dropbox, LucidLink or Descript into the files link, ClickUp or Asana into the task link, and a Mac path into the project folder. The job's own tools (Edit job → Tools & folders) decide first. Undo is in the message that pops up.`,null],
  ['Tasks','Export file names',`Each task panel shows an export name, like 260930_Client_Title_V2, with a copy button (it's in the floating window too). Click Pattern to set the naming for that client, or for the job when a task has no client: {date} today, {due}, {client}, {job}, {title}, {v} version (revision round + 1), {r}, {format} and {length}.`,null],
  ['Tasks','Split into tasks',`In a task's panel (or the right-click menu), Split into tasks turns one task into several: one name per line, each with the same job, client, links, dates and notes, and the checklist unticked.`,null],
- ['Your work','ClickUp',`In Settings → ClickUp, paste your ClickUp API token (ClickUp → Settings → Apps), then pick a job for each workspace. Tasks assigned to you come in on their own, with the client, due date, priority and task link; ClickUp comments, status and due-date changes show in the task's Activity tab, and new comments from others show in notifications. Choose whether each video is the main task (subtasks become checklist steps) or a subtask (main tasks are batches). Nothing is sent back to ClickUp.`,['clickup','ClickUp']],
+ ['Your work','ClickUp',`In Settings → ClickUp, paste your ClickUp API token (ClickUp → Settings → Apps), then pick a job for each workspace. Tasks assigned to you come in on their own, with the client, due date, priority and task link; ClickUp comments, status and due-date changes show in the task's Activity tab, and new comments from others show in notifications. ClickUp gives each workspace its own token, so use Connect another workspace for the second one. Choose whether each video is the main task (subtasks become checklist steps) or a subtask (main tasks are batches). Nothing is sent back to ClickUp.`,['clickup','ClickUp']],
  ['Tasks','Drag on the Calendar',`On a computer, drag a task in the Calendar (month or week) onto another day to move its due date. A toast says when the new day is busy and has Undo. On a phone, change the date in the task panel.`,null],
  ['Tasks','Archive finished tasks on their own',`Done tasks can move to Archived by themselves 3, 7 or 14 days after they were finished, so the Done column stays short. It's off until you pick a time. Each one is logged, and Undo brings them back. Set it in Settings → Tasks & calendar.`,['tasks','Tasks & calendar']],
  ['Tasks','Same name twice',`If you save a new task with the same name as an open one in that job, the panel asks whether to open the one you already have or save the new one anyway.`,null],
@@ -6637,6 +6651,9 @@ document.addEventListener('click',e=>{
     case 'cal-sync': calSync(true);break;
     case 'cu-connect': cuConnect();break;
     case 'cu-sync': cuSync(true);break;
+    case 'cu-add': CU.adding=true;CU.err='';renderSettings();setTimeout(()=>$('#cu-token')?.focus(),30);break;
+    case 'cu-add-cancel': CU.adding=false;CU.err='';renderSettings();break;
+    case 'cu-remove': if(CU.rmArmed!==el.dataset.team){CU.rmArmed=el.dataset.team;renderSettings();setTimeout(()=>{if(CU.rmArmed===el.dataset.team){CU.rmArmed=null;if(SM)renderSettings()}},4000)}else cuRemove(el.dataset.team);break;
     case 'cu-disconnect': if(!CU.disArmed){CU.disArmed=true;renderSettings();setTimeout(()=>{CU.disArmed=false;if(SM)renderSettings()},4000)}else cuDisconnect();break;
     case 'cu-mode':{const j=S.jobs[el.dataset.job];if(j&&j.clickup&&j.clickup.mode!==el.dataset.v){patch('jobs',j.id,{clickup:{...j.clickup,mode:el.dataset.v}});cuSoon(800)}renderSettings();break}
     case 'cal-disconnect': if(CAL.disArmed)calDisconnect();else{CAL.disArmed=true;renderSettings()}break;
