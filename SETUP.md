@@ -69,12 +69,20 @@ Then go to **Deployments**, open the menu (**⋯**) on the latest deployment and
 3. Open **Settings → Connect Google Calendar**. Google warns that it "hasn't verified this app". That's expected for a personal app. Click **Advanced → Go to Cutroom**, then **Continue**.
 4. Add a task with a due date. After a few seconds it appears in a calendar called **Cutroom** in Google Calendar.
 
+## 7. ClickUp (optional)
+
+1. In Supabase, open **SQL Editor**, paste the whole of [`supabase/schema.sql`](supabase/schema.sql) again and click **Run**. This adds the `clickup_links` table. Running it again is safe; it doesn't touch your data.
+2. In ClickUp, click your avatar → **Settings** → **Apps**, and under **API Token** click **Generate** (or **Copy**). It starts with `pk_`.
+3. In the app, open **Settings → ClickUp**, paste the token and click **Connect**.
+4. For each workspace, pick the job it belongs to, and whether each video is **the main task** (subtasks become checklist steps) or **a subtask** (main tasks are batches like "W2 Aug Reels").
+
 ## How it works
 
 - **The page** is `index.html`, served by Vercel. It loads the Supabase library from jsDelivr.
 - **Data:** each job, client, task and your settings is one row in the `docs` table. Row level security makes sure each account only sees its own rows.
 - **Pictures** go in the `pictures` storage bucket, in a folder named after your account. Each file has a long random name.
 - **Calendar:** the functions in `api/` handle it. Your Google access is kept in the `gcal_links` table, which the browser can't read. Every change you make asks the server to bring the "Cutroom" calendar in line with your tasks: one all-day event on each open task's due date, and nothing for Done or archived tasks. A daily job (`vercel.json` → `/api/cron`) does the same as a safety net.
+- **ClickUp:** one way only. The token is kept in the `clickup_links` table, which the browser can't read. `/api/clickup?action=sync` reads the tasks assigned to you in each linked workspace and adds or updates them, with ClickUp comments and status changes in each task's Activity tab. The page asks for it every 5 minutes while it's open, and the daily job does it for everyone.
 - **Accounts:** anyone can sign up and gets their own empty tracker. Google limits an unverified app's Calendar access to 100 people. If you ever need more, submit the app for verification in Google Cloud.
 
 ## Things to know

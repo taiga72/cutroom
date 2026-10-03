@@ -1474,6 +1474,20 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .smart-hint .sh-chip{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:999px;background:var(--accent-soft);color:var(--text);font-weight:600}
 .smart-hint .sh-chip .i{width:12px;height:12px}
 .smart-hint .sh-name{color:var(--faint)}
+.cu-steps{margin:4px 0 10px 18px;padding:0;font-size:calc(13px*var(--ts));color:var(--muted);display:grid;gap:3px}
+.cu-token{flex:1;min-width:180px;font-family:var(--mono)}
+.cu-ws{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:8px;margin-bottom:10px}
+.cu-ws-h{display:flex;align-items:center;gap:8px}
+.cu-dot{width:10px;height:10px;border-radius:3px;background:var(--c)}
+.cu-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:calc(13px*var(--ts))}
+.cu-row>span{min-width:96px;color:var(--muted)}
+.cu-ws .hint{margin:0}
+.tl-item.cu-c{align-items:flex-start}
+.tl-item.cu-c .tl-text{flex:1;min-width:0}
+.tl-item.cu-c small{color:var(--faint)}
+.cu-body{margin-top:3px;padding:7px 10px;border-radius:8px;background:var(--surface-2,var(--bg));border:1px solid var(--line);font-size:calc(13px*var(--ts));overflow-wrap:anywhere}
+.cu-body p{margin:0 0 4px}.cu-body p:last-child{margin:0}
+.l-ic.k-clickup{color:#7b68ee}
 .dup-warn{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:2px 0 8px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--st-rev) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--st-rev) 40%,var(--line));font-size:calc(13px*var(--ts));color:var(--text)}
 .dup-warn>.i{width:16px;height:16px;color:var(--st-rev);flex:none}
 .dup-warn>span{flex:1;min-width:180px}
@@ -2589,6 +2603,7 @@ async function cloudStart(session){
     history.replaceState(null,'',location.pathname);
   }
   if(B.cfg.calendar) calStatus();
+  if(B.cfg.clickup){cuStatus();setInterval(()=>cuSync(),5*60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-CU.at>120000)cuSync()})}
 }
 async function cloudLoad(){
   const m={};COLS.forEach(c=>m[c]={});
@@ -2716,6 +2731,91 @@ function accountSettingsHtml(){
   }
   return `${cal}<div class="field"><span class="lbl">Account</span><p class="acct-line">Signed in as <b>${esc(B.email)}</b></p>
     <div class="acct-btns"><button type="button" class="btn sm" data-act="sign-out">Sign out</button></div></div>`;
+}
+
+
+/* ================= ClickUp (hosted only, one way: ClickUp → app) =================
+   A personal API token (kept server side in clickup_links) reads tasks assigned to you in the workspaces linked
+   to jobs (job.clickup = {team, mode}). /api/clickup?action=sync creates and updates tasks (t.cu holds the ClickUp
+   side: id, url, status, due, feed of comments and changes) and returns the docs it wrote, which are merged here. */
+const CU_IC='<svg class="i" viewBox="0 0 16 16"><path d="M3 10.6 5.2 9c1 1.3 1.8 1.9 2.8 1.9s1.8-.6 2.8-1.9l2.2 1.6C11.6 12.6 10 13.6 8 13.6s-3.6-1-5-3z"/><path d="M4 6.6 8 3l4 3.6-1.5 1.6L8 6 5.5 8.2z"/></svg>';
+const CU={loaded:false,connected:false,name:'',email:'',teams:[],lastSync:null,error:null,busy:null,disArmed:false,at:0,err:''};
+async function cuApi(action,body){
+  const {data:{session}}=await B.sb.auth.getSession();
+  const r=await fetch('/api/clickup?action='+action,{method:'POST',headers:{Authorization:'Bearer '+(session?.access_token||''),'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw Object.assign(new Error(j.error||'failed'),{code:j.error});
+  return j;
+}
+function cuSet(j){Object.assign(CU,{loaded:true,connected:!!j.connected,name:j.name||'',email:j.email||'',teams:j.teams||[],lastSync:j.lastSync||null,error:j.error||null});if(SM)renderSettings()}
+async function cuStatus(){try{cuSet(await cuApi('status'));if(CU.connected)cuSoon(3000)}catch(e){CU.loaded=true;if(SM)renderSettings()}}
+const cuJobs=()=>jobsSorted().filter(j=>j.clickup&&j.clickup.team);
+let cuT=null,cuRunning=false;
+function cuSoon(ms){if(B.mode!=='cloud'||!CU.connected)return;clearTimeout(cuT);cuT=setTimeout(()=>cuSync(),ms||0)}
+/* merge the docs the server wrote; local edits still on the way win, field by field */
+function cuMerge(docs){
+  const before=stamps(S.tasks);let openHit=false;
+  for(const d of docs||[]){const key=d.col+'/'+d.id;if(!S[d.col])continue;S[d.col][d.id]=merge({...d.data,id:d.id},pending[key]||{});if(d.col==='tasks'&&d.id===S.ui.openTask)openHit=true}
+  markFresh(before);saveSnap();
+  if(openHit&&!$('#drawer').contains(document.activeElement))renderDrawer();
+  scheduleRender();
+}
+async function cuSync(manual){
+  if(cuRunning||B.mode!=='cloud'||!navigator.onLine)return;
+  if(!manual&&(!CU.connected||!cuJobs().length||document.hidden))return;
+  cuRunning=true;if(manual){CU.busy='sync';if(SM)renderSettings()}
+  try{
+    flushAll();await Promise.allSettled(Object.values(chains));
+    let j,n=0,made=0,changed=0;
+    do{j=await cuApi('sync');cuMerge(j.docs);made+=j.created||0;changed+=j.updated||0}while(j.more&&!j.error&&++n<4);
+    cuSet(j);CU.at=Date.now();
+    if(j.error==='token')toast('ClickUp stopped accepting your token. Paste a new one in Settings → ClickUp.');
+    else if(j.error&&manual)toast("Couldn't reach ClickUp. Try again in a minute.");
+    else if(made)toast(`${made} new task${made===1?'':'s'} from ClickUp`);
+    else if(manual)toast(changed?`Updated ${changed} task${changed===1?'':'s'} from ClickUp`:'Everything from ClickUp is already here');
+  }catch(e){if(manual)toast("Couldn't reach ClickUp. Try again in a minute.")}
+  CU.busy=null;cuRunning=false;if(SM)renderSettings();
+}
+async function cuConnect(){
+  const tok=($('#cu-token')?.value||'').trim();
+  if(!/^pk_/.test(tok)){CU.err='That doesn’t look like a ClickUp token. It starts with pk_.';renderSettings();return}
+  CU.busy='connect';CU.err='';renderSettings();
+  try{cuSet(await cuApi('connect',{token:tok}));toast(`ClickUp connected as ${CU.name||'you'}. Now pick a job for each workspace.`)}
+  catch(e){CU.err=e.code==='bad_token'?'ClickUp didn’t accept that token. Copy it again from ClickUp → Settings → Apps.':"Couldn't reach ClickUp. Try again in a minute."}
+  CU.busy=null;if(SM)renderSettings();
+}
+async function cuDisconnect(){
+  CU.busy='disconnect';CU.disArmed=false;renderSettings();
+  try{cuSet(await cuApi('disconnect'));toast('ClickUp disconnected. Tasks it brought in stay.')}catch(e){toast("Couldn't disconnect ClickUp. Try again.")}
+  CU.busy=null;if(SM)renderSettings();
+}
+/* one job per workspace; picking a job for a workspace takes it off any other workspace */
+function cuLink(team,jobId){
+  for(const j of Object.values(S.jobs))if(j.clickup&&String(j.clickup.team)===String(team)&&j.id!==jobId){patch('jobs',j.id,{clickup:null});logAct('job',`ClickUp workspace unlinked from ${j.name}`,{jobId:j.id})}
+  if(jobId&&S.jobs[jobId]){const j=S.jobs[jobId];patch('jobs',jobId,{clickup:{team:String(team),mode:j.clickup?.mode||'main'}});logAct('job',`ClickUp workspace linked to ${j.name}`,{jobId});cuSoon(800)}
+  renderSettings();
+}
+function clickupSettingsHtml(){
+  if(B.mode!=='cloud')return `<div class="field"><span class="lbl">ClickUp</span><p class="hint">ClickUp sync works in the hosted app (signed in), not in this copy.</p></div>`;
+  if(!B.cfg.clickup)return `<div class="field"><span class="lbl">ClickUp</span><p class="hint">Not set up yet. Add <code>SUPABASE_SERVICE_ROLE_KEY</code> in Vercel and redeploy.</p></div>`;
+  const c=CU,busy=c.busy;
+  if(!c.loaded)return '<p class="hint">Checking…</p>';
+  if(!c.connected)return `<div class="field"><span class="lbl">Connect ClickUp</span>
+    <p class="acct-line">Tasks assigned to you in ClickUp show up here on their own, with ClickUp comments and status changes in each task's Activity tab. Nothing is sent back to ClickUp.</p>
+    <ol class="cu-steps"><li>In ClickUp, click your avatar → <b>Settings</b> → <b>Apps</b>.</li><li>Under <b>API Token</b>, click <b>Generate</b> (or Copy). It starts with <code>pk_</code>.</li><li>Paste it here. One token covers every workspace you're in.</li></ol>
+    <div class="acct-btns"><input type="password" id="cu-token" class="cu-token" data-fk="cu-token" placeholder="pk_…" autocomplete="off" spellcheck="false" aria-label="ClickUp API token"><button type="button" class="btn sm primary" data-act="cu-connect" ${busy?'disabled':''}>${CU_IC}${busy==='connect'?'Checking…':'Connect'}</button></div>
+    ${c.err?`<p class="hint acct-warn">${esc(c.err)}</p>`:''}<p class="hint">The token is stored on the server only and never shown again. Disconnect any time.</p></div>`;
+  const jobs=jobsSorted();
+  const rows=(c.teams||[]).map(t=>{const j=jobs.find(x=>x.clickup&&String(x.clickup.team)===String(t.id)),mode=j?.clickup?.mode||'main';
+    return `<div class="cu-ws"><div class="cu-ws-h"><span class="cu-dot" style="--c:${esc(t.color||'var(--accent)')}"></span><b>${esc(t.name)}</b></div>
+      <label class="cu-row"><span>Job</span><select class="sel" data-act="cu-job" data-team="${esc(t.id)}" aria-label="Job for ${esc(t.name)}"><option value="">Don't sync</option>${jobs.map(x=>`<option value="${x.id}" ${j&&j.id===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
+      ${j?`<div class="cu-row"><span>Each video is</span><div class="seg" role="group" aria-label="How tasks are set up in ${esc(t.name)}"><button type="button" data-act="cu-mode" data-job="${j.id}" data-v="main" class="${mode==='main'?'on':''}" aria-pressed="${mode==='main'}">The main task</button><button type="button" data-act="cu-mode" data-job="${j.id}" data-v="sub" class="${mode==='sub'?'on':''}" aria-pressed="${mode==='sub'}">A subtask</button></div></div>
+      <p class="hint">${mode==='main'?'Main tasks become tasks here; their subtasks and ClickUp checklists become checklist steps.':'Main tasks are batches (like “W2 Aug Reels”) and are skipped; each subtask assigned to you becomes its own task. The client comes from the batch above it.'}</p>`:''}</div>`}).join('');
+  return `<div class="field"><span class="lbl">ClickUp</span><p class="acct-line">${c.error==='token'?'<b class="acct-warn">ClickUp stopped accepting your token. Paste a new one below.</b>':`Connected as <b>${esc(c.name||c.email||'you')}</b>. Checked ${esc(calAgo(c.lastSync))}.${c.error?' <b class="acct-warn">The last check failed.</b>':''}`}</p>
+    ${c.error==='token'?`<div class="acct-btns"><input type="password" id="cu-token" class="cu-token" data-fk="cu-token" placeholder="pk_…" autocomplete="off" aria-label="ClickUp API token"><button type="button" class="btn sm primary" data-act="cu-connect" ${busy?'disabled':''}>${busy==='connect'?'Checking…':'Reconnect'}</button></div>`:''}
+    <div class="acct-btns"><button type="button" class="btn sm" data-act="cu-sync" ${busy||!cuJobs().length?'disabled':''}>${busy==='sync'?'Checking ClickUp…':'Check now'}</button><button type="button" class="btn sm ${c.disArmed?'danger armed':''}" data-act="cu-disconnect" ${busy?'disabled':''}>${busy==='disconnect'?'Disconnecting…':c.disArmed?'Click again to disconnect':'Disconnect'}</button></div></div>
+    <div class="field"><span class="lbl">Workspaces</span>${rows||'<p class="hint">This token can’t see any workspaces.</p>'}
+    <p class="hint">Only tasks assigned to you come in: open ones updated in the last 60 days, then anything new. Finished ones stay in ClickUp. A task you already added by hand with the same name is linked, not copied. Delete one here and it won’t come back. The app checks every few minutes while it's open and once a day when it's closed.</p></div>`;
 }
 
 /* ================= derived ================= */
@@ -3537,6 +3637,7 @@ function notifications(all){
       out.push({key:`stale:${t.id}:${ymd(new Date(t.updated))}`,rank:4,kind:'info',icon:'loop',task:t,title:`${nm} has been in ${stLabel(t.status)} for ${d} days`,body:t.status==='client_review'||t.status==='waiting_client'?'No update since. Worth a nudge to the client?':'No changes since. Worth a follow-up?'});
     }
     if((t.revision||0)>=3)out.push({key:`rev:${t.id}:${t.revision}`,rank:5,kind:'info',icon:'loop',task:t,title:`${nm} is on revision round ${t.revision}`,body:'Might be time to agree the remaining changes in one go.'});
+    for(const f of (t.cu?.feed||[]).slice(-6))if(f.k==='comment'&&!f.me&&Date.now()-new Date(f.at)<3*86400000)out.push({key:`cu:${t.id}:${f.cid}`,rank:1.5,kind:'info',icon:'chat',task:t,tab:'activity',title:`${f.who||'Someone'} commented on ${nm}`,body:String(f.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)});
     if(!t.due&&(t.priority==='urgent'||t.priority==='high'))out.push({key:`nodate:${t.id}`,rank:6,kind:'info',icon:'cal',task:t,title:`${nm} is ${t.priority==='urgent'?'urgent':'high priority'} but has no due date`,body:''});
   }
   const load=dueLoad();
@@ -3562,7 +3663,7 @@ function renderBell(){
 /* phones: notifications as a full page like Slack's Activity: colored header, filter chips,
    rows with the task's logo, a kind badge, what happened, when, and the job; swipe a row left to dismiss */
 let NF='all';
-const NA_LBL={over:'Overdue',today:'Due today',tmrw:'Due tomorrow',start:'Starts today',stale:'Needs a nudge',rev:'Many revisions',nodate:'No due date',busy:'Busy day',backup:'Backup'};
+const NA_LBL={over:'Overdue',today:'Due today',tmrw:'Due tomorrow',start:'Starts today',stale:'Needs a nudge',rev:'Many revisions',nodate:'No due date',busy:'Busy day',backup:'Backup',cu:'ClickUp comment'};
 const NA_DEAD=new Set(['over','today','tmrw','busy']);
 function notesPageHtml(list,unread){
   const kindOf=n=>n.key.split(':')[0];
@@ -3595,7 +3696,7 @@ function openNote(key){
   const n=notifications(true).find(x=>x.key===key);if(!n)return;
   NS.read[key]=1;saveNotes();notesOpen=false;renderBell();
   if(n.backup){openSettings();SM.sec='backup';SM.mv='sec';renderSettings();return}
-  if(n.task)openTask(n.task.id);
+  if(n.task)openTask(n.task.id,n.tab);
   else if(n.day){const u=S.ui;u.tab='overview';u.client='all';u.view='calendar';u.month=n.day.slice(0,7);saveUi();render()}
 }
 
@@ -3626,7 +3727,7 @@ function restoreTasks(ids,quiet){
   if(!quiet)toast(ids.length===1?`Restored “${S.tasks[ids[0]].name||'task'}”`:`Restored ${ids.length} tasks`);
 }
 const TOMATO_IC='<svg class="i" viewBox="0 0 16 16"><path d="M8 4.5c3.3 0 5.5 2 5.5 4.8S11.3 14 8 14s-5.5-1.9-5.5-4.7S4.7 4.5 8 4.5z"/><path d="M8 4.5V2.2M5.6 4.9 8 6.1l2.4-1.2"/></svg>';
-const LOG_ICON={focus:TOMATO_IC,note:I.chat,create:I.plus,status:I.status,date:I.cal,edit:I.pencil,check:I.task,archive:I.archive,restore:I.loop,delete:I.trash,job:I.briefcase,brand:I.palette};
+const LOG_ICON={clickup:CU_IC,focus:TOMATO_IC,note:I.chat,create:I.plus,status:I.status,date:I.cal,edit:I.pencil,check:I.task,archive:I.archive,restore:I.loop,delete:I.trash,job:I.briefcase,brand:I.palette};
 const fmtTime=iso=>new Date(iso).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
 function dayHeading(iso){const d=ymd(new Date(iso)),t=today(),y=ymd(new Date(Date.now()-864e5));return d===t?'Today':d===y?'Yesterday':fmtLong(d)}
 function logRow(e,showTask=true){
@@ -3702,8 +3803,9 @@ let LSHOW=new Set();
 /* Task activity: the task's log entries plus your own posted updates (kind 'note'), newest first */
 function taskActivity(t){
   const h=logItems().filter(e=>e.taskId===t.id);
-  if(t.created&&!h.some(e=>e.kind==='create'))h.push({at:new Date(t.created).toISOString(),kind:'create',text:'Created',taskId:t.id,synthetic:true});
-  return h;
+  if(t.created&&!h.some(e=>e.kind==='create'))h.push({at:new Date(t.created).toISOString(),kind:'create',text:t.cu?'Brought in from ClickUp':'Created',taskId:t.id,synthetic:true});
+  for(const f of t.cu?.feed||[])h.push({at:f.at,kind:'clickup',k:f.k,who:f.who,me:f.me,text:f.text,taskId:t.id,synthetic:true});
+  return h.sort((a,b)=>b.at.localeCompare(a.at));
 }
 let noteDelArmed=null;
 function activityPane(t){
@@ -3713,6 +3815,7 @@ function activityPane(t){
     const d=dayHeading(e.at);if(d!==day){day=d;rows+=`<div class="tl-day">${esc(d)}</div>`}
     if(e.kind==='note'&&e.done&&S.ui.hideResolved)continue;
     rows+=e.kind==='note'?noteHtml(e)
+      :e.kind==='clickup'&&e.k==='comment'?`<div class="tl-item cu-c"><span class="l-ic k-clickup">${CU_IC}</span><div class="tl-text"><b>${esc(e.who||'Someone')}</b> <small>in ClickUp</small><div class="cu-body md">${noteText(e.text,S.jobs[t.jobId])}</div></div><time datetime="${esc(e.at)}">${fmtTime(e.at)}</time></div>`
       :`<div class="tl-item"><span class="l-ic k-${e.kind}">${LOG_ICON[e.kind]||I.info}</span><span class="tl-text">${esc(e.text)}</span><time datetime="${esc(e.at)}">${fmtTime(e.at)}</time></div>`;
   }
   return `<div class="d-body d-activity">
@@ -3722,7 +3825,7 @@ function activityPane(t){
       <div class="composer-foot"><button type="button" class="btn sm ghost" data-act="upd-attach" data-for="note" title="Attach pictures">${I.image}Picture</button><span class="hint">⌘/Ctrl + Enter to post</span><button class="btn sm primary" data-act="note-post" ${ATT.busy?'disabled':''} aria-label="Post update" title="Post update"><span class="np-l">Post update</span>${SEND_IC}</button></div></div>
     ${notes.length?`<div class="notes-sum"><span><b>${notes.length-nDone}</b> open${nDone?` · <b>${nDone}</b> resolved`:''}</span>${nDone?`<button type="button" class="btn sm ghost" data-act="notes-hide-done">${S.ui.hideResolved?'Show resolved':'Hide resolved'}</button>`:''}</div>`:''}
     <div class="timeline">${rows||(S.ui.hideResolved&&nDone?'<p class="hint">Every update is resolved.</p>':'<p class="hint">Nothing yet. Changes to this task will show up here.</p>')}</div>
-    ${h.length&&!logItems().some(e=>e.taskId===t.id&&e.kind!=='note')?'<p class="hint">Status, date and checklist changes are recorded from now on.</p>':''}
+    ${h.length&&!t.cu&&!logItems().some(e=>e.taskId===t.id&&e.kind!=='note')?'<p class="hint">Status, date and checklist changes are recorded from now on.</p>':''}
   </div>`;
 }
 /* ================= updates: resolve and reply (Frame.io style) =================
@@ -4995,6 +5098,7 @@ const HELP=[
  ['Tasks','Paste a link to add it',`With a task open, press ${IS_MAC?'⌘V':'Ctrl+V'} anywhere in the panel (not inside a text box) and the link goes into the right slot: Frame.io or Vimeo into the review link, Drive, OneDrive, Dropbox, LucidLink or Descript into the files link, ClickUp or Asana into the task link, and a Mac path into the project folder. The job's own tools (Edit job → Tools & folders) decide first. Undo is in the message that pops up.`,null],
  ['Tasks','Export file names',`Each task panel shows an export name, like 260930_Client_Title_V2, with a copy button (it's in the floating window too). Click Pattern to set the naming for that client, or for the job when a task has no client: {date} today, {due}, {client}, {job}, {title}, {v} version (revision round + 1), {r}, {format} and {length}.`,null],
  ['Tasks','Split into tasks',`In a task's panel (or the right-click menu), Split into tasks turns one task into several: one name per line, each with the same job, client, links, dates and notes, and the checklist unticked.`,null],
+ ['Your work','ClickUp',`In Settings → ClickUp, paste your ClickUp API token (ClickUp → Settings → Apps), then pick a job for each workspace. Tasks assigned to you come in on their own, with the client, due date, priority and task link; ClickUp comments, status and due-date changes show in the task's Activity tab, and new comments from others show in notifications. Choose whether each video is the main task (subtasks become checklist steps) or a subtask (main tasks are batches). Nothing is sent back to ClickUp.`,['clickup','ClickUp']],
  ['Tasks','Drag on the Calendar',`On a computer, drag a task in the Calendar (month or week) onto another day to move its due date. A toast says when the new day is busy and has Undo. On a phone, change the date in the task panel.`,null],
  ['Tasks','Archive finished tasks on their own',`Done tasks can move to Archived by themselves 3, 7 or 14 days after they were finished, so the Done column stays short. It's off until you pick a time. Each one is logged, and Undo brings them back. Set it in Settings → Tasks & calendar.`,['tasks','Tasks & calendar']],
  ['Tasks','Same name twice',`If you save a new task with the same name as an open one in that job, the panel asks whether to open the one you already have or save the new one anyway.`,null],
@@ -5469,13 +5573,13 @@ function renderSettings(){
       <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${canUpload()?`<button type="button" class="btn sm" data-act="s-logo-pick">${I.image}${src?'Replace':'Upload'}</button>`:''}${src?'<button type="button" class="btn sm" data-act="s-logo-remove">Remove</button>':''}${SM.busy?'<span class="hint">Uploading…</span>':''}</div>
       <p class="hint">Replaces the ${esc(APP_NAME)} logo next to the app name and in the browser tab. A square image works best.</p></div></div></div>`},
     {id:'finder',label:'Finder & Chrome',icon:I.folder,html:finderSettingsHtml()},
-    ...(B.mode==='cloud'?[{id:'account',label:'Calendar & account',icon:I.cal,html:accountSettingsHtml()}]:[]),
+    ...(B.mode==='cloud'?[{id:'account',label:'Calendar & account',icon:I.cal,html:accountSettingsHtml()},{id:'clickup',label:'ClickUp',icon:CU_IC,html:clickupSettingsHtml()}]:[]),
     {id:'keys',label:'Keyboard shortcuts',icon:'<svg class="i" viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8.5" rx="1.5"/><path d="M4 6.5h.01M6.5 6.5h.01M9 6.5h.01M11.5 6.5h.01M5 10h6"/></svg>',html:shortcutSettingsHtml()},
     {id:'pomo',label:'Focus timer',icon:TOMATO_IC,html:pomoSettingsHtml()},
     {id:'safezones',label:'Safe-zone overlays',icon:SZ_IC,html:safeZonesHtml()},
     {id:'import',label:'Import CSV',icon:I.upload,html:importSettingsHtml()},
     {id:'backup',label:'Backup',icon:I.download,html:backupSettingsHtml()}];
-  const META={appearance:['Look & feel','Theme, colors, surfaces'],tasks:['Look & feel','Task rows, due dates, the Calendar'],fun:['Look & feel','Greeting, the office cat, cork board'],a11y:['Look & feel','Text size, motion, contrast'],statuses:['Your work','Rename, recolor and reorder'],workload:['Your work','When a day counts as busy'],holidays:['Your work','Public holidays on the Calendar'],pomo:['Your work','Focus and break lengths, sounds'],safezones:['Your work','TikTok, Reels and Shorts overlays'],branding:['App','Your own name and logo'],finder:['App','Mac folders and Chrome profiles'],account:['App','Google Calendar and sign out'],keys:['App','Shortcuts on a keyboard'],import:['Your data','Bring in a tracker sheet'],backup:['Your data','Download, restore, trash']};
+  const META={appearance:['Look & feel','Theme, colors, surfaces'],tasks:['Look & feel','Task rows, due dates, the Calendar'],fun:['Look & feel','Greeting, the office cat, cork board'],a11y:['Look & feel','Text size, motion, contrast'],statuses:['Your work','Rename, recolor and reorder'],workload:['Your work','When a day counts as busy'],holidays:['Your work','Public holidays on the Calendar'],pomo:['Your work','Focus and break lengths, sounds'],safezones:['Your work','TikTok, Reels and Shorts overlays'],branding:['App','Your own name and logo'],finder:['App','Mac folders and Chrome profiles'],account:['App','Google Calendar and sign out'],clickup:['App','Bring in tasks assigned to you'],keys:['App','Shortcuts on a keyboard'],import:['Your data','Bring in a tracker sheet'],backup:['Your data','Download, restore, trash']};
   secs.forEach(x=>{const m=META[x.id];if(m){x.group=m[0];x.sub=m[1]}});
   const GORD=['Look & feel','Your work','App','Your data'];secs.sort((x,y)=>GORD.indexOf(x.group)-GORD.indexOf(y.group));
   keepScroll('#modal',()=>withFocus(()=>{$('#modal').innerHTML=`<div class="modal pref-modal" role="dialog" aria-modal="true" aria-labelledby="s-title">
@@ -6531,6 +6635,10 @@ document.addEventListener('click',e=>{
     case 'sign-out': closeSettings(false);signOut();break;
     case 'cal-connect': calConnect();break;
     case 'cal-sync': calSync(true);break;
+    case 'cu-connect': cuConnect();break;
+    case 'cu-sync': cuSync(true);break;
+    case 'cu-disconnect': if(!CU.disArmed){CU.disArmed=true;renderSettings();setTimeout(()=>{CU.disArmed=false;if(SM)renderSettings()},4000)}else cuDisconnect();break;
+    case 'cu-mode':{const j=S.jobs[el.dataset.job];if(j&&j.clickup&&j.clickup.mode!==el.dataset.v){patch('jobs',j.id,{clickup:{...j.clickup,mode:el.dataset.v}});cuSoon(800)}renderSettings();break}
     case 'cal-disconnect': if(CAL.disArmed)calDisconnect();else{CAL.disArmed=true;renderSettings()}break;
     case 'auth-google': authGoogle();break;
     case 'crop-cancel': closeCrop();break;
@@ -6626,6 +6734,7 @@ document.addEventListener('change',e=>{
   if(el.id==='logo-in'){const f=el.files[0];el.value='';if(!f)return;const app=logoTarget?.kind==='app';openCrop(f,blob=>app?setAppLogo(blob):setModalLogo(blob));return}
   const act=el.dataset.act;
   if(act==='row-prio'){const t=S.tasks[el.dataset.id],v=el.value;if(t&&(t.priority||'normal')!==v){patch('tasks',t.id,{priority:v});logAct('edit',`Priority set to ${(PRIORITIES.find(x=>x.id===v)||{}).label||v}`,{task:t})}render();return}
+  if(act==='cu-job'){cuLink(el.dataset.team,el.value);return}
   if(act==='row-due'){const t=S.tasks[el.dataset.id],v=el.value;if(t&&(t.due||'')!==v){patch('tasks',t.id,{due:v});logAct('date',v?`Due date set to ${fmtDate(v)}`:'Due date removed',{task:t});toast(v?`Due ${fmtDate(v)}`:'Due date removed')}render();return}
   if(act==='row-status'){setStatus(el.dataset.id,el.value);if(u.openTask===el.dataset.id)renderDrawer();return}
   if(act==='d-status'){setStatus(u.openTask,el.value);renderDrawer();return}

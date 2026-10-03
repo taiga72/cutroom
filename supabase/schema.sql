@@ -34,6 +34,22 @@ create table if not exists public.gcal_links (
 );
 alter table public.gcal_links enable row level security;
 
+-- ClickUp connections (personal API token, kept server side only). No policies on purpose, like gcal_links.
+create table if not exists public.clickup_links (
+  user_id     uuid primary key references auth.users (id) on delete cascade,
+  token       text not null,
+  cu_user_id  text not null,
+  cu_name     text,
+  cu_email    text,
+  tz          text,
+  teams       jsonb not null default '[]'::jsonb,
+  state       jsonb not null default '{}'::jsonb,
+  last_sync   timestamptz,
+  last_error  text,
+  created_at  timestamptz not null default now()
+);
+alter table public.clickup_links enable row level security;
+
 -- Pictures (job/client/app logos) and brand guide PDFs. Files live in a folder named
 -- after the owner's user id. The bucket is public so pictures load by their
 -- (random, unguessable) address; only the owner can add, replace or delete them.
