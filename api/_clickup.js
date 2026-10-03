@@ -153,6 +153,7 @@ async function syncUser(uid) {
       const team = String(job.clickup.team), mode = job.clickup.mode === 'sub' ? 'sub' : 'main';
       const ti = (link.teams || []).find(x => String(x.id) === team) || {};
       cu = api(ti.token || link.token); me = String(ti.uid || link.cu_user_id);
+      const tsum = { at: now, failed: 0 };
       try {
       // every task assigned to you, updated in the window (subtasks included, closed ones too)
       const list = [];
@@ -184,7 +185,7 @@ async function syncUser(uid) {
 
       for (const [cuId, c] of cands) {
         const linked = Object.entries(D.tasks).find(([, x]) => x.cu && x.cu.id === cuId) || (state.seen[cuId] && D.tasks[state.seen[cuId]] ? [state.seen[cuId], D.tasks[state.seen[cuId]]] : null);
-        if (linked && linked[1].cu && linked[1].cu.v === 2 && +linked[1].cu.upd >= c.upd) continue;      // nothing new in ClickUp
+        if (linked && linked[1].cu && linked[1].cu.v === 2 && +(linked[1].cu.at || 0) >= (state.redo || 0) && +linked[1].cu.upd >= c.upd) continue;      // nothing new in ClickUp
         if (!linked && state.seen[cuId]) continue;                              // deleted in the app: don't bring it back
         if (calls >= BUDGET - 3) { res.more = true; continue; }
         if (!c.t) { const info = await parentInfo(cuId); if (!info) { res.more = true; continue; } c.t = info.task; }
@@ -198,7 +199,11 @@ async function syncUser(uid) {
         // details: subtasks and checklists for main tasks, comments for the Activity tab
         let detail = t;
         if (mode === 'main') detail = await soft(`/task/${cuId}?include_subtasks=true&include_markdown_description=true`, t);
-        const comments = ((await soft(`/task/${cuId}/comment`, { comments: [] })).comments || []);
+        let readFail = false;
+        const comments = ((await call(`/task/${cuId}/comment`).catch(e => {
+          if (e instanceof RateLimited || e instanceof NeedsToken) throw e;
+          readFail = true; tsum.failed++; tsum.msg = String(e.message || e).slice(0, 160); return { comments: [] };
+        })).comments || []);
         const clientName = job.type === 'agency' ? await clientNameFor(t) : '';
 
         const prev = (existing && existing[1].cu) || {};
@@ -214,7 +219,7 @@ async function syncUser(uid) {
         if (existing && prev.due !== undefined && prev.due !== due) feed.push({ at: iso, k: 'due', text: due ? `Due date in ClickUp: ${due}` : 'Due date removed in ClickUp' });
         feed.sort((a, b) => a.at.localeCompare(b.at));
         const lastComment = Math.max(prev.lastComment || 0, ...comments.map(m => +m.date || 0));
-        const cuInfo = { v: 2, id: cuId, team, url: t.url, status: statusName, due, prio: prioOf(t), name: t.name, upd: c.upd, lastComment, feed: feed.slice(-FEED_MAX) };
+        const cuInfo = { v: readFail ? 1 : 2, at: now, id: cuId, team, url: t.url, status: statusName, due, prio: prioOf(t), name: t.name, upd: c.upd, lastComment, feed: feed.slice(-FEED_MAX) };
 
         // checklist steps from subtasks (main mode) and ClickUp checklists
         const steps = [];
@@ -265,10 +270,13 @@ async function syncUser(uid) {
           D.tasks[id] = d; state.seen[cuId] = id; put('tasks', id, d); res.updated++;
         }
       }
-      const inApp = [...cands.keys()].filter(k => state.seen[k] && D.tasks[state.seen[k]]).length;
-      state.sum[team] = { at: now, assigned: list.length, videos: cands.size, inApp };
+      const inApp = [...cands.keys()].filter(k => state.seen[k] && D.tasks[state.seen[k]]);
+      const withComments = inApp.filter(k => ((D.tasks[state.seen[k]].cu || {}).feed || []).some(f => f.k === 'comment')).length;
+      state.sum[team] = { ...tsum, assigned: list.length, videos: cands.size, inApp: inApp.length, withComments };
       } catch (e) {
+        if (e instanceof NeedsToken) { state.sum[team] = { ...(state.sum[team] || {}), at: now, error: 'token' }; res.teamErrors = (res.teamErrors || 0) + 1; continue; }  // other workspaces still sync
         if (!(e instanceof RateLimited)) throw e;
+        state.sum[team] = { ...(state.sum[team] || {}), ...tsum, pending: true };
         res.more = true; res.wait = 65; break;     // keep what was done; the page asks again in a minute
       }
     }
@@ -278,7 +286,9 @@ async function syncUser(uid) {
     // keep the parent cache small
     const pk = Object.keys(state.parents); if (pk.length > 400) pk.sort((a, b) => state.parents[a].at - state.parents[b].at).slice(0, pk.length - 400).forEach(k => delete state.parents[k]);
     for (const k in state.parents) delete state.parents[k].task;
-    await saveLink(uid, { state, last_sync: new Date().toISOString(), last_error: null });
+    const allBad = jobs.length && res.teamErrors === jobs.length;
+    await saveLink(uid, { state, last_sync: new Date().toISOString(), last_error: allBad ? 'token' : null });
+    if (allBad) res.error = 'token';
     return res;
   } catch (e) {
     console.error(e);
