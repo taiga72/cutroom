@@ -8,5 +8,5 @@ module.exports = (req, res) => {
   const missing = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'].filter(k => !env(k));
   if (!url || !key) return send(res, 503, { error: 'not_configured', missing });
   if (!/^https:\/\/[^/]+$/.test(url.replace(/\/+$/, ''))) return send(res, 503, { error: 'bad_url', missing });
-  send(res, 200, { supabaseUrl: url.replace(/\/+$/, ''), supabaseAnonKey: key, calendar: calendarReady(), missing });
+  send(res, 200, { supabaseUrl: url.replace(/\/+$/, ''), supabaseAnonKey: key, calendar: calendarReady(), clickup: !!env('SUPABASE_SERVICE_ROLE_KEY'), missing });
 };
