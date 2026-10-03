@@ -1,4 +1,4 @@
-// ClickUp actions for the signed-in user: POST /api/clickup?action=status|connect|remove|sync|disconnect
+// ClickUp actions for the signed-in user: POST /api/clickup?action=status|connect|remove|sync|resync|disconnect
 // connect takes {token} (a ClickUp personal API token, pk_…), checked against ClickUp and kept server side only.
 // ClickUp tokens are per workspace: connecting another token adds its workspace; remove {team} drops one.
 const { send, authUser, sb, env } = require('./_lib');
@@ -39,6 +39,11 @@ module.exports = async (req, res) => {
       if (!teams.length) { await sb(`clickup_links?user_id=eq.${user.id}`, { method: 'DELETE' }); return send(res, 200, { connected: false }); }
       await saveLink(user.id, { teams, token: (teams[0].token || had.token) });
       return send(res, 200, view(await getLink(user.id)));
+    }
+    if (action === 'resync') {   // re-read every linked task (comments, status) once, e.g. after a token problem
+      const l = await getLink(user.id);
+      if (l) await saveLink(user.id, { state: { ...(l.state || {}), redo: Date.now() } });
+      const r = await syncUser(user.id); return send(res, 200, { ...r, ...view(await getLink(user.id)) });
     }
     if (action === 'sync') { const r = await syncUser(user.id); return send(res, 200, { ...r, ...view(await getLink(user.id)) }); }
     if (action === 'disconnect') { await sb(`clickup_links?user_id=eq.${user.id}`, { method: 'DELETE' }); return send(res, 200, { connected: false }); }

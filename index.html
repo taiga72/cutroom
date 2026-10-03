@@ -2763,17 +2763,18 @@ function cuMerge(docs){
   if(openHit&&!$('#drawer').contains(document.activeElement))renderDrawer();
   scheduleRender();
 }
-async function cuSync(manual){
+async function cuSync(manual,redo){
   if(cuRunning||B.mode!=='cloud'||!navigator.onLine)return;
   if(!manual&&(!CU.connected||!cuJobs().length||document.hidden))return;
   cuRunning=true;if(manual){CU.busy='sync';if(SM)renderSettings()}
   try{
     flushAll();await Promise.allSettled(Object.values(chains));
-    const j=await cuApi('sync');cuMerge(j.docs);const made=j.created||0,changed=j.updated||0;
+    const j=await cuApi(redo?'resync':'sync');cuMerge(j.docs);const made=j.created||0,changed=j.updated||0;
     cuSet(j);CU.at=Date.now();
     /* ClickUp allows about 100 requests a minute, so the rest comes in a minute later */
     if(j.more&&!j.error){clearTimeout(cuT);cuT=setTimeout(()=>cuSync(),65000);CU.more=true}else CU.more=false;
     if(j.error==='token')toast('ClickUp stopped accepting your token. Paste a new one in Settings → ClickUp.');
+    else if(j.teamErrors&&manual)toast('One workspace’s token was rejected. Settings → ClickUp shows which.');
     else if(j.error&&manual)toast("Couldn't reach ClickUp. Try again in a minute.");
     else if(made)toast(`${made} new task${made===1?'':'s'} from ClickUp`);
     else if(manual)toast(j.more?`Updated ${changed} task${changed===1?'':'s'} from ClickUp. Bringing in the rest in a minute…`:changed?`Updated ${changed} task${changed===1?'':'s'} from ClickUp`:'Everything from ClickUp is already here');
@@ -2817,14 +2818,16 @@ function clickupSettingsHtml(){
     ${c.err?`<p class="hint acct-warn">${esc(c.err)}</p>`:''}<p class="hint">The token is stored on the server only and never shown again. Disconnect any time.</p></div>`;
   const jobs=jobsSorted();
   const rows=(c.teams||[]).map(t=>{const j=jobs.find(x=>x.clickup&&String(x.clickup.team)===String(t.id)),mode=j?.clickup?.mode||'main';
-    const sm=t.sum&&j?`<p class="hint cu-sum">Last check: ${t.sum.videos} task${t.sum.videos===1?'':'s'} assigned to you · ${t.sum.inApp} in the app${t.sum.videos>t.sum.inApp?` · ${t.sum.videos-t.sum.inApp} finished or older, left in ClickUp`:''}${CU.more?' · more coming in a minute':''}</p>`:'';
+    const su=t.sum||{};
+    const sm=!j?'':su.error==='token'?`<p class="hint cu-sum acct-warn">ClickUp didn’t accept this workspace’s token. Copy it again in ClickUp (switch to this workspace → Settings → Apps) and paste it with Connect another workspace below.</p>`
+      :su.videos!=null?`<p class="hint cu-sum">Last check: ${su.videos} task${su.videos===1?'':'s'} assigned to you · ${su.inApp} in the app${su.videos>su.inApp?` · ${su.videos-su.inApp} finished or older, left in ClickUp`:''}${su.withComments!=null?` · ${su.withComments} with ClickUp comments`:''}${su.pending||CU.more?' · more coming in a minute':''}${su.failed?` · <b class="acct-warn">${su.failed} couldn’t be read (${esc(su.msg||'ClickUp error')}), trying again</b>`:''}</p>`:'';
     return `<div class="cu-ws"><div class="cu-ws-h"><span class="cu-dot" style="--c:${esc(t.color||'var(--accent)')}"></span><b>${esc(t.name)}</b><button type="button" class="btn sm ghost cu-rm ${CU.rmArmed===t.id?'danger armed':''}" data-act="cu-remove" data-team="${esc(t.id)}" ${busy?'disabled':''}>${CU.rmArmed===t.id?'Click again to remove':'Remove'}</button></div>${sm}
       <label class="cu-row"><span>Job</span><select class="sel" data-act="cu-job" data-team="${esc(t.id)}" aria-label="Job for ${esc(t.name)}"><option value="">Don't sync</option>${jobs.map(x=>`<option value="${x.id}" ${j&&j.id===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
       ${j?`<div class="cu-row"><span>Each video is</span><div class="seg" role="group" aria-label="How tasks are set up in ${esc(t.name)}"><button type="button" data-act="cu-mode" data-job="${j.id}" data-v="main" class="${mode==='main'?'on':''}" aria-pressed="${mode==='main'}">The main task</button><button type="button" data-act="cu-mode" data-job="${j.id}" data-v="sub" class="${mode==='sub'?'on':''}" aria-pressed="${mode==='sub'}">A subtask</button></div></div>
       <p class="hint">${mode==='main'?'Main tasks become tasks here; their subtasks and ClickUp checklists become checklist steps.':'Main tasks are batches (like “W2 Aug Reels”) and are skipped; each subtask assigned to you becomes its own task. The client comes from the batch above it.'}</p>`:''}</div>`}).join('');
   return `<div class="field"><span class="lbl">ClickUp</span><p class="acct-line">${c.error==='token'?'<b class="acct-warn">ClickUp stopped accepting your token. Paste a new one below.</b>':`Connected as <b>${esc(c.name||c.email||'you')}</b>. ${c.lastSync?`Checked ${esc(calAgo(c.lastSync))}.`:'Not checked yet.'}${c.error?' <b class="acct-warn">The last check failed.</b>':''}`}</p>
     ${c.error==='token'?`<div class="acct-btns"><input type="password" id="cu-token" class="cu-token" data-fk="cu-token" placeholder="pk_…" autocomplete="off" aria-label="ClickUp API token"><button type="button" class="btn sm primary" data-act="cu-connect" ${busy?'disabled':''}>${busy==='connect'?'Checking…':'Reconnect'}</button></div>`:''}
-    <div class="acct-btns"><button type="button" class="btn sm" data-act="cu-sync" ${busy||!cuJobs().length?'disabled':''}>${busy==='sync'?'Checking ClickUp…':'Check now'}</button><button type="button" class="btn sm ${c.disArmed?'danger armed':''}" data-act="cu-disconnect" ${busy?'disabled':''}>${busy==='disconnect'?'Disconnecting…':c.disArmed?'Click again to disconnect':'Disconnect'}</button></div></div>
+    <div class="acct-btns"><button type="button" class="btn sm" data-act="cu-sync" ${busy||!cuJobs().length?'disabled':''}>${busy==='sync'?'Checking ClickUp…':'Check now'}</button><button type="button" class="btn sm ghost" data-act="cu-resync" title="Read every linked task again, comments included" ${busy||!cuJobs().length?'disabled':''}>Re-read everything</button><button type="button" class="btn sm ${c.disArmed?'danger armed':''}" data-act="cu-disconnect" ${busy?'disabled':''}>${busy==='disconnect'?'Disconnecting…':c.disArmed?'Click again to disconnect':'Disconnect'}</button></div></div>
     <div class="field"><span class="lbl">Workspaces</span>${rows||'<p class="hint">This token can’t see any workspaces.</p>'}
     ${c.adding?`<div class="cu-ws cu-add"><b>Connect another workspace</b><p class="hint">ClickUp gives each workspace its own token. Switch to the other workspace in ClickUp (top left), open your avatar → <b>Settings</b> → <b>Apps</b>, copy its API token and paste it here.</p>
       <div class="acct-btns"><input type="password" id="cu-token" class="cu-token" data-fk="cu-token" placeholder="pk_…" autocomplete="off" spellcheck="false" aria-label="ClickUp API token for another workspace"><button type="button" class="btn sm primary" data-act="cu-connect" ${busy?'disabled':''}>${busy==='connect'?'Checking…':'Add workspace'}</button><button type="button" class="btn sm ghost" data-act="cu-add-cancel">Cancel</button></div>${c.err?`<p class="hint acct-warn">${esc(c.err)}</p>`:''}</div>`
@@ -6651,6 +6654,7 @@ document.addEventListener('click',e=>{
     case 'cal-sync': calSync(true);break;
     case 'cu-connect': cuConnect();break;
     case 'cu-sync': cuSync(true);break;
+    case 'cu-resync': cuSync(true,true);break;
     case 'cu-add': CU.adding=true;CU.err='';renderSettings();setTimeout(()=>$('#cu-token')?.focus(),30);break;
     case 'cu-add-cancel': CU.adding=false;CU.err='';renderSettings();break;
     case 'cu-remove': if(CU.rmArmed!==el.dataset.team){CU.rmArmed=el.dataset.team;renderSettings();setTimeout(()=>{if(CU.rmArmed===el.dataset.team){CU.rmArmed=null;if(SM)renderSettings()}},4000)}else cuRemove(el.dataset.team);break;
