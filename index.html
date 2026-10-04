@@ -1978,7 +1978,17 @@ html{overscroll-behavior-y:contain}
   .side-foot .nav-item{padding:12px}
   /* focus timer lives in the + menu */
   .mtop .pomo-wrap{display:none}
-  body > #pomo-pop{position:fixed;left:12px;right:12px;top:auto;bottom:calc(86px + env(safe-area-inset-bottom,0px));width:auto;z-index:32;border-radius:20px}
+  body > #pomo-pop{position:fixed;left:0;right:0;top:auto;bottom:0;width:auto;z-index:32;border-radius:20px 20px 0 0;padding:22px 16px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:0 0 0 100vmax rgba(10,12,16,.4),var(--shadow-lg)}
+  body > #pomo-pop::before{content:'';position:absolute;top:7px;left:50%;width:38px;height:5px;margin-left:-19px;border-radius:3px;background:var(--line-strong)}
+  body > #pomo-pop.opening{animation:sheetUp .28s cubic-bezier(.2,.8,.2,1)}
+  /* dialogs (Settings, Profile, Edit job / New job, brand guide, invoices) slide up as sheets like a task; swipe down closes, swipe right goes back */
+  #modal.modal-wrap{place-items:end stretch;padding:12px 0 0}
+  #modal .modal{width:100%;max-width:none;border-radius:20px 20px 0 0;max-height:calc(100dvh - 12px);padding-bottom:env(safe-area-inset-bottom,0px);position:relative;will-change:transform}
+  #modal .modal.pref-modal{height:calc(100dvh - 12px)}
+  #modal .modal>header{position:relative;padding-top:22px}
+  #modal .modal>header::before{content:'';position:absolute;top:7px;left:50%;width:38px;height:5px;margin-left:-19px;border-radius:3px;background:var(--line-strong)}
+  #modal.opening .modal{animation:sheetUp .3s cubic-bezier(.2,.8,.2,1)}
+  #modal .pref-body.swipe-back{transition:none}
   /* + menu */
   .plus-menu{display:flex;flex-direction:column;gap:2px;position:fixed;left:12px;right:12px;bottom:calc(158px + env(safe-area-inset-bottom,0px));z-index:31;padding:10px;border-radius:24px;background:color-mix(in srgb,var(--surface) 88%,transparent);-webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6);border:1px solid color-mix(in srgb,var(--line-strong) 70%,transparent);box-shadow:0 16px 40px rgba(10,12,16,.28);animation:pmIn .18s ease-out;transform-origin:90% 100%}
   .plus-menu[hidden]{display:none}
@@ -6279,6 +6289,7 @@ const HELP=[
  ['Your work','Job emoji',`Give a job an emoji in Edit job → General. It shows next to the job in the sidebar, on its Overview card and in notifications.`,null],
  ['Look and feel','Little extras',`An “All clear” moment on the Overview when nothing is overdue or due today; emoji reactions on client updates (the smiley under an update); film-look color schemes (Portra, Fuji, Noir, Teal & Orange, Technicolor); the office cat on the sidebar (it wears headphones and nods along during a focus session, naps during breaks and when you're away, stretches when you finish a task, and purrs when you click it; a little window behind it shows the sky for your time of day, and it dresses up in December, on New Year's Day and on Halloween; it sweats when something's overdue, smiles on all-clear days and watches your mouse; a plant on the sill grows a leaf per task done this month; birds and butterflies drop by; now and then it naps on one of your tasks until you open it; it peeks over the updates you post; a treat jar fills with a treat per finished task (click it to feed the cat); and after 30 days a puppy, hamster or goldfish can join it on the sill); a cork board in the sidebar with your photos and sticky notes (click + to pin one, click a note to edit it); a photo strip of your own pictures in the sidebar (add them in Settings → Personalize & fun); and seasonal touches: a Christmas countdown from September, snow in December, fireworks on New Year's Day, bats on Halloween and hearts on Valentine's. Turn them off in Settings → Personalize & fun.`,['fun','Personalize & fun']],
  ['Getting work done','Installed app (Chrome)',`Install Splice & Co. from Chrome's address bar (the install icon) to get its own window and Dock icon. The Dock icon shows how many tasks are overdue or due today; right-click it for New task, Overview, Calendar and Quick search. The app's colors reach into the title bar (Chrome's chevron at the top right switches that off). To have task links from Slack or email open in the app, turn on "Open supported links" in the app's settings (⋮ menu in the app window → App info or Settings).`,null],
+ ['Getting around','Phone: dialogs are sheets too',`On a phone, Settings, your profile, Edit job, New job and the focus timer slide up from the bottom. Pull one down from the top to close it: Settings, Edit job and the brand guide save as they close, and a new job with no name is just dropped. Inside a section, swipe right to go back to the list.`,null],
  ['Getting work done','Phone: pull the task down to close',`On a phone, a task opens as a sheet from the bottom. Pull it down from the top (or anywhere when it's scrolled to the top) to close it; swipe sideways to go to the next or previous task.`,null],
  ['Getting work done','Pull to refresh',`At the top of any page, pull down (on a phone or tablet) or keep scrolling up with two fingers on the trackpad. When it says “Release to refresh”, let go and the app reloads with the latest data and any app updates.`,null],
  ['Getting work done','Save & add another',`Next to Save task: saves it and opens a fresh task for the same job, client and format, for entering a batch of reels in a row.`,null],
@@ -7556,6 +7567,41 @@ function boardRestore(){const w=$('.board-wrap'),x=BOARD_X[boardKey()];if(w&&x!=
 let SSW=null;
 const IS_STANDALONE=matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: window-controls-overlay)').matches||navigator.standalone===true;
 function sideScroller(el){for(let n=el;n&&n!==document.body;n=n.parentElement){if(n.scrollWidth>n.clientWidth+2){const ox=getComputedStyle(n).overflowX;if(ox==='auto'||ox==='scroll')return n}}return null}
+/* ================= phone sheets: dialogs and the focus timer slide up from the bottom like a task (Slack-style) =================
+   Pull down from the grab bar, the header, or anywhere while the content is scrolled to the top to close; a dialog with a
+   Save button saves on the way out (Settings, Edit job, the brand guide), a new job with no name is just closed.
+   Inside a dialog's section, swipe right to go back to the list of sections. */
+function sheetClose(){
+  if(INV){closeInv();return}if(INVD){closeInvDefaults();return}if(STKB){closeStickers();return}
+  if(PRF){closeProfile();return}if(BM){saveBrand();return}if(SM){closeSettings(true);return}
+  if(M){if(M.id&&M.name.trim())saveModal();else closeModal();return}
+  const m=$('#modal');m.hidden=true;m.innerHTML='';
+}
+{const mo=new MutationObserver(ms=>{for(const r of ms){const el=r.target;if(el.hidden||r.oldValue===null)continue;{el.classList.add('opening');clearTimeout(el._opT);el._opT=setTimeout(()=>el.classList.remove('opening'),340)}}});
+ for(const id of ['modal','pomo-pop']){const el=document.getElementById(id);if(el)mo.observe(el,{attributes:true,attributeFilter:['hidden'],attributeOldValue:true})}}
+let MSW=null;
+document.addEventListener('touchstart',e=>{
+  MSW=null;if(!narrow.matches||e.touches.length>1)return;
+  const sheet=e.target.closest?.('#modal .modal, body > #pomo-pop');if(!sheet||e.target.closest('input,textarea,select,[contenteditable="true"],.ck-grip'))return;
+  let top=true;for(let n=e.target;n&&n!==sheet.parentElement;n=n.parentElement){if(n.scrollHeight>n.clientHeight+2&&n.scrollTop>0){top=false;break}}
+  const pref=sheet.querySelector('.pref'),back=pref&&!pref.classList.contains('m-list')?sheet.querySelector('[data-act="pref-back"]'):null;
+  const t=e.touches[0];MSW={sheet,x:t.clientX,y:t.clientY,at:Date.now(),down:top||!!e.target.closest('.modal>header')||sheet.id==='pomo-pop',back:back&&back.offsetParent&&!sideScroller(e.target)?back:null,lock:null,d:0};
+},{passive:true});
+document.addEventListener('touchmove',e=>{
+  if(!MSW)return;const t=e.touches[0],dx=t.clientX-MSW.x,dy=t.clientY-MSW.y;
+  if(MSW.lock===null&&(Math.abs(dx)>8||Math.abs(dy)>8))MSW.lock=Math.abs(dy)>=Math.abs(dx)?(dy>0&&MSW.down?'down':'none'):(dx>0&&MSW.back?'back':'none');
+  if(MSW.lock==='down'){e.preventDefault();MSW.d=Math.max(0,dy);MSW.sheet.style.transition='none';MSW.sheet.style.transform=`translateY(${MSW.d}px)`}
+  else if(MSW.lock==='back'){e.preventDefault();MSW.d=Math.max(0,dx);const b=MSW.sheet.querySelector('.pref-body');if(b){b.style.transition='none';b.style.transform=`translateX(${MSW.d}px)`}}
+},{passive:false});
+document.addEventListener('touchend',()=>{
+  const g=MSW;MSW=null;if(!g||!g.lock||g.lock==='none')return;const fast=Date.now()-g.at<300;
+  if(g.lock==='down'){if(g.d>8)SHD_EAT=Date.now()+450;const sh=g.sheet;sh.style.transition='transform .2s ease';
+    if(g.d>110||(fast&&g.d>40)){haptic(8);sh.style.transform='translateY(100%)';setTimeout(()=>{sh.style.transition='';sh.style.transform='';if(sh.id==='pomo-pop'){POMO_OPEN=false;renderPomo()}else sheetClose()},190)}
+    else sh.style.transform='';return}
+  const b=g.sheet.querySelector('.pref-body');
+  if(g.d>80||(fast&&g.d>35)){haptic(8);if(b){b.style.transform='';b.style.transition=''}g.back.click();SHD_EAT=Date.now()+450}
+  else{if(g.d>8)SHD_EAT=Date.now()+450;if(b){b.style.transition='transform .2s ease';b.style.transform=''}}
+},{passive:true});
 document.addEventListener('touchstart',e=>{
   SSW=null;if(!narrow.matches||e.touches.length>1)return;
   const t=e.touches[0],open=$('#side').classList.contains('open');
