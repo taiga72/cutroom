@@ -362,7 +362,7 @@ button.stat:hover{border-color:var(--line-strong)}
 .pf-bar:hover .pf-stack b,.pf-bar:focus-visible .pf-stack b,.pf-bar.now .pf-stack b{background:var(--jc)}
 .ivd-warn{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0;padding:8px 12px;border-radius:9px;background:color-mix(in srgb,var(--st-rev,#d97706) 12%,transparent);font-size:calc(13px*var(--ts))}
 .pf-jsum{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:10px;font-size:calc(13.5px*var(--ts))}.pf-jsum span{display:grid;gap:1px}.pf-jsum small{color:var(--muted);font-size:calc(11.5px*var(--ts));text-transform:uppercase;letter-spacing:.04em}
-.pref-find{display:flex;align-items:center;gap:6px;margin:0 0 8px;padding:0 10px;height:36px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}.pref-find .i{color:var(--muted);flex:none}.pref-find input{border:0;background:none;outline:none;flex:1;min-width:0;color:var(--text);font:500 calc(13.5px*var(--ts)) var(--body)}
+.pref-find{flex:none;display:flex;align-items:center;gap:8px;margin:2px 2px 14px;padding:0 12px;height:38px;box-sizing:border-box;border:1px solid var(--line);border-radius:9px;background:var(--bg)}.pref-find .i{color:var(--muted);flex:none}.pref-find input{border:0;background:none;outline:none;flex:1;min-width:0;color:var(--text);font:500 calc(13.5px*var(--ts)) var(--body)}
 .pref-none{color:var(--muted);font-size:calc(13px*var(--ts));padding:4px 10px}
 .pref-tip{margin:0 0 14px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:calc(13px*var(--ts));color:var(--muted)}.pref-tip summary{cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--text);font-weight:600}.pref-tip summary .i{width:15px;height:15px}.pref-tip p{margin:8px 0 0}.pref-tip b{color:var(--text)}
 .help-more{margin-top:16px}
@@ -1257,7 +1257,7 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .pins-all{margin-left:auto}.pin-card .un-n{font:600 calc(11.5px*var(--ts)) var(--mono);color:var(--faint);min-width:22px}
 .pins h3 .count{font:500 calc(12px*var(--ts)) var(--mono);color:var(--faint)}
 .pin-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:8px}
-.pin-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;align-items:center;gap:10px;border:1px solid var(--line);border-left:3px solid var(--accent);background:var(--surface);border-radius:10px;padding:8px 6px 8px 10px;cursor:pointer}
+.pin-card{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto auto auto;align-items:center;gap:10px;border:1px solid var(--line);border-left:3px solid var(--accent);background:var(--surface);border-radius:10px;padding:8px 6px 8px 10px;cursor:pointer}
 .pin-card:hover{border-color:var(--line-strong);border-left-color:var(--accent)}
 .pin-card .tmark{width:30px;height:30px}
 .pc-main{display:flex;flex-direction:column;min-width:0}
@@ -1328,7 +1328,8 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
   .wd-head{width:100%}
   .wcard{flex:1 1 100%}
   .pin-list{grid-template-columns:minmax(0,1fr)}
-  .pin-card{grid-template-columns:auto minmax(0,1fr) auto auto}
+  .pin-card{grid-template-columns:auto auto minmax(0,1fr) auto auto}
+  .pins{display:none}
   .pin-card .pill{display:none}
   .cal-bar{flex-wrap:wrap}
 }
@@ -1532,6 +1533,13 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 :root[data-today="column"] .day.today .dn b{background:none;color:var(--accent);font-weight:700;padding:0}
 :root[data-today="column"] .wday.today{background:var(--accent-soft);border-color:transparent}
 .pr-input{width:180px;max-width:100%}
+/* one look for every text box and picker in Settings, Profile and the invoice dialogs: line border, surface fill, 9px corners, 38px tall */
+:is(.pr-input,.pomo-num input,.limit-row input,.pf-form input,.ivd-grid input,#s-name,.st-row input[type=text]){height:38px;box-sizing:border-box;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:9px;padding:0 10px;font-family:var(--body);font-weight:500;-webkit-appearance:none;appearance:none}
+:is(.ivd-grid select,.acct-btns select.sel,.inv-form select){height:38px;box-sizing:border-box;border-radius:9px}
+:is(.pr-input,.pomo-num input,.limit-row input,.pf-form input,.ivd-grid input,.ivd-grid select,.acct-btns select.sel,#s-name,.st-row input[type=text]):focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+@media (min-width:821px){:is(.pr-input,.pomo-num input,.limit-row input,.pf-form input,.ivd-grid input,#s-name,.st-row input[type=text]){font-size:calc(13.5px*var(--ts))}}
+.search{min-height:38px;box-sizing:border-box}
+:is(#d-start,#d-due,#d-job,#d-client,#d-len,.pf-v input[type=text],.pf-v select){height:36px;box-sizing:border-box;border-radius:9px}
 
 /* ---------- floating task window + safe zones ---------- */
 .pip-body{background:var(--surface);margin:0}
