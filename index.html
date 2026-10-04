@@ -360,6 +360,13 @@ button.stat:hover{border-color:var(--line-strong)}
 .pf-tip{position:absolute;bottom:calc(100% - 140px);left:50%;transform:translate(-50%,-8px);background:var(--text);color:var(--bg);border-radius:8px;padding:6px 10px;font-size:calc(12px*var(--ts));white-space:nowrap;display:grid;gap:1px;text-align:center;opacity:0;pointer-events:none;transition:opacity .12s;z-index:2}
 .pf-col i.pf-stack{display:flex;flex-direction:column-reverse;overflow:hidden;background:none!important}.pf-stack b{display:block;min-height:2px;background:color-mix(in srgb,var(--jc) 75%,var(--surface));transition:background .15s}.pf-stack b+b{border-bottom:1px solid var(--surface)}
 .pf-bar:hover .pf-stack b,.pf-bar:focus-visible .pf-stack b,.pf-bar.now .pf-stack b{background:var(--jc)}
+.ivd-warn{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0;padding:8px 12px;border-radius:9px;background:color-mix(in srgb,var(--st-rev,#d97706) 12%,transparent);font-size:calc(13px*var(--ts))}
+.pf-jsum{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:10px;font-size:calc(13.5px*var(--ts))}.pf-jsum span{display:grid;gap:1px}.pf-jsum small{color:var(--muted);font-size:calc(11.5px*var(--ts));text-transform:uppercase;letter-spacing:.04em}
+.pref-find{display:flex;align-items:center;gap:6px;margin:0 0 8px;padding:0 10px;height:36px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}.pref-find .i{color:var(--muted);flex:none}.pref-find input{border:0;background:none;outline:none;flex:1;min-width:0;color:var(--text);font:500 calc(13.5px*var(--ts)) var(--body)}
+.pref-none{color:var(--muted);font-size:calc(13px*var(--ts));padding:4px 10px}
+.pref-tip{margin:0 0 14px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:calc(13px*var(--ts));color:var(--muted)}.pref-tip summary{cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--text);font-weight:600}.pref-tip summary .i{width:15px;height:15px}.pref-tip p{margin:8px 0 0}.pref-tip b{color:var(--text)}
+.help-more{margin-top:16px}
+.wf-static{display:grid;gap:2px;padding:9px 0;color:var(--text);font-size:calc(14px*var(--ts))}.wf-static small{color:var(--muted);font-size:calc(12px*var(--ts))}
 .pf-tj2{display:flex;align-items:center;gap:5px;justify-content:center;font-size:calc(11.5px*var(--ts))}.pf-tj2 i{width:8px;height:8px;border-radius:2px;background:var(--jc)}
 .pf-ch-leg{margin:10px 0 0}
 .pf-tip b{font:700 calc(13.5px*var(--ts)) var(--mono)}
@@ -1247,6 +1254,7 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .pins{margin-top:4px}
 .pins h3{display:flex;align-items:center;gap:6px;margin:0 0 8px;font:700 calc(14px*var(--ts)) var(--display)}
 .pins h3 .i{color:var(--accent)}
+.pins-all{margin-left:auto}.pin-card .un-n{font:600 calc(11.5px*var(--ts)) var(--mono);color:var(--faint);min-width:22px}
 .pins h3 .count{font:500 calc(12px*var(--ts)) var(--mono);color:var(--faint)}
 .pin-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:8px}
 .pin-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;align-items:center;gap:10px;border:1px solid var(--line);border-left:3px solid var(--accent);background:var(--surface);border-radius:10px;padding:8px 6px 8px 10px;cursor:pointer}
@@ -2653,7 +2661,7 @@ const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','De
 const MONTH_FULL=['January','February','March','April','May','June','July','August','September','October','November','December'];
 /* Look & date preferences (settings/app), previewed live from SM while Settings is open */
 const PREF_DEF={dateRel:false,dateFmt:'md',weekStart:'mon',hideWeekends:false,confetti:true,motion:'system',contrast:'normal',trashDays:30,darkShade:'standard',pillStyle:'tint',tips:true,
-  iconWeight:'regular',depth:'soft',sideStyle:'colored',thinScroll:false,toastPos:'bottom',nameWrap:false,doneStyle:'struck',overdueTint:false,statusIcons:false,prioColors:{},logoShape:'rounded',numFont:'mono',readSpacing:'normal',sideCounts:true,
+  iconWeight:'regular',depth:'soft',sideStyle:'colored',thinScroll:false,toastPos:'bottom',nameWrap:false,doneStyle:'struck',overdueTint:false,statusIcons:false,prioColors:{},logoShape:'rounded',numFont:'mono',readSpacing:'normal',sideCounts:true,sideCompact:false,
   compactHeader:false,greeting:true,greetName:'',drawerBand:true,boardTint:false,dueStyle:'text',jobProgress:'bar',calGrid:'lines',todayMark:'dot',
   pomoFocus:25,pomoShort:5,pomoLong:15,pomoEvery:4,pomoAutoBreak:false,pomoAutoFocus:false,pomoSound:'chime',pomoPopup:false,allClear:true,seasonal:true,officeCat:true,catSky:true,catPlant:true,plantGoal:20,catVisitors:true,catNaps:true,catTreats:true,catPeek:true,sillPet:'none',corkBoard:true,catName:'',catFur:'orange',meShow:false,meHair:'short',meHairCol:'#3b2a20',meSkin:'#f1c27d',meTop:'#4c8dff',deskMug:true,deskLamp:true,deskCam:false,deskVinyl:false,stickerShow:true,autoArchive:0};
 const pref=k=>{let o=null;try{o=SM}catch(e){/* Settings state not set up yet */}o=o||S.settings?.app||{};return o[k]!==undefined&&o[k]!==null?o[k]:PREF_DEF[k]};
@@ -2915,9 +2923,11 @@ async function cloudLoad(){
   COLS.forEach(c=>{S[c]=m[c]});
 }
 /* Picks up changes made on another device. Skipped while this tab still has writes on the way. */
+/* a cheap fingerprint of everything loaded, so a refresh that brought nothing new doesn't redraw the page */
+const dataSig=()=>JSON.stringify([S.jobs,S.clients,S.tasks,S.settings]);
 async function cloudRefresh(){
   if(!S.ready||document.hidden||inflight||Object.keys(pending).length||Object.keys(OUT).length||!navigator.onLine) return;
-  try{const before=stamps(S.tasks);await cloudLoad();noteSynced();markFresh(before);saveSnap();if(!inflight)scheduleRender(true)}catch(e){console.error(e)}
+  try{const before=stamps(S.tasks),sig0=dataSig();await cloudLoad();noteSynced();markFresh(before);saveSnap();if(!inflight){if(dataSig()!==sig0)scheduleRender(true);else renderSide()}}catch(e){console.error(e)}
 }
 function showSetup(cfg){
   applyTheme('system');document.title='Finish setup · '+APP_NAME;
@@ -3136,7 +3146,7 @@ function clickupSettingsHtml(){
    Tasks in the same job with the same name (dupKey), not in Trash. Merging keeps one copy, fills its empty fields
    from the others (links, client, dates, notes, checklist steps, ClickUp link and comments, updates and history),
    then moves the other copies to Trash. */
-let DM={keep:{},armed:null};
+let DM={keep:{},armed:null},XPDEL=false;
 function dupeGroups(){
   const m={};
   for(const t of Object.values(S.tasks)){if(t._draft||t.deleted||!S.jobs[t.jobId])continue;const k=t.jobId+'|'+dupKey(t.name);if(!dupKey(t.name))continue;(m[k]=m[k]||[]).push(t)}
@@ -3280,6 +3290,8 @@ function renderInvDefaults(){
       <p class="pref-group">Line item and terms</p><div class="ivd-grid">${f('item','Description','Video editing · {month}')}${f('qty','Quantity','1','number','min="0" step="any"')}${f('rate','Rate','0','number','min="0" step="any"')}
         <label>Currency<select class="sel" data-ivd="currency">${[...new Set([...CURRENCIES,d.currency].filter(Boolean))].map(x=>`<option ${x===d.currency?'selected':''}>${esc(x)}</option>`).join('')}</select></label>
         ${f('tax','Tax %','0','number','min="0" step="any"')}</div>
+      ${(()=>{const pp=workOf(job).pay||{},pa=parseFloat(pp.amount);if(!pa||(pp.period||'month')!=='month')return '';const want=d.billing==='half'?Math.round(pa/2*100)/100:pa;
+        return (d.rate!==''&&+d.rate!==want)||(pp.currency&&d.currency!==pp.currency)?`<p class="ivd-warn">Work details says ${esc(money(pa,pp.currency))} a month${d.billing==='half'?` (${esc(money(want,pp.currency))} a half)`:''}, but these defaults say ${esc(money(+d.rate||0,d.currency))}. <button type="button" class="btn sm" data-act="ivd-usepay">Use ${esc(money(want,pp.currency))}</button></p>`:''})()}
       <p class="hint">{month} becomes the invoice's month, e.g. “October 2026”, or “October 2026 (1–15)” when billed twice a month. Leave Quantity empty to count the month's finished videos on per-video jobs.${d.billing==='half'?' Rate is the amount for each half.':''}</p>
       <p class="pref-group">Billing and due date</p><div class="ivd-grid">
         ${s2('billing','How often you bill',[['month','Once a month'],['half','Twice a month (1–15 and 16–end)']])}
@@ -3331,6 +3343,14 @@ function invAutoDraft(){
   scheduleRender();
 }
 function invGo(jobId,id){const u=S.ui;u.tab=jobId;u.client='all';u.pane='invoices';saveUi();render();if(id)openInv(jobId,id)}
+/* paydays come from Invoice defaults when they're set ("On payday"), else from the free-text payday in Work details */
+const dayWord=d=>d==='last'?'the last day':'the '+ORD(+d||15);
+function invPaydayText(job){const def=invDef(job);if(def?.dueMode!=='day')return '';return def.billing==='half'?`${dayWord(def.dueDay)} (for 1–15) and ${dayWord(def.dueDay2)} (for 16–end)`:dayWord(def.dueDay)}
+function invNextPayday(job,from=today()){
+  const def=invDef(job);if(def?.dueMode!=='day')return null;const ym=from.slice(0,7),out=[];
+  for(const m of [ymNext(ym,-1),ym,ymNext(ym)])for(const h of def.billing==='half'?[1,2]:[0])out.push(invDueFor(def,m,h));
+  return out.filter(d=>d>=from).sort()[0]||null;
+}
 /* which period a new invoice is for: this month, or when billed twice a month the half that just ended
    (from the 15th: this month's 1–15, before it: last month's 16–end), moved on past any half that already has an invoice */
 function invNextPer(job){
@@ -3371,7 +3391,7 @@ function invoicesPane(job){
   const yr=today().slice(0,4),inYr=list.filter(v=>(v.date||'').startsWith(yr));
   const paid=inYr.filter(v=>v.status==='paid').reduce((a,v)=>a+(+v.amount||0),0),open=list.filter(v=>v.status==='sent').reduce((a,v)=>a+(+v.amount||0),0);
   const two=invDef(job)?.billing==='half',np=two?invNextPer(job):{ym,half:0};
-  const missing=w.pay?.period==='month'&&(two?np.ym<=ym&&(np.ym<ym||np.half===1&&+today().slice(8)>=15):!list.some(v=>v.period===ym));
+  const missing=w.pay?.period==='month'&&!+invDef(job)?.autoDraft&&(two?np.ym<=ym&&(np.ym<ym||np.half===1&&+today().slice(8)>=15):!list.some(v=>v.period===ym));
   const row=v=>{const st=invState(v),href=v.kind==='file'&&v.file?imgSrc(v.file.v):'',ed=ROW_EDIT.has(v.id);
     return `<div class="inv-row st-${st} ${ed?'editing':''}"><span class="inv-ic">${v.kind==='file'?I.file:INV_IC}</span>
       <div class="inv-main"><b>${esc(v.number||v.file?.name||'Invoice')}</b><small>${[v.period?perLabel(v.period,v.half):'',v.date?'Issued '+fmtDate(v.date):'',v.due&&v.status!=='paid'?'Due '+fmtDate(v.due):'',v.paidAt?'Paid '+fmtDate(v.paidAt):'',v.kind==='file'?'Uploaded file':'',v.auto&&v.status==='draft'?'Made for you':''].filter(Boolean).join(' · ')}</small>
@@ -3831,6 +3851,9 @@ function applyLook(o){
 }
 function migrateStatuses(){
   pruneLog();purgeOldTrash();setTimeout(autoArchive,1500);setTimeout(invAutoDraft,2500);
+  /* pins were folded into Up next: pinned tasks go to the top of the queue once */
+  {const pins=Object.values(S.tasks).filter(t=>t.pinned&&!t._draft);if(pins.length){let k=Math.min(1000,...live().filter(x=>x.upNext).map(x=>x.upNext))-pins.length*10;
+    for(const t of pins.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')))patch('tasks',t.id,t.upNext||isClosed(t)?{pinned:false}:{pinned:false,upNext:(k+=10)})}}
   for(const t of Object.values(S.tasks)){
     if(t.status==='dropped')patch('tasks',t.id,{status:'done',doneAt:t.doneAt||today()});
     // Finder paths briefly went into the files link; they belong in the project folder now
@@ -3889,7 +3912,7 @@ function renderMain(){
   const job=u.tab==='overview'?null:S.jobs[u.tab];
 
   const hasExamples=[...Object.values(S.jobs),...Object.values(S.clients),...Object.values(S.tasks)].some(x=>x.example);
-  const nd=hasExamples||!S.ready?0:dupeGroups().length;
+  const nd=0; /* the duplicate-tasks banner was dropped: the warning when saving a draft and Settings → Duplicate tasks cover it */
   const ncu=u.due==='cu-new'?Object.values(S.tasks).filter(t=>cuUnreviewed(t)&&S.jobs[t.jobId]).length:0;
   $('#banner').innerHTML=u.due==='cu-new'?`<div class="banner cu-banner"><p>${CU_IC}<b>${ncu?`${ncu} new from ClickUp`:'Nothing new from ClickUp'}</b>${ncu?' to review. Opening a task marks it reviewed.':'. You’re all caught up.'}</p>${ncu?`<button class="btn sm" data-act="cu-review-all">Mark all as reviewed</button>`:''}<button class="btn sm ghost" data-act="cu-review-off">Show all tasks</button></div>`:!hasExamples&&nd&&lsGet('cutroom.dupehide')!==nd?`<div class="banner"><p><b>${nd} task${nd===1?' has':'s have'} a duplicate</b> with the same name in the same job.</p><button class="btn sm" data-act="help-go" data-sec="dupes">Review and merge</button><button class="icon-btn" data-act="dupes-hide" title="Hide" aria-label="Hide">${I.x}</button></div>`:hasExamples?`<div class="banner"><p><b>You're looking at example jobs and tasks.</b> Poke around, then clear them and add your own jobs.</p><button class="btn sm ${clearArmed?'danger armed':''}" data-act="clear-examples">${clearArmed?'Delete all example data':'Clear examples'}</button></div>`:'';
   {const cdp=job&&!hasExamples&&!$('#banner').innerHTML.trim()?clientDupe(job):null;
@@ -3917,7 +3940,7 @@ function renderMain(){
     if(paneName)crumbs.push(`<span aria-current="page">${paneName}</span>`);
     $('#head').innerHTML=`<nav class="crumbs" aria-label="Breadcrumb">${crumbs.join('<i aria-hidden="true">›</i>')}</nav><div class="head"><div class="head-title"><h1>${jobMark(job,34)}<span class="h1-name" data-act="job-name" data-id="${job.id}">${esc(job.name)}</span><button class="icon-btn h1-edit" data-act="edit-job" data-id="${job.id}" title="Edit job" aria-label="Edit job">${I.pencil}</button><button class="icon-btn h1-edit" data-act="export-csv" data-job="${job.id}" title="Export tasks as CSV" aria-label="Export tasks as CSV">${I.download}</button></h1>
       <div class="sub"><span class="badge">${job.type==='agency'?I.briefcase+'Agency':I.user+'Direct client'}</span>${job.type==='agency'?`<span>${cl.length} client${cl.length===1?'':'s'}</span>`:''}</div></div></div>`;
-    $('#subnav').innerHTML=`<div class="pane-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${['brand','details','invoices'].includes(u.pane)?'':'on'}" aria-selected="${!['brand','details','invoices'].includes(u.pane)}" data-act="pane" data-pane="tasks">${I.task}Tasks</button><button role="tab" class="${u.pane==='brand'?'on':''}" aria-selected="${u.pane==='brand'}" data-act="pane" data-pane="brand">${I.palette}Brand guide</button><button role="tab" class="${u.pane==='invoices'?'on':''}" aria-selected="${u.pane==='invoices'}" data-act="pane" data-pane="invoices">${INV_IC}Invoices &amp; docs</button><button role="tab" class="${u.pane==='details'?'on':''}" aria-selected="${u.pane==='details'}" data-act="pane" data-pane="details">${I.info}Details</button></div>
+    $('#subnav').innerHTML=`<div class="pane-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${['brand','details','invoices'].includes(u.pane)?'':'on'}" aria-selected="${!['brand','details','invoices'].includes(u.pane)}" data-act="pane" data-pane="tasks">${I.task}Tasks</button><button role="tab" class="${u.pane==='brand'?'on':''}" aria-selected="${u.pane==='brand'}" data-act="pane" data-pane="brand">${I.palette}Brand guide</button><button role="tab" class="${u.pane==='details'?'on':''}" aria-selected="${u.pane==='details'}" data-act="pane" data-pane="details">${I.info}Details</button><button role="tab" class="${u.pane==='invoices'?'on':''}" aria-selected="${u.pane==='invoices'}" data-act="pane" data-pane="invoices">${INV_IC}Invoices &amp; docs</button></div>
       ${job.type==='agency'&&!['details','invoices'].includes(u.pane)?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}" draggable="true" data-ctab="${c.id}" title="Drag to reorder">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}`;
   }
 
@@ -4020,7 +4043,7 @@ function copyTaskLink(id){
   const url=location.origin+location.pathname+location.search+'#/task/'+encodeURIComponent(id);
   try{navigator.clipboard.writeText(url).then(()=>toast('Link to this task copied'),()=>toast(url))}catch(x){toast(url)}
 }
-/* Pinned tasks: a strip above the toolbar on the Overview (all jobs) and on a job page (that job / client). */
+/* The top of Up next: a strip on the Overview (all jobs) and on a job page (that job / client). */
 /* List options pop-up: which columns show, and fold or unfold every status group */
 let VOPT=false;
 function renderVopt(){
@@ -4070,7 +4093,6 @@ function renderCtx(){
     <div class="ctx-sep"></div>
     <button type="button" class="ctx-item" data-act="cx" data-do="open">${I.info}Open</button>
     ${isClosed(t)||t.archived?'':`<button type="button" class="ctx-item" data-act="cx" data-do="upnext">${UP_IC}${t.upNext?'Remove from Up next':'Add to Up next'}</button>`}
-    <button type="button" class="ctx-item" data-act="cx" data-do="pin">${I.pin}${t.pinned?'Unpin':'Pin to the top'}</button>
     <button type="button" class="ctx-item" data-act="cx" data-do="dup">${I.copy}Duplicate</button>
     <button type="button" class="ctx-item" data-act="cx" data-do="split">${SPLIT_IC}Split into tasks</button>
     <button type="button" class="ctx-item" data-act="cx" data-do="link">${LINK_IC}Copy link</button>
@@ -4084,7 +4106,6 @@ function ctxDo(what,v){
   if(what==='status'){setStatus(id,v);render();if(S.ui.openTask===id)renderDrawer()}
   else if(what==='prio'){if((t.priority||'normal')!==v){patch('tasks',id,{priority:v});logAct('edit',`Priority set to ${(PRIORITIES.find(x=>x.id===v)||{}).label||v}`,{task:t})}render();if(S.ui.openTask===id)renderDrawer()}
   else if(what==='open')openTask(id);
-  else if(what==='pin'){const on=!t.pinned;patch('tasks',id,{pinned:on});logAct('edit',on?'Pinned':'Unpinned',{task:t});render();toast(on?'Pinned to the top':'Unpinned')}
   else if(what==='upnext')toggleUpNext(id);
   else if(what==='dup')duplicateTask(id);
   else if(what==='split'){openTask(id);openSplit()}
@@ -4160,9 +4181,10 @@ function allClearHtml(){
     <div class="ac-text"><b>All clear</b><span>Nothing overdue and nothing due today. Go touch grass 🌿</span>${next?`<small>Next up: ${esc(next.name||'Untitled task')} · due ${esc(fmtDate(next.due))}</small>`:''}</div>
     <button type="button" class="icon-btn" data-act="clear-hide" title="Hide for today" aria-label="Hide for today">${I.x}</button></section>`;
 }
+/* the top of your Up next queue (pins were folded into Up next): first 3 queued tasks in this scope, with a link to the whole queue */
 function pinnedStrip(scope){
-  const pins=scope.filter(t=>t.pinned&&!t._draft).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));if(!pins.length)return '';
-  return `<section class="pins"><h3>${I.pin}Pinned<span class="count">${pins.length}</span></h3><div class="pin-list">${pins.map(t=>`<div class="pin-card" data-act="open" data-id="${t.id}" tabindex="0">${taskMark(t)}<div class="pc-main"><b>${esc(t.name||'Untitled task')}</b><small>${esc([S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '))}</small></div><span class="pill" ${pillStyle(stOf(t))}><span class="pl">${esc(stLabel(stOf(t)))}</span></span><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):''}</span><button class="icon-btn" data-act="unpin" data-id="${t.id}" data-stop title="Unpin" aria-label="Unpin">${I.x}</button></div>`).join('')}</div></section>`;
+  const ids=new Set(scope.map(t=>t.id)),all=upNextList().filter(t=>ids.has(t.id)),pins=all.slice(0,3);if(!pins.length)return '';
+  return `<section class="pins"><h3>${UP_IC}Up next<span class="count">${all.length}</span>${all.length>3?`<button type="button" class="btn sm ghost pins-all" data-act="nav" data-tab="upnext">See all</button>`:''}</h3><div class="pin-list">${pins.map(t=>`<div class="pin-card" data-act="open" data-id="${t.id}" tabindex="0"><span class="un-n">#${upNextPos(t)}</span>${taskMark(t)}<div class="pc-main"><b>${esc(t.name||'Untitled task')}</b><small>${esc([S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '))}</small></div><span class="pill" ${pillStyle(stOf(t))}><span class="pl">${esc(stLabel(stOf(t)))}</span></span><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):''}</span><button class="icon-btn" data-act="unpin" data-id="${t.id}" data-stop title="Remove from Up next" aria-label="Remove from Up next">${I.x}</button></div>`).join('')}</div></section>`;
 }
 /* "Good morning, Kim · Monday, Sep 28" above the Overview title (Settings → Appearance) */
 function greetHtml(){
@@ -4250,7 +4272,7 @@ function rowsAttrs(){
 }
 const rowHtml=(t,job,showJob)=>`<div class="row ${isClosed(t)?'done-row':''} ${dueClass(t)==='over'?'is-over':''} ${S.ui.openTask===t.id?'focus':''} ${SEL.has(t.id)?'picked':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="mark-wrap">${taskMark(t)}${selBox(t)}</div>
-        <div class="t-main"><div class="t-name" title="Double-click to rename">${cuBadge(t)}${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</div>${metaLine(t,job,showJob)}${searchHit(t)}</div>
+        <div class="t-main"><div class="t-name" title="Double-click to rename">${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</div>${metaLine(t,job,showJob)}${searchHit(t)}</div>
         <div class="c-status" data-stop>${statusSelect(t,'row-status')}${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
         <div class="c-prio pedit" title="Change priority">${prioHtml(t.priority)}<select class="cell-sel" data-act="row-prio" data-id="${t.id}" aria-label="Priority">${PRIORITIES.map(p=>`<option value="${p.id}" ${(t.priority||'normal')===p.id?'selected':''}>${p.label}</option>`).join('')}</select></div>
         <div class="c-start date ${t.start?'':'none'}"${relTitle(t.start)}>${t.start?fmtRel(t.start):'—'}</div>
@@ -4279,7 +4301,7 @@ function boardView(list,job){
     const cards=list.filter(t=>stOf(t)===s.id);
     return `<div class="col" data-drop="${s.id}" style="--sc:${stColor(s.id)}"><div class="col-head"><span class="pill" ${pillStyle(s.id)}><span class="pl">${esc(s.label)}</span></span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
       ${cards.map(t=>`<div class="card ${SEL.has(t.id)?'picked':''} ${isClosed(t)?'is-done':''} ${dueClass(t)==='over'?'is-over':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
-        <div class="card-top"><div class="mark-wrap">${taskMark(t)}${selBox(t)}</div><div class="t-name" title="Double-click to rename">${cuBadge(t)}${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</div></div>${metaLine(t,job,!job)}${searchHit(t)}
+        <div class="card-top"><div class="mark-wrap">${taskMark(t)}${selBox(t)}</div><div class="t-name" title="Double-click to rename">${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</div></div>${metaLine(t,job,!job)}${searchHit(t)}
         <div class="card-foot"><span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,!isClosed(t)):'No date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
       </div>`;
   }).join('')}</div></div>`;
@@ -4537,7 +4559,7 @@ function renderArchive(){
   const all=archived();
   $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${I.archive.replace('class="i"','class="i" style="width:28px;height:28px"')}Archived</h1><div class="sub">${all.length} task${all.length===1?'':'s'} · hidden from Overview, job tabs and counts. Restore one to bring it back.</div></div></div>`;
   $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
-  const ym0=today().slice(0,7),sweep=live().filter(t=>stOf(t)==='done'&&!t.archived&&t.doneAt&&t.doneAt.slice(0,7)<ym0).map(t=>t.id);
+  const ym0=today().slice(0,7),sweep=autoArchiveDays()?[]:live().filter(t=>stOf(t)==='done'&&!t.archived&&t.doneAt&&t.doneAt.slice(0,7)<ym0).map(t=>t.id);
   const sweepHtml=sweep.length?`<div class="arch-sweep">${I.archive}<span><b>${sweep.length} finished task${sweep.length===1?'':'s'}</b> from before ${MONTH_FULL[+ym0.slice(5,7)-1]} ${sweep.length===1?'is':'are'} still in your lists.</span><button type="button" class="btn sm primary" data-act="arch-sweep" data-ids="${sweep.join(',')}">Archive ${sweep.length===1?'it':'them'}</button></div>`:'';
   if(!all.length){$('#view').innerHTML=sweepHtml+`<div class="empty"><h3>Nothing archived yet</h3><p>When a task is Done, click <b>Archive</b> on it to move it here and keep your lists clean.</p></div>`;return}
   if(u.ajob&&u.ajob!=='all'&&!S.jobs[u.ajob])u.ajob='all';
@@ -5171,7 +5193,7 @@ function renderDrawer(){
   withFocus(()=>{$('#drawer').innerHTML=`
   ${t._draft?`<div class="d-draft">${t.copiedFrom?I.copy:I.plus}<b>${t.copiedFrom?'Copy of a task':'New task'}</b><span>Not saved yet</span></div>`:''}
   <div class="d-top" style="--jc:${esc(j?.color||'transparent')}"><div class="crumb">${taskMark(t)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
-    ${t._draft?'':`<button class="icon-btn ${t.pinned?'pin-on':''}" data-act="d-pin" aria-pressed="${!!t.pinned}" aria-label="${t.pinned?'Unpin':'Pin to the top'}" title="${t.pinned?'Unpin':'Pin to the top of the Overview'}">${I.pin}</button>${isClosed(t)?'':(()=>{const T=pomoState(),on=T.taskId===t.id&&T.mode==='focus'&&T.run!=='idle';return `<button class="icon-btn d-pomo ${on?'pin-on':''}" data-act="d-pomo" aria-pressed="${on}" aria-label="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task'}" title="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task (starts a focus session)'}${t.pomos?` · ${t.pomos} focus session${t.pomos===1?'':'s'} so far`:''}">${TOMATO_IC}${t.pomos?`<span class="dp-n">${t.pomos}</span>`:''}</button>`})()}${isClosed(t)?'':`<button class="icon-btn ${t.upNext?'pin-on':''}" data-act="d-upnext" aria-pressed="${!!t.upNext}" aria-label="${t.upNext?'Remove from Up next':'Add to Up next'}" title="${t.upNext?`Up next #${upNextPos(t)} · click to remove`:'Add to Up next (your queue across jobs)'}">${UP_IC}</button>`}<button class="icon-btn" data-act="d-link" aria-label="Copy link to this task" title="Copy link to this task">${LINK_IC}</button><button class="icon-btn" data-act="d-duplicate" aria-label="Duplicate task" title="Duplicate (make a copy to edit)">${I.copy}</button>${canPip()?`<button class="icon-btn ${PIP.win&&PIP.id===t.id?'pin-on':''}" data-act="d-pip" aria-pressed="${!!(PIP.win&&PIP.id===t.id)}" aria-label="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task in its own window'}" title="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task over Premiere or Resolve'}">${PIP_IC}</button>`:''}`}${t._draft?'':`<button class="icon-btn d-more" data-act="d-more" aria-label="Task options" title="Task options" aria-expanded="${!!TOPT}">${MORE_IC}</button>`}<button class="icon-btn d-close" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
+    ${t._draft?'':`${isClosed(t)?'':(()=>{const T=pomoState(),on=T.taskId===t.id&&T.mode==='focus'&&T.run!=='idle';return `<button class="icon-btn d-pomo ${on?'pin-on':''}" data-act="d-pomo" aria-pressed="${on}" aria-label="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task'}" title="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task (starts a focus session)'}${t.pomos?` · ${t.pomos} focus session${t.pomos===1?'':'s'} so far`:''}">${TOMATO_IC}${t.pomos?`<span class="dp-n">${t.pomos}</span>`:''}</button>`})()}${isClosed(t)?'':`<button class="icon-btn ${t.upNext?'pin-on':''}" data-act="d-upnext" aria-pressed="${!!t.upNext}" aria-label="${t.upNext?'Remove from Up next':'Add to Up next'}" title="${t.upNext?`Up next #${upNextPos(t)} · click to remove`:'Add to Up next (your queue across jobs)'}">${UP_IC}</button>`}<button class="icon-btn" data-act="d-link" aria-label="Copy link to this task" title="Copy link to this task">${LINK_IC}</button><button class="icon-btn" data-act="d-duplicate" aria-label="Duplicate task" title="Duplicate (make a copy to edit)">${I.copy}</button>${canPip()?`<button class="icon-btn ${PIP.win&&PIP.id===t.id?'pin-on':''}" data-act="d-pip" aria-pressed="${!!(PIP.win&&PIP.id===t.id)}" aria-label="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task in its own window'}" title="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task over Premiere or Resolve'}">${PIP_IC}</button>`:''}`}${t._draft?'':`<button class="icon-btn d-more" data-act="d-more" aria-label="Task options" title="Task options" aria-expanded="${!!TOPT}">${MORE_IC}</button>`}<button class="icon-btn d-close" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
   ${t._draft?'':`<div class="d-tabs" role="tablist"><button role="tab" data-act="d-tab" data-tab="details" class="${S.ui.dtab!=='activity'?'on':''}" aria-selected="${S.ui.dtab!=='activity'}">${I.info}Details</button><button role="tab" data-act="d-tab" data-tab="activity" class="${S.ui.dtab==='activity'?'on':''}" aria-selected="${S.ui.dtab==='activity'}">${I.clock}Activity<span class="mono">${taskActivity(t).length}</span></button></div>`}
   ${!t._draft&&S.ui.dtab==='activity'?activityPane(t):`  <div class="d-body">
     ${SPLIT&&SPLIT.id===t.id?splitHtml(t):''}
@@ -5821,7 +5843,7 @@ function renderProfile(){
     return {j,w,got:cb&&own.length?(own.some(v=>conv(v.amount,v.currency)==null)?'…':recIn(v=>v.jobId===j.id&&invPer(v).startsWith(yr))):null,ph,cur,phc:ph==null?null:conv(ph,cur)}});
   const curSel=`<label class="inv-cur">Totals in<select class="sel" data-act="home-cur" aria-label="Show totals in"><option value="">Each job's currency</option>${[...new Set([...CURRENCIES,h].filter(Boolean))].map(x=>`<option ${x===h?'selected':''}>${esc(x)}</option>`).join('')}</select></label>`;
   /* upcoming paydays */
-  const pays=jobs.map(j=>{const w=workOf(j),d=nextPayday(w.pay?.payday);return d?{j,w,d}:null}).filter(Boolean).sort((a,b)=>a.d.localeCompare(b.d));
+  const pays=jobs.map(j=>{const w=workOf(j),d=invNextPayday(j)||nextPayday(w.pay?.payday);return d?{j,w,d}:null}).filter(Boolean).sort((a,b)=>a.d.localeCompare(b.d));
   /* months with no invoice, or one not marked paid (monthly-paid jobs; from Working together since or the first invoice, up to last month, 12 at most) */
   const lastM=payMonths('6m').slice(-2)[0],gaps=[];
   for(const j of jobs){const w=workOf(j);if((w.pay?.period||'month')!=='month'||!parseFloat(w.pay?.amount))continue;
@@ -5853,10 +5875,10 @@ function renderProfile(){
   const acctRow=(icon,name,line,sec,btn)=>`<div class="pf-acct">${icon}<div><b>${name}</b><small>${line}</small></div>${sec?`<button type="button" class="btn sm" data-act="help-go" data-sec="${sec}">${btn||'Manage'}</button>`:''}</div>`;
   const secs=[
     {id:'me',label:'You',icon:PERSON_IC,html:`${meCard}
-      <div class="pf-tiles">${tile(jobs.length,jobs.length===1?'job':'jobs')}${tile(ncl,ncl===1?'client':'clients')}${tile(open,'open tasks')}${tile(doneM,'done this month')}${tile(doneY,`done in ${yr}`)}${tile(pom,'focus sessions')}${tile(`${stk}/${STICKERS.length}`,'stickers')}${tile(wkTot?fmtNum(wkTot)+' h':'—','scheduled a week')}</div>
+      <div class="pf-tiles">${tile(jobs.length,jobs.length===1?'job':'jobs')}${tile(ncl,ncl===1?'client':'clients')}${tile(doneM,'done this month')}${tile(doneY,`done in ${yr}`)}${tile(pom,'focus sessions')}${tile(`${stk}/${STICKERS.length}`,'stickers')}${tile(wkTot?fmtNum(wkTot)+' h':'—','scheduled a week')}</div>
       <div class="pf-btns"><button type="button" class="btn sm" data-act="stk-open">Sticker book</button></div>`},
     {id:'jobs',label:'My jobs',icon:I.briefcase,html:jobs.length?jobs.map(j=>{const w=workOf(j),r=rows.find(x=>x.j===j),nOpen=ts.filter(t=>t.jobId===j.id&&!isClosed(t)&&!t.archived).length;
-      return `<div class="pf-job" style="--jc:${esc(j.color||'var(--accent)')}"><div class="pf-job-h">${jobMark(j,26)}${jobEmoji(j)}<div class="pf-jn"><b>${esc(j.name)}</b><small>${j.type==='agency'?`Agency · ${shownClients(j.id).length} client${shownClients(j.id).length===1?'':'s'}`:'Direct client'} · ${nOpen} open${r.ph!=null?` · about ${esc(money(r.ph,r.cur))} an hour`:''}</small>${ctr(w)}</div><button type="button" class="btn sm" data-act="prf-job" data-id="${j.id}">Open details</button></div>${workCard(j)}</div>`}).join(''):'<p class="hint">No jobs yet.</p>'},
+      return `<div class="pf-job" style="--jc:${esc(j.color||'var(--accent)')}"><div class="pf-job-h">${jobMark(j,26)}${jobEmoji(j)}<div class="pf-jn"><b>${esc(j.name)}</b><small>${j.type==='agency'?`Agency · ${shownClients(j.id).length} client${shownClients(j.id).length===1?'':'s'}`:'Direct client'} · ${nOpen} open${r.ph!=null?` · about ${esc(money(r.ph,r.cur))} an hour`:''}</small>${ctr(w)}</div><button type="button" class="btn sm" data-act="prf-job" data-id="${j.id}">Open details</button></div>${(()=>{const pd=invPaydayText(j)||w.pay?.payday,wh=weeklyHours(w),bits=[[payLabel(w.pay),'Pay'],[pd?`Paid ${pd}`:'','Payday'],[wh?`${fmtNum(wh)} h a week`:'','Hours'],[w.location||(w.tz?tzCity(w.tz):''),'Where']].filter(x=>x[0]);return bits.length?`<div class="pf-jsum">${bits.map(([v,l])=>`<span><small>${l}</small>${esc(v)}</span>`).join('')}</div>`:''})()}</div>`}).join(''):'<p class="hint">No jobs yet.</p>'},
     {id:'pay',label:'Pay',icon:'<svg class="i" viewBox="0 0 16 16"><rect x="1.8" y="4" width="12.4" height="8.5" rx="1.5"/><circle cx="8" cy="8.2" r="1.8"/></svg>',html:`<div class="pf-pay-top">${curSel}</div>
       <div class="pf-tiles wide">${tile(cb?money(recY,cb):'—','received this year')}${tile(cb?money(recIn(v=>invPer(v)===ym),cb):'—','received this month')}</div>
       ${pays.length?`<div class="pf-block"><h5 class="pf-h5">Upcoming paydays</h5><div class="pf-list">${pays.map(x=>`<div class="pf-li"><span class="pf-tj">${jobMark(x.j,18)}${esc(x.j.name)}</span><span>${esc(fmtDate(x.d))} <small class="hint">${relDays(x.d)}</small></span><span class="pf-num">${esc(payLabel(x.w.pay)||'')}</span></div>`).join('')}</div></div>`:''}
@@ -5865,7 +5887,7 @@ function renderProfile(){
         <div class="pf-legend">${split.map(x=>`<span><i style="--jc:${esc(x.r.j.color||'var(--accent)')}"></i>${esc(x.r.j.name)} <b>${Math.round(x.v/splitTot*100)}%</b> <small>${esc(money(x.v,cb))}</small></span>`).join('')}</div></div>`:''}
       ${gaps.length?`<div class="pf-block"><h5 class="pf-h5">Missing invoices</h5><div class="pf-list">${gaps.slice(0,12).map(g=>`<div class="pf-li"><span class="pf-tj">${jobMark(g.j,18)}${esc(g.j.name)}</span><span>${esc(perLabel(g.m,g.h))}</span><span class="pf-gap">${esc(g.what)}</span><button type="button" class="btn sm" data-act="prf-inv" data-id="${g.j.id}">Invoices</button></div>`).join('')}</div></div>`:''}
       <div class="pf-block"><h5 class="pf-h5">By job</h5>
-      <div class="pf-table">${rows.map(r=>`<div class="pf-tr"><span class="pf-tj">${jobMark(r.j,18)}${esc(r.j.name)}</span><span>${esc(payLabel(r.w.pay)||'—')}${r.ph!=null?`<small class="hint"> · about ${esc(money(r.phc??r.ph,r.phc!=null?cb:r.cur))}/h</small>`:''}</span><span class="pf-num">${r.got==null?'—':r.got==='…'?'…':money(r.got,cb)}<small>received for ${yr}</small></span><span class="pf-sub">${[r.w.pay?.payday?`Paid ${esc(r.w.pay.payday)}`:'',r.w.pay?.method?`via ${esc(r.w.pay.method)}`:''].filter(Boolean).join(' ')||''}</span></div>`).join('')}</div></div>
+      <div class="pf-table">${rows.map(r=>`<div class="pf-tr"><span class="pf-tj">${jobMark(r.j,18)}${esc(r.j.name)}</span><span>${esc(payLabel(r.w.pay)||'—')}${r.ph!=null?`<small class="hint"> · about ${esc(money(r.phc??r.ph,r.phc!=null?cb:r.cur))}/h</small>`:''}</span><span class="pf-num">${r.got==null?'—':r.got==='…'?'…':money(r.got,cb)}<small>received for ${yr}</small></span><span class="pf-sub">${[invPaydayText(r.j)||r.w.pay?.payday?`Paid ${esc(invPaydayText(r.j)||r.w.pay.payday)}`:'',r.w.pay?.method?`via ${esc(r.w.pay.method)}`:''].filter(Boolean).join(' ')||''}</span></div>`).join('')}</div></div>
       ${fxWait?'<p class="hint">Getting exchange rates… amounts in other currencies are added once they load.</p>':''}<p class="hint">From your invoices marked Paid, counted in the month each one covers (its Period); the chart puts each one in the month it was due${cb&&inv.some(v=>v.currency!==cb)?`, converted to ${cb}`:''}. The hourly rate comes from each job's pay and schedule in Work details.</p>`},
     {id:'week',label:'My week',icon:I.cal,html:`<p class="hint">${wkTot?`${fmtNum(wkTot)} hours scheduled a week across ${jobs.filter(j=>(workOf(j).days||[]).length).length} jobs.`:'Add work days and hours in each job’s Work details to see your week here.'}</p>
       <div class="pf-week">${week.map(x=>`<div class="pf-day ${x.on.length?'':'off'} ${new Date().getDay()===x.d?'today':''}"><div class="pf-dh"><b>${WEEKDAY_FULL[x.d]}</b><small>${x.hrs?fmtNum(x.hrs)+' h':'Off'}</small></div><div class="pf-shifts">${x.on.map(j=>{const w=workOf(j);return `<span class="pf-shift" style="--jc:${esc(j.color||'var(--accent)')}"><span class="pf-sn">${jobEmoji(j)}${esc(j.name)}</span><em>${w.shiftStart&&w.shiftEnd?`${esc(fmtClock(w.shiftStart))} – ${esc(fmtClock(w.shiftEnd))}`:jobHoursDay(w)?`${fmtNum(jobHoursDay(w))} h`:''}</em></span>`}).join('')}</div></div>`).join('')}</div>`},
@@ -5970,6 +5992,7 @@ let STICKY_EDIT=null,STICKY_DRAFT=null;
 const stickies=()=>(appSettings().stickies||[]).slice(0,6);
 function saveStickies(list){saveApp({stickies:list});renderSide()}
 function corkHtml(){
+  if(pref('sideCompact'))return '';
   if(!pref('corkBoard'))return photoStripHtml();
   const ps=photos(),st=stickies();
   return `<div class="cork ${pref('officeCat')?'with-cat':''}" aria-label="Cork board">
@@ -6221,7 +6244,7 @@ const HELP=[
  ['Tasks','Merge duplicate tasks',`Settings → Duplicate tasks lists tasks in the same job with the same name. Pick the copy to keep and click Merge: it gets anything it was missing from the others (links, client, dates, notes, checklist steps, the ClickUp link and comments, updates and history), and the other copies go to Trash, where you can still restore them.`,['dupes','Duplicate tasks']],
  ['Tasks','Same name twice',`If you save a new task with the same name as an open one in that job, the panel asks whether to open the one you already have or save the new one anyway.`,null],
  ['Tasks','Select several',`Turn on Select in the toolbar, tick tasks (Shift-click for a range), then set status, priority, due date, move them to another job or client, archive or delete them together.`,null],
- ['Tasks','Pins, templates and duplicates',`Pin a task to keep it at the top of the Overview. Save checklist steps as a template per client. Duplicate makes an unsaved copy to edit: same client (so the same brand guide), due date, links, notes and checklist (unticked), with a fresh status.`,null],
+ ['Tasks','Up next, templates and duplicates',`Add a task to Up next (the queue icon at the top of a task, or right-click) to line up what you'll work on; the first three show on the Overview and the job page. Pins were folded into Up next. Save checklist steps as a template per client. Duplicate makes an unsaved copy to edit: same client (so the same brand guide), due date, links, notes and checklist (unticked), with a fresh status.`,null],
  ['Updates and notes','Updates and revision notes',`In a task's Activity tab, post updates with formatting, timecodes and pictures (paste a screenshot or drop it in). Tick an update when it's done, reply to it, or edit it. Tasks with open updates show a speech-bubble count in lists.`,null],
  ['Updates and notes','Notes formatting',`Notes support bold (${IS_MAC?'⌘':'Ctrl '}B), italic (${IS_MAC?'⌘':'Ctrl '}I), bullet and numbered lists and links. ${IS_MAC?'⌘':'Ctrl '}Z undoes typing in any text box.`,['keys','Keyboard shortcuts']],
  ['Links and files','Finder folders and Chrome profiles',`Paste a Finder path into a task's Project folder (Mac) and it opens in Finder through a one-time Shortcuts setup. A job can open its links in its own Chrome profile or Google account.`,['finder','Finder & Chrome']],
@@ -6391,7 +6414,7 @@ function renderHelp(){
   const u=S.ui,q=(u.hq||'').trim().toLowerCase();
   $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${HELP_IC.replace('class="i"','class="i" style="width:28px;height:28px"')}Help &amp; tips</h1><div class="sub">How everything in ${esc((appSettings().name||'').trim()||APP_NAME)} works.</div></div></div>`;
   $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
-  const hits=HELP.filter(([g,t,b])=>!q||(g+' '+t+' '+b).toLowerCase().includes(q));
+  const inSet=HELP.filter(h=>h[3]).length,hits=HELP.filter(([g,t,b,go])=>q?(g+' '+t+' '+b).toLowerCase().includes(q):!go);
   let html=`<div class="arch-bar"><label class="search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="help-q" data-fk="help-q" type="search" placeholder="Search help (e.g. Finder, backup, holidays)" value="${esc(u.hq||'')}" autocomplete="off"></label></div>`;
   let grp='';
   for(const [g,t,b,go] of hits){
@@ -6399,6 +6422,7 @@ function renderHelp(){
     html+=`<section class="help-item"><h4>${hlText(t,q)}</h4><p>${hlText(b,q)}</p>${go?`<button type="button" class="btn sm" data-act="help-go" data-sec="${go[0]}">${I.gear}Open ${esc(go[1])}</button>`:''}</section>`;
   }
   if(grp)html+='</div>';
+  if(!q&&inSet)html+=`<p class="hint help-more">${inSet} more tips sit inside the Settings sections they belong to (under “Tips”). Search above to find them here too.</p>`;
   if(!hits.length)html+=`<div class="empty"><h3>Nothing about “${esc(u.hq)}”</h3><p>Try another word, like “calendar” or “backup”.</p></div>`;
   $('#view').innerHTML=html;
 }
@@ -6646,7 +6670,8 @@ function renderSettings(){
       <p class="pref-group">Details</p>
       ${prefRow('logoShape','Logo shape',[['rounded','Rounded'],['circle','Circle']])}
       ${prefRow('numFont','Dates and numbers',[['mono','Typewriter'],['regular','Regular']])}
-      ${prefRow('sideCounts','Counts in the sidebar',[[true,'Show'],[false,'Hide']])}`},
+      ${prefRow('sideCounts','Counts in the sidebar',[[true,'Show'],[false,'Hide']])}
+      ${prefRow('sideCompact','Compact sidebar',[[false,'Off'],[true,'On']],'Hides the cork board and photos so the job list has more room')}`},
     {id:'tasks',label:'Tasks & calendar',icon:I.cal,html:`<p class="pref-group" style="margin-top:0">Tasks</p>
       ${prefRow('nameWrap','Long task names',[[false,'One line'],[true,'Wrap']])}
       ${prefRow('doneStyle','Finished tasks',[['plain','Plain'],['struck','Crossed out'],['faded','Faded']])}
@@ -6722,13 +6747,24 @@ function renderSettings(){
     {id:'dupes',label:'Duplicate tasks',icon:'<svg class="i" viewBox="0 0 16 16"><rect x="5" y="5" width="8.5" height="8.5" rx="1.5"/><path d="M10.5 3V2.5A1 1 0 0 0 9.5 1.5h-7a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1H3"/></svg>',html:dupesHtml()},
     {id:'backup',label:'Backup',icon:I.download,html:backupSettingsHtml()}];
   const META={appearance:['Look & feel','Theme, colors, surfaces'],tasks:['Look & feel','Task rows, due dates, the Calendar'],fun:['Look & feel','Greeting, the office cat, cork board'],a11y:['Look & feel','Text size, motion, contrast'],statuses:['Your work','Rename, recolor and reorder'],workload:['Your work','When a day counts as busy'],holidays:['Your work','Public holidays on the Calendar'],pomo:['Your work','Focus and break lengths, sounds'],safezones:['Your work','TikTok, Reels and Shorts overlays'],branding:['App','Your own name and logo'],finder:['App','Mac folders and Chrome profiles'],account:['App','Google Calendar and sign out'],clickup:['App','Bring in tasks assigned to you'],keys:['App','Shortcuts on a keyboard'],import:['Your data','Bring in a tracker sheet'],dupes:['Your data','Find and merge tasks with the same name'],backup:['Your data','Download, restore, trash']};
-  secs.forEach(x=>{const m=META[x.id];if(m){x.group=m[0];x.sub=m[1]}});
+  secs.forEach(x=>{const m=META[x.id];if(m){x.group=m[0];x.sub=m[1]}
+    /* the Help tips for a section live inside it (Help lists them only when you search) */
+    const tips=HELP.filter(h=>h[3]&&h[3][0]===x.id);if(tips.length)x.html=`<details class="pref-tip"><summary>${HELP_IC}Tips for ${esc(x.label)}</summary>${tips.map(h=>`<p><b>${esc(h[1])}.</b> ${esc(h[2])}</p>`).join('')}</details>`+x.html});
   const GORD=['Look & feel','Your work','App','Your data'];secs.sort((x,y)=>GORD.indexOf(x.group)-GORD.indexOf(y.group));
   keepScroll('#modal',()=>withFocus(()=>{$('#modal').innerHTML=`<div class="modal pref-modal" role="dialog" aria-modal="true" aria-labelledby="s-title">
   <header><h2 id="s-title">Settings</h2><button class="icon-btn" data-act="s-cancel" aria-label="Close">${I.x}</button></header>
   ${prefLayout('s',SM.sec,secs,'form','data-act="s-save" id="s-form"')}
   <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn s-back" data-act="pref-back" data-key="s">${I.left}Back</button><button type="button" class="btn s-cancel" data-act="s-cancel">Cancel</button><button type="submit" form="s-form" class="btn primary">Save</button></div></footer></div>`}));
-  prefNavInView();
+  prefNavInView();sFind();
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target?.id==='s-find')e.preventDefault()},true);
+/* Settings search: hides sections whose name, description and contents don't match */
+function sFind(){
+  const box=document.querySelector('#modal .pref');if(!box||!SM)return;const q=(SM.find||'').trim().toLowerCase();let n=0,first=null;
+  box.querySelectorAll('.pref-nav button[data-sec]').forEach(b=>{const sec=box.querySelector(`.pref-sec[data-sec="${b.dataset.sec}"]`),hit=!q||(b.textContent+' '+(sec?.textContent||'')).toLowerCase().includes(q);b.hidden=!hit;if(hit){n++;first=first||b}});
+  box.querySelectorAll('.pref-nav .pref-g').forEach(g=>g.hidden=!!q);
+  const none=box.querySelector('.pref-none');if(none)none.hidden=n>0;
+  const on=box.querySelector('.pref-nav button.on');if(q&&first&&(!on||on.hidden)&&!narrow.matches)showPrefSec(first);
 }
 async function setAppLogo(file){
   const sm=SM;if(!sm||!file)return;
@@ -6966,7 +7002,8 @@ function workCard(job){
     items.push(['Schedule',[d,h?`${fmtNum(h)} h/day`:'',h&&w.days.length?`${fmtNum(weeklyHours(w))} h/week`:''].filter(Boolean).join(' · '),shift?shift+there:'']);
   }
   const pay=payLabel(w.pay);
-  if(pay||w.pay.payday||w.pay.method)items.push(['Pay',pay||'—',[w.pay.payday?`Paid ${w.pay.payday}`:'',w.pay.method?`via ${w.pay.method}`:''].filter(Boolean).join(' ')]);
+  const pdt=invPaydayText(job)||w.pay.payday;
+  if(pay||pdt||w.pay.method)items.push(['Pay',pay||'—',[pdt?`Paid ${pdt}`:'',w.pay.method?`via ${w.pay.method}`:''].filter(Boolean).join(' ')]);
   if(w.location||w.tz)items.push(['Location',w.location||tzCity(w.tz),w.tz?`${timeThere(w.tz)} there · ${diffLabel(w.tz)}`:'']);
   if(w.contact.name||w.contact.reach)items.push(['Contact',w.contact.name||w.contact.reach,w.contact.name?w.contact.reach:'']);
   if(w.since)items.push(['Working together since',fmtLong(w.since),'']);
@@ -6989,7 +7026,7 @@ function workForm(){
     <div class="wf-grid">
       <label>Pay<span class="pay-row"><select data-mw="pay.currency" aria-label="Currency">${CURRENCIES.map(c=>`<option ${c===p.currency?'selected':''}>${c}</option>`).join('')}</select><input type="number" min="0" step="any" data-mw="pay.amount" data-fk="mw-amount" value="${esc(p.amount)}" placeholder="Amount"></span></label>
       <label>How it's paid<select data-mw="pay.period">${PERIODS.map(x=>`<option value="${x.id}" ${x.id===p.period?'selected':''}>${x.label.replace('per ','Per ')}</option>`).join('')}</select></label>
-      <label>Payday<input type="text" data-mw="pay.payday" data-fk="mw-payday" value="${esc(p.payday)}" placeholder="e.g. on the 30th"></label>
+      ${M.id&&invPaydayText(S.jobs[M.id])?`<label>Payday<span class="wf-static">${esc(invPaydayText(S.jobs[M.id]))}<small>Set in the Invoices tab → Defaults</small></span></label>`:`<label>Payday<input type="text" data-mw="pay.payday" data-fk="mw-payday" value="${esc(p.payday)}" placeholder="e.g. on the 30th"></label>`}
       <label>Payment method<input type="text" list="pay-methods" data-mw="pay.method" data-fk="mw-method" value="${esc(p.method)}" placeholder="e.g. Wise"></label>
     </div>
     <datalist id="pay-methods"><option>Wise</option><option>PayPal</option><option>Payoneer</option><option>Bank transfer</option><option>GCash</option><option>Deel</option><option>Upwork</option></datalist>
@@ -7198,7 +7235,7 @@ function prefLayout(key,active,sections,tag='div',attrs=''){
   /* Settings on a phone: a Slack-style grouped list first, then one section at a time with a back button */
   const st={s:SM,m:M,b:BM,p:PRF}[key],mlist=!!st&&st.mv!=='sec';let g='';
   sections.forEach(x=>{if(!x.sub&&PREF_SUBS[key]?.[x.id])x.sub=PREF_SUBS[key][x.id]});
-  return `<${tag} class="pref pref-s ${mlist?'m-list':''}" ${attrs}><nav class="pref-nav" role="tablist" aria-label="Sections">${sections.map(x=>`${x.group&&x.group!==g?`<p class="pref-g">${esc(g=x.group)}</p>`:''}<button type="button" role="tab" data-act="pref-sec" data-key="${key}" data-sec="${x.id}" class="${x.id===active?'on':''}" aria-selected="${x.id===active}">${x.icon||''}<span>${x.label}${x.sub?`<em class="pn-sub">${esc(x.sub)}</em>`:''}</span>${x.badge?`<small>${x.badge}</small>`:''}<i class="pn-chev" aria-hidden="true">›</i></button>`).join('')}</nav>
+  return `<${tag} class="pref pref-s ${mlist?'m-list':''}" ${attrs}><nav class="pref-nav" role="tablist" aria-label="Sections">${key==='s'?`<label class="pref-find"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input type="search" id="s-find" data-fk="s-find" placeholder="Search settings" value="${esc(SM?.find||'')}" autocomplete="off"></label><p class="pref-none" hidden>Nothing matches.</p>`:''}${sections.map(x=>`${x.group&&x.group!==g?`<p class="pref-g">${esc(g=x.group)}</p>`:''}<button type="button" role="tab" data-act="pref-sec" data-key="${key}" data-sec="${x.id}" class="${x.id===active?'on':''}" aria-selected="${x.id===active}">${x.icon||''}<span>${x.label}${x.sub?`<em class="pn-sub">${esc(x.sub)}</em>`:''}</span>${x.badge?`<small>${x.badge}</small>`:''}<i class="pn-chev" aria-hidden="true">›</i></button>`).join('')}</nav>
     <div class="pref-body">${sections.map(x=>`<section class="pref-sec" data-sec="${x.id}" role="tabpanel" ${x.id===active?'':'hidden'}><h3 class="pref-h">${x.label}</h3>${x.html}</section>`).join('')}${key==='b'?`<label class="bm-note">What changed? (optional, goes in the change log)<input type="text" data-bm-note data-fk="bm-note" value="${esc(BM.note)}" placeholder="e.g. New end card from October"></label>`:''}</div></${tag}>`;
 }
 function showPrefSec(el){
@@ -7399,13 +7436,14 @@ function backupSettingsHtml(){
     ${RP.loading?'<p class="hint">Loading…</p>':RP.error?`<p class="hint">Couldn't load restore points (${esc(RP.error)}).</p>`:RP.points.length?`<div class="rp-list">${RP.points.map(p=>`<div class="rp-row"><span><b>${esc(fmtDate(p.date))}</b><small>${esc(p.date)} · ${Math.max(1,Math.round(p.size/1024))} KB</small></span><button type="button" class="btn sm" data-act="rp-load" data-name="${esc(p.name)}" ${RP.busy?'disabled':''}>Restore…</button></div>`).join('')}</div>`:'<p class="hint">No restore points yet. The first one is made automatically.</p>'}
     <div class="acct-btns"><button type="button" class="btn sm" data-act="rp-create" ${RP.busy?'disabled':''}>${RP.busy==='create'?'Saving…':'Save a restore point now'}</button></div></div>`:'';
   const trashPick=prefPick('trashDays','Keep deleted tasks in Trash for',[[7,'7 days',''],[30,'30 days',''],[90,'90 days','']]);
-  return `${rp}<div class="field"><span class="lbl">Export tasks as a spreadsheet</span><div class="acct-btns"><select class="sel" id="csv-job" aria-label="Which job"><option value="all">All jobs</option>${jobsSorted().map(j=>`<option value="${j.id}">${esc(j.name)}</option>`).join('')}</select><button type="button" class="btn sm" data-act="export-csv">${I.download}Export CSV</button></div><p class="hint">Same layout as a task tracker sheet: client, title, drafts (revision rounds), date assigned, deadline, status and the storage, task and review links, grouped by month. Opens in Excel, Numbers or Google Sheets.</p></div>
-  <div class="field"><span class="lbl">Backup</span>
+  return `${rp}<div class="field"><span class="lbl">Spreadsheet of tasks <small>(to open in Excel or Google Sheets; can't be restored)</small></span><div class="acct-btns"><select class="sel" id="csv-job" aria-label="Which job"><option value="all">All jobs</option>${jobsSorted().map(j=>`<option value="${j.id}">${esc(j.name)}</option>`).join('')}</select><button type="button" class="btn sm" data-act="export-csv">${I.download}Download spreadsheet</button></div><p class="hint">Same layout as a task tracker sheet: client, title, drafts (revision rounds), date assigned, deadline, status and the storage, task and review links, grouped by month. Opens in Excel, Numbers or Google Sheets.</p></div>
+  <div class="field"><span class="lbl">Full backup <small>(everything, to restore later)</small></span>
     <p class="last-backup">${last?`Last backup downloaded ${fmtDate(last)}${diffDays(today(),last)>1?` (${diffDays(today(),last)} days ago)`:''}.`:'No backup downloaded yet.'} You'll get a reminder in notifications after ${BACKUP_DAYS} days.</p>
-    <div class="acct-btns"><button type="button" class="btn sm" data-act="backup-download">${I.download}Download backup</button><button type="button" class="btn sm" data-act="backup-pick">${I.upload}Restore from a backup…</button></div>
+    <div class="acct-btns"><button type="button" class="btn sm" data-act="backup-download">${I.download}Download full backup</button><button type="button" class="btn sm" data-act="backup-pick">${I.upload}Restore from a backup…</button></div>
     ${r?`<div class="restore-box"><p class="acct-line"><b>${esc(r.name)}</b>${r.date?` · saved ${esc(fmtDate(ymd(new Date(r.date))))}`:''}<br>${r.counts.jobs} jobs, ${r.counts.clients} clients and ${r.counts.tasks} tasks. Restoring adds back anything missing and sets items that are in both back to the backup's version. Nothing else is deleted.</p>
       <div class="acct-btns"><button type="button" class="btn sm primary" data-act="backup-restore">Restore now</button><button type="button" class="btn sm ghost" data-act="backup-cancel">Cancel</button></div></div>`
     :`<p class="hint">Downloads every job, client, task, brand guide and setting as one file. Pictures and PDFs stay where they're stored; the backup keeps links to them.</p>`}</div>
+  ${S.settings.expenses?`<div class="field"><span class="lbl">Old expense data</span><p class="hint" style="margin:0">Expenses were removed from Profile, but what you entered is still saved in your account.</p><div class="acct-btns"><button type="button" class="btn sm danger ${XPDEL?'armed':''}" data-act="xp-purge">${I.trash}${XPDEL?'Click again to delete it for good':'Delete old expense data'}</button></div></div>`:''}
   ${trashPick}<p class="hint" style="margin-top:-8px">Shorter times apply the next time the app opens: tasks already older than that are deleted for good then.</p>`;
 }
 /* Details tab on a job page */
@@ -7606,6 +7644,8 @@ document.addEventListener('click',e=>{
     case 'inv-new': openInv(u.tab);break;
     case 'inv-defaults': openInvDefaults(u.tab);break;
     case 'ivd-close': closeInvDefaults();break;
+    case 'xp-purge': if(!XPDEL){XPDEL=true;renderSettings();setTimeout(()=>{if(XPDEL){XPDEL=false;if(SM)renderSettings()}},3000)}else{XPDEL=false;remove('settings','expenses');toast('Old expense data deleted');renderSettings()}break;
+    case 'ivd-usepay': if(INVD){const pp=workOf(S.jobs[INVD.jobId]).pay||{},pa=parseFloat(pp.amount);if(pa){INVD.d.rate=INVD.d.billing==='half'?Math.round(pa/2*100)/100:pa;if(pp.currency)INVD.d.currency=pp.currency;renderInvDefaults()}}break;
     case 'ivd-save': saveInvDefaults();break;
     case 'doc-upload': $('#doc-file')?.click();break;
     case 'doc-del':{const job=S.jobs[u.tab],id=el.dataset.id;if(!job)break;if(docDelArmed!==id){docDelArmed=id;render();setTimeout(()=>{if(docDelArmed===id){docDelArmed=null;render()}},4000);break}
@@ -7685,7 +7725,7 @@ document.addEventListener('click',e=>{
     case 'trash-restore': trashArmed=null;restoreTrash([el.dataset.id]);break;
     case 'trash-purge': if(trashArmed!==el.dataset.id){trashArmed=el.dataset.id;render();break}trashArmed=null;purgeTasks([el.dataset.id]);render();toast('Deleted for good');break;
     case 'trash-empty': if(trashArmed!=='all'){trashArmed='all';render();break}{const ids=trashed().map(t=>t.id);trashArmed=null;purgeTasks(ids);render();toast(`Deleted ${ids.length} task${ids.length===1?'':'s'} for good`)}break;
-    case 'd-pin':case 'unpin':{const id=el.dataset.id||u.openTask,t=S.tasks[id];if(!t)break;const on=a==='unpin'?false:!t.pinned;haptic(8);patch('tasks',id,{pinned:on});logAct('edit',on?'Pinned':'Unpinned',{task:t});render();if(u.openTask===id)renderDrawer();toast(on?'Pinned to the top':'Unpinned');break}
+    case 'unpin':{const id=el.dataset.id;if(S.tasks[id]?.upNext)toggleUpNext(id);break}
     case 'jump': openJump();break;
     case 'sel':{const id=el.dataset.id;
       if(e.shiftKey&&selLast){const all=[...document.querySelectorAll('[data-act="sel"]')].map(x=>x.dataset.id),a1=all.indexOf(selLast),b1=all.indexOf(id);if(a1>=0&&b1>=0){const on=el.checked;all.slice(Math.min(a1,b1),Math.max(a1,b1)+1).forEach(x=>on?SEL.add(x):SEL.delete(x))}}
@@ -7964,6 +8004,7 @@ document.addEventListener('input',e=>{
   if(el.id==='sticky-in'){STICKY_DRAFT=el.value;return}
   if(el.id==='xn-in'){const t=S.tasks[u.openTask],pv=$('#xn-prev');if(t&&pv)pv.textContent=exportName(t,el.value.trim()||XN_DEF);return}
   if(el.id==='jump-q'&&JUMP){JUMP.q=el.value;JUMP.i=0;renderJump();return}
+  if(el.id==='s-find'&&SM){SM.find=el.value;sFind();return}
   if(el.id==='s-name'&&SM){SM.name=el.value;return}
   if(el.id==='s-greet'&&SM){SM.greetName=el.value;render();return}
   if(el.id==='s-catname'&&SM){SM.catName=el.value;catTick();return}
@@ -8151,7 +8192,9 @@ document.addEventListener('dragover',e=>{if(!calDrag)return;const d=e.target.clo
 document.addEventListener('dragend',()=>{if(!calDrag)return;calDrag=null;document.body.classList.remove('cal-dragging');document.querySelectorAll('.cal-drop,[data-caldrag].dragging').forEach(x=>x.classList.remove('cal-drop','dragging'))});
 document.addEventListener('drop',e=>{if(!calDrag)return;const d=e.target.closest?.('[data-calday]'),id=calDrag;calDrag=null;document.body.classList.remove('cal-dragging');document.querySelectorAll('.cal-drop').forEach(x=>x.classList.remove('cal-drop'));if(!d)return;e.preventDefault();moveDue(id,d.dataset.calday)});
 
-setInterval(()=>{if(S.ready&&!document.hidden&&$('#modal').hidden){autoArchive();invAutoDraft();scheduleRender()}},60000);
+/* every minute: the sidebar (shift dots, "synced … ago") and notifications; the whole page every 5 minutes or when the day changes */
+let TICK=0,TICK_DAY='';
+setInterval(()=>{if(S.ready&&!document.hidden&&$('#modal').hidden){autoArchive();invAutoDraft();const d=today();if(++TICK%5===0||d!==TICK_DAY){TICK_DAY=d;scheduleRender()}else{renderSide();renderBell()}}},60000);
 document.addEventListener('toggle',e=>{if(e.target.classList?.contains('d-brand')){S.ui.brandTaskOpen=e.target.open;saveUi()}},true);
 placeTopRight();
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('/sw.js').catch(()=>{});
