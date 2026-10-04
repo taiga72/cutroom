@@ -2223,8 +2223,13 @@ select.rs-add{appearance:auto}
 .inv-amt small{display:block;font-size:calc(11px*var(--ts));color:var(--muted);font-weight:400;text-align:right}
 .docs-sec{max-width:1000px;margin-top:28px;padding-top:18px;border-top:1px solid var(--line)}
 .doc-row{grid-template-columns:auto minmax(0,1fr) auto auto}
-.doc-name{border:1px solid transparent;background:none;font-weight:600;padding:3px 6px;margin-left:-6px;border-radius:6px;width:100%;font-size:calc(14.5px*var(--ts));color:var(--text)}
-.doc-name:hover,.doc-name:focus{border-color:var(--line);background:var(--surface)}
+.doc-name{border:1px solid var(--line);background:var(--surface);color:var(--text);font:600 calc(14px*var(--ts)) var(--body);padding:6px 8px;border-radius:9px;width:100%;max-width:420px;height:34px;box-sizing:border-box;transition:border-color .15s}
+.doc-name:hover,.doc-kind:hover{border-color:var(--line-strong)}
+.doc-name:focus,.doc-kind:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.doc-kind{height:34px;color:var(--text)}
+.inv-pill{display:inline-flex;align-items:center;justify-content:center;min-width:96px;height:34px;box-sizing:border-box;padding:0 12px;border-radius:9px;background:var(--bg);font:600 calc(13px*var(--ts)) var(--body);color:var(--muted);white-space:nowrap}
+.inv-pill.inv-paid{color:var(--st-done,#1f9d55)}.inv-pill.inv-sent{color:var(--accent)}.inv-pill.inv-overdue{color:var(--danger)}
+.inv-row.editing{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
 .docs-empty{margin:4px 0 0}
 .spec-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .spec{display:inline-flex;align-items:center;padding:2px 9px;border-radius:999px;background:var(--accent-soft);color:var(--text);font-size:calc(12.5px*var(--ts));font-weight:600;white-space:nowrap}
@@ -3134,14 +3139,14 @@ function invoicesPane(job){
   const yr=today().slice(0,4),inYr=list.filter(v=>(v.date||'').startsWith(yr));
   const paid=inYr.filter(v=>v.status==='paid').reduce((a,v)=>a+(+v.amount||0),0),open=list.filter(v=>v.status==='sent').reduce((a,v)=>a+(+v.amount||0),0);
   const missing=w.pay?.period==='month'&&!list.some(v=>v.period===ym);
-  const row=v=>{const st=invState(v),href=v.kind==='file'&&v.file?imgSrc(v.file.v):'';
-    return `<div class="inv-row st-${st}"><span class="inv-ic">${v.kind==='file'?I.file:INV_IC}</span>
+  const row=v=>{const st=invState(v),href=v.kind==='file'&&v.file?imgSrc(v.file.v):'',ed=ROW_EDIT.has(v.id);
+    return `<div class="inv-row st-${st} ${ed?'editing':''}"><span class="inv-ic">${v.kind==='file'?I.file:INV_IC}</span>
       <div class="inv-main"><b>${esc(v.number||v.file?.name||'Invoice')}</b><small>${[v.period?monthLabel(v.period):'',v.date?'Issued '+fmtDate(v.date):'',v.due&&v.status!=='paid'?'Due '+fmtDate(v.due):'',v.paidAt?'Paid '+fmtDate(v.paidAt):'',v.kind==='file'?'Uploaded file':''].filter(Boolean).join(' · ')}</small>
-        ${v.kind==='file'?`<div class="inv-edit"><label>Period<input type="month" data-invf="${v.id}" data-k="period" value="${esc(v.period||'')}"></label><label>Currency<select class="sel" data-invf="${v.id}" data-k="currency" aria-label="Currency">${[...new Set([...CURRENCIES,v.currency].filter(Boolean))].map(x=>`<option value="${esc(x)}" ${(v.currency||c)===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label><label>Amount<input type="number" step="any" min="0" data-invf="${v.id}" data-k="amount" value="${esc(v.amount??'')}" placeholder="0"></label><label>Due<input type="date" data-invf="${v.id}" data-k="due" value="${esc(v.due||'')}"></label></div>`:''}</div>
+        ${v.kind==='file'&&ed?`<div class="inv-edit"><label>Period<input type="month" data-invf="${v.id}" data-k="period" value="${esc(v.period||'')}"></label><label>Currency<select class="sel" data-invf="${v.id}" data-k="currency" aria-label="Currency">${[...new Set([...CURRENCIES,v.currency].filter(Boolean))].map(x=>`<option value="${esc(x)}" ${(v.currency||c)===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label><label>Amount<input type="number" step="any" min="0" data-invf="${v.id}" data-k="amount" value="${esc(v.amount??'')}" placeholder="0"></label><label>Due<input type="date" data-invf="${v.id}" data-k="due" value="${esc(v.due||'')}"></label></div>`:''}</div>
       <div class="inv-amt">${v.amount!==''&&v.amount!=null?money(v.amount,v.currency||c):'—'}${v.amount!==''&&v.amount!=null&&approx(v.amount,v.currency||c)?`<small>${approx(v.amount,v.currency||c)}</small>`:''}</div>
-      <select class="sel inv-st inv-${st}" data-act="inv-status" data-id="${v.id}" aria-label="Status">${['draft','sent','paid'].map(x=>`<option value="${x}" ${v.status===x||(!v.status&&x==='draft')?'selected':''}>${x==='sent'&&st==='overdue'?'Overdue':INV_ST[x]}</option>`).join('')}</select>
+      ${ed?`<select class="sel inv-st inv-${st}" data-act="inv-status" data-id="${v.id}" aria-label="Status">${['draft','sent','paid'].map(x=>`<option value="${x}" ${v.status===x||(!v.status&&x==='draft')?'selected':''}>${x==='sent'&&st==='overdue'?'Overdue':INV_ST[x]}</option>`).join('')}</select>`:`<span class="inv-pill inv-${st}">${st==='overdue'?'Overdue':INV_ST[v.status||'draft']}</span>`}
       <div class="inv-acts">${v.kind==='made'?`<button type="button" class="btn sm" data-act="inv-open" data-id="${v.id}">Open</button><button type="button" class="icon-btn" data-act="inv-pdf" data-id="${v.id}" title="Download PDF" aria-label="Download PDF">${I.download}</button>`:href?`<a class="btn sm" href="${esc(href)}" target="_blank" rel="noopener">Open</a>`:''}
-        <button type="button" class="icon-btn ${invDelArmed===v.id?'danger armed':''}" data-act="inv-del" data-id="${v.id}" title="${invDelArmed===v.id?'Click again to delete':'Delete'}" aria-label="Delete invoice">${invDelArmed===v.id?'Sure?':I.trash}</button></div></div>`};
+        ${ed?`<button type="button" class="icon-btn ${invDelArmed===v.id?'danger armed':''}" data-act="inv-del" data-id="${v.id}" title="${invDelArmed===v.id?'Click again to delete':'Delete'}" aria-label="Delete invoice">${invDelArmed===v.id?'Sure?':I.trash}</button><button type="button" class="btn sm primary" data-act="row-edit" data-id="${v.id}">Done</button>`:`<button type="button" class="icon-btn" data-act="row-edit" data-id="${v.id}" title="Edit" aria-label="Edit invoice">${I.pencil}</button>`}</div></div>`};
   const h=homeCur(),allInv=Object.values(S.jobs).flatMap(j=>(j.invoices||[]).map(v=>({...v,currency:v.currency||workOf(j).pay?.currency||'USD'})));
   const sum=(vs,st)=>{let t=0,miss=false;for(const v of vs){if(v.status!==st||v.amount===''||v.amount==null)continue;const x=toHome(v.amount,v.currency);if(x==null)miss=true;else t+=x}return miss?null:t};
   const yrAll=allInv.filter(v=>(v.date||'').startsWith(yr)),hp=h?sum(yrAll,'paid'):null,hw=h?sum(allInv,'sent'):null;
@@ -3281,13 +3286,15 @@ const approx=(n,cur)=>{const h=homeCur();if(!h||cur===h)return '';const v=toHome
    job.docs [{id, name, kind 'contract'|'nda'|'onboarding'|'brief'|'other', added, file{v,name,size,type}}] */
 const DOC_KINDS=[['contract','Contract'],['nda','NDA'],['onboarding','Onboarding'],['brief','Brief'],['other','Other']];
 let docDelArmed=null;
+/* invoice and document rows are locked until their pencil is clicked (ROW_EDIT, this page only) */
+const ROW_EDIT=new Set();
 function docsHtml(job){
   const ds=(job.docs||[]).slice().sort((a,b)=>(b.added||'').localeCompare(a.added||''));
   return `<div class="docs-sec"><div class="inv-head"><div><h2>${I.file}Documents</h2><p class="hint">Contracts, NDAs, onboarding notes and anything else for this job.</p></div><div class="inv-btns"><button type="button" class="btn" data-act="doc-upload">${I.upload}Upload</button></div></div>
-    ${ds.length?`<div class="inv-list">${ds.map(d=>{const href=d.file?imgSrc(d.file.v):'';return `<div class="inv-row doc-row"><span class="inv-ic">${I.file}</span>
-      <div class="inv-main"><input type="text" class="doc-name" data-docf="${d.id}" data-k="name" data-fk="doc-${d.id}" value="${esc(d.name||'')}" aria-label="Document name"><small>${[d.file?.name&&d.file.name!==d.name?d.file.name:'',d.added?'Added '+fmtDate(d.added):'',d.file?.size?Math.max(1,Math.round(d.file.size/1024))+' KB':''].filter(Boolean).join(' · ')}</small></div>
-      <select class="sel" data-act="doc-kind" data-id="${d.id}" aria-label="Kind">${DOC_KINDS.map(([k,l])=>`<option value="${k}" ${d.kind===k?'selected':''}>${l}</option>`).join('')}</select>
-      <div class="inv-acts">${href?`<a class="btn sm" href="${esc(href)}" target="_blank" rel="noopener">Open</a>`:''}<button type="button" class="icon-btn ${docDelArmed===d.id?'danger armed':''}" data-act="doc-del" data-id="${d.id}" title="${docDelArmed===d.id?'Click again to delete':'Delete'}" aria-label="Delete document">${docDelArmed===d.id?'Sure?':I.trash}</button></div></div>`}).join('')}</div>`
+    ${ds.length?`<div class="inv-list">${ds.map(d=>{const href=d.file?imgSrc(d.file.v):'',ed=ROW_EDIT.has(d.id);return `<div class="inv-row doc-row ${ed?'editing':''}"><span class="inv-ic">${I.file}</span>
+      <div class="inv-main">${ed?`<input type="text" class="doc-name" data-docf="${d.id}" data-k="name" data-fk="doc-${d.id}" value="${esc(d.name||'')}" aria-label="Document name">`:`<b>${esc(d.name||d.file?.name||'Document')}</b>`}<small>${[d.file?.name&&d.file.name!==d.name?d.file.name:'',d.added?'Added '+fmtDate(d.added):'',d.file?.size?Math.max(1,Math.round(d.file.size/1024))+' KB':''].filter(Boolean).join(' · ')}</small></div>
+      ${ed?`<select class="sel doc-kind" data-act="doc-kind" data-id="${d.id}" aria-label="Kind">${DOC_KINDS.map(([k,l])=>`<option value="${k}" ${d.kind===k?'selected':''}>${l}</option>`).join('')}</select>`:`<span class="inv-pill doc-kind-pill">${esc((DOC_KINDS.find(([k])=>k===d.kind)||DOC_KINDS[DOC_KINDS.length-1])[1])}</span>`}
+      <div class="inv-acts">${href?`<a class="btn sm" href="${esc(href)}" target="_blank" rel="noopener">Open</a>`:''}${ed?`<button type="button" class="icon-btn ${docDelArmed===d.id?'danger armed':''}" data-act="doc-del" data-id="${d.id}" title="${docDelArmed===d.id?'Click again to delete':'Delete'}" aria-label="Delete document">${docDelArmed===d.id?'Sure?':I.trash}</button><button type="button" class="btn sm primary" data-act="row-edit" data-id="${d.id}">Done</button>`:`<button type="button" class="icon-btn" data-act="row-edit" data-id="${d.id}" title="Edit" aria-label="Edit document">${I.pencil}</button>`}</div></div>`}).join('')}</div>`
     :`<p class="hint docs-empty">No documents yet. Upload a PDF or a picture.</p>`}
     <input type="file" id="doc-file" accept="application/pdf,image/png,image/jpeg,image/webp" multiple hidden></div>`;
 }
@@ -7190,6 +7197,7 @@ document.addEventListener('click',e=>{
     case 'inv-del':{const job=S.jobs[u.tab],id=el.dataset.id;if(!job)break;if(invDelArmed!==id){invDelArmed=id;render();setTimeout(()=>{if(invDelArmed===id){invDelArmed=null;render()}},4000);break}
       invDelArmed=null;const v=(job.invoices||[]).find(x=>x.id===id);invSave(job,(job.invoices||[]).filter(x=>x.id!==id));if(v?.file?.v)setTimeout(()=>dropImage(v.file.v),300);logAct('job',`Invoice ${v?.number||''} deleted (${job.name})`,{jobId:job.id});toast('Invoice deleted');render();break}
     case 'inv-close': closeInv();break;
+    case 'row-edit': {const id=el.dataset.id;if(ROW_EDIT.has(id))ROW_EDIT.delete(id);else ROW_EDIT.add(id);invDelArmed=null;docDelArmed=null;render();break}
     case 'inv-save': invCommit();closeInv();toast('Invoice saved');render();break;
     case 'inv-save-pdf':{const d=INV.d;invCommit();closeInv();render();invPrint(d);break}
     case 'iv-add': INV.d.items.push({d:'',q:1,r:''});renderInv();break;
