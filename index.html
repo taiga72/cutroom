@@ -374,13 +374,12 @@ button.stat:hover{border-color:var(--line-strong)}
 .pf-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:12px;font-size:calc(12.5px*var(--ts))}
 .pf-legend span{display:inline-flex;align-items:center;gap:6px}.pf-legend span>i{width:10px;height:10px;border-radius:3px;background:var(--jc)}.pf-legend small{color:var(--muted)}
 .pf-ctr{display:inline-block;margin-top:3px;font-size:calc(12px*var(--ts));color:var(--muted)}.pf-ctr.soon{color:var(--st-rev,#d97706);font-weight:600}.pf-ctr.over{color:var(--danger);font-weight:600}
-.xp-form{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:10px;margin-bottom:14px;background:var(--surface)}.xp-form .pf-h5{margin:0}
+.xp-addrow{display:flex;justify-content:flex-end;margin:-4px 0 14px}.xp-modal{max-width:560px}.xp-modal .m-body{padding:16px 18px}
 .xp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.xp-grid label:first-child,.xp-grid .xp-wide{grid-column:span 2}
 .xp-grid label{display:grid;gap:4px;font-size:calc(12px*var(--ts));color:var(--muted)}
 .xp-grid input,.xp-grid select{width:100%;box-sizing:border-box;height:38px;border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:9px;padding:7px 10px;font:500 calc(13.5px*var(--ts)) var(--body)}
 .xp-grid select{appearance:none;-webkit-appearance:none;padding-right:30px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23888' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:12px}
 .xp-grid input:focus,.xp-grid select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
-.xp-form .pf-btns{display:flex;justify-content:flex-end;gap:8px}
 .xp-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:9px 12px;border-top:1px solid var(--line);font-size:calc(13px*var(--ts))}.xp-row:first-child{border-top:0}
 .xp-row.off{opacity:.6}.xp-main{min-width:0;display:grid;gap:3px}.xp-main b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.xp-main small{color:var(--muted);display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px}
 .xp-amt{text-align:right;font:600 calc(13px*var(--ts)) var(--mono);display:grid}.xp-amt small{font:500 calc(11.5px*var(--ts)) var(--body);color:var(--muted)}
@@ -389,7 +388,6 @@ button.stat:hover{border-color:var(--line-strong)}
 .xp-mh{display:flex;justify-content:space-between;gap:8px;padding:7px 12px;background:var(--bg);border-top:1px solid var(--line);font-size:calc(12px*var(--ts));color:var(--muted)}.xp-mh:first-child{border-top:0}.xp-mh b{color:var(--text)}.xp-mh span{font-family:var(--mono)}.xp-mh+.xp-row{border-top:1px solid var(--line)}
 .xp-stop{color:var(--danger);font-weight:600}
 .pf-tiles.xp-one{grid-template-columns:1fr!important}
-.xp-yh{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .pf-tc{font-style:normal;opacity:.85}
 @media (max-width:820px){.pf-tiles.wide{grid-template-columns:1fr 1fr}.xp-grid{grid-template-columns:1fr 1fr}.xp-row{grid-template-columns:minmax(0,1fr) auto}.xp-acts{grid-column:1/-1;justify-content:flex-end}}
 .pf-me-t{flex:1;min-width:0}.pf-title{margin:2px 0 0;font-weight:600}
@@ -2051,7 +2049,7 @@ html{overscroll-behavior-y:contain}
   .xp-grid input[type=date],.inv-form input[type=date],.inv-form input[type=month],.inv-edit input[type=date],.inv-edit input[type=month],.ivd-grid input[type=date]{-webkit-appearance:none;appearance:none;display:block;text-align:left;min-width:0;max-width:100%;width:100%;box-sizing:border-box}
   .xp-grid input::-webkit-date-and-time-value,.inv-form input::-webkit-date-and-time-value,.inv-edit input::-webkit-date-and-time-value{text-align:left;margin:0}
   .xp-grid input,.xp-grid select{height:46px;min-height:46px;line-height:normal;padding-top:0;padding-bottom:0}
-  .xp-grid{gap:12px}.xp-grid label{min-width:0}.xp-form{padding:14px}.xp-form .pf-btns .btn{min-height:44px}
+  .xp-grid{gap:12px}.xp-grid label{min-width:0}
   .work-form,.wf{padding:14px}
   .props2 .date-ctl{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px;align-items:center}
   .props2 .date-ctl input{min-width:0;width:100%}
@@ -5789,12 +5787,25 @@ const xpActive=e=>(e.repeat==='month'||e.repeat==='year')&&(!e.until||e.until>=t
 function xpForm(){
   const d=XP.d,f=(k,l,type='text',ph='',extra='')=>`<label>${l}<input type="${type}" data-xp="${k}" data-fk="xp-${k}" value="${esc(d[k]??'')}" placeholder="${esc(ph)}" ${extra}></label>`;
   const sel=(k,l,opts)=>`<label${k==='jobId'?' class="xp-wide"':''}>${l}<select class="sel" data-xp="${k}">${opts.map(([v,t])=>`<option value="${esc(v)}" ${String(d[k]??'')===v?'selected':''}>${esc(t)}</option>`).join('')}</select></label>`;
-  return `<div class="xp-form"><h5 class="pf-h5">${XP.edit?'Edit expense':'Add an expense'}</h5><div class="xp-grid">
+  return `<div class="xp-grid">
     ${f('name','What','text','e.g. Adobe Creative Cloud')}${f('amount','Amount','number','0','min="0" step="any"')}
     ${sel('currency','Currency',[...new Set([...CURRENCIES,d.currency].filter(Boolean))].map(x=>[x,x]))}
     ${sel('cat','Kind',XP_CATS.map(x=>[x[0],x[1]]))}${sel('repeat','Repeats',[['none','One time'],['month','Every month'],['year','Every year']])}
-    ${sel('jobId','For a job (optional)',[['','Not for one job'],...jobsSorted().filter(j=>!j.example).map(j=>[j.id,j.name])])}</div>
-    <div class="pf-btns">${XP.edit?`<button type="button" class="btn sm" data-act="xp-cancel">Cancel</button>`:''}<button type="button" class="btn sm primary" data-act="xp-add">${XP.edit?'Save changes':`${I.plus}Add expense`}</button></div></div>`;
+    ${sel('jobId','For a job (optional)',[['','Not for one job'],...jobsSorted().filter(j=>!j.example).map(j=>[j.id,j.name])])}</div>`;
+}
+/* the add / edit expense dialog sits on the #crop layer, above the Profile dialog */
+function xpOpen(e){
+  XP.edit=e?e.id:null;XP.d=e?{name:e.name,amount:e.amount,currency:e.currency,date:e.date,cat:e.cat,repeat:e.repeat||'none',jobId:e.jobId||''}:xpBlank();XP.open=true;renderXpDlg();
+  requestAnimationFrame(()=>{if(!e&&matchMedia('(hover:hover)').matches)$('#crop [data-xp=name]')?.focus()});
+}
+function xpClose(){if(XP)XP.open=false;const c=$('#crop');c.hidden=true;c.innerHTML=''}
+function renderXpDlg(){
+  if(!XP?.open)return;const c=$('#crop');
+  withFocus(()=>{c.innerHTML=`<div class="modal xp-modal" role="dialog" aria-modal="true" aria-labelledby="xp-title">
+    <header><h2 id="xp-title">${XP.edit?'Edit expense':'Add an expense'}</h2><button class="icon-btn" data-act="xp-cancel" aria-label="Close" title="Close">${I.x}</button></header>
+    <div class="m-body">${xpForm()}</div>
+    <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="xp-cancel">Cancel</button><button type="button" class="btn primary" data-act="xp-add">${XP.edit?'Save changes':`${I.plus}Add expense`}</button></div></footer></div>`});
+  c.hidden=false;
 }
 function xpCommit(){
   const d=XP.d,amt=parseFloat(d.amount);
@@ -5803,10 +5814,10 @@ function xpCommit(){
   const items=xpItems().slice();
   if(XP.edit){const i=items.findIndex(x=>x.id===XP.edit);if(i>=0)items[i]={...items[i],...e}}
   else{items.unshift({id:uid(),...e});logAct('job',`Expense added: ${e.name} (${money(amt,e.currency)}${e.repeat==='month'?' a month':e.repeat==='year'?' a year':''})`)}
-  const was=XP.edit;xpSave(items);XP={edit:null,d:{...xpBlank(),currency:e.currency},year:XP.year};toast(was?'Expense saved':'Expense added');renderProfile();
+  const was=XP.edit;xpSave(items);xpClose();XP={edit:null,d:{...xpBlank(),currency:e.currency}};toast(was?'Expense saved':'Expense added');renderProfile();
 }
 function openProfile(sec){PRF={sec:sec||'me',mv:sec?'sec':'list',edit:false};renderProfile();$('#modal').hidden=false;closeSide();if(B.mode==='cloud'){if(B.cfg?.calendar&&!CAL.loaded)calStatus().then(()=>{if(PRF)renderProfile()});if(B.cfg?.clickup&&!CU.loaded)cuStatus().then(()=>{if(PRF)renderProfile()})}}
-function closeProfile(){PRF=null;$('#modal').hidden=true;$('#modal').innerHTML='';renderMeBtn()}
+function closeProfile(){xpClose();PRF=null;$('#modal').hidden=true;$('#modal').innerHTML='';renderMeBtn()}
 function renderProfile(){
   if(!PRF)return;
   const jobs=jobsSorted().filter(j=>!j.example||Object.values(S.jobs).every(x=>x.example)),t0=today(),ym=t0.slice(0,7),yr=t0.slice(0,4);
@@ -5879,20 +5890,16 @@ function renderProfile(){
       <div class="pf-table">${rows.map(r=>`<div class="pf-tr"><span class="pf-tj">${jobMark(r.j,18)}${esc(r.j.name)}</span><span>${esc(payLabel(r.w.pay)||'—')}${r.ph!=null?`<small class="hint"> · about ${esc(money(r.phc??r.ph,r.phc!=null?cb:r.cur))}/h</small>`:''}</span><span class="pf-num">${r.got==null?'—':r.got==='…'?'…':money(r.got,cb)}<small>received for ${yr}</small></span><span class="pf-sub">${[r.w.pay?.payday?`Paid ${esc(r.w.pay.payday)}`:'',r.w.pay?.method?`via ${esc(r.w.pay.method)}`:''].filter(Boolean).join(' ')||''}</span></div>`).join('')}</div></div>
       ${fxWait?'<p class="hint">Getting exchange rates… amounts in other currencies are added once they load.</p>':''}<p class="hint">From your invoices marked Paid, counted in the month each one covers (its Period)${cb&&inv.some(v=>v.currency!==cb)?`, converted to ${cb}`:''}. The hourly rate comes from each job's pay and schedule in Work details.</p>`},
     {id:'costs',label:'Expenses',sub:'Subscriptions, gear and other costs',icon:'<svg class="i" viewBox="0 0 16 16"><path d="M3.5 1.8h9v12.6l-1.8-1.1-1.5 1.1-1.7-1.1-1.7 1.1-1.5-1.1-1.8 1.1z"/><path d="M6 5.2h4M6 8h4M8 10.2v.1"/></svg>',html:(()=>{
-      const yy=XP.year||yr,yEnd=yy===yr?ym:yy+'-12',subs=xps.filter(e=>e.repeat==='month'||e.repeat==='year');
-      const years=[...new Set([yr,...xps.flatMap(e=>xpMonths(e,'2000-01',ym).map(m=>m.slice(0,4)))])].sort().reverse();
-      const occ=xps.flatMap(e=>xpMonths(e,yy+'-01',yEnd).map(m=>({e,m,d:e.repeat==='none'?e.date:`${m}-${String(Math.min(ymDays(m),+(e.date||'').slice(8,10)||1)).padStart(2,'0')}`}))).sort((a,b)=>b.d.localeCompare(a.d));
-      const byCat=XP_CATS.map(c=>({c,v:occ.filter(o=>(o.e.cat||'other')===c[0]||(c[0]==='other'&&!XP_CATS.some(x=>x[0]===o.e.cat))).reduce((a,o)=>{const x=xconv(o.e.amount,o.e.currency);return x==null?a:a+x},0)})).filter(x=>x.v>0),catTot=byCat.reduce((a,x)=>a+x.v,0);
+      const subs=xps.filter(e=>e.repeat==='month'||e.repeat==='year'),once=xps.filter(e=>e.repeat!=='month'&&e.repeat!=='year').sort((a,b)=>(b.date||'').localeCompare(a.date||''));
       const acts=e=>`<button type="button" class="icon-btn" data-act="xp-edit" data-id="${e.id}" title="Edit" aria-label="Edit expense">${I.pencil}</button><button type="button" class="icon-btn ${xpDelArmed===e.id?'danger armed':''}" data-act="xp-del" data-id="${e.id}" title="${xpDelArmed===e.id?'Click again to delete':'Delete'}" aria-label="Delete expense">${xpDelArmed===e.id?'Sure?':I.trash}</button>`;
       const amt=(n,c)=>`${esc(money(n,c))}${cx&&c!==cx&&xconv(n,c)!=null?`<small>≈ ${esc(money(xconv(n,c),cx))}</small>`:''}`;
       const chip=k=>{const c=xpCat(k);return `<span class="xp-cat" style="--xc:${c[2]}">${esc(c[1])}</span>`};
       const perMonth=subs.filter(xpActive).reduce((a,e)=>{const x=xconv(e.amount,e.currency);return x==null?a:a+(e.repeat==='year'?x/12:x)},0);
       return `<div class="pf-tiles wide xp-one">${tile(cx?money(perMonth,cx):'—','subscriptions a month')}</div>
-      ${xpForm()}
+      <div class="xp-addrow"><button type="button" class="btn primary" data-act="xp-new">${I.plus}Add expense</button></div>
       ${subs.length?`<div class="pf-block"><h5 class="pf-h5">Subscriptions</h5><div class="pf-list">${subs.map(e=>{const on=xpActive(e);return `<div class="xp-row ${on?'':'off'}"><div class="xp-main"><b>${esc(e.name)}</b><small>${chip(e.cat)}${e.repeat==='year'?'Every year':'Every month'} · since ${esc(monthLabel(e.date.slice(0,7)))}${e.until?` · <b class="xp-stop">Cancelled</b><span>last paid ${esc(monthLabel(e.until))}</span>`:''}${e.jobId&&S.jobs[e.jobId]?` · ${esc(S.jobs[e.jobId].name)}`:''}</small></div><div class="xp-amt">${amt(e.amount,e.currency)}<small>${e.repeat==='year'?'a year':'a month'}</small></div><div class="xp-acts">${!e.until?`<button type="button" class="btn sm" data-act="xp-stop" data-id="${e.id}" title="You've cancelled it: stop counting it after this month">Mark cancelled</button>`:`<button type="button" class="btn sm" data-act="xp-restart" data-id="${e.id}" title="Count it every month again">Paying again</button>`}${acts(e)}</div></div>`}).join('')}</div></div>`:''}
-      <div class="pf-block"><div class="xp-yh"><h5 class="pf-h5">Paid in ${esc(yy)}</h5>${years.length>1?`<select class="sel pf-range" data-act="xp-year" aria-label="Year">${years.map(y=>`<option ${y===yy?'selected':''}>${y}</option>`).join('')}</select>`:''}</div>
-      ${catTot?`<div class="pf-split">${byCat.map(x=>`<i style="width:${(x.v/catTot*100).toFixed(2)}%;--jc:${x.c[2]}" title="${esc(x.c[1])}: ${esc(money(x.v,cx))}"></i>`).join('')}</div><div class="pf-legend">${byCat.map(x=>`<span><i style="--jc:${x.c[2]}"></i>${esc(x.c[1])} <b>${Math.round(x.v/catTot*100)}%</b> <small>${esc(money(x.v,cx))}</small></span>`).join('')}</div>`:''}
-      ${occ.length?`<div class="pf-list">${occ.map((o,i)=>`${i===0||occ[i-1].m!==o.m?`<div class="xp-mh"><b>${esc(MONTH_FULL[+o.m.slice(5,7)-1])}</b><span>${esc(money(costIn(o.m,o.m),cx))}</span></div>`:''}<div class="xp-row"><div class="xp-main"><b>${esc(o.e.name)}</b><small>${chip(o.e.cat)}${esc(fmtDate(o.d))}${o.e.repeat!=='none'?' · subscription':''}${o.e.jobId&&S.jobs[o.e.jobId]?` · ${esc(S.jobs[o.e.jobId].name)}`:''}</small></div><div class="xp-amt">${amt(o.e.amount,o.e.currency)}</div><div class="xp-acts">${o.e.repeat==='none'?acts(o.e):''}</div></div>`).join('')}</div>`:`<p class="hint">Nothing paid in ${esc(yy)} yet. Add your software subscriptions, music and stock sites, gear and fees above.</p>`}</div>
+      ${once.length?`<div class="pf-block"><h5 class="pf-h5">One-time costs</h5><div class="pf-list">${once.map(e=>`<div class="xp-row"><div class="xp-main"><b>${esc(e.name)}</b><small>${chip(e.cat)}${esc(fmtDate(e.date))}${e.jobId&&S.jobs[e.jobId]?` · ${esc(S.jobs[e.jobId].name)}`:''}</small></div><div class="xp-amt">${amt(e.amount,e.currency)}</div><div class="xp-acts">${acts(e)}</div></div>`).join('')}</div></div>`:''}
+      ${xps.length?'':`<p class="hint">No expenses yet. Add your software subscriptions, music and stock sites, gear and fees.</p>`}
       <p class="hint">Expenses are dated the day you add them. Subscriptions count every month (or year) from then until you mark them Cancelled. Amounts in other currencies are converted with a recent exchange rate.</p>`})()},
     {id:'week',label:'My week',icon:I.cal,html:`<p class="hint">${wkTot?`${fmtNum(wkTot)} hours scheduled a week across ${jobs.filter(j=>(workOf(j).days||[]).length).length} jobs.`:'Add work days and hours in each job’s Work details to see your week here.'}</p>
       <div class="pf-week">${week.map(x=>`<div class="pf-day ${x.on.length?'':'off'} ${new Date().getDay()===x.d?'today':''}"><div class="pf-dh"><b>${WEEKDAY_FULL[x.d]}</b><small>${x.hrs?fmtNum(x.hrs)+' h':'Off'}</small></div><div class="pf-shifts">${x.on.map(j=>{const w=workOf(j);return `<span class="pf-shift" style="--jc:${esc(j.color||'var(--accent)')}"><span class="pf-sn">${jobEmoji(j)}${esc(j.name)}</span><em>${w.shiftStart&&w.shiftEnd?`${esc(fmtClock(w.shiftStart))} – ${esc(fmtClock(w.shiftEnd))}`:jobHoursDay(w)?`${fmtNum(jobHoursDay(w))} h`:''}</em></span>`}).join('')}</div></div>`).join('')}</div>`},
@@ -7644,9 +7651,10 @@ document.addEventListener('click',e=>{
     case 'inv-close': closeInv();break;
     case 'profile': openProfile();break;
     case 'prf-close': closeProfile();break;
+    case 'xp-new': if(XP)xpOpen();break;
     case 'xp-add': if(XP)xpCommit();break;
-    case 'xp-cancel': if(XP){XP.edit=null;XP.d=xpBlank();renderProfile()}break;
-    case 'xp-edit': {const e=xpItems().find(x=>x.id===el.dataset.id);if(e&&XP){XP.edit=e.id;XP.d={name:e.name,amount:e.amount,currency:e.currency,date:e.date,cat:e.cat,repeat:e.repeat||'none',jobId:e.jobId||''};renderProfile();requestAnimationFrame(()=>$('.xp-form')?.scrollIntoView({block:'nearest',behavior:'smooth'}))}break}
+    case 'xp-cancel': xpClose();break;
+    case 'xp-edit': {const e=xpItems().find(x=>x.id===el.dataset.id);if(e&&XP)xpOpen(e);break}
     case 'xp-del': {const id=el.dataset.id;if(xpDelArmed!==id){xpDelArmed=id;renderProfile();setTimeout(()=>{if(xpDelArmed===id){xpDelArmed=null;if(PRF)renderProfile()}},3000);break}
       xpDelArmed=null;const old=xpItems(),e=old.find(x=>x.id===id);xpSave(old.filter(x=>x.id!==id));if(XP?.edit===id){XP.edit=null;XP.d=xpBlank()}renderProfile();toast(`Deleted ${e?.name||'expense'}`,{label:'Undo',fn:()=>{xpSave(old);if(PRF)renderProfile()}});break}
     case 'xp-stop': xpSave(xpItems().map(x=>x.id===el.dataset.id?{...x,until:today().slice(0,7)}:x));renderProfile();toast('Marked cancelled. It counts up to this month.');break;
@@ -7913,7 +7921,7 @@ document.addEventListener('keydown',e=>{
     return;
   }
   if(e.key==='Escape'&&SEL.size&&$('#drawer').hidden&&$('#modal').hidden){clearSel();return}
-  if(e.key==='Escape'){if(POMO_OPEN){POMO_OPEN=false;renderPomo();return}if(!$('#filter-sheet').hidden){closeFilters();return}if($('#side').classList.contains('open')){closeSide();return}if(INV){closeInv();return}if(INVD){closeInvDefaults();return}if(STKB){closeStickers();return}if(PRF){closeProfile();return}if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
+  if(e.key==='Escape'){if(XP?.open){xpClose();return}if(POMO_OPEN){POMO_OPEN=false;renderPomo();return}if(!$('#filter-sheet').hidden){closeFilters();return}if($('#side').classList.contains('open')){closeSide();return}if(INV){closeInv();return}if(INVD){closeInvDefaults();return}if(STKB){closeStickers();return}if(PRF){closeProfile();return}if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'');
   if(e.key==='Enter'&&!typing){const r=e.target.closest?.('[data-act="open"]');if(r){openTask(r.dataset.id);return}}
   if(typing||e.metaKey||e.ctrlKey||e.altKey)return;
@@ -7959,8 +7967,7 @@ document.addEventListener('change',e=>{
   if(act==='inv-sort'){S.ui.invSort=el.value;saveUi();render();return}
   if(act==='home-cur'){saveApp({homeCurrency:el.value});render();if(PRF)renderProfile();return}
   if(act==='prf-range'){S.ui.payRange=el.value;saveUi();renderProfile();return}
-  if(act==='xp-year'&&XP){XP.year=el.value;renderProfile();return}
-  if(XP&&el.dataset.xp){XP.d[el.dataset.xp]=el.value;if(el.dataset.xp==='repeat')renderProfile();return}
+  if(XP&&el.dataset.xp){XP.d[el.dataset.xp]=el.value;return}
   if(act==='doc-kind'){const job=S.jobs[S.ui.tab];if(job)patch('jobs',job.id,{docs:(job.docs||[]).map(d=>d.id===el.dataset.id?{...d,kind:el.value}:d)});return}
   if(el.id==='doc-file'){docUpload([...el.files]);el.value='';return}
   if(el.dataset&&el.dataset.docf){const job=S.jobs[S.ui.tab];if(job)patch('jobs',job.id,{docs:(job.docs||[]).map(d=>d.id===el.dataset.docf?{...d,name:el.value.trim()||d.name}:d)});return}
