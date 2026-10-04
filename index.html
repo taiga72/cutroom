@@ -668,6 +668,7 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .ivd-grid label{display:grid;gap:4px;font-size:calc(12.5px*var(--ts));color:var(--muted)}
 .ivd-grid input,.ivd-grid textarea,.ivd-grid select{width:100%;box-sizing:border-box;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:9px;padding:8px 10px;font:500 calc(13.5px*var(--ts)) var(--body)}
 .ivd-grid textarea{resize:vertical}
+.ivd-grid .ivd-due{grid-column:1/-1}.ivd-pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:8px}
 .ivd-grid input:focus,.ivd-grid textarea:focus,.ivd-grid select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
 .ivd-prev{font-family:var(--mono);color:var(--text)!important}
 @media (max-width:820px){.ivd-grid{grid-template-columns:1fr}}
@@ -2371,7 +2372,7 @@ select.rs-add{appearance:auto}
 .inv-form label{display:grid;gap:4px;font-size:calc(12.5px*var(--ts));color:var(--muted)}
 .inv-form .pref-group{margin:8px 0 0}
 .inv-form .pref-group small{font-weight:400;text-transform:none;letter-spacing:0}
-.iv-row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.iv-row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.iv-row3.iv-row4{grid-template-columns:1.3fr 1fr 1fr .8fr}
 .iv-row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .iv-items-form{display:grid;gap:6px}
 .iv-li{display:grid;grid-template-columns:minmax(0,1fr) 64px 96px auto;gap:6px;align-items:center}
@@ -3188,6 +3189,19 @@ const invList=(j,sort=S.ui.invSort||'period')=>(j?.invoices||[]).slice().sort((a
   const pa=invPer(a),pb=invPer(b);if(!pa!==!pb)return pa?-1:1;
   return (sort==='period-old'?pa.localeCompare(pb):pb.localeCompare(pa))||byDate});
 const monthLabel=ym=>ym?`${MONTH_FULL[+ym.slice(5,7)-1]} ${ym.slice(0,4)}`:'';
+/* twice-a-month billing: an invoice can cover half a month (half 1 = 1–15, half 2 = 16–end) */
+const ymDays=ym=>new Date(+ym.slice(0,4),+ym.slice(5,7),0).getDate();
+const ymNext=(ym,n=1)=>{const d=new Date(+ym.slice(0,4),+ym.slice(5,7)-1+n,1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`};
+const halfLabel=(ym,h)=>+h===1?'1–15':+h===2&&ym?`16–${ymDays(ym)}`:'';
+const perLabel=(ym,h)=>ym?monthLabel(ym)+(+h?` (${halfLabel(ym,h)})`:''):'';
+const PER_RE=new RegExp('('+MONTH_FULL.join('|')+') \\d{4}(?: \\((?:1–15|16–\\d{2})\\))?');
+const ORD=n=>n+(n%100>10&&n%100<14?'th':{1:'st',2:'nd',3:'rd'}[n%10]||'th');
+/* the due date from a job's defaults: N days after issue, or a set day of the month covered / the month after (per half when billed twice) */
+function invDueFor(def,ym,half,issued=today()){
+  if(def?.dueMode!=='day'||!ym)return addDays(issued,def?.dueDays!==''&&def?.dueDays!=null?+def.dueDays:7);
+  const two=+half===2,day=two?def.dueDay2:def.dueDay,when=two?def.dueWhen2:def.dueWhen,m=when==='same'?ym:ymNext(ym),n=ymDays(m);
+  return `${m}-${String(day==='last'?n:Math.min(n,Math.max(1,+day||15))).padStart(2,'0')}`;
+}
 const money=(n,c)=>{try{return new Intl.NumberFormat(undefined,{style:'currency',currency:c||'USD'}).format(+n||0)}catch(e){return (c||'')+' '+fmtNum(+n||0)}};
 const invTotals=d=>{const sub=(d.items||[]).reduce((a,x)=>a+(+x.q||0)*(+x.r||0),0),tax=Math.round(sub*(+d.tax||0))/100;return {sub,tax,total:sub+tax}};
 const invState=v=>v.status==='paid'?'paid':v.status==='sent'&&v.due&&v.due<today()?'overdue':v.status||'draft';
@@ -3220,17 +3234,23 @@ function openInvDefaults(jobId){
   INVD={jobId,d:{
     toName:job.invoiceTo?.name??last?.to?.name??job.name,toDetails:job.invoiceTo?.details??last?.to?.details??[w.contact?.name,w.contact?.reach,w.location].filter(Boolean).join('\n'),
     number:def.number||'',next:def.next||'',item:def.item||(p.period==='video'?'Videos delivered · {month}':'Video editing · {month}'),qty:def.qty??'',rate:def.rate??(p.amount||''),currency:def.currency||p.currency||'USD',
-    dueDays:def.dueDays??7,tax:job.invoiceTax??last?.tax??'',notes:job.invoiceNotes??last?.notes??(p.method?`Payment via ${p.method}.`:''),payment:def.payment||'',
+    dueDays:def.dueDays??7,dueMode:def.dueMode||'days',dueDay:def.dueDay??15,dueWhen:def.dueWhen||'next',dueDay2:def.dueDay2??'last',dueWhen2:def.dueWhen2||'next',billing:def.billing||'month',tax:job.invoiceTax??last?.tax??'',notes:job.invoiceNotes??last?.notes??(p.method?`Payment via ${p.method}.`:''),payment:def.payment||'',
     fName:from.name||B.name||'',fEmail:from.email||B.email||'',fPhone:from.phone||'',fAddress:from.address||'',fTax:from.taxId||'',fPayment:from.payment||''}};
   renderInvDefaults();$('#modal').hidden=false;
 }
 function closeInvDefaults(){INVD=null;$('#modal').hidden=true;$('#modal').innerHTML=''}
 function invDefPreview(){const job=S.jobs[INVD?.jobId];if(!job)return '';const d=INVD.d;if(!d.number)return `Next number: ${nextInvNumber()} (the app's own numbering)`;
   const n=invDefNext(job,{number:d.number,next:d.next});return `Next number: ${invFill(d.number,n)}`}
+function invDuePreview(){if(!INVD)return '';const d=INVD.d,ym=today().slice(0,7),ex=d.billing==='half'?[[ym,1],[ym,2]]:[[ym,0]];
+  if(d.dueMode!=='day')return `Due ${+d.dueDays||0} days after the invoice date.`;
+  return 'For example: '+ex.map(([m,h])=>`${perLabel(m,h)} is due ${fmtDate(invDueFor(d,m,h))}`).join(', ')+'.'}
 function renderInvDefaults(){
   if(!INVD)return;const job=S.jobs[INVD.jobId],d=INVD.d;
   const f=(k,l,ph='',type='text',extra='')=>`<label>${l}<input type="${type}" data-ivd="${k}" data-fk="ivd-${k}" value="${esc(d[k]??'')}" placeholder="${esc(ph)}" ${extra}></label>`;
   const a=(k,l,ph='',rows=2)=>`<label>${l}<textarea data-ivd="${k}" data-fk="ivd-${k}" rows="${rows}" placeholder="${esc(ph)}">${esc(d[k]??'')}</textarea></label>`;
+  const s2=(k,l,opts)=>`<label>${l}<select class="sel" data-ivd="${k}">${opts.map(([v,t])=>`<option value="${v}" ${String(d[k])===v?'selected':''}>${esc(t)}</option>`).join('')}</select></label>`;
+  const days=[...Array.from({length:31},(_,i)=>[String(i+1),'the '+ORD(i+1)]),['last','the last day']];
+  const dueRow=(n,l)=>`<label class="ivd-due">${l}<span class="ivd-pair"><select class="sel" data-ivd="dueDay${n}" aria-label="Day">${days.map(([v,t])=>`<option value="${v}" ${String(d['dueDay'+n])===v?'selected':''}>${t}</option>`).join('')}</select><select class="sel" data-ivd="dueWhen${n}" aria-label="Which month"><option value="same" ${d['dueWhen'+n]==='same'?'selected':''}>of the month it covers</option><option value="next" ${d['dueWhen'+n]!=='same'?'selected':''}>of the month after</option></select></span></label>`;
   keepScroll('#modal',()=>withFocus(()=>{$('#modal').innerHTML=`<div class="modal ivd-modal" role="dialog" aria-modal="true" aria-labelledby="ivd-title">
     <header><h2 id="ivd-title">Invoice defaults · ${esc(job?.name||'')}</h2><button class="icon-btn" data-act="ivd-close" aria-label="Close" title="Close">${I.x}</button></header>
     <div class="m-body ivd-body">
@@ -3241,8 +3261,13 @@ function renderInvDefaults(){
       <p class="hint">{n} is the number (001, 002…). You can also use {yyyy}, {yy} and {mm}. Leave the pattern empty to use INV-${today().slice(0,4)}-001. Numbers already used by this job's invoices are skipped.</p>
       <p class="pref-group">Line item and terms</p><div class="ivd-grid">${f('item','Description','Video editing · {month}')}${f('qty','Quantity','1','number','min="0" step="any"')}${f('rate','Rate','0','number','min="0" step="any"')}
         <label>Currency<select class="sel" data-ivd="currency">${[...new Set([...CURRENCIES,d.currency].filter(Boolean))].map(x=>`<option ${x===d.currency?'selected':''}>${esc(x)}</option>`).join('')}</select></label>
-        ${f('dueDays','Due after (days)','7','number','min="0"')}${f('tax','Tax %','0','number','min="0" step="any"')}</div>
-      <p class="hint">{month} becomes the invoice's month, e.g. “October 2026”. Leave Quantity empty to count the month's finished videos on per-video jobs.</p>
+        ${f('tax','Tax %','0','number','min="0" step="any"')}</div>
+      <p class="hint">{month} becomes the invoice's month, e.g. “October 2026”, or “October 2026 (1–15)” when billed twice a month. Leave Quantity empty to count the month's finished videos on per-video jobs.${d.billing==='half'?' Rate is the amount for each half.':''}</p>
+      <p class="pref-group">Billing and due date</p><div class="ivd-grid">
+        ${s2('billing','How often you bill',[['month','Once a month'],['half','Twice a month (1–15 and 16–end)']])}
+        ${s2('dueMode','Due date',[['days','A number of days after issue'],['day','On a set day of the month']])}
+        ${d.dueMode==='day'?dueRow('','When '+(d.billing==='half'?'the 1st half (1–15) is':'it’s')+' due')+(d.billing==='half'?dueRow('2','When the 2nd half (16–end) is due'):''):f('dueDays','Due after (days)','7','number','min="0"')}</div>
+      <p class="hint ivd-prev" id="ivd-due">${esc(invDuePreview())}</p>
       <p class="pref-group">Payment and notes</p><div class="ivd-grid one">${a('payment','Payment details for this job','Leave empty to use your usual payment details below',3)}${a('notes','Notes','Thanks! Payment terms, PO number…',2)}</div>
       <p class="pref-group">Your details <small>(all jobs)</small></p><div class="ivd-grid">${f('fName','Your name')}${f('fEmail','Email','','email')}${f('fPhone','Phone')}${f('fTax','Tax ID (optional)')}</div>
       <div class="ivd-grid one">${a('fAddress','Address','',2)}${a('fPayment','Your usual payment details','Bank, Wise, PayPal, Payoneer…',3)}</div>
@@ -3252,21 +3277,31 @@ function renderInvDefaults(){
 function saveInvDefaults(){
   const job=S.jobs[INVD?.jobId];if(!job)return;const d=INVD.d,num=(x)=>x===''||x==null?'':+x;
   patch('jobs',job.id,{invoiceTo:{name:d.toName.trim(),details:d.toDetails.trim()},invoiceNotes:d.notes,invoiceTax:d.tax===''?'':+d.tax,
-    invoiceDef:{number:d.number.trim(),next:num(d.next),item:d.item.trim(),qty:num(d.qty),rate:num(d.rate),currency:d.currency,dueDays:d.dueDays===''?7:+d.dueDays,payment:d.payment.trim()}});
+    invoiceDef:{number:d.number.trim(),next:num(d.next),item:d.item.trim(),qty:num(d.qty),rate:num(d.rate),currency:d.currency,dueDays:d.dueDays===''?7:+d.dueDays,
+      dueMode:d.dueMode,dueDay:d.dueDay==='last'?'last':+d.dueDay,dueWhen:d.dueWhen,dueDay2:d.dueDay2==='last'?'last':+d.dueDay2,dueWhen2:d.dueWhen2,billing:d.billing,payment:d.payment.trim()}});
   saveApp({invoiceFrom:{...(appSettings().invoiceFrom||{}),name:d.fName.trim(),email:d.fEmail.trim(),phone:d.fPhone.trim(),address:d.fAddress.trim(),taxId:d.fTax.trim(),payment:d.fPayment.trim()}});
   logAct('job',`Invoice defaults saved for ${job.name}`,{jobId:job.id});closeInvDefaults();toast('Invoice defaults saved');render();
 }
-document.addEventListener('input',e=>{const el=e.target;if(INVD&&el.dataset&&el.dataset.ivd){INVD.d[el.dataset.ivd]=el.value;if(['number','next'].includes(el.dataset.ivd)){const pv=$('#ivd-prev');if(pv)pv.textContent=invDefPreview()}}});
-document.addEventListener('change',e=>{const el=e.target;if(INVD&&el.dataset&&el.dataset.ivd&&el.tagName==='SELECT')INVD.d[el.dataset.ivd]=el.value});
+document.addEventListener('input',e=>{const el=e.target;if(INVD&&el.dataset&&el.dataset.ivd){INVD.d[el.dataset.ivd]=el.value;if(['number','next'].includes(el.dataset.ivd)){const pv=$('#ivd-prev');if(pv)pv.textContent=invDefPreview()}if(el.dataset.ivd==='dueDays'){const pv=$('#ivd-due');if(pv)pv.textContent=invDuePreview()}}});
+document.addEventListener('change',e=>{const el=e.target;if(INVD&&el.dataset&&el.dataset.ivd&&el.tagName==='SELECT'){INVD.d[el.dataset.ivd]=el.value;if(['billing','dueMode'].includes(el.dataset.ivd))renderInvDefaults();else{const pv=$('#ivd-due');if(pv)pv.textContent=invDuePreview()}}});
+/* which period a new invoice is for: this month, or when billed twice a month the half that just ended
+   (from the 15th: this month's 1–15, before it: last month's 16–end), moved on past any half that already has an invoice */
+function invNextPer(job){
+  const ym=today().slice(0,7);if(invDef(job)?.billing!=='half')return {ym,half:0};
+  let m=+today().slice(8)>=15?ym:ymNext(ym,-1),h=m===ym?1:2;const has=(m,h)=>(job.invoices||[]).some(v=>invPer(v)===m&&+v.half===h);
+  for(let i=0;i<2&&has(m,h);i++){if(h===1)h=2;else{h=1;m=ymNext(m)}}
+  return {ym:m,half:h};
+}
 function invNew(job){
   /* what you typed last time for this job (billed to, notes, tax) and your own details carry over */
   const last=(job.invoices||[]).filter(v=>v.kind==='made'&&v.doc).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0]?.doc;
-  const w=workOf(job),p=w.pay||{},ym=today().slice(0,7),from=appSettings().invoiceFrom||{name:B.name||'',email:B.email||''};
+  const w=workOf(job),p=w.pay||{},from=appSettings().invoiceFrom||{name:B.name||'',email:B.email||''},def=invDef(job)||{},nd=invDefNext(job);
+  const {ym,half}=invNextPer(job);
   const n=p.period==='video'?deliveredIn(job.id,ym).length||1:1;
   const what={month:`Video editing · ${monthLabel(ym)}`,week:'Video editing · weekly',day:'Video editing · days',hour:'Video editing · hours',project:'Video editing · project',video:`Videos delivered · ${monthLabel(ym)}`}[p.period]||`Video editing · ${monthLabel(ym)}`;
-  const def=invDef(job)||{},nd=invDefNext(job);
-  const item=def.item?def.item.replace('{month}',monthLabel(ym)):what,qty=def.qty!==''&&def.qty!=null?def.qty:n,rate=def.rate!==''&&def.rate!=null?def.rate:(p.amount||'');
-  return {number:nd?invFill(def.number,nd,ym):nextInvNumber(),date:today(),due:addDays(today(),def.dueDays!==''&&def.dueDays!=null?+def.dueDays:7),period:ym,currency:def.currency||p.currency||'USD',
+  const item=(def.item?def.item.replace('{month}',monthLabel(ym)):what).replace(PER_RE,perLabel(ym,half)),qty=def.qty!==''&&def.qty!=null?def.qty:n,
+    rate=def.rate!==''&&def.rate!=null?def.rate:half&&p.amount?Math.round(+p.amount/2*100)/100:(p.amount||'');
+  return {number:nd?invFill(def.number,nd,ym):nextInvNumber(),date:today(),due:invDueFor(def,ym,half),period:ym,half,currency:def.currency||p.currency||'USD',
     from:{name:from.name||'',email:from.email||'',phone:from.phone||'',address:from.address||'',payment:def.payment||from.payment||'',taxId:from.taxId||''},
     to:job.invoiceTo?{...job.invoiceTo}:last?{...last.to}:{name:job.name,details:[w.contact?.name,w.contact?.reach,w.location].filter(Boolean).join('\n')},
     items:[{d:item,q:qty,r:rate}],tax:job.invoiceTax??last?.tax??'',notes:job.invoiceNotes??last?.notes??(p.method?`Payment via ${p.method}.`:''),list:[]};
@@ -3276,7 +3311,7 @@ function invSheet(d){
   return `<div class="inv-sheet"><div class="iv-top"><div><div class="iv-title">Invoice</div><div class="iv-no">${esc(d.number||'')}</div></div>
     <div class="iv-from"><b>${esc(d.from?.name||'Your name')}</b>${d.from?.email?`<span>${esc(d.from.email)}</span>`:''}${d.from?.phone?`<span>${esc(d.from.phone)}</span>`:''}${d.from?.address?`<span>${ml(d.from.address)}</span>`:''}${d.from?.taxId?`<span>Tax ID ${esc(d.from.taxId)}</span>`:''}</div></div>
     <div class="iv-meta"><div><small>Billed to</small><b>${esc(d.to?.name||'')}</b>${d.to?.details?`<span>${ml(d.to.details)}</span>`:''}</div>
-      <div class="iv-dates"><div><small>Issued</small><b>${d.date?absDate(d.date):'—'}</b></div><div><small>Due</small><b>${d.due?absDate(d.due):'—'}</b></div>${d.period?`<div><small>Period</small><b>${esc(monthLabel(d.period))}</b></div>`:''}</div></div>
+      <div class="iv-dates"><div><small>Issued</small><b>${d.date?absDate(d.date):'—'}</b></div><div><small>Due</small><b>${d.due?absDate(d.due):'—'}</b></div>${d.period?`<div><small>Period</small><b>${esc(perLabel(d.period,d.half))}</b></div>`:''}</div></div>
     <table class="iv-items"><thead><tr><th>Description</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>
       ${(d.items||[]).filter(x=>x.d||+x.r).map(x=>`<tr><td>${ml(x.d)}</td><td>${fmtNum(+x.q||0)}</td><td>${money(x.r,c)}</td><td>${money((+x.q||0)*(+x.r||0),c)}</td></tr>`).join('')}</tbody></table>
     <div class="iv-tot"><div><span>Subtotal</span><b>${money(t.sub,c)}</b></div>${+d.tax?`<div><span>Tax ${fmtNum(+d.tax)}%</span><b>${money(t.tax,c)}</b></div>`:''}<div class="iv-grand"><span>Total due</span><b>${money(t.total,c)}</b></div></div>
@@ -3288,11 +3323,12 @@ function invoicesPane(job){
   const list=invList(job),ym=today().slice(0,7),w=workOf(job),c=w.pay?.currency||'USD';
   const yr=today().slice(0,4),inYr=list.filter(v=>(v.date||'').startsWith(yr));
   const paid=inYr.filter(v=>v.status==='paid').reduce((a,v)=>a+(+v.amount||0),0),open=list.filter(v=>v.status==='sent').reduce((a,v)=>a+(+v.amount||0),0);
-  const missing=w.pay?.period==='month'&&!list.some(v=>v.period===ym);
+  const two=invDef(job)?.billing==='half',np=two?invNextPer(job):{ym,half:0};
+  const missing=w.pay?.period==='month'&&(two?np.ym<=ym&&(np.ym<ym||np.half===1&&+today().slice(8)>=15):!list.some(v=>v.period===ym));
   const row=v=>{const st=invState(v),href=v.kind==='file'&&v.file?imgSrc(v.file.v):'',ed=ROW_EDIT.has(v.id);
     return `<div class="inv-row st-${st} ${ed?'editing':''}"><span class="inv-ic">${v.kind==='file'?I.file:INV_IC}</span>
-      <div class="inv-main"><b>${esc(v.number||v.file?.name||'Invoice')}</b><small>${[v.period?monthLabel(v.period):'',v.date?'Issued '+fmtDate(v.date):'',v.due&&v.status!=='paid'?'Due '+fmtDate(v.due):'',v.paidAt?'Paid '+fmtDate(v.paidAt):'',v.kind==='file'?'Uploaded file':''].filter(Boolean).join(' · ')}</small>
-        ${v.kind==='file'&&ed?`<div class="inv-edit"><label>Period<input type="month" data-invf="${v.id}" data-k="period" value="${esc(v.period||'')}"></label><label>Currency<select class="sel" data-invf="${v.id}" data-k="currency" aria-label="Currency">${[...new Set([...CURRENCIES,v.currency].filter(Boolean))].map(x=>`<option value="${esc(x)}" ${(v.currency||c)===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label><label>Amount<input type="number" step="any" min="0" data-invf="${v.id}" data-k="amount" value="${esc(v.amount??'')}" placeholder="0"></label><label>Due<input type="date" data-invf="${v.id}" data-k="due" value="${esc(v.due||'')}"></label>${v.status==='paid'?`<label>Paid on<input type="date" data-invf="${v.id}" data-k="paidAt" value="${esc(dayOf(v.paidAt)||'')}"></label>`:''}</div>`:ed&&v.status==='paid'?`<div class="inv-edit">${v.status==='paid'?`<label>Paid on<input type="date" data-invf="${v.id}" data-k="paidAt" value="${esc(dayOf(v.paidAt)||'')}"></label>`:''}</div>`:''}</div>
+      <div class="inv-main"><b>${esc(v.number||v.file?.name||'Invoice')}</b><small>${[v.period?perLabel(v.period,v.half):'',v.date?'Issued '+fmtDate(v.date):'',v.due&&v.status!=='paid'?'Due '+fmtDate(v.due):'',v.paidAt?'Paid '+fmtDate(v.paidAt):'',v.kind==='file'?'Uploaded file':''].filter(Boolean).join(' · ')}</small>
+        ${v.kind==='file'&&ed?`<div class="inv-edit"><label>Period<input type="month" data-invf="${v.id}" data-k="period" value="${esc(v.period||'')}"></label>${invDef(job)?.billing==='half'||+v.half?`<label>Half<select class="sel" data-invf="${v.id}" data-k="half" aria-label="Which half">${[['','Whole month'],['1','1–15'],['2','16–end']].map(([x,l])=>`<option value="${x}" ${String(v.half||'')===x?'selected':''}>${l}</option>`).join('')}</select></label>`:''}<label>Currency<select class="sel" data-invf="${v.id}" data-k="currency" aria-label="Currency">${[...new Set([...CURRENCIES,v.currency].filter(Boolean))].map(x=>`<option value="${esc(x)}" ${(v.currency||c)===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label><label>Amount<input type="number" step="any" min="0" data-invf="${v.id}" data-k="amount" value="${esc(v.amount??'')}" placeholder="0"></label><label>Due<input type="date" data-invf="${v.id}" data-k="due" value="${esc(v.due||'')}"></label>${v.status==='paid'?`<label>Paid on<input type="date" data-invf="${v.id}" data-k="paidAt" value="${esc(dayOf(v.paidAt)||'')}"></label>`:''}</div>`:ed&&v.status==='paid'?`<div class="inv-edit">${v.status==='paid'?`<label>Paid on<input type="date" data-invf="${v.id}" data-k="paidAt" value="${esc(dayOf(v.paidAt)||'')}"></label>`:''}</div>`:''}</div>
       <div class="inv-amt">${v.amount!==''&&v.amount!=null?money(v.amount,v.currency||c):'—'}${v.amount!==''&&v.amount!=null&&approx(v.amount,v.currency||c)?`<small>${approx(v.amount,v.currency||c)}</small>`:''}</div>
       <select class="sel inv-st inv-${st}" data-act="inv-status" data-id="${v.id}" aria-label="Status">${['draft','sent','paid'].map(x=>`<option value="${x}" ${v.status===x||(!v.status&&x==='draft')?'selected':''}>${x==='sent'&&st==='overdue'?'Overdue':INV_ST[x]}</option>`).join('')}</select>
       <div class="inv-acts">${v.kind==='made'?`<button type="button" class="btn sm" data-act="inv-open" data-id="${v.id}">Open</button><button type="button" class="icon-btn" data-act="inv-pdf" data-id="${v.id}" title="Download PDF" aria-label="Download PDF">${I.download}</button>`:href?`<a class="btn sm" href="${esc(href)}" target="_blank" rel="noopener">Open</a>`:''}
@@ -3304,7 +3340,7 @@ function invoicesPane(job){
   return `<div class="inv-pane"><div class="inv-head"><div><h2>${INV_IC}Invoices</h2><p class="hint">${inYr.length?`${yr}: ${money(paid,c)} paid${open?` · ${money(open,c)} waiting`:''}${h&&h!==c&&(paid||open)?` <span class="fx">(${approx(paid,c)||'…'}${open?` · ${approx(open,c)||'…'}`:''})</span>`:''}`:'Upload the invoices you send, or make one here.'}</p>
     ${h?`<p class="hint inv-all">All jobs: ${hp==null||hw==null?'loading rates…':`${money(hp,h)} paid in ${yr}${hw?` · ${money(hw,h)} waiting`:''}`}</p>`:''}</div>
     <div class="inv-btns">${curSel}<button type="button" class="btn" data-act="inv-defaults" title="What every new invoice for this job starts with">${I.gear}Defaults</button><button type="button" class="btn" data-act="inv-upload">${I.upload}Upload</button><button type="button" class="btn primary" data-act="inv-new">${I.plus}Create invoice</button></div></div>
-    ${missing?`<div class="inv-nudge">${I.cal}<span>No invoice for ${monthLabel(ym)} yet.</span><button type="button" class="btn sm" data-act="inv-new">Create ${MONTH_FULL[+ym.slice(5,7)-1]}'s invoice</button></div>`:''}
+    ${missing?`<div class="inv-nudge">${I.cal}<span>No invoice for ${perLabel(np.ym,np.half)} yet.</span><button type="button" class="btn sm" data-act="inv-new">Create ${two?MONTH_FULL[+np.ym.slice(5,7)-1]+' '+halfLabel(np.ym,np.half):MONTH_FULL[+ym.slice(5,7)-1]+'\'s'} invoice</button></div>`:''}
     ${list.length>1?`<div class="inv-sort"><label>Sort<select class="sel" data-act="inv-sort" aria-label="Sort invoices">${[['period','Month covered, newest first'],['period-old','Month covered, oldest first'],['date','Date issued']].map(([k,l])=>`<option value="${k}" ${(S.ui.invSort||'period')===k?'selected':''}>${l}</option>`).join('')}</select></label></div>`:''}
     ${list.length?`<div class="inv-list">${(()=>{const srt=S.ui.invSort||'period',years=new Set(list.map(v=>(srt==='date'?v.date:invPer(v))?.slice(0,4)||''));let last=null;return list.map(v=>{const y=(srt==='date'?v.date:invPer(v))?.slice(0,4)||'';const hd=years.size>1&&y!==last?`<p class="inv-yr">${y||(srt==='date'?'No issue date':'No month set')}</p>`:'';last=y;return hd+row(v)}).join('')})()}</div>`:`<div class="empty"><h3>No invoices yet</h3><p>Upload a PDF or picture of an invoice you've sent, or create one: it fills in from this job's pay in Details.</p></div>`}
     <input type="file" id="inv-file" accept="application/pdf,image/png,image/jpeg,image/webp" multiple hidden></div>${docsHtml(job)}`;
@@ -3342,12 +3378,12 @@ function renderInv(){
     <header><h2 id="iv-title">${INV_IC}${INV.id?'Invoice '+esc(d.number||''):'New invoice'} · ${esc(job?.name||'')}</h2><button class="icon-btn" data-act="inv-close" aria-label="Close" title="Close">${I.x}</button></header>
     <div class="m-body inv-body"><div class="inv-form">
       <div class="iv-row3">${f('number','Invoice number')}${f('date','Issued','', 'date')}${f('due','Due','', 'date')}</div>
-      <div class="iv-row3">${f('period','For the month','', 'month')}<label>Currency<select data-iv="currency">${[...new Set([...CURRENCIES,d.currency])].map(c=>`<option ${c===d.currency?'selected':''}>${esc(c)}</option>`).join('')}</select></label>${f('tax','Tax %','0','number')}</div>
+      <div class="iv-row3 ${invDef(job)?.billing==='half'||+d.half?'iv-row4':''}">${f('period','For the month','', 'month')}${invDef(job)?.billing==='half'||+d.half?`<label>Half<select data-iv="half">${[['0','Whole month'],['1','1–15'],['2','16–end']].map(([x,l])=>`<option value="${x}" ${String(+d.half||0)===x?'selected':''}>${l}</option>`).join('')}</select></label>`:''}<label>Currency<select data-iv="currency">${[...new Set([...CURRENCIES,d.currency])].map(c=>`<option ${c===d.currency?'selected':''}>${esc(c)}</option>`).join('')}</select></label>${f('tax','Tax %','0','number')}</div>
       <p class="pref-group">Billed to <small>(${invDef(job)?'from this job’s Defaults':'kept for this job’s next invoice'})</small></p>${f('to.name','Name or company')}${a('to.details','Details','Contact, address, email',2)}
       <p class="pref-group">Line items</p>
       <div class="iv-items-form">${(d.items||[]).map((x,i)=>`<div class="iv-li"><input type="text" data-iv="items.${i}.d" data-fk="iv-items.${i}.d" value="${esc(x.d||'')}" placeholder="Description" aria-label="Description"><input type="number" step="any" min="0" data-iv="items.${i}.q" data-fk="iv-items.${i}.q" value="${esc(x.q??'')}" aria-label="Quantity" placeholder="Qty"><input type="number" step="any" min="0" data-iv="items.${i}.r" data-fk="iv-items.${i}.r" value="${esc(x.r??'')}" aria-label="Rate" placeholder="Rate"><button type="button" class="icon-btn" data-act="iv-rm" data-i="${i}" title="Remove line" aria-label="Remove line">${I.x}</button></div>`).join('')}</div>
       <div class="acct-btns"><button type="button" class="btn sm" data-act="iv-add">${I.plus}Add a line</button>
-        <button type="button" class="btn sm" data-act="iv-list" ${done.length?'':'disabled'} title="List the tasks you finished in ${esc(monthLabel(d.period))}">${I.task}${(d.list||[]).length?'Update':'Add'} delivered videos (${done.length})</button>${(d.list||[]).length?`<button type="button" class="btn sm ghost" data-act="iv-list-rm">Remove the list</button>`:''}</div>
+        <button type="button" class="btn sm" data-act="iv-list" ${done.length?'':'disabled'} title="List the tasks you finished in ${esc(perLabel(d.period,d.half))}">${I.task}${(d.list||[]).length?'Update':'Add'} delivered videos (${done.length})</button>${(d.list||[]).length?`<button type="button" class="btn sm ghost" data-act="iv-list-rm">Remove the list</button>`:''}</div>
       ${a('notes',invDef(job)?'Notes':'Notes (kept for this job’s next invoice)','Thanks! Payment terms, PO number…',2)}
       <p class="pref-group">Your details and payment <small>(kept for every invoice)</small></p>
       <div class="iv-row2">${f('from.name','Your name')}${f('from.email','Email','', 'email')}</div><div class="iv-row2">${f('from.phone','Phone')}${f('from.taxId','Tax ID (optional)')}</div>
@@ -3363,7 +3399,7 @@ function invPreview(){const p=$('#inv-preview');if(p){p.innerHTML=invSheet(INV.d
 function invCommit(){
   const job=S.jobs[INV.jobId];if(!job)return null;const d=INV.d,t=invTotals(d);
   const list=(job.invoices||[]).slice(),i=INV.id?list.findIndex(x=>x.id===INV.id):-1;
-  const e={...(i>=0?list[i]:{id:uid(),kind:'made',status:'draft'}),number:d.number,date:d.date,due:d.due,period:d.period,amount:t.total,currency:d.currency,doc:JSON.parse(JSON.stringify(d))};
+  const e={...(i>=0?list[i]:{id:uid(),kind:'made',status:'draft'}),number:d.number,date:d.date,due:d.due,period:d.period,half:+d.half||'',amount:t.total,currency:d.currency,doc:JSON.parse(JSON.stringify(d))};
   if(i>=0)list[i]=e;else list.unshift(e);
   if(invDef(job))patch('jobs',job.id,{invoices:list});
   else{patch('jobs',job.id,{invoices:list,invoiceTo:{name:d.to?.name||'',details:d.to?.details||''},invoiceNotes:d.notes||'',invoiceTax:d.tax??''});saveApp({invoiceFrom:{...d.from}})}
@@ -5703,8 +5739,9 @@ function renderProfile(){
   const lastM=payMonths('6m').slice(-2)[0],gaps=[];
   for(const j of jobs){const w=workOf(j);if((w.pay?.period||'month')!=='month'||!parseFloat(w.pay?.amount))continue;
     const own=(j.invoices||[]),first=[(w.since||'').slice(0,7),...own.map(invPer).filter(Boolean)].filter(Boolean).sort()[0];if(!first)continue;
-    for(const m of payMonths('12m').filter(m=>m>=first&&m<=lastM)){const vs=own.filter(v=>invPer(v)===m);
-      if(!vs.length)gaps.push({j,m,what:'No invoice'});else if(!vs.some(v=>v.status==='paid'))gaps.push({j,m,what:vs.some(v=>invState(v)==='overdue')?'Overdue':vs.some(v=>v.status==='sent')?'Sent, not marked paid':'Draft, not sent'})}}
+    const two=invDef(j)?.billing==='half';
+    for(const m of payMonths('12m').filter(m=>m>=first&&m<=lastM))for(const h of two?[1,2]:[0]){const vs=own.filter(v=>invPer(v)===m&&(!two||+v.half===h||!+v.half));
+      if(!vs.length)gaps.push({j,m,h,what:'No invoice'});else if(!vs.some(v=>v.status==='paid'))gaps.push({j,m,h,what:vs.some(v=>invState(v)==='overdue')?'Overdue':vs.some(v=>v.status==='sent')?'Sent, not marked paid':'Draft, not sent'})}}
   /* income split this year */
   const split=rows.map(r=>({r,v:typeof r.got==='number'?r.got:0})).filter(x=>x.v>0),splitTot=split.reduce((a,x)=>a+x.v,0);
   /* week */
@@ -5739,7 +5776,7 @@ function renderProfile(){
       ${payChart(recM,cb,range)}
       ${splitTot?`<div class="pf-block"><h5 class="pf-h5">Where it came from in ${yr}</h5><div class="pf-split">${split.map(x=>`<i style="width:${(x.v/splitTot*100).toFixed(2)}%;--jc:${esc(x.r.j.color||'var(--accent)')}" title="${esc(x.r.j.name)}: ${esc(money(x.v,cb))}"></i>`).join('')}</div>
         <div class="pf-legend">${split.map(x=>`<span><i style="--jc:${esc(x.r.j.color||'var(--accent)')}"></i>${esc(x.r.j.name)} <b>${Math.round(x.v/splitTot*100)}%</b> <small>${esc(money(x.v,cb))}</small></span>`).join('')}</div></div>`:''}
-      ${gaps.length?`<div class="pf-block"><h5 class="pf-h5">Missing invoices</h5><div class="pf-list">${gaps.slice(0,12).map(g=>`<div class="pf-li"><span class="pf-tj">${jobMark(g.j,18)}${esc(g.j.name)}</span><span>${esc(monthLabel(g.m))}</span><span class="pf-gap">${esc(g.what)}</span><button type="button" class="btn sm" data-act="prf-inv" data-id="${g.j.id}">Invoices</button></div>`).join('')}</div></div>`:''}
+      ${gaps.length?`<div class="pf-block"><h5 class="pf-h5">Missing invoices</h5><div class="pf-list">${gaps.slice(0,12).map(g=>`<div class="pf-li"><span class="pf-tj">${jobMark(g.j,18)}${esc(g.j.name)}</span><span>${esc(perLabel(g.m,g.h))}</span><span class="pf-gap">${esc(g.what)}</span><button type="button" class="btn sm" data-act="prf-inv" data-id="${g.j.id}">Invoices</button></div>`).join('')}</div></div>`:''}
       <div class="pf-block"><h5 class="pf-h5">By job</h5>
       <div class="pf-table">${rows.map(r=>`<div class="pf-tr"><span class="pf-tj">${jobMark(r.j,18)}${esc(r.j.name)}</span><span>${esc(payLabel(r.w.pay)||'—')}${r.ph!=null?`<small class="hint"> · about ${esc(money(r.phc??r.ph,r.phc!=null?cb:r.cur))}/h</small>`:''}</span><span class="pf-num">${r.got==null?'—':r.got==='…'?'…':money(r.got,cb)}<small>received for ${yr}</small></span><span class="pf-sub">${[r.w.pay?.payday?`Paid ${esc(r.w.pay.payday)}`:'',r.w.pay?.method?`via ${esc(r.w.pay.method)}`:''].filter(Boolean).join(' ')||''}</span></div>`).join('')}</div></div>
       ${fxWait?'<p class="hint">Getting exchange rates… amounts in other currencies are added once they load.</p>':''}<p class="hint">From your invoices marked Paid, counted in the month each one covers (its Period)${cb&&inv.some(v=>v.currency!==cb)?`, converted to ${cb}`:''}. The hourly rate comes from each job's pay and schedule in Work details.</p>`},
@@ -6092,7 +6129,7 @@ const HELP=[
  ['Tasks','Delivery specs',`When a task's notes hold a brief (ClickUp briefs land there), the panel shows its specs as chips under the details: resolution, orientation, aspect, bitrate, frame rate, codec, loudness, length and captions. If the brief's aspect differs from the task's format, one click sets it.`,null],
  ['Your work','New from ClickUp',`Tasks the ClickUp sync brings in get a purple New badge, and tasks with new ClickUp comments or status or due-date changes show “2 new”. Opening the task clears it. Click Review on the message that pops up, the notification, or pick New from ClickUp in the due-date filter to see them all; Mark all as reviewed clears every badge.`,null],
  ['Your work','ClickUp mentions',`ClickUp comments that tag you (like “Hi @Kim, please update”) are marked “mentioned you” in the task's Activity tab, come first in notifications for a week, and have their own Mentions filter.`,null],
- ['Your work','Invoices',`Each job has an Invoices & docs tab. Upload the invoices you send (PDF or a picture) and set their month and amount, or click Create invoice: it fills in from the job's pay in Details (amount, currency, payment method), adds the next number (INV-2026-001…), can list the videos you finished that month, and saves a PDF. Your own name, address and payment details are kept for next time. Mark each one Sent or Paid; a sent invoice past its due date shows as overdue in notifications. Pick a currency in “Totals in” to see every job's paid and waiting amounts converted with a recent exchange rate. Below the invoices, Documents holds the job's contract, NDA, onboarding files and briefs. Click Defaults on a job's Invoices tab to set what every new invoice starts with: billed to, your own numbering (like Invoice_JCUT_{n}, which carries on from the highest number already used), the line item, rate, currency, due days, tax, this job's payment details and your own details.`,null],
+ ['Your work','Invoices',`Each job has an Invoices & docs tab. Upload the invoices you send (PDF or a picture) and set their month and amount, or click Create invoice: it fills in from the job's pay in Details (amount, currency, payment method), adds the next number (INV-2026-001…), can list the videos you finished that month, and saves a PDF. Your own name, address and payment details are kept for next time. Mark each one Sent or Paid; a sent invoice past its due date shows as overdue in notifications. Pick a currency in “Totals in” to see every job's paid and waiting amounts converted with a recent exchange rate. Below the invoices, Documents holds the job's contract, NDA, onboarding files and briefs. Click Defaults on a job's Invoices tab to set what every new invoice starts with: billed to, your own numbering (like Invoice_JCUT_{n}, which carries on from the highest number already used), the line item, rate, currency, due days, tax, this job's payment details and your own details. The due date can be a number of days after the invoice date or a set day, like the 15th of the month it covers or of the month after. If a job pays you twice a month, set “How often you bill” to Twice a month: each invoice covers 1–15 or 16–end (pick the half next to the month), the rate is the amount for each half, each half can have its own due day, and the reminders look for both halves.`,null],
  ['Tasks','Merge duplicate tasks',`Settings → Duplicate tasks lists tasks in the same job with the same name. Pick the copy to keep and click Merge: it gets anything it was missing from the others (links, client, dates, notes, checklist steps, the ClickUp link and comments, updates and history), and the other copies go to Trash, where you can still restore them.`,['dupes','Duplicate tasks']],
  ['Tasks','Same name twice',`If you save a new task with the same name as an open one in that job, the panel asks whether to open the one you already have or save the new one anyway.`,null],
  ['Tasks','Select several',`Turn on Select in the toolbar, tick tasks (Shift-click for a range), then set status, priority, due date, move them to another job or client, archive or delete them together.`,null],
@@ -7804,8 +7841,8 @@ document.addEventListener('change',e=>{
   if(el.id==='doc-file'){docUpload([...el.files]);el.value='';return}
   if(el.dataset&&el.dataset.docf){const job=S.jobs[S.ui.tab];if(job)patch('jobs',job.id,{docs:(job.docs||[]).map(d=>d.id===el.dataset.docf?{...d,name:el.value.trim()||d.name}:d)});return}
   if(el.id==='inv-file'){invUpload([...el.files]);el.value='';return}
-  if(el.dataset&&el.dataset.invf){const job=S.jobs[S.ui.tab];if(job){const k=el.dataset.k;invSave(job,(job.invoices||[]).map(v=>v.id===el.dataset.invf?{...v,[k]:k==='amount'?(el.value===''?'':+el.value):el.value}:v));render()}return}
-  if(el.dataset&&el.dataset.iv&&INV){invSet(el.dataset.iv,el.value);if(el.dataset.iv==='period'){const it=INV.d.items[0],re=new RegExp('· ('+MONTH_FULL.join('|')+') \\d{4}$');if(it&&re.test(it.d||''))it.d=it.d.replace(re,'· '+monthLabel(el.value));INV.d.list=[]}if(el.dataset.iv==='period'||el.dataset.iv==='currency')renderInv();else invPreview();return}
+  if(el.dataset&&el.dataset.invf){const job=S.jobs[S.ui.tab];if(job){const k=el.dataset.k;invSave(job,(job.invoices||[]).map(v=>v.id===el.dataset.invf?{...v,[k]:k==='amount'||k==='half'?(el.value===''?'':+el.value):el.value}:v));render()}return}
+  if(el.dataset&&el.dataset.iv&&INV){const k=el.dataset.iv;invSet(k,k==='half'?+el.value:el.value);if(k==='period'||k==='half'){const it=INV.d.items[0];if(it&&PER_RE.test(it.d||''))it.d=it.d.replace(PER_RE,perLabel(INV.d.period,INV.d.half));INV.d.list=[];const def=invDef(S.jobs[INV.jobId]);if(def?.dueMode==='day'&&INV.d.period)INV.d.due=invDueFor(def,INV.d.period,INV.d.half,INV.d.date)}if(k==='period'||k==='half'||k==='currency')renderInv();else invPreview();return}
   if(act==='dm-keep'){DM.keep[el.dataset.g]=el.dataset.id;renderSettings();return}
   if(act==='row-due'){const t=S.tasks[el.dataset.id],v=el.value;if(t&&(t.due||'')!==v){patch('tasks',t.id,{due:v});logAct('date',v?`Due date set to ${fmtDate(v)}`:'Due date removed',{task:t});toast(v?`Due ${fmtDate(v)}`:'Due date removed')}render();return}
   if(act==='row-status'){setStatus(el.dataset.id,el.value);if(u.openTask===el.dataset.id)renderDrawer();return}
