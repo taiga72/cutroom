@@ -216,9 +216,10 @@ async function syncUser(uid) {
         const fresh = comments.filter(m => !seenC.has(String(m.id)) && (backfill || +m.date > (prev.lastComment || 0) || !existing))
           .sort((a, b) => +a.date - +b.date).slice(existing ? -40 : -12);
         for (const m of fresh) feed.push({ at: new Date(+m.date).toISOString(), k: 'comment', cid: String(m.id), who: (m.user && m.user.username) || 'Someone', me: String(m.user && m.user.id) === me, mention: (m.comment || []).some(x => x && x.type === 'tag' && String(x.user && x.user.id) === me) || undefined, text: String(m.comment_text || '').trim().slice(0, 4000) });
+        let newCount = existing && !backfill ? fresh.filter(m => String(m.user && m.user.id) !== me).length : 0;
         const iso = new Date(+t.date_updated || now).toISOString();
-        if (existing && prev.status && prev.status !== statusName) feed.push({ at: iso, k: 'status', text: `Status in ClickUp: ${prev.status} → ${statusName}` });
-        if (existing && prev.due !== undefined && prev.due !== due) feed.push({ at: iso, k: 'due', text: due ? `Due date in ClickUp: ${due}` : 'Due date removed in ClickUp' });
+        if (existing && prev.status && prev.status !== statusName) { feed.push({ at: iso, k: 'status', text: `Status in ClickUp: ${prev.status} → ${statusName}` }); newCount++; }
+        if (existing && prev.due !== undefined && prev.due !== due) { feed.push({ at: iso, k: 'due', text: due ? `Due date in ClickUp: ${due}` : 'Due date removed in ClickUp' }); newCount++; }
         feed.sort((a, b) => a.at.localeCompare(b.at));
         const lastComment = Math.max(prev.lastComment || 0, ...comments.map(m => +m.date || 0));
         const cuInfo = { v: readFail ? 1 : 2, at: now, id: cuId, team, url: t.url, status: statusName, due, prio: prioOf(t), name: t.name, upd: c.upd, lastComment, feed: feed.slice(-FEED_MAX) };
@@ -244,7 +245,7 @@ async function syncUser(uid) {
           const notes = notesFrom(detail);
           const id = rid(), mapped = okStatus.has(st) ? st : firstStatus;
           const data = { jobId, clientId, name: t.name, status: mapped, priority: prioOf(t), start, due, format: formatOf(t, notes, jobTasks), length: '', revision: 0,
-            links: { task: t.url || '', upload: '', file: '', project: '' }, thumb: null, notes, checklist: steps, created: +t.date_created || now, updated: now, cu: cuInfo };
+            links: { task: t.url || '', upload: '', file: '', project: '' }, thumb: null, notes, checklist: steps, created: +t.date_created || now, updated: now, cu: cuInfo, cuNew: true };
           if (mapped === 'done') data.doneAt = ymdIn(t.date_closed || t.date_updated, tz);
           D.tasks[id] = data; state.seen[cuId] = id; put('tasks', id, data); res.created++;
         } else {
@@ -269,6 +270,7 @@ async function syncUser(uid) {
             for (const s of steps) { if (at.has(s.id)) Object.assign(list2[at.get(s.id)], { text: s.text, done: s.done }); else list2.push(s); }
             d.checklist = list2;
           }
+          if (newCount && x.cu) { d.cuUnseen = (x.cuUnseen || 0) + newCount; res.news = (res.news || 0) + 1; }
           D.tasks[id] = d; state.seen[cuId] = id; put('tasks', id, d); res.updated++;
         }
       }

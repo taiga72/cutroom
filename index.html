@@ -1491,6 +1491,10 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .cu-body{margin-top:3px;padding:7px 10px;border-radius:8px;background:var(--surface-2,var(--bg));border:1px solid var(--line);font-size:calc(13px*var(--ts));overflow-wrap:anywhere}
 .cu-body p{margin:0 0 4px}.cu-body p:last-child{margin:0}
 .l-ic.k-clickup{color:#7b68ee}
+.cu-new{display:inline-flex;align-items:center;gap:3px;vertical-align:1px;margin-right:6px;padding:1px 7px;border-radius:999px;background:#7b68ee;color:#fff;font-size:calc(10.5px*var(--ts));font-weight:800;letter-spacing:.03em;text-transform:uppercase;line-height:1.5;white-space:nowrap}
+.cu-new.upd{background:color-mix(in srgb,#7b68ee 18%,var(--surface));color:#7b68ee;text-transform:none;letter-spacing:0}
+.cu-banner p{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cu-banner p .i{width:16px;height:16px;color:#7b68ee}
 .dm-g{border:1px solid var(--line);border-radius:10px;padding:6px;margin-bottom:10px;display:grid;gap:4px}
 .dm-row{display:flex;align-items:flex-start;gap:10px;padding:8px;border-radius:8px;cursor:pointer}
 .dm-row:hover{background:var(--hover,var(--accent-soft))}
@@ -2274,7 +2278,7 @@ select.rs-add{appearance:auto}
       </select>
       <select class="sel" id="f-due" aria-label="Due date filter">
         <option value="all">Any due date</option><option value="overdue">Overdue</option><option value="today">Due today</option><option value="week">Due in 7 days</option><option value="nodate">No due date</option>
-        <optgroup label="Missing"><option value="miss-any">Missing a link</option><option value="miss-upload">No review link</option><option value="miss-file">No storage link</option><option value="miss-task">No task link</option></optgroup>
+        <optgroup label="ClickUp"><option value="cu-new">New from ClickUp</option></optgroup><optgroup label="Missing"><option value="miss-any">Missing a link</option><option value="miss-upload">No review link</option><option value="miss-file">No storage link</option><option value="miss-task">No task link</option></optgroup>
       </select>
       <select class="sel" id="f-sort" aria-label="Sort">
         <option value="due">Sort: Due date</option><option value="start">Sort: Start date</option><option value="priority">Sort: Priority</option><option value="name">Sort: Name</option><option value="created">Sort: Newest</option><option value="updated">Sort: Recently updated</option><option value="age">Sort: Oldest assigned</option><option value="revision">Sort: Most revisions</option><option value="client">Sort: Client</option><option value="manual">Sort: My order (drag)</option>
@@ -2879,7 +2883,7 @@ async function cuSync(manual,redo){
     if(j.error==='token')toast('ClickUp stopped accepting your token. Paste a new one in Settings → ClickUp.');
     else if(j.teamErrors&&manual)toast('One workspace’s token was rejected. Settings → ClickUp shows which.');
     else if(j.error&&manual)toast(j.msg?`The ClickUp check failed: ${j.msg}`:"Couldn't reach ClickUp. Try again in a minute.");
-    else if(made)toast(`${made} new task${made===1?'':'s'} from ClickUp`);
+    else if(made||j.news)toast([made?`${made} new task${made===1?'':'s'}`:'',j.news?`${j.news} updated`:''].filter(Boolean).join(' and ')+' from ClickUp',{label:'Review',fn:cuReview});
     else if(manual)toast(j.more?`Updated ${changed} task${changed===1?'':'s'} from ClickUp. Bringing in the rest in a minute…`:changed?`Updated ${changed} task${changed===1?'':'s'} from ClickUp`:'Everything from ClickUp is already here');
   }catch(e){if(manual)toast("Couldn't reach ClickUp. Try again in a minute.")}
   CU.busy=null;cuRunning=false;if(SM)renderSettings();
@@ -3211,6 +3215,17 @@ async function docUpload(files){
   logAct('job',`${add.length===1?`“${add[0].name}”`:add.length+' documents'} added to ${job.name}`,{jobId:job.id});toast(add.length===1?'Document added':`${add.length} documents added`);render();
 }
 
+
+/* ================= review what ClickUp brought in =================
+   The sync sets cuNew on tasks it creates and adds to cuUnseen for others' comments and ClickUp status/due changes.
+   Rows and cards show a badge (cuBadge) until the task is opened (cuSeen); the due filter's "New from ClickUp"
+   (cu-new) lists them, with a banner to mark them all reviewed. */
+const cuUnreviewed=t=>!t.deleted&&!t._draft&&(t.cuNew||(t.cuUnseen||0)>0);
+const cuBadge=t=>t.cuNew?`<span class="cu-new" title="New from ClickUp">New</span>`:(t.cuUnseen||0)>0?`<span class="cu-new upd" title="${t.cuUnseen} new in ClickUp since you last opened it">${t.cuUnseen} new</span>`:'';
+function cuSeen(id){const t=S.tasks[id];if(t&&cuUnreviewed(t))patch('tasks',id,{cuNew:false,cuUnseen:0})}
+function cuReviewAll(){const ts=Object.values(S.tasks).filter(cuUnreviewed);ts.forEach(t=>patch('tasks',t.id,{cuNew:false,cuUnseen:0}));toast(`Marked ${ts.length} as reviewed`);S.ui.due='all';saveUi();render()}
+function cuReview(){const u=S.ui;if(u.openTask&&!DRAFT)closeDrawer();u.tab='overview';u.client='all';u.pane='tasks';u.due='cu-new';if(u.view==='calendar')u.view='list';saveUi();notesOpen=false;render();window.scrollTo({top:0})}
+
 /* ================= derived ================= */
 const jobsSorted=()=>Object.values(S.jobs).sort((a,b)=>(a.order??0)-(b.order??0)||a.name.localeCompare(b.name));
 const shownClients=jid=>clientsOf(jid).filter(c=>!c.hidden);
@@ -3258,6 +3273,7 @@ function filtered(){
   if(u.due==='today') list=list.filter(t=>t.due===t0&&!isClosed(t));
   if(q) list=list.filter(t=>[t.name,t.notes,S.clients[t.clientId]?.name,S.jobs[t.jobId]?.name,...(t.checklist||[]).map(c=>c.text),...Object.values(t.links||{})].some(x=>String(x||'').toLowerCase().includes(q)));
   if(u.due.startsWith('miss-')) list=list.filter(t=>!isClosed(t)&&missing(t,u.due.slice(5)));
+  if(u.due==='cu-new') list=list.filter(cuUnreviewed);
   const by={
     due:(a,b)=>(a.due||'9999').localeCompare(b.due||'9999')||PRIO_RANK[a.priority||'normal']-PRIO_RANK[b.priority||'normal'],
     start:(a,b)=>(a.start||'9999').localeCompare(b.start||'9999'),
@@ -3522,7 +3538,8 @@ function renderMain(){
 
   const hasExamples=[...Object.values(S.jobs),...Object.values(S.clients),...Object.values(S.tasks)].some(x=>x.example);
   const nd=hasExamples||!S.ready?0:dupeGroups().length;
-  $('#banner').innerHTML=!hasExamples&&nd&&lsGet('cutroom.dupehide')!==nd?`<div class="banner"><p><b>${nd} task${nd===1?' has':'s have'} a duplicate</b> with the same name in the same job.</p><button class="btn sm" data-act="help-go" data-sec="dupes">Review and merge</button><button class="icon-btn" data-act="dupes-hide" title="Hide" aria-label="Hide">${I.x}</button></div>`:hasExamples?`<div class="banner"><p><b>You're looking at example jobs and tasks.</b> Poke around, then clear them and add your own jobs.</p><button class="btn sm ${clearArmed?'danger armed':''}" data-act="clear-examples">${clearArmed?'Delete all example data':'Clear examples'}</button></div>`:'';
+  const ncu=u.due==='cu-new'?Object.values(S.tasks).filter(t=>cuUnreviewed(t)&&S.jobs[t.jobId]).length:0;
+  $('#banner').innerHTML=u.due==='cu-new'?`<div class="banner cu-banner"><p>${CU_IC}<b>${ncu?`${ncu} new from ClickUp`:'Nothing new from ClickUp'}</b>${ncu?' to review. Opening a task marks it reviewed.':'. You’re all caught up.'}</p>${ncu?`<button class="btn sm" data-act="cu-review-all">Mark all as reviewed</button>`:''}<button class="btn sm ghost" data-act="cu-review-off">Show all tasks</button></div>`:!hasExamples&&nd&&lsGet('cutroom.dupehide')!==nd?`<div class="banner"><p><b>${nd} task${nd===1?' has':'s have'} a duplicate</b> with the same name in the same job.</p><button class="btn sm" data-act="help-go" data-sec="dupes">Review and merge</button><button class="icon-btn" data-act="dupes-hide" title="Hide" aria-label="Hide">${I.x}</button></div>`:hasExamples?`<div class="banner"><p><b>You're looking at example jobs and tasks.</b> Poke around, then clear them and add your own jobs.</p><button class="btn sm ${clearArmed?'danger armed':''}" data-act="clear-examples">${clearArmed?'Delete all example data':'Clear examples'}</button></div>`:'';
 
   if(u.tab==='archived'){renderArchive();return}
   if(u.tab==='activity'){renderActivity();return}
@@ -3879,7 +3896,7 @@ function rowsAttrs(){
 }
 const rowHtml=(t,job,showJob)=>`<div class="row ${isClosed(t)?'done-row':''} ${dueClass(t)==='over'?'is-over':''} ${S.ui.openTask===t.id?'focus':''} ${SEL.has(t.id)?'picked':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="mark-wrap">${taskMark(t)}${selBox(t)}</div>
-        <div class="t-main"><div class="t-name" title="Double-click to rename">${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</div>${metaLine(t,job,showJob)}${searchHit(t)}</div>
+        <div class="t-main"><div class="t-name" title="Double-click to rename">${cuBadge(t)}${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</div>${metaLine(t,job,showJob)}${searchHit(t)}</div>
         <div class="c-status" data-stop>${statusSelect(t,'row-status')}${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
         <div class="c-prio pedit" title="Change priority">${prioHtml(t.priority)}<select class="cell-sel" data-act="row-prio" data-id="${t.id}" aria-label="Priority">${PRIORITIES.map(p=>`<option value="${p.id}" ${(t.priority||'normal')===p.id?'selected':''}>${p.label}</option>`).join('')}</select></div>
         <div class="c-start date ${t.start?'':'none'}"${relTitle(t.start)}>${t.start?fmtRel(t.start):'—'}</div>
@@ -3908,7 +3925,7 @@ function boardView(list,job){
     const cards=list.filter(t=>stOf(t)===s.id);
     return `<div class="col" data-drop="${s.id}" style="--sc:${stColor(s.id)}"><div class="col-head"><span class="pill" ${pillStyle(s.id)}><span class="pl">${esc(s.label)}</span></span>${s.id==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
       ${cards.map(t=>`<div class="card ${SEL.has(t.id)?'picked':''} ${isClosed(t)?'is-done':''} ${dueClass(t)==='over'?'is-over':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
-        <div class="card-top"><div class="mark-wrap">${taskMark(t)}${selBox(t)}</div><div class="t-name" title="Double-click to rename">${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</div></div>${metaLine(t,job,!job)}${searchHit(t)}
+        <div class="card-top"><div class="mark-wrap">${taskMark(t)}${selBox(t)}</div><div class="t-name" title="Double-click to rename">${cuBadge(t)}${freshDot(t)}${t.pinned?I.pin.replace('class="i"','class="i pin-i"'):''}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</div></div>${metaLine(t,job,!job)}${searchHit(t)}
         <div class="card-foot"><span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,!isClosed(t)):'No date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
       </div>`;
   }).join('')}</div></div>`;
@@ -4037,6 +4054,7 @@ function notifications(all){
   }
   const load=dueLoad();
   for(let i=0;i<7;i++){const d=addDays(t0,i),n=load[d]||0;if(n>=lim)out.push({key:`busy:${d}:${n}`,rank:2.5,kind:'warn',icon:'warn',day:d,title:`${i===0?'Today':i===1?'Tomorrow':WEEKDAY[parseD(d).getDay()]+' '+fmtDate(d)} is a busy day`,body:`${n} tasks are due.`})}
+  {const rv=Object.values(S.tasks).filter(t=>cuUnreviewed(t)&&S.jobs[t.jobId]),nn=rv.filter(t=>t.cuNew).length;if(rv.length)out.push({key:`cunew:${rv.length}:${t0}`,rank:0.8,kind:'info',icon:'chat',cuReview:true,sub:'ClickUp',title:nn&&nn===rv.length?`${nn} new task${nn===1?'':'s'} from ClickUp to review`:`${rv.length} task${rv.length===1?'':'s'} with something new from ClickUp`,body:rv.slice(0,3).map(t=>t.name||'Untitled task').join(' · ')+(rv.length>3?` +${rv.length-3} more`:'')})}
   for(const j of Object.values(S.jobs))for(const v of j.invoices||[])if(invState(v)==='overdue')out.push({key:`inv:${v.id}:${v.due}`,rank:2.6,kind:'warn',icon:'warn',inv:j.id,sub:j.name,title:`Invoice ${v.number||''} is overdue`,body:`${v.amount!==''&&v.amount!=null?money(v.amount,v.currency)+' · ':''}due ${fmtDate(v.due)}. Mark it paid once it arrives.`});
   {const b=backupDue();if(b)out.push({key:`backup:${b.last||'never'}:${Math.floor(b.days/30)}`,rank:7,kind:'info',icon:'download',backup:true,sub:'Settings → Backup',title:b.last?`Your last backup was ${b.days} days ago`:"You haven't downloaded a backup yet",body:'A backup file keeps a copy of every job and task on your computer. It takes a second.'})}
   out.forEach(n=>{n.sub=n.sub||(n.task?who(n.task):'All jobs')});
@@ -4060,7 +4078,7 @@ function renderBell(){
 /* phones: notifications as a full page like Slack's Activity: colored header, filter chips,
    rows with the task's logo, a kind badge, what happened, when, and the job; swipe a row left to dismiss */
 let NF='all';
-const NA_LBL={over:'Overdue',today:'Due today',tmrw:'Due tomorrow',start:'Starts today',stale:'Needs a nudge',rev:'Many revisions',nodate:'No due date',busy:'Busy day',backup:'Backup',cu:'ClickUp comment',cum:'Mentioned you',inv:'Invoice'};
+const NA_LBL={over:'Overdue',today:'Due today',tmrw:'Due tomorrow',start:'Starts today',stale:'Needs a nudge',rev:'Many revisions',nodate:'No due date',busy:'Busy day',backup:'Backup',cu:'ClickUp comment',cum:'Mentioned you',cunew:'From ClickUp',inv:'Invoice'};
 const NA_DEAD=new Set(['over','today','tmrw','busy']);
 function notesPageHtml(list,unread){
   const kindOf=n=>n.key.split(':')[0];
@@ -4093,6 +4111,7 @@ function openNote(key){
   const n=notifications(true).find(x=>x.key===key);if(!n)return;
   NS.read[key]=1;saveNotes();notesOpen=false;renderBell();
   if(n.backup){openSettings();SM.sec='backup';SM.mv='sec';renderSettings();return}
+  if(n.cuReview){cuReview();return}
   if(n.inv){const u=S.ui;u.tab=n.inv;u.client='all';u.pane='invoices';saveUi();render();return}
   if(n.task)openTask(n.task.id,n.tab);
   else if(n.day){const u=S.ui;u.tab='overview';u.client='all';u.view='calendar';u.month=n.day.slice(0,7);saveUi();render()}
@@ -4195,7 +4214,7 @@ function renderArchive(){
 
 /* ================= drawer ================= */
 let deleteArmed=false, clearArmed=false;
-function openTask(id,tab){seenTask(id);if(NAP&&NAP.id===id)napEnd('wake');if(NOTES_EDIT!==id)NOTES_EDIT=null;if(S.tasks[id]&&!S.tasks[id]._draft){S.ui.recent=[id,...(S.ui.recent||[]).filter(x=>x!==id)].slice(0,8);saveUi()}if(S.ui.openTask!==id)TPL={open:false,naming:false,del:null};if(DRAFT&&DRAFT.id!==id)discardDraft();if(S.ui.openTask!==id||tab)S.ui.dtab=tab||'details';if(S.ui.openTask!==id){NEWCL=null;REACT_AT=null;REPLY_AT=null;replyDelArmed=null;EDIT_AT=null;SPLIT=null;if(ATT.task&&ATT.task!==id)attReset()}S.ui.openTask=id;noteDelArmed=null;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender();syncUrl()}
+function openTask(id,tab){seenTask(id);cuSeen(id);if(NAP&&NAP.id===id)napEnd('wake');if(NOTES_EDIT!==id)NOTES_EDIT=null;if(S.tasks[id]&&!S.tasks[id]._draft){S.ui.recent=[id,...(S.ui.recent||[]).filter(x=>x!==id)].slice(0,8);saveUi()}if(S.ui.openTask!==id)TPL={open:false,naming:false,del:null};if(DRAFT&&DRAFT.id!==id)discardDraft();if(S.ui.openTask!==id||tab)S.ui.dtab=tab||'details';if(S.ui.openTask!==id){NEWCL=null;REACT_AT=null;REPLY_AT=null;replyDelArmed=null;EDIT_AT=null;SPLIT=null;if(ATT.task&&ATT.task!==id)attReset()}S.ui.openTask=id;noteDelArmed=null;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender();syncUrl()}
 function closeDrawer(){TOPT=false;renderTopt();flushAll();discardDraft();S.ui.openTask=null;$('#drawer').hidden=true;$('#scrim').hidden=true;scheduleRender();syncUrl()}
 let LSHOW=new Set();
 /* Task activity: the task's log entries plus your own posted updates (kind 'note'), newest first */
@@ -5501,6 +5520,7 @@ const HELP=[
  ['Tasks','Drag on the Calendar',`On a computer, drag a task in the Calendar (month or week) onto another day to move its due date. A toast says when the new day is busy and has Undo. On a phone, change the date in the task panel.`,null],
  ['Tasks','Archive finished tasks on their own',`Done tasks can move to Archived by themselves 3, 7 or 14 days after they were finished, so the Done column stays short. It's off until you pick a time. Each one is logged, and Undo brings them back. Set it in Settings → Tasks & calendar.`,['tasks','Tasks & calendar']],
  ['Tasks','Delivery specs',`When a task's notes hold a brief (ClickUp briefs land there), the panel shows its specs as chips under the details: resolution, orientation, aspect, bitrate, frame rate, codec, loudness, length and captions. If the brief's aspect differs from the task's format, one click sets it.`,null],
+ ['Your work','New from ClickUp',`Tasks the ClickUp sync brings in get a purple New badge, and tasks with new ClickUp comments or status or due-date changes show “2 new”. Opening the task clears it. Click Review on the message that pops up, the notification, or pick New from ClickUp in the due-date filter to see them all; Mark all as reviewed clears every badge.`,null],
  ['Your work','ClickUp mentions',`ClickUp comments that tag you (like “Hi @Kim, please update”) are marked “mentioned you” in the task's Activity tab, come first in notifications for a week, and have their own Mentions filter.`,null],
  ['Your work','Invoices',`Each job has an Invoices & docs tab. Upload the invoices you send (PDF or a picture) and set their month and amount, or click Create invoice: it fills in from the job's pay in Details (amount, currency, payment method), adds the next number (INV-2026-001…), can list the videos you finished that month, and saves a PDF. Your own name, address and payment details are kept for next time. Mark each one Sent or Paid; a sent invoice past its due date shows as overdue in notifications. Pick a currency in “Totals in” to see every job's paid and waiting amounts converted with a recent exchange rate. Below the invoices, Documents holds the job's contract, NDA, onboarding files and briefs.`,null],
  ['Tasks','Merge duplicate tasks',`Settings → Duplicate tasks lists tasks in the same job with the same name. Pick the copy to keep and click Merge: it gets anything it was missing from the others (links, client, dates, notes, checklist steps, the ClickUp link and comments, updates and history), and the other copies go to Trash, where you can still restore them.`,['dupes','Duplicate tasks']],
@@ -7061,6 +7081,8 @@ document.addEventListener('click',e=>{
     case 'cu-connect': cuConnect();break;
     case 'cu-sync': cuSync(true);break;
     case 'cu-resync': cuSync(true,true);break;
+    case 'cu-review-all': cuReviewAll();break;
+    case 'cu-review-off': u.due='all';saveUi();render();break;
     case 'dm-merge': if(dmMerge(el.dataset.g)){toast('Merged. The extra copy is in Trash.');renderSettings()}break;
     case 'dm-all': if(DM.armed!=='all'){DM.armed='all';renderSettings();setTimeout(()=>{if(DM.armed==='all'){DM.armed=null;if(SM)renderSettings()}},4000)}else{DM.armed=null;let n=0;for(const g of dupeGroups())n+=dmMerge(g.k);toast(`Merged ${n} task${n===1?'':'s'}. The extra copies are in Trash.`);renderSettings()}break;
     case 'dupes-hide': lsSet('cutroom.dupehide',dupeGroups().length);render();break;
