@@ -352,6 +352,8 @@ button.stat:hover{border-color:var(--line-strong)}
 .pf-bars[style*="--n:1"]{gap:4px}
 .pf-bar{position:relative;display:grid;justify-items:center;gap:2px;border:0;background:none;padding:0;cursor:default;color:var(--muted);font:inherit}
 .pf-col{display:flex;align-items:flex-end;justify-content:center;width:100%;height:150px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.pf-col{gap:3px}.pf-col i.pf-cost{width:min(12px,22%);border-radius:4px 4px 0 0;background:color-mix(in srgb,var(--danger) 55%,var(--surface))!important}
+.pf-legend2{display:flex;gap:14px;margin-top:6px;font-size:calc(12px*var(--ts));color:var(--muted)}.pf-legend2 span{display:inline-flex;align-items:center;gap:6px}.pf-legend2 i{width:10px;height:10px;border-radius:3px;background:color-mix(in srgb,var(--st-done,#3fa55a) 60%,var(--surface))}.pf-legend2 i.c{background:color-mix(in srgb,var(--danger) 55%,var(--surface))}
 .pf-col i{display:block;width:min(46px,70%);border-radius:7px 7px 0 0;background:color-mix(in srgb,var(--st-done,#3fa55a) 45%,var(--surface));transition:background .15s}
 .pf-bar.now .pf-col i{background:var(--st-done,#3fa55a)}
 .pf-bar:hover .pf-col i,.pf-bar:focus-visible .pf-col i{background:var(--st-done,#3fa55a)}
@@ -384,12 +386,13 @@ button.stat:hover{border-color:var(--line-strong)}
 .xp-row.off{opacity:.6}.xp-main{min-width:0;display:grid;gap:3px}.xp-main b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.xp-main small{color:var(--muted);display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px}
 .xp-amt{text-align:right;font:600 calc(13px*var(--ts)) var(--mono);display:grid}.xp-amt small{font:500 calc(11.5px*var(--ts)) var(--body);color:var(--muted)}
 .xp-acts{display:flex;align-items:center;gap:4px}.xp-acts .icon-btn.armed{width:auto;padding:0 10px;border-radius:99px;background:var(--danger);color:#fff}
+.xp-more,.xp-menu{display:none}.xp-menu{flex-basis:100%;gap:8px;justify-content:flex-end}.xp-menu .btn.armed{background:var(--danger);border-color:var(--danger);color:#fff}
 .xp-cat{display:inline-block;padding:1px 7px;border-radius:99px;font-size:calc(11px*var(--ts));font-weight:600;color:var(--xc);background:color-mix(in srgb,var(--xc) 14%,transparent)}
 .xp-mh{display:flex;justify-content:space-between;gap:8px;padding:7px 12px;background:var(--bg);border-top:1px solid var(--line);font-size:calc(12px*var(--ts));color:var(--muted)}.xp-mh:first-child{border-top:0}.xp-mh b{color:var(--text)}.xp-mh span{font-family:var(--mono)}.xp-mh+.xp-row{border-top:1px solid var(--line)}
 .xp-stop{color:var(--danger);font-weight:600}
 .pf-tiles.xp-one{grid-template-columns:1fr!important}
 .pf-tc{font-style:normal;opacity:.85}
-@media (max-width:820px){.pf-tiles.wide{grid-template-columns:1fr 1fr}.xp-grid{grid-template-columns:1fr 1fr}.xp-row{grid-template-columns:minmax(0,1fr) auto}.xp-acts{grid-column:1/-1;justify-content:flex-end}}
+@media (max-width:820px){.xp-ic{display:none!important}.xp-more{display:grid}.xp-menu{display:flex}.xp-acts{flex-wrap:wrap}.xp-more.on{background:var(--hover,var(--bg))}.pf-tiles.wide{grid-template-columns:1fr 1fr}.xp-grid{grid-template-columns:1fr 1fr}.xp-row{grid-template-columns:minmax(0,1fr) auto}.xp-acts{grid-column:1/-1;justify-content:flex-end}}
 .pf-me-t{flex:1;min-width:0}.pf-title{margin:2px 0 0;font-weight:600}
 .pf-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .pf-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
@@ -814,6 +817,7 @@ body.resizing .drawer{transition:none}
 .fresh-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:middle;flex:none}
 .synced{display:block;padding:0 10px 2px 25px;font-size:calc(11px*var(--ts));color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.side-mini .synced{display:none}
+.cu-synced{display:flex;align-items:center;gap:5px;border:0;background:none;cursor:pointer;font-family:inherit;text-align:left;width:100%;padding-left:10px}.cu-synced:hover{color:var(--muted)}.cu-synced .i{width:12px;height:12px;flex:none}
 /* calendar: narrow weekends */
 .cal{--wd:minmax(96px,1fr);--wk:56px}
 .day.wk-min .ev{height:7px;padding:0;min-height:0;font-size:0;border-radius:3px}
@@ -2090,7 +2094,9 @@ html{overscroll-behavior-y:contain}
   .upn-page .upnext h3{display:none}
   .upn-page .un-row{padding:14px 12px;gap:12px;border-radius:14px}
   .upn-page .un-row .t-name,.upn-page .un-row b{font-size:calc(16px*var(--ts))}
-  .tb-pill{grid-template-columns:repeat(4,1fr)}
+  .tb-pill{grid-template-columns:repeat(5,1fr)}
+  #me-btn{display:none!important}
+  .tb-me .me-av{width:26px!important;height:26px!important;font-size:calc(10px*var(--ts))}.tb-me.on .me-av{box-shadow:0 0 0 2px var(--accent)}
   .tb-pill{gap:0;padding:5px 4px}
   .tb-pill button span{font-size:calc(9.5px*var(--ts));letter-spacing:-.01em;white-space:nowrap}
   .tb-count{background:var(--accent);color:var(--accent-ink)}
@@ -2318,6 +2324,7 @@ select.rs-add{appearance:auto}
 @media (max-width:820px){.rs-acts{flex-wrap:nowrap;width:100%}.rs-acts .btn{flex:1 1 0;padding-inline:8px;white-space:nowrap;font-size:calc(14px*var(--ts))}.rs-acts .btn .i{display:none}.rs-wrap{margin:0 -8px}}
 #print-root{display:none}
 .inv-pane{max-width:1000px}
+.arch-sweep{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;margin-bottom:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:calc(13.5px*var(--ts))}.arch-sweep>span{flex:1;min-width:180px}.arch-sweep .i{color:var(--muted)}
 .inv-cur{display:flex;align-items:center;gap:6px;font-size:calc(12.5px*var(--ts));color:var(--muted)}
 .inv-cur .sel{max-width:170px}
 .inv-head .fx{color:var(--faint)}
@@ -2421,15 +2428,17 @@ select.rs-add{appearance:auto}
 .iv-sec p{margin:0}
 .iv-sec ol{margin:0;padding-left:18px;columns:2;column-gap:24px}
 @media (max-width:820px){
-  .inv-row{grid-template-columns:auto minmax(0,1fr) auto;row-gap:8px}
-  .inv-st{grid-column:2}.inv-acts{grid-column:3}
-  .inv-amt{grid-column:3;grid-row:1}
+  .inv-row{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"ic main main" "ic amt amt" "st st acts";row-gap:6px;column-gap:12px;align-items:center}
+  .inv-row .inv-ic{grid-area:ic;align-self:start;padding-top:2px}.inv-row .inv-main{grid-area:main}
+  .inv-row .inv-amt{grid-area:amt;text-align:left;font-size:calc(15px*var(--ts));display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.inv-row .inv-amt small{font-weight:500}
+  .inv-row .inv-st{grid-area:st;width:100%;margin-top:4px}.inv-row .inv-acts{grid-area:acts;margin-top:4px;justify-content:flex-end}
+  .inv-main b{overflow-wrap:anywhere;word-break:break-word}
   .modal .m-body.inv-body{grid-template-columns:minmax(0,1fr)}
   .inv-preview{position:static}
   .iv-row3{grid-template-columns:1fr 1fr}
   .iv-li{grid-template-columns:minmax(0,1fr) 54px 80px auto}
   .inv-modal footer{flex-wrap:wrap}.inv-modal footer .hint{width:100%}
-  .inv-btns{width:100%}.inv-btns .btn{flex:1}
+  .inv-btns{width:100%;flex-wrap:wrap}.inv-btns .btn{flex:1 1 auto;justify-content:center;white-space:nowrap}
 }
 @media print{
   @page{size:A4;margin:0}
@@ -3067,7 +3076,7 @@ function cuMerge(docs){
 async function cuSync(manual,redo){
   if(cuRunning||B.mode!=='cloud'||!navigator.onLine)return;
   if(!manual&&(!CU.connected||!cuJobs().length||document.hidden))return;
-  cuRunning=true;if(manual){CU.busy='sync';if(SM)renderSettings()}
+  cuRunning=true;if(manual){CU.busy='sync';if(SM)renderSettings();scheduleRender()}
   try{
     flushAll();await Promise.allSettled(Object.values(chains));
     const j=await cuApi(redo?'resync':'sync');cuMerge(j.docs);const made=j.created||0,changed=j.updated||0;
@@ -3080,7 +3089,7 @@ async function cuSync(manual,redo){
     else if(made||j.news)toast([made?`${made} new task${made===1?'':'s'}`:'',j.news?`${j.news} updated`:''].filter(Boolean).join(' and ')+' from ClickUp',{label:'Review',fn:cuReview});
     else if(manual)toast(j.more?`Updated ${changed} task${changed===1?'':'s'} from ClickUp. Bringing in the rest in a minute…`:changed?`Updated ${changed} task${changed===1?'':'s'} from ClickUp`:'Everything from ClickUp is already here');
   }catch(e){if(manual)toast("Couldn't reach ClickUp. Try again in a minute.")}
-  CU.busy=null;cuRunning=false;if(SM)renderSettings();
+  CU.busy=null;cuRunning=false;if(SM)renderSettings();scheduleRender();
 }
 async function cuConnect(){
   const tok=($('#cu-token')?.value||'').trim();
@@ -3565,6 +3574,28 @@ function cuReview(){const u=S.ui;if(u.openTask&&!DRAFT)closeDrawer();u.tab='over
 /* ================= derived ================= */
 const jobsSorted=()=>Object.values(S.jobs).sort((a,b)=>(a.order??0)-(b.order??0)||a.name.localeCompare(b.name));
 const shownClients=jid=>clientsOf(jid).filter(c=>!c.hidden);
+/* near-duplicate clients on one job (the ClickUp sync can create "Dr Raiboy" next to "Dr. Raiboy Aesthetic Clinic"): same name once case, punctuation and
+   " (Trial)" are ignored, one name starting the other as whole words, or 1–2 letters apart. job.clientSame keeps pairs you said are different. */
+const cdNorm=n=>String(n||'').toLowerCase().replace(/\(trial\)/g,'').replace(/[^a-z0-9\u00c0-\uffff]+/g,' ').trim();
+function cdNear(a,b){if(!a||!b)return false;if(a===b||b.startsWith(a+' ')||a.startsWith(b+' '))return true;if(Math.min(a.length,b.length)<6||Math.abs(a.length-b.length)>2)return false;
+  const d=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){let p=d[0];d[0]=i;for(let j=1;j<=b.length;j++){const t=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=t}}return d[b.length]<=2}
+const clientTaskN=c=>Object.values(S.tasks).filter(t=>t.clientId===c.id&&!t.deleted&&!t._draft).length;
+function clientDupe(job){
+  if(job.type!=='agency')return null;const cs=clientsOf(job.id).filter(c=>!c.hidden),ok=new Set(job.clientSame||[]);
+  for(let i=0;i<cs.length;i++)for(let j=i+1;j<cs.length;j++){const a=cs[i],b=cs[j];if(ok.has([a.id,b.id].sort().join('|')))continue;
+    if(cdNear(cdNorm(a.name),cdNorm(b.name)))return clientTaskN(a)>=clientTaskN(b)?[a,b]:[b,a]}
+  return null;
+}
+function mergeClients(keepId,fromId){
+  const k=S.clients[keepId],f=S.clients[fromId];if(!k||!f)return;
+  const ts=Object.values(S.tasks).filter(t=>t.clientId===fromId&&!t._draft);ts.forEach(t=>patch('tasks',t.id,{clientId:keepId}));
+  const p={};for(const x of ['logo','brand','templates','fileName'])if(!k[x]&&f[x])p[x]=f[x];
+  if(f.templates?.length&&k.templates?.length)p.templates=[...k.templates,...f.templates.filter(t=>!k.templates.some(x=>x.name===t.name))];
+  if(Object.keys(p).length)patch('clients',keepId,p);
+  remove('clients',fromId);if(S.ui.client===fromId)S.ui.client=keepId;
+  logAct('job',`Client “${f.name}” merged into “${k.name}” (${ts.length} task${ts.length===1?'':'s'})`,{jobId:k.jobId});
+  toast(`Merged “${f.name}” into “${k.name}”`);render();
+}
 const clientsOf=jid=>Object.values(S.clients).filter(c=>c.jobId===jid).sort((a,b)=>(a.order??0)-(b.order??0)||a.name.localeCompare(b.name));
 const live=()=>Object.values(S.tasks).filter(t=>!t.archived&&!t._draft&&!t.deleted);
 const archived=()=>Object.values(S.tasks).filter(t=>t.archived&&!t.deleted&&S.jobs[t.jobId]);
@@ -3856,6 +3887,7 @@ function renderSide(){
   ${u.sideMini?'':corkHtml()}
   <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='cloud'&&(B.offline||Object.keys(OUT).length)?`<span class="sync-dot local"></span>Offline · ${Object.keys(OUT).length?`${Object.keys(OUT).length} change${Object.keys(OUT).length===1?'':'s'} waiting to sync`:'changes will sync'}`:B.mode==='db'||B.mode==='cloud'?'<span class="sync-dot"></span>Saved to your account':B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
     ${B.mode==='cloud'&&B.syncedAt?`<small class="synced" title="Last time this device heard back from your account">Last synced ${syncedAgo()}</small>`:''}
+    ${B.mode==='cloud'&&CU.connected&&cuJobs().length?`<button type="button" class="synced cu-synced" data-act="cu-sync" title="Check ClickUp now">${CU_IC}${cuRunning?'Checking ClickUp…':`ClickUp checked ${CU.lastSync?calAgo(CU.lastSync):'—'}`}</button>`:''}
     <button class="nav-item foot-settings ${u.tab==='resume'?'on':''}" data-act="nav" data-tab="resume"${tt('Resume')}>${RS_IC}<span class="name">Resume</span></button>
     <button class="nav-item foot-settings ${u.tab==='help'?'on':''}" data-act="nav" data-tab="help"${tt('Help & tips')}>${HELP_IC}<span class="name">Help &amp; tips</span></button>
     <button class="nav-item foot-settings" data-act="open-settings"${tt('Settings')}>${I.gear}<span class="name">Settings</span></button></div>`;
@@ -3876,6 +3908,8 @@ function renderMain(){
   const nd=hasExamples||!S.ready?0:dupeGroups().length;
   const ncu=u.due==='cu-new'?Object.values(S.tasks).filter(t=>cuUnreviewed(t)&&S.jobs[t.jobId]).length:0;
   $('#banner').innerHTML=u.due==='cu-new'?`<div class="banner cu-banner"><p>${CU_IC}<b>${ncu?`${ncu} new from ClickUp`:'Nothing new from ClickUp'}</b>${ncu?' to review. Opening a task marks it reviewed.':'. You’re all caught up.'}</p>${ncu?`<button class="btn sm" data-act="cu-review-all">Mark all as reviewed</button>`:''}<button class="btn sm ghost" data-act="cu-review-off">Show all tasks</button></div>`:!hasExamples&&nd&&lsGet('cutroom.dupehide')!==nd?`<div class="banner"><p><b>${nd} task${nd===1?' has':'s have'} a duplicate</b> with the same name in the same job.</p><button class="btn sm" data-act="help-go" data-sec="dupes">Review and merge</button><button class="icon-btn" data-act="dupes-hide" title="Hide" aria-label="Hide">${I.x}</button></div>`:hasExamples?`<div class="banner"><p><b>You're looking at example jobs and tasks.</b> Poke around, then clear them and add your own jobs.</p><button class="btn sm ${clearArmed?'danger armed':''}" data-act="clear-examples">${clearArmed?'Delete all example data':'Clear examples'}</button></div>`:'';
+  {const cdp=job&&!hasExamples&&!$('#banner').innerHTML.trim()?clientDupe(job):null;
+   if(cdp){const [a,b]=cdp,na=clientTaskN(a),nb=clientTaskN(b);$('#banner').innerHTML=`<div class="banner cdup-banner"><p>${I.users||''}<b>“${esc(b.name)}” looks like “${esc(a.name)}”.</b> Same client? ${nb?`Merging moves its ${nb===1?'task':`${nb} tasks`} over.`:'It has no tasks yet.'}</p><button class="btn sm primary" data-act="cdup-merge" data-keep="${a.id}" data-from="${b.id}">Merge into “${esc(a.name)}”</button><button class="btn sm" data-act="cdup-merge" data-keep="${b.id}" data-from="${a.id}">Merge into “${esc(b.name)}”</button><button class="btn sm ghost" data-act="cdup-keep" data-a="${a.id}" data-b="${b.id}">Keep both</button></div>`}}
 
   if(u.tab==='archived'){renderArchive();return}
   if(u.tab==='activity'){renderActivity();return}
@@ -4026,9 +4060,9 @@ function renderPlus(){
 }
 function renderTabbar(){
   const e=$('#tabbar');if(!e)return;const u=S.ui,cal=u.view==='calendar'&&!['archived','activity','trash','help','resume','upnext'].includes(u.tab);
-  const b=(act,label,icon,on,extra='')=>`<button type="button" data-act="${act}" class="${on?'on':''} ${extra} tb-${act.slice(3)}" aria-label="${label}" ${on?'aria-current="page"':''}>${icon}<span>${label}</span></button>`;
+  const b=(act,label,icon,on,extra='',short=label)=>`<button type="button" data-act="${act}" class="${on?'on':''} ${extra} tb-${act.slice(3)}" aria-label="${label}" ${on?'aria-current="page"':''}>${icon}<span>${short}</span></button>`;
   const busy=notesOpen||UPN;
-  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Overview',I.grid,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Notifications','<svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg>'+(()=>{const n=$('#bell-n');return n&&!n.hidden?`<i class="tb-badge">${esc(n.textContent)}</i>`:''})(),notesOpen)+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-upnext','Up next',UP_IC+(()=>{const n=upNextList().length;return n?`<i class="tb-badge tb-count">${n}</i>`:''})(),UPN)}</div>`
+  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Overview',I.grid,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Notifications','<svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg>'+(()=>{const n=$('#bell-n');return n&&!n.hidden?`<i class="tb-badge">${esc(n.textContent)}</i>`:''})(),notesOpen,'','Alerts')+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-upnext','Up next',UP_IC+(()=>{const n=upNextList().length;return n?`<i class="tb-badge tb-count">${n}</i>`:''})(),UPN)+b('tb-me','You',meAvatar(26),!!PRF)}</div>`
     +`<button type="button" data-act="tb-search" class="tb-search" aria-label="Search" title="Search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 14 14"/></svg></button>`
     +`<button type="button" data-act="tb-plus" class="tb-fab ${PLUS?'on':''}" aria-label="New" aria-expanded="${PLUS}" title="New task, new job or focus timer">${I.plus}</button>`;
 }
@@ -4519,7 +4553,9 @@ function renderArchive(){
   const all=archived();
   $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${I.archive.replace('class="i"','class="i" style="width:28px;height:28px"')}Archived</h1><div class="sub">${all.length} task${all.length===1?'':'s'} · hidden from Overview, job tabs and counts. Restore one to bring it back.</div></div></div>`;
   $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
-  if(!all.length){$('#view').innerHTML=`<div class="empty"><h3>Nothing archived yet</h3><p>When a task is Done, click <b>Archive</b> on it to move it here and keep your lists clean.</p></div>`;return}
+  const ym0=today().slice(0,7),sweep=live().filter(t=>stOf(t)==='done'&&!t.archived&&t.doneAt&&t.doneAt.slice(0,7)<ym0).map(t=>t.id);
+  const sweepHtml=sweep.length?`<div class="arch-sweep">${I.archive}<span><b>${sweep.length} finished task${sweep.length===1?'':'s'}</b> from before ${MONTH_FULL[+ym0.slice(5,7)-1]} ${sweep.length===1?'is':'are'} still in your lists.</span><button type="button" class="btn sm primary" data-act="arch-sweep" data-ids="${sweep.join(',')}">Archive ${sweep.length===1?'it':'them'}</button></div>`:'';
+  if(!all.length){$('#view').innerHTML=sweepHtml+`<div class="empty"><h3>Nothing archived yet</h3><p>When a task is Done, click <b>Archive</b> on it to move it here and keep your lists clean.</p></div>`;return}
   if(u.ajob&&u.ajob!=='all'&&!S.jobs[u.ajob])u.ajob='all';
   const aj=S.jobs[u.ajob],clientsWith=aj&&aj.type==='agency'?clientsOf(aj.id).filter(c=>all.some(t=>t.clientId===c.id)):[];
   if(!clientsWith.some(c=>c.id===u.aclient))u.aclient='all';
@@ -4532,21 +4568,27 @@ function renderArchive(){
   for(const id of [...ASEL])if(!S.tasks[id]||!S.tasks[id].archived||S.tasks[id].deleted)ASEL.delete(id);
   const jobsWith=jobsSorted().filter(j=>all.some(t=>t.jobId===j.id));
   const mLabel=m=>`${MONTH_FULL[+m.slice(5,7)-1]} ${m.slice(0,4)}`;
-  let html=`<div class="arch-bar"><label class="search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="arch-q" data-fk="arch-q" type="search" placeholder="Search archived tasks" value="${esc(u.aq||'')}" autocomplete="off"></label>
+  let html=sweepHtml+`<div class="arch-bar"><label class="search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="arch-q" data-fk="arch-q" type="search" placeholder="Search archived tasks" value="${esc(u.aq||'')}" autocomplete="off"></label>
     <select class="sel" id="arch-job" aria-label="Filter by job"><option value="all">All jobs</option>${jobsWith.map(j=>`<option value="${j.id}" ${u.ajob===j.id?'selected':''}>${esc(j.name)}</option>`).join('')}</select>
     ${clientsWith.length?`<select class="sel" id="arch-client" aria-label="Filter by client"><option value="all">All clients</option>${clientsWith.map(c=>`<option value="${c.id}" ${u.aclient===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>`:''}
     <select class="sel" id="arch-month" aria-label="Filter by month archived"><option value="all">Any month</option>${months.map(m=>`<option value="${m}" ${u.amonth===m?'selected':''}>${mLabel(m)}</option>`).join('')}</select>
+    <select class="sel" id="arch-group" aria-label="Group by"><option value="job" ${(u.agroup||'job')==='job'?'selected':''}>Group by job</option><option value="month" ${u.agroup==='month'?'selected':''}>Group by month done</option></select>
     <button type="button" class="btn sm ${ASELMODE?'on':''}" data-act="asel-mode" aria-pressed="${ASELMODE}">${ASELMODE?'Done selecting':'Select'}</button>
     ${ASELMODE?`<button type="button" class="btn sm ghost" data-act="asel-all" data-ids="${list.map(t=>t.id).join(',')}">${list.length&&list.every(t=>ASEL.has(t.id))?'Select none':`Select all ${list.length}`}</button>`:''}</div>
     ${ASEL.size?`<div class="asel-bar"><b>${ASEL.size} selected</b><button type="button" class="btn sm primary" data-act="asel-restore">Restore ${ASEL.size}</button><button type="button" class="btn sm danger ${aselDelArmed?'armed':''}" data-act="asel-delete">${I.trash}${aselDelArmed?'Click again to move to Trash':'Delete'}</button><button type="button" class="icon-btn" data-act="asel-clear" title="Clear selection" aria-label="Clear selection">${I.x}</button></div>`:''}`;
-  for(const j of jobsWith){
-    const rows=list.filter(t=>t.jobId===j.id);if(!rows.length)continue;
-    html+=`<section class="arch-group"><h3>${jobMark(j,20)}${esc(j.name)}<span class="count">${rows.length}</span></h3><div class="rows">${rows.map(t=>`<div class="arow ${ASEL.has(t.id)?'picked':''} ${ASELMODE?'selecting':''}" data-act="open" data-id="${t.id}" tabindex="0">
+  const arow=t=>`<div class="arow ${ASEL.has(t.id)?'picked':''} ${ASELMODE?'selecting':''}" data-act="open" data-id="${t.id}" tabindex="0">
       ${ASELMODE?`<label class="selbox" data-stop><input type="checkbox" data-act="asel" data-id="${t.id}" ${ASEL.has(t.id)?'checked':''} aria-label="Select ${esc(t.name||'task')}"></label>`:taskMark(t)}
-      <div class="t-main"><div class="t-name">${esc(t.name||'Untitled task')}</div>${metaLine(t,j,false)}</div>
+      <div class="t-main"><div class="t-name">${esc(t.name||'Untitled task')}</div>${metaLine(t,S.jobs[t.jobId],false)}</div>
       <div class="date c-done"><small>Done</small>${t.doneAt?fmtDate(t.doneAt):'—'}</div>
       <div class="date c-done"><small>Archived</small>${t.archivedAt?fmtDate(t.archivedAt):'—'}</div>
-      <div class="acts"><button class="btn sm" data-act="restore" data-id="${t.id}">Restore</button><button class="btn sm danger ${archDelArmed===t.id?'armed':''}" data-act="arch-delete" data-id="${t.id}">${archDelArmed===t.id?'Delete for good':I.trash+'Delete'}</button></div></div>`).join('')}</div></section>`;
+      <div class="acts"><button class="btn sm" data-act="restore" data-id="${t.id}">Restore</button><button class="btn sm danger ${archDelArmed===t.id?'armed':''}" data-act="arch-delete" data-id="${t.id}">${archDelArmed===t.id?'Delete for good':I.trash+'Delete'}</button></div></div>`;
+  const doneM=t=>(t.doneAt||t.archivedAt||'').slice(0,7);
+  if((u.agroup||'job')==='month'){
+    const ms=[...new Set(list.map(doneM))].sort().reverse();
+    for(const m of ms){const rows=list.filter(t=>doneM(t)===m);html+=`<section class="arch-group"><h3>${I.cal}${m?`Done in ${mLabel(m)}`:'No finish date'}<span class="count">${rows.length}</span></h3><div class="rows">${rows.map(arow).join('')}</div></section>`}
+  }else for(const j of jobsWith){
+    const rows=list.filter(t=>t.jobId===j.id);if(!rows.length)continue;
+    html+=`<section class="arch-group"><h3>${jobMark(j,20)}${esc(j.name)}<span class="count">${rows.length}</span></h3><div class="rows">${rows.map(arow).join('')}</div></section>`;
   }
   if(!list.length) html+=`<div class="empty"><h3>No archived tasks match</h3></div>`;
   $('#view').innerHTML=html;
@@ -4776,6 +4818,9 @@ function jumpItems(q){
   for(const j of jobsSorted()){const sc=score(j.name);if(sc)out.push({sc:sc+.4,icon:jobMark(j,16),label:j.name,sub:j.type==='agency'?'Agency':'Direct client',act:'nav',tab:j.id})}
   for(const c of Object.values(S.clients)){const sc=score(c.name);if(sc)out.push({sc:sc+.3,icon:clientMark(c,16),label:c.name,sub:`Client · ${S.jobs[c.jobId]?.name||''}`,act:'nav',tab:c.jobId,client:c.id})}
   if(q)for(const t of Object.values(S.tasks)){if(t._draft||t.deleted)continue;const sc=Math.max(score(t.name),score(S.clients[t.clientId]?.name)*.6);if(sc)out.push({sc:sc+(t.archived?0:isClosed(t)?.05:.2),icon:`<span class="jdot" ${pillStyle(stOf(t))}></span>`,label:t.name||'Untitled task',sub:[S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name,t.archived?'Archived':stLabel(stOf(t))].filter(Boolean).join(' · '),act:'open',id:t.id})}
+  if(q){for(const j of Object.values(S.jobs))for(const v of j.invoices||[]){const nm=v.number||v.file?.name||'Invoice',sc=Math.max(score(nm),score(v.file?.name)*.8,score(perLabel(invPer(v),v.half))*.7,score('invoice '+j.name)*.5);
+      if(sc)out.push({sc:sc+.1,icon:INV_IC,label:nm,sub:['Invoice',j.name,perLabel(invPer(v),v.half),v.amount!==''&&v.amount!=null?money(v.amount,v.currency||workOf(j).pay?.currency||'USD'):'',INV_ST[invState(v)]].filter(Boolean).join(' · '),act:'inv',job:j.id,id:v.kind==='made'?v.id:null})}
+    for(const e of xpItems()){const sc=Math.max(score(e.name),score(xpCat(e.cat)[1])*.5);if(sc)out.push({sc,icon:'<svg class="i" viewBox="0 0 16 16"><path d="M3.5 1.8h9v12.6l-1.8-1.1-1.5 1.1-1.7-1.1-1.7 1.1-1.5-1.1-1.8 1.1z"/><path d="M6 5.2h4M6 8h4"/></svg>',label:e.name,sub:['Expense',money(e.amount,e.currency),e.repeat==='month'?'every month':e.repeat==='year'?'every year':fmtDate(e.date)].filter(Boolean).join(' · '),act:'xp',id:e.id})}}
   return out.sort((a,b)=>b.sc-a.sc).slice(0,12);
 }
 function focusSearch(){const q=$('#q'),ts=$('#top-search');if(q&&ts&&!ts.hidden&&q.offsetParent){q.focus();q.select()}else openJump()}
@@ -4851,6 +4896,8 @@ function jumpGo(k){
   else if(x.act==='open-settings')openSettings();
   else if(x.act==='stickers')openStickers();
   else if(x.act==='profile')openProfile();
+  else if(x.act==='inv'){u.from=u.tab;closeSide();invGo(x.job,x.id);window.scrollTo({top:0})}
+  else if(x.act==='xp'){openProfile('costs');const e=xpItems().find(y=>y.id===x.id);if(e&&XP)xpOpen(e)}
   else if(x.act==='path'){notePathOpen(x.p);location.href=pathOpenUrl(x.p)}
 }
 /* "Assigned 12 days ago" under the dates (or how long a finished task took) */
@@ -5761,10 +5808,10 @@ function payMonths(range){
 }
 function payChart(ms,cur,range){
   if(!cur)return '';
-  const max=Math.max(1,...ms.map(x=>x.v)),cm=today().slice(0,7);
+  const max=Math.max(1,...ms.map(x=>Math.max(x.v,x.c||0))),cm=today().slice(0,7),hasC=ms.some(x=>x.c);
   return `<div class="pf-chart"><div class="pf-ch-h"><h4>${esc((PAY_RANGES.find(x=>x[0]===range)||PAY_RANGES[0])[1])}</h4><select class="sel pf-range" data-act="prf-range" aria-label="Chart range">${PAY_RANGES.map(([k,l])=>`<option value="${k}" ${k===range?'selected':''}>${l}</option>`).join('')}</select></div>
     <div class="pf-bars" style="--n:${ms.length}">${ms.map((x,i)=>{const mo=MONTH_FULL[+x.m.slice(5,7)-1],pct=x.v?Math.max(4,x.v/max*100):0,edge=i===0?'first':i===ms.length-1?'last':'';
-    return `<button type="button" class="pf-bar ${x.m===cm?'now':''} ${edge}" aria-label="${esc(mo)} ${x.m.slice(0,4)}: ${esc(money(x.v,cur))} received"><span class="pf-tip"><b>${esc(money(x.v,cur))}</b>${esc(mo)} ${x.m.slice(0,4)}${x.n?` · ${x.n} invoice${x.n===1?'':'s'}`:''}${x.c?`<em class="pf-tc">Costs ${esc(money(x.c,cur))} · kept ${esc(money(x.v-x.c,cur))}</em>`:''}</span><span class="pf-col"><i style="height:${pct}%"></i></span><small>${esc(mo.slice(0,3))}</small><em>${esc(moneyShort(x.v,cur))}</em></button>`}).join('')}</div></div>`;
+    return `<button type="button" class="pf-bar ${x.m===cm?'now':''} ${edge}" aria-label="${esc(mo)} ${x.m.slice(0,4)}: ${esc(money(x.v,cur))} received"><span class="pf-tip"><b>${esc(money(x.v,cur))}</b>${esc(mo)} ${x.m.slice(0,4)}${x.n?` · ${x.n} invoice${x.n===1?'':'s'}`:''}${x.c?`<em class="pf-tc">Costs ${esc(money(x.c,cur))} · kept ${esc(money(x.v-x.c,cur))}</em>`:''}</span><span class="pf-col"><i style="height:${pct}%"></i>${hasC?`<i class="pf-cost" style="height:${x.c?Math.max(3,x.c/max*100):0}%"></i>`:''}</span><small>${esc(mo.slice(0,3))}</small><em>${esc(moneyShort(x.v,cur))}</em></button>`}).join('')}</div>${hasC?'<div class="pf-legend2"><span><i></i>Received</span><span><i class="c"></i>Costs</span></div>':''}</div>`;
 }
 const relDays=d=>{const n=diffDays(d,today());return n===0?'today':n===1?'tomorrow':n>1?`in ${n} days`:n===-1?'yesterday':`${-n} days ago`};
 /* ================= expenses (Profile → Expenses; settings/expenses {items:[{id,name,amount,currency,date,cat,repeat 'none'|'month'|'year',until YYYY-MM,jobId}]}) =================
@@ -5817,7 +5864,7 @@ function xpCommit(){
   const was=XP.edit;xpSave(items);xpClose();XP={edit:null,d:{...xpBlank(),currency:e.currency}};toast(was?'Expense saved':'Expense added');renderProfile();
 }
 function openProfile(sec){PRF={sec:sec||'me',mv:sec?'sec':'list',edit:false};renderProfile();$('#modal').hidden=false;closeSide();if(B.mode==='cloud'){if(B.cfg?.calendar&&!CAL.loaded)calStatus().then(()=>{if(PRF)renderProfile()});if(B.cfg?.clickup&&!CU.loaded)cuStatus().then(()=>{if(PRF)renderProfile()})}}
-function closeProfile(){xpClose();PRF=null;$('#modal').hidden=true;$('#modal').innerHTML='';renderMeBtn()}
+function closeProfile(){xpClose();PRF=null;$('#modal').hidden=true;$('#modal').innerHTML='';renderMeBtn();renderTabbar()}
 function renderProfile(){
   if(!PRF)return;
   const jobs=jobsSorted().filter(j=>!j.example||Object.values(S.jobs).every(x=>x.example)),t0=today(),ym=t0.slice(0,7),yr=t0.slice(0,4);
@@ -5891,7 +5938,7 @@ function renderProfile(){
       ${fxWait?'<p class="hint">Getting exchange rates… amounts in other currencies are added once they load.</p>':''}<p class="hint">From your invoices marked Paid, counted in the month each one covers (its Period)${cb&&inv.some(v=>v.currency!==cb)?`, converted to ${cb}`:''}. The hourly rate comes from each job's pay and schedule in Work details.</p>`},
     {id:'costs',label:'Expenses',sub:'Subscriptions, gear and other costs',icon:'<svg class="i" viewBox="0 0 16 16"><path d="M3.5 1.8h9v12.6l-1.8-1.1-1.5 1.1-1.7-1.1-1.7 1.1-1.5-1.1-1.8 1.1z"/><path d="M6 5.2h4M6 8h4M8 10.2v.1"/></svg>',html:(()=>{
       const subs=xps.filter(e=>e.repeat==='month'||e.repeat==='year'),once=xps.filter(e=>e.repeat!=='month'&&e.repeat!=='year').sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-      const acts=e=>`<button type="button" class="icon-btn" data-act="xp-edit" data-id="${e.id}" title="Edit" aria-label="Edit expense">${I.pencil}</button><button type="button" class="icon-btn ${xpDelArmed===e.id?'danger armed':''}" data-act="xp-del" data-id="${e.id}" title="${xpDelArmed===e.id?'Click again to delete':'Delete'}" aria-label="Delete expense">${xpDelArmed===e.id?'Sure?':I.trash}</button>`;
+      const acts=e=>{const del=xpDelArmed===e.id,open=XP.more===e.id;return `<button type="button" class="icon-btn xp-ic" data-act="xp-edit" data-id="${e.id}" title="Edit" aria-label="Edit expense">${I.pencil}</button><button type="button" class="icon-btn xp-ic ${del?'danger armed':''}" data-act="xp-del" data-id="${e.id}" title="${del?'Click again to delete':'Delete'}" aria-label="Delete expense">${del?'Sure?':I.trash}</button><button type="button" class="icon-btn xp-more ${open?'on':''}" data-act="xp-more" data-id="${e.id}" aria-expanded="${open}" title="More" aria-label="More for ${esc(e.name)}">${MORE_IC}</button>${open?`<div class="xp-menu"><button type="button" class="btn sm" data-act="xp-edit" data-id="${e.id}">${I.pencil}Edit</button><button type="button" class="btn sm ${del?'danger armed':''}" data-act="xp-del" data-id="${e.id}">${I.trash}${del?'Tap again to delete':'Delete'}</button></div>`:''}`};
       const amt=(n,c)=>`${esc(money(n,c))}${cx&&c!==cx&&xconv(n,c)!=null?`<small>≈ ${esc(money(xconv(n,c),cx))}</small>`:''}`;
       const chip=k=>{const c=xpCat(k);return `<span class="xp-cat" style="--xc:${c[2]}">${esc(c[1])}</span>`};
       const perMonth=subs.filter(xpActive).reduce((a,e)=>{const x=xconv(e.amount,e.currency);return x==null?a:a+(e.repeat==='year'?x/12:x)},0);
@@ -6250,6 +6297,7 @@ const HELP=[
  ['Tasks','Delivery specs',`When a task's notes hold a brief (ClickUp briefs land there), the panel shows its specs as chips under the details: resolution, orientation, aspect, bitrate, frame rate, codec, loudness, length and captions. If the brief's aspect differs from the task's format, one click sets it.`,null],
  ['Your work','New from ClickUp',`Tasks the ClickUp sync brings in get a purple New badge, and tasks with new ClickUp comments or status or due-date changes show “2 new”. Opening the task clears it. Click Review on the message that pops up, the notification, or pick New from ClickUp in the due-date filter to see them all; Mark all as reviewed clears every badge.`,null],
  ['Your work','ClickUp mentions',`ClickUp comments that tag you (like “Hi @Kim, please update”) are marked “mentioned you” in the task's Activity tab, come first in notifications for a week, and have their own Mentions filter.`,null],
+ ['Your work','Duplicate clients',`When two clients on the same agency job have nearly the same name (often one made by the ClickUp sync), a banner on the job page offers to merge them. Merging moves the tasks over and keeps the brand guide and logo. Keep both hides the question for that pair.`,null],
  ['Your work','Expenses',`Open your Profile (the round picture top right) → Expenses to keep track of what your work costs: software subscriptions, music and stock sites, gear, internet and fees. Set a subscription to repeat every month or year and it counts each time until you mark it cancelled. Amounts in other currencies are converted. Pay then shows what you kept this year after costs, and each month in the chart shows its costs too.`,null],
  ['Your work','Invoices',`Each job has an Invoices & docs tab. Upload the invoices you send (PDF or a picture) and set their month and amount, or click Create invoice: it fills in from the job's pay in Details (amount, currency, payment method), adds the next number (INV-2026-001…), can list the videos you finished that month, and saves a PDF. Your own name, address and payment details are kept for next time. Mark each one Sent or Paid; a sent invoice past its due date shows as overdue in notifications. Pick a currency in “Totals in” to see every job's paid and waiting amounts converted with a recent exchange rate. Below the invoices, Documents holds the job's contract, NDA, onboarding files and briefs. Click Defaults on a job's Invoices tab to set what every new invoice starts with: billed to, your own numbering (like Invoice_JCUT_{n}, which carries on from the highest number already used), the line item, rate, currency, due days, tax, this job's payment details and your own details. The due date can be a number of days after the invoice date, or On payday: pick the day you get paid and each invoice is due on the first payday on or after its last day of work. If a job pays you twice a month, set “How often you bill” to Twice a month: each invoice covers 1–15 or 16–end (pick the half next to the month), the rate is the amount for each half, each half has its own payday (for example the 15th for 1–15, and the 1st for 16–end, which lands on the 1st of the next month), and the reminders look for both halves. With On payday set, “Make a draft before payday” (1, 3 or 7 days) has the next invoice waiting as a Draft when you open the app, with a notification that opens it; you pick its issue date and whether it lists the videos you finished. Nothing is sent for you.`,null],
  ['Tasks','Merge duplicate tasks',`Settings → Duplicate tasks lists tasks in the same job with the same name. Pick the copy to keep and click Merge: it gets anything it was missing from the others (links, client, dates, notes, checklist steps, the ClickUp link and comments, updates and history), and the other copies go to Trash, where you can still restore them.`,['dupes','Duplicate tasks']],
@@ -7606,6 +7654,7 @@ document.addEventListener('click',e=>{
     case 'tb-plus': PLUS=!PLUS;renderPlus();break;
     case 'pm-timer': PLUS=false;renderPlus();POMO_OPEN=true;notesOpen=false;renderBell();renderPomo();break;
     case 'pm-job': PLUS=false;renderPlus();openJobModal();break;
+    case 'tb-me': PLUS=false;renderPlus();if(UPN){UPN=false;renderUpNextPage()}if(notesOpen){notesOpen=false;renderBell()}closeSide();PRF?closeProfile():openProfile();renderTabbar();break;
     case 'tb-upnext': UPN=!UPN;if(UPN){notesOpen=false;renderBell();closeSide()}renderUpNextPage();renderTabbar();break;
     case 'tb-notes': UPN=false;renderUpNextPage();notesOpen=!notesOpen;if(notesOpen){saveNotes();POMO_OPEN=false;renderPomo();closeSide()}renderBell();break;
     case 'groups-all': {const open=el.dataset.open==='1';u.collapsed=u.collapsed||{};STATUSES.forEach(x=>{u.collapsed[x.id]=!open});saveUi();render();break}
@@ -7652,9 +7701,10 @@ document.addEventListener('click',e=>{
     case 'profile': openProfile();break;
     case 'prf-close': closeProfile();break;
     case 'xp-new': if(XP)xpOpen();break;
+    case 'xp-more': if(XP){XP.more=XP.more===el.dataset.id?null:el.dataset.id;xpDelArmed=null;renderProfile()}break;
     case 'xp-add': if(XP)xpCommit();break;
     case 'xp-cancel': xpClose();break;
-    case 'xp-edit': {const e=xpItems().find(x=>x.id===el.dataset.id);if(e&&XP)xpOpen(e);break}
+    case 'xp-edit': {const e=xpItems().find(x=>x.id===el.dataset.id);if(e&&XP){XP.more=null;xpOpen(e)}break}
     case 'xp-del': {const id=el.dataset.id;if(xpDelArmed!==id){xpDelArmed=id;renderProfile();setTimeout(()=>{if(xpDelArmed===id){xpDelArmed=null;if(PRF)renderProfile()}},3000);break}
       xpDelArmed=null;const old=xpItems(),e=old.find(x=>x.id===id);xpSave(old.filter(x=>x.id!==id));if(XP?.edit===id){XP.edit=null;XP.d=xpBlank()}renderProfile();toast(`Deleted ${e?.name||'expense'}`,{label:'Undo',fn:()=>{xpSave(old);if(PRF)renderProfile()}});break}
     case 'xp-stop': xpSave(xpItems().map(x=>x.id===el.dataset.id?{...x,until:today().slice(0,7)}:x));renderProfile();toast('Marked cancelled. It counts up to this month.');break;
@@ -7836,6 +7886,9 @@ document.addEventListener('click',e=>{
     case 'archive': archiveTasks([el.dataset.id]);break;
     case 'archive-all': archiveTasks(filtered().filter(t=>stOf(t)===el.dataset.status).map(t=>t.id));break;
     case 'restore': restoreTasks([el.dataset.id]);break;
+    case 'cdup-merge': mergeClients(el.dataset.keep,el.dataset.from);break;
+    case 'cdup-keep': {const a=S.clients[el.dataset.a];if(a){const j=S.jobs[a.jobId];patch('jobs',j.id,{clientSame:[...(j.clientSame||[]),[el.dataset.a,el.dataset.b].sort().join('|')]});render()}break}
+    case 'arch-sweep': {const ids=(el.dataset.ids||'').split(',').filter(id=>S.tasks[id]&&!S.tasks[id].archived);if(ids.length){archiveTasks(ids);render()}break}
     case 'asel-mode': ASELMODE=!ASELMODE;if(!ASELMODE)ASEL.clear();aselDelArmed=false;render();break;
     case 'asel-all':{const ids=(el.dataset.ids||'').split(',').filter(Boolean);const all=ids.length&&ids.every(id=>ASEL.has(id));ids.forEach(id=>all?ASEL.delete(id):ASEL.add(id));aselDelArmed=false;render();break}
     case 'asel-clear': ASEL.clear();aselDelArmed=false;render();break;
@@ -7942,6 +7995,7 @@ document.addEventListener('change',e=>{
   if(el.id==='arch-job'){u.ajob=el.value;u.aclient='all';saveUi();render();return}
   if(el.id==='arch-client'){u.aclient=el.value;saveUi();render();return}
   if(el.id==='arch-month'){u.amonth=el.value;saveUi();render();return}
+  if(el.id==='arch-group'){u.agroup=el.value;saveUi();render();return}
   if(el.dataset.act==='asel'){el.checked?ASEL.add(el.dataset.id):ASEL.delete(el.dataset.id);aselDelArmed=false;render();return}
   if(el.id==='bulk-move'&&el.value){moveTasks([...SEL],el.value);return}
   if(el.id==='bulk-status'&&el.value){const v=el.value,undo=[];[...SEL].forEach(id=>{const prev=setStatus(id,v,{quiet:true});if(prev)undo.push([id,prev])});if(v==='done'&&undo.length)celebrate();render();toast(`Moved ${undo.length} task${undo.length===1?'':'s'} to ${stLabel(v)}`,undo.length?{label:'Undo',fn:()=>undoStatus(undo)}:null);return}
