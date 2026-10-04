@@ -1539,6 +1539,12 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 :is(.pr-input,.pomo-num input,.limit-row input,.pf-form input,.ivd-grid input,.ivd-grid select,.acct-btns select.sel,#s-name,.st-row input[type=text]):focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
 @media (min-width:821px){:is(.pr-input,.pomo-num input,.limit-row input,.pf-form input,.ivd-grid input,#s-name,.st-row input[type=text]){font-size:calc(13.5px*var(--ts))}}
 .search{min-height:38px;box-sizing:border-box}
+/* every dialog laid out with prefLayout (Edit job, brand guide editor, Settings, Profile) gets the same boxes; background-color only, so dropdown chevrons stay */
+#modal .pref :is(input:not([type]),input[type=text],input[type=email],input[type=url],input[type=number],input[type=date],input[type=time],input[type=month],input[type=tel],select:not(.pill)){height:38px;box-sizing:border-box;border:1px solid var(--line);background-color:var(--surface);color:var(--text);border-radius:9px;padding-left:10px}
+#modal .pref :is(input:not([type]),input[type=text],input[type=email],input[type=url],input[type=number],input[type=date],input[type=time],input[type=month],input[type=tel]){padding-right:10px;-webkit-appearance:none;appearance:none}
+#modal .pref select:not(.pill){-webkit-appearance:none;appearance:none;padding-right:30px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23888' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:12px;cursor:pointer}
+#modal .pref textarea{box-sizing:border-box;border:1px solid var(--line);background-color:var(--surface);color:var(--text);border-radius:9px}
+#modal .pref :is(input,select,textarea):focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
 :is(#d-start,#d-due,#d-job,#d-client,#d-len,.pf-v input[type=text],.pf-v select){height:36px;box-sizing:border-box;border-radius:9px}
 
 /* ---------- floating task window + safe zones ---------- */
