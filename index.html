@@ -2264,7 +2264,9 @@ select.rs-add{appearance:auto}
 .inv-edit input:focus,.inv-edit select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
 .inv-edit select{min-width:84px}
 .inv-amt{font-family:var(--mono);font-weight:600;white-space:nowrap}
-.inv-st{min-width:96px;font-weight:600}
+.inv-st{font-weight:600}
+.inv-st,.inv-edit select,.doc-kind,.inv-sort .sel,.inv-cur .sel{appearance:none;-webkit-appearance:none;padding:6px 30px 6px 12px;min-width:0;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23888' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:12px}
+.inv-row .inv-st{min-width:110px}
 .inv-st.inv-paid{color:var(--st-done,#1f9d55)}
 .inv-st.inv-sent{color:var(--accent)}
 .inv-st.inv-overdue{color:var(--danger)}
@@ -3660,7 +3662,7 @@ function renderMain(){
     $('#head').innerHTML=`<nav class="crumbs" aria-label="Breadcrumb">${crumbs.join('<i aria-hidden="true">›</i>')}</nav><div class="head"><div class="head-title"><h1>${jobMark(job,34)}<span class="h1-name" data-act="job-name" data-id="${job.id}">${esc(job.name)}</span><button class="icon-btn h1-edit" data-act="edit-job" data-id="${job.id}" title="Edit job" aria-label="Edit job">${I.pencil}</button><button class="icon-btn h1-edit" data-act="export-csv" data-job="${job.id}" title="Export tasks as CSV" aria-label="Export tasks as CSV">${I.download}</button></h1>
       <div class="sub"><span class="badge">${job.type==='agency'?I.briefcase+'Agency':I.user+'Direct client'}</span>${job.type==='agency'?`<span>${cl.length} client${cl.length===1?'':'s'}</span>`:''}</div></div></div>`;
     $('#subnav').innerHTML=`<div class="pane-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${['brand','details','invoices'].includes(u.pane)?'':'on'}" aria-selected="${!['brand','details','invoices'].includes(u.pane)}" data-act="pane" data-pane="tasks">${I.task}Tasks</button><button role="tab" class="${u.pane==='brand'?'on':''}" aria-selected="${u.pane==='brand'}" data-act="pane" data-pane="brand">${I.palette}Brand guide</button><button role="tab" class="${u.pane==='invoices'?'on':''}" aria-selected="${u.pane==='invoices'}" data-act="pane" data-pane="invoices">${INV_IC}Invoices &amp; docs</button><button role="tab" class="${u.pane==='details'?'on':''}" aria-selected="${u.pane==='details'}" data-act="pane" data-pane="details">${I.info}Details</button></div>
-      ${job.type==='agency'?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}" draggable="true" data-ctab="${c.id}" title="Drag to reorder">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}`;
+      ${job.type==='agency'&&!['details','invoices'].includes(u.pane)?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}" draggable="true" data-ctab="${c.id}" title="Drag to reorder">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}`;
   }
 
   if(job&&(u.pane==='brand'||u.pane==='details'||u.pane==='invoices')){
