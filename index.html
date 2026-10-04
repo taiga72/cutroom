@@ -2263,6 +2263,8 @@ select.rs-add{appearance:auto}
 .inv-acts{display:flex;gap:6px;align-items:center}
 .modal.inv-modal{width:min(1180px,96vw);max-width:none;max-height:94vh;display:flex;flex-direction:column;overflow:hidden}
 .modal .m-body.inv-body{display:grid;flex-direction:initial}
+.inv-modal header h2{display:flex;align-items:center;gap:8px;min-width:0}
+.inv-modal header h2 .i{flex:none}
 .inv-form input,.inv-form select,.inv-form textarea{width:100%;min-width:0;box-sizing:border-box}
 .inv-form label{min-width:0}
 .inv-body{display:grid;grid-template-columns:minmax(320px,1fr) minmax(0,1.05fr);gap:18px;overflow:auto}
@@ -3100,13 +3102,15 @@ function nextInvNumber(){
 /* finished tasks of the job in a month (by doneAt), for "Add the videos you delivered" */
 const deliveredIn=(jobId,ym)=>Object.values(S.tasks).filter(t=>t.jobId===jobId&&!t.deleted&&!t._draft&&(t.doneAt||'').slice(0,7)===ym).sort((a,b)=>(a.doneAt||'').localeCompare(b.doneAt||''));
 function invNew(job){
+  /* what you typed last time for this job (billed to, notes, tax) and your own details carry over */
+  const last=(job.invoices||[]).filter(v=>v.kind==='made'&&v.doc).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0]?.doc;
   const w=workOf(job),p=w.pay||{},ym=today().slice(0,7),from=appSettings().invoiceFrom||{name:B.name||'',email:B.email||''};
   const n=p.period==='video'?deliveredIn(job.id,ym).length||1:1;
   const what={month:`Video editing · ${monthLabel(ym)}`,week:'Video editing · weekly',day:'Video editing · days',hour:'Video editing · hours',project:'Video editing · project',video:`Videos delivered · ${monthLabel(ym)}`}[p.period]||`Video editing · ${monthLabel(ym)}`;
   return {number:nextInvNumber(),date:today(),due:addDays(today(),7),period:ym,currency:p.currency||'USD',
     from:{name:from.name||'',email:from.email||'',phone:from.phone||'',address:from.address||'',payment:from.payment||'',taxId:from.taxId||''},
-    to:{name:job.name,details:[w.contact?.name,w.contact?.reach,w.location].filter(Boolean).join('\n')},
-    items:[{d:what,q:n,r:p.amount||''}],tax:'',notes:p.method?`Payment via ${p.method}.`:'',list:[]};
+    to:job.invoiceTo?{...job.invoiceTo}:last?{...last.to}:{name:job.name,details:[w.contact?.name,w.contact?.reach,w.location].filter(Boolean).join('\n')},
+    items:[{d:what,q:n,r:p.amount||''}],tax:job.invoiceTax??last?.tax??'',notes:job.invoiceNotes??last?.notes??(p.method?`Payment via ${p.method}.`:''),list:[]};
 }
 function invSheet(d){
   const t=invTotals(d),c=d.currency,ml=x=>esc(x||'').replace(/\n/g,'<br>');
@@ -3165,9 +3169,9 @@ function openInv(jobId,id){
   const job=S.jobs[jobId];if(!job)return;
   const v=id&&(job.invoices||[]).find(x=>x.id===id);
   INV={jobId,id:v?v.id:null,d:v?JSON.parse(JSON.stringify(v.doc)):invNew(job),status:v?v.status:'draft'};
-  renderInv();$('#modal').hidden=false;
+  renderInv();$('#modal').hidden=false;requestAnimationFrame(invFit);
 }
-function closeInv(){INV=null;$('#modal').hidden=true;$('#modal').innerHTML=''}
+function closeInv(){INV=null;INV_RO?.disconnect();$('#modal').hidden=true;$('#modal').innerHTML=''}
 function invGet(path){return path.split('.').reduce((o,k)=>o?.[k],INV.d)}
 function invSet(path,val){const ks=path.split('.'),last=ks.pop();const o=ks.reduce((o,k)=>o[k]=o[k]??{},INV.d);o[last]=val}
 function renderInv(){
@@ -3180,28 +3184,29 @@ function renderInv(){
     <div class="m-body inv-body"><div class="inv-form">
       <div class="iv-row3">${f('number','Invoice number')}${f('date','Issued','', 'date')}${f('due','Due','', 'date')}</div>
       <div class="iv-row3">${f('period','For the month','', 'month')}<label>Currency<select data-iv="currency">${[...new Set([...CURRENCIES,d.currency])].map(c=>`<option ${c===d.currency?'selected':''}>${esc(c)}</option>`).join('')}</select></label>${f('tax','Tax %','0','number')}</div>
-      <p class="pref-group">Billed to</p>${f('to.name','Name or company')}${a('to.details','Details','Contact, address, email',2)}
+      <p class="pref-group">Billed to <small>(kept for this job’s next invoice)</small></p>${f('to.name','Name or company')}${a('to.details','Details','Contact, address, email',2)}
       <p class="pref-group">Line items</p>
       <div class="iv-items-form">${(d.items||[]).map((x,i)=>`<div class="iv-li"><input type="text" data-iv="items.${i}.d" data-fk="iv-items.${i}.d" value="${esc(x.d||'')}" placeholder="Description" aria-label="Description"><input type="number" step="any" min="0" data-iv="items.${i}.q" data-fk="iv-items.${i}.q" value="${esc(x.q??'')}" aria-label="Quantity" placeholder="Qty"><input type="number" step="any" min="0" data-iv="items.${i}.r" data-fk="iv-items.${i}.r" value="${esc(x.r??'')}" aria-label="Rate" placeholder="Rate"><button type="button" class="icon-btn" data-act="iv-rm" data-i="${i}" title="Remove line" aria-label="Remove line">${I.x}</button></div>`).join('')}</div>
       <div class="acct-btns"><button type="button" class="btn sm" data-act="iv-add">${I.plus}Add a line</button>
         <button type="button" class="btn sm" data-act="iv-list" ${done.length?'':'disabled'} title="List the tasks you finished in ${esc(monthLabel(d.period))}">${I.task}${(d.list||[]).length?'Update':'Add'} delivered videos (${done.length})</button>${(d.list||[]).length?`<button type="button" class="btn sm ghost" data-act="iv-list-rm">Remove the list</button>`:''}</div>
-      ${a('notes','Notes','Thanks! Payment terms, PO number…',2)}
-      <p class="pref-group">Your details <small>(saved for next time)</small></p>
+      ${a('notes','Notes (kept for this job’s next invoice)','Thanks! Payment terms, PO number…',2)}
+      <p class="pref-group">Your details and payment <small>(kept for every invoice)</small></p>
       <div class="iv-row2">${f('from.name','Your name')}${f('from.email','Email','', 'email')}</div><div class="iv-row2">${f('from.phone','Phone')}${f('from.taxId','Tax ID (optional)')}</div>
       ${a('from.address','Address','',2)}${a('from.payment','Payment details','Bank, Wise, PayPal, Payoneer…',3)}
     </div><div class="inv-preview" id="inv-preview" aria-label="Preview">${invSheet(d)}</div></div>
     <footer><span class="hint">${money(invTotals(d).total,d.currency)} total</span><button class="btn" data-act="inv-close">Cancel</button><button class="btn" data-act="inv-save">Save</button><button class="btn primary" data-act="inv-save-pdf">${I.download}Save &amp; download PDF</button></footer></div>`}));
-  invFit();
+  invFit();if(window.ResizeObserver){INV_RO?.disconnect();INV_RO=new ResizeObserver(()=>{if(INV)invFit()});const pv=$('#inv-preview');if(pv)INV_RO.observe(pv)}
 }
 /* the preview is an A4 sheet scaled to its column */
-function invFit(){const p=$('#inv-preview'),sh=p&&p.querySelector('.inv-sheet');if(!sh)return;const z=Math.min(1,(p.clientWidth-4)/sh.offsetWidth||1);sh.style.zoom=z}
+function invFit(){const p=$('#inv-preview'),sh=p&&p.querySelector('.inv-sheet');if(!sh)return;const cs=getComputedStyle(p),w=p.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);if(w>0)sh.style.zoom=Math.min(1,w/793.7)}
+let INV_RO=null;
 function invPreview(){const p=$('#inv-preview');if(p){p.innerHTML=invSheet(INV.d);invFit()}const h=$('.inv-modal footer .hint');if(h)h.textContent=money(invTotals(INV.d).total,INV.d.currency)+' total'}
 function invCommit(){
   const job=S.jobs[INV.jobId];if(!job)return null;const d=INV.d,t=invTotals(d);
   const list=(job.invoices||[]).slice(),i=INV.id?list.findIndex(x=>x.id===INV.id):-1;
   const e={...(i>=0?list[i]:{id:uid(),kind:'made',status:'draft'}),number:d.number,date:d.date,due:d.due,period:d.period,amount:t.total,currency:d.currency,doc:JSON.parse(JSON.stringify(d))};
   if(i>=0)list[i]=e;else list.unshift(e);
-  invSave(job,list);saveApp({invoiceFrom:{...d.from}});
+  patch('jobs',job.id,{invoices:list,invoiceTo:{name:d.to?.name||'',details:d.to?.details||''},invoiceNotes:d.notes||'',invoiceTax:d.tax??''});saveApp({invoiceFrom:{...d.from}});
   if(i<0)logAct('job',`Invoice ${d.number} created for ${job.name} (${money(t.total,d.currency)})`,{jobId:job.id});
   INV.id=e.id;return e;
 }
