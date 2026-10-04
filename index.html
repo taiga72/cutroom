@@ -2046,6 +2046,11 @@ html{overscroll-behavior-y:contain}
   .wf-grid{grid-template-columns:minmax(0,1fr);gap:14px}
   .wf-grid input,.wf-grid select{min-width:0;width:100%;min-height:46px;padding:10px 12px}
   .wf-grid input[type=time],.wf-grid input[type=date],.props2 input[type=date]{-webkit-appearance:none;appearance:none;text-align:left;display:block}
+  /* iPhone draws date/month boxes taller and wider than text boxes: same look and size as the fields next to them */
+  .xp-grid input[type=date],.inv-form input[type=date],.inv-form input[type=month],.inv-edit input[type=date],.inv-edit input[type=month],.ivd-grid input[type=date]{-webkit-appearance:none;appearance:none;display:block;text-align:left;min-width:0;max-width:100%;width:100%;box-sizing:border-box}
+  .xp-grid input::-webkit-date-and-time-value,.inv-form input::-webkit-date-and-time-value,.inv-edit input::-webkit-date-and-time-value{text-align:left;margin:0}
+  .xp-grid input,.xp-grid select{height:46px;min-height:46px;line-height:normal;padding-top:0;padding-bottom:0}
+  .xp-grid{gap:12px}.xp-grid label{min-width:0}.xp-form{padding:14px}.xp-form .pf-btns .btn{min-height:44px}
   .work-form,.wf{padding:14px}
   .props2 .date-ctl{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px;align-items:center}
   .props2 .date-ctl input{min-width:0;width:100%}
