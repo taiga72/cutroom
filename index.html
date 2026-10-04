@@ -375,7 +375,7 @@ button.stat:hover{border-color:var(--line-strong)}
 .pf-legend span{display:inline-flex;align-items:center;gap:6px}.pf-legend span>i{width:10px;height:10px;border-radius:3px;background:var(--jc)}.pf-legend small{color:var(--muted)}
 .pf-ctr{display:inline-block;margin-top:3px;font-size:calc(12px*var(--ts));color:var(--muted)}.pf-ctr.soon{color:var(--st-rev,#d97706);font-weight:600}.pf-ctr.over{color:var(--danger);font-weight:600}
 .xp-form{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:10px;margin-bottom:14px;background:var(--surface)}.xp-form .pf-h5{margin:0}
-.xp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.xp-grid label:first-child{grid-column:span 2}
+.xp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.xp-grid label:first-child,.xp-grid .xp-wide{grid-column:span 2}
 .xp-grid label{display:grid;gap:4px;font-size:calc(12px*var(--ts));color:var(--muted)}
 .xp-grid input,.xp-grid select{width:100%;box-sizing:border-box;height:38px;border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:9px;padding:7px 10px;font:500 calc(13.5px*var(--ts)) var(--body)}
 .xp-grid select{appearance:none;-webkit-appearance:none;padding-right:30px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23888' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:12px}
@@ -5787,10 +5787,10 @@ function xpMonths(e,from,to){
 const xpActive=e=>(e.repeat==='month'||e.repeat==='year')&&(!e.until||e.until>=today().slice(0,7));
 function xpForm(){
   const d=XP.d,f=(k,l,type='text',ph='',extra='')=>`<label>${l}<input type="${type}" data-xp="${k}" data-fk="xp-${k}" value="${esc(d[k]??'')}" placeholder="${esc(ph)}" ${extra}></label>`;
-  const sel=(k,l,opts)=>`<label>${l}<select class="sel" data-xp="${k}">${opts.map(([v,t])=>`<option value="${esc(v)}" ${String(d[k]??'')===v?'selected':''}>${esc(t)}</option>`).join('')}</select></label>`;
+  const sel=(k,l,opts)=>`<label${k==='jobId'?' class="xp-wide"':''}>${l}<select class="sel" data-xp="${k}">${opts.map(([v,t])=>`<option value="${esc(v)}" ${String(d[k]??'')===v?'selected':''}>${esc(t)}</option>`).join('')}</select></label>`;
   return `<div class="xp-form"><h5 class="pf-h5">${XP.edit?'Edit expense':'Add an expense'}</h5><div class="xp-grid">
     ${f('name','What','text','e.g. Adobe Creative Cloud')}${f('amount','Amount','number','0','min="0" step="any"')}
-    ${sel('currency','Currency',[...new Set([...CURRENCIES,d.currency].filter(Boolean))].map(x=>[x,x]))}${f('date',d.repeat==='none'?'Date':'First paid on','date')}
+    ${sel('currency','Currency',[...new Set([...CURRENCIES,d.currency].filter(Boolean))].map(x=>[x,x]))}
     ${sel('cat','Kind',XP_CATS.map(x=>[x[0],x[1]]))}${sel('repeat','Repeats',[['none','One time'],['month','Every month'],['year','Every year']])}
     ${sel('jobId','For a job (optional)',[['','Not for one job'],...jobsSorted().filter(j=>!j.example).map(j=>[j.id,j.name])])}</div>
     <div class="pf-btns">${XP.edit?`<button type="button" class="btn sm" data-act="xp-cancel">Cancel</button>`:''}<button type="button" class="btn sm primary" data-act="xp-add">${XP.edit?'Save changes':`${I.plus}Add expense`}</button></div></div>`;
@@ -5798,7 +5798,7 @@ function xpForm(){
 function xpCommit(){
   const d=XP.d,amt=parseFloat(d.amount);
   if(!d.name.trim()||!(amt>0)){toast('Add what it was and an amount');return}
-  const e={name:d.name.trim(),amount:amt,currency:d.currency,date:d.date||today(),cat:d.cat,repeat:d.repeat,jobId:d.jobId||''};
+  const e={name:d.name.trim(),amount:amt,currency:d.currency,date:XP.edit?(d.date||today()):today(),cat:d.cat,repeat:d.repeat,jobId:d.jobId||''};
   const items=xpItems().slice();
   if(XP.edit){const i=items.findIndex(x=>x.id===XP.edit);if(i>=0)items[i]={...items[i],...e}}
   else{items.unshift({id:uid(),...e});logAct('job',`Expense added: ${e.name} (${money(amt,e.currency)}${e.repeat==='month'?' a month':e.repeat==='year'?' a year':''})`)}
@@ -5892,7 +5892,7 @@ function renderProfile(){
       <div class="pf-block"><div class="xp-yh"><h5 class="pf-h5">Paid in ${esc(yy)}</h5>${years.length>1?`<select class="sel pf-range" data-act="xp-year" aria-label="Year">${years.map(y=>`<option ${y===yy?'selected':''}>${y}</option>`).join('')}</select>`:''}</div>
       ${catTot?`<div class="pf-split">${byCat.map(x=>`<i style="width:${(x.v/catTot*100).toFixed(2)}%;--jc:${x.c[2]}" title="${esc(x.c[1])}: ${esc(money(x.v,cx))}"></i>`).join('')}</div><div class="pf-legend">${byCat.map(x=>`<span><i style="--jc:${x.c[2]}"></i>${esc(x.c[1])} <b>${Math.round(x.v/catTot*100)}%</b> <small>${esc(money(x.v,cx))}</small></span>`).join('')}</div>`:''}
       ${occ.length?`<div class="pf-list">${occ.map((o,i)=>`${i===0||occ[i-1].m!==o.m?`<div class="xp-mh"><b>${esc(MONTH_FULL[+o.m.slice(5,7)-1])}</b><span>${esc(money(costIn(o.m,o.m),cx))}</span></div>`:''}<div class="xp-row"><div class="xp-main"><b>${esc(o.e.name)}</b><small>${chip(o.e.cat)}${esc(fmtDate(o.d))}${o.e.repeat!=='none'?' · subscription':''}${o.e.jobId&&S.jobs[o.e.jobId]?` · ${esc(S.jobs[o.e.jobId].name)}`:''}</small></div><div class="xp-amt">${amt(o.e.amount,o.e.currency)}</div><div class="xp-acts">${o.e.repeat==='none'?acts(o.e):''}</div></div>`).join('')}</div>`:`<p class="hint">Nothing paid in ${esc(yy)} yet. Add your software subscriptions, music and stock sites, gear and fees above.</p>`}</div>
-      <p class="hint">Subscriptions count every month (or year) from the date they were first paid until you mark them Cancelled. Amounts in other currencies are converted with a recent exchange rate.</p>`})()},
+      <p class="hint">Expenses are dated the day you add them. Subscriptions count every month (or year) from then until you mark them Cancelled. Amounts in other currencies are converted with a recent exchange rate.</p>`})()},
     {id:'week',label:'My week',icon:I.cal,html:`<p class="hint">${wkTot?`${fmtNum(wkTot)} hours scheduled a week across ${jobs.filter(j=>(workOf(j).days||[]).length).length} jobs.`:'Add work days and hours in each job’s Work details to see your week here.'}</p>
       <div class="pf-week">${week.map(x=>`<div class="pf-day ${x.on.length?'':'off'} ${new Date().getDay()===x.d?'today':''}"><div class="pf-dh"><b>${WEEKDAY_FULL[x.d]}</b><small>${x.hrs?fmtNum(x.hrs)+' h':'Off'}</small></div><div class="pf-shifts">${x.on.map(j=>{const w=workOf(j);return `<span class="pf-shift" style="--jc:${esc(j.color||'var(--accent)')}"><span class="pf-sn">${jobEmoji(j)}${esc(j.name)}</span><em>${w.shiftStart&&w.shiftEnd?`${esc(fmtClock(w.shiftStart))} – ${esc(fmtClock(w.shiftEnd))}`:jobHoursDay(w)?`${fmtNum(jobHoursDay(w))} h`:''}</em></span>`}).join('')}</div></div>`).join('')}</div>`},
     {id:'account',label:'Account',icon:I.gear,html:`<div class="pf-acct-list">
