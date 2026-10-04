@@ -358,6 +358,10 @@ button.stat:hover{border-color:var(--line-strong)}
 .pf-bar small{font-size:calc(12.5px*var(--ts))}.pf-bar em{font-style:normal;font-family:var(--mono);font-size:calc(12px*var(--ts))}
 .pf-bar.now small,.pf-bar.now em{color:var(--text);font-weight:700}
 .pf-tip{position:absolute;bottom:calc(100% - 140px);left:50%;transform:translate(-50%,-8px);background:var(--text);color:var(--bg);border-radius:8px;padding:6px 10px;font-size:calc(12px*var(--ts));white-space:nowrap;display:grid;gap:1px;text-align:center;opacity:0;pointer-events:none;transition:opacity .12s;z-index:2}
+.pf-col i.pf-stack{display:flex;flex-direction:column-reverse;overflow:hidden;background:none!important}.pf-stack b{display:block;min-height:2px;background:color-mix(in srgb,var(--jc) 75%,var(--surface));transition:background .15s}.pf-stack b+b{border-bottom:1px solid var(--surface)}
+.pf-bar:hover .pf-stack b,.pf-bar:focus-visible .pf-stack b,.pf-bar.now .pf-stack b{background:var(--jc)}
+.pf-tj2{display:flex;align-items:center;gap:5px;justify-content:center;font-size:calc(11.5px*var(--ts))}.pf-tj2 i{width:8px;height:8px;border-radius:2px;background:var(--jc)}
+.pf-ch-leg{margin:10px 0 0}
 .pf-tip b{font:700 calc(13.5px*var(--ts)) var(--mono)}
 .pf-bar:hover .pf-tip,.pf-bar:focus .pf-tip{opacity:1}
 .pf-bar.first .pf-tip{left:0;transform:translate(0,-8px)}.pf-bar.last .pf-tip{left:auto;right:0;transform:translate(0,-8px)}
@@ -5789,7 +5793,7 @@ function payChart(ms,cur,range){
   const max=Math.max(1,...ms.map(x=>x.v)),cm=today().slice(0,7);
   return `<div class="pf-chart"><div class="pf-ch-h"><h4>${esc((PAY_RANGES.find(x=>x[0]===range)||PAY_RANGES[0])[1])}</h4><select class="sel pf-range" data-act="prf-range" aria-label="Chart range">${PAY_RANGES.map(([k,l])=>`<option value="${k}" ${k===range?'selected':''}>${l}</option>`).join('')}</select></div>
     <div class="pf-bars" style="--n:${ms.length}">${ms.map((x,i)=>{const mo=MONTH_FULL[+x.m.slice(5,7)-1],pct=x.v?Math.max(4,x.v/max*100):0,edge=i===0?'first':i===ms.length-1?'last':'';
-    return `<button type="button" class="pf-bar ${x.m===cm?'now':''} ${edge}" aria-label="${esc(mo)} ${x.m.slice(0,4)}: ${esc(money(x.v,cur))} received"><span class="pf-tip"><b>${esc(money(x.v,cur))}</b>${esc(mo)} ${x.m.slice(0,4)}${x.n?` · ${x.n} invoice${x.n===1?'':'s'}`:''}</span><span class="pf-col"><i style="height:${pct}%"></i></span><small>${esc(mo.slice(0,3))}</small><em>${esc(moneyShort(x.v,cur))}</em></button>`}).join('')}</div></div>`;
+    return `<button type="button" class="pf-bar ${x.m===cm?'now':''} ${edge}" aria-label="${esc(mo)} ${x.m.slice(0,4)}: ${esc(money(x.v,cur))} received"><span class="pf-tip"><b>${esc(money(x.v,cur))}</b>${esc(mo)} ${x.m.slice(0,4)}${x.n?` · ${x.n} invoice${x.n===1?'':'s'}`:''}${(x.segs||[]).length>1?(x.segs||[]).map(g=>`<span class="pf-tj2"><i style="--jc:${esc(g.j.color||'var(--accent)')}"></i>${esc(g.j.name)} ${esc(moneyShort(g.v,cur))}</span>`).join(''):''}</span><span class="pf-col"><i class="pf-stack" style="height:${pct}%">${(x.segs||[]).map(g=>`<b style="flex:${g.v.toFixed(2)} 0 0;--jc:${esc(g.j.color||'var(--accent)')}"></b>`).join('')}</i></span><small>${esc(mo.slice(0,3))}</small><em>${esc(moneyShort(x.v,cur))}</em></button>`}).join('')}</div>${(()=>{const js=[...new Map(ms.flatMap(x=>x.segs||[]).map(g=>[g.j.id,g.j])).values()];return js.length?`<div class="pf-legend pf-ch-leg">${js.map(j=>`<span><i style="--jc:${esc(j.color||'var(--accent)')}"></i>${esc(j.name)}</span>`).join('')}</div>`:''})()}</div>`;
 }
 const relDays=d=>{const n=diffDays(d,today());return n===0?'today':n===1?'tomorrow':n>1?`in ${n} days`:n===-1?'yesterday':`${-n} days ago`};
 function openProfile(sec){PRF={sec:sec||'me',mv:sec?'sec':'list',edit:false};renderProfile();$('#modal').hidden=false;closeSide();if(B.mode==='cloud'){if(B.cfg?.calendar&&!CAL.loaded)calStatus().then(()=>{if(PRF)renderProfile()});if(B.cfg?.clickup&&!CU.loaded)cuStatus().then(()=>{if(PRF)renderProfile()})}}
@@ -5812,7 +5816,7 @@ function renderProfile(){
   const recY=recIn(v=>invPer(v).startsWith(yr)),fxWait=!!cb&&paidInv.some(v=>conv(v.amount,v.currency)==null);
   /* the chart counts each paid invoice in the month it was due (its payday), else the month it covers */
   const dueMon=v=>(v.due||'').slice(0,7)||invPer(v);
-  const recM=payMonths(range).map(m=>({m,v:recIn(v=>dueMon(v)===m),n:paidInv.filter(v=>dueMon(v)===m).length}));
+  const recM=payMonths(range).map(m=>({m,v:recIn(v=>dueMon(v)===m),n:paidInv.filter(v=>dueMon(v)===m).length,segs:jobs.map(j=>({j,v:recIn(v=>v.jobId===j.id&&dueMon(v)===m)})).filter(x=>x.v>0)}));
   const rows=jobs.map(j=>{const w=workOf(j),own=paidInv.filter(v=>v.jobId===j.id&&invPer(v).startsWith(yr)),ph=perHour(w),cur=w.pay?.currency||'USD';
     return {j,w,got:cb&&own.length?(own.some(v=>conv(v.amount,v.currency)==null)?'…':recIn(v=>v.jobId===j.id&&invPer(v).startsWith(yr))):null,ph,cur,phc:ph==null?null:conv(ph,cur)}});
   const curSel=`<label class="inv-cur">Totals in<select class="sel" data-act="home-cur" aria-label="Show totals in"><option value="">Each job's currency</option>${[...new Set([...CURRENCIES,h].filter(Boolean))].map(x=>`<option ${x===h?'selected':''}>${esc(x)}</option>`).join('')}</select></label>`;
