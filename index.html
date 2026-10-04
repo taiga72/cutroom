@@ -352,8 +352,6 @@ button.stat:hover{border-color:var(--line-strong)}
 .pf-bars[style*="--n:1"]{gap:4px}
 .pf-bar{position:relative;display:grid;justify-items:center;gap:2px;border:0;background:none;padding:0;cursor:default;color:var(--muted);font:inherit}
 .pf-col{display:flex;align-items:flex-end;justify-content:center;width:100%;height:150px;border-bottom:1px solid var(--line);margin-bottom:6px}
-.pf-col{gap:3px}.pf-col i.pf-cost{width:min(12px,22%);border-radius:4px 4px 0 0;background:color-mix(in srgb,var(--danger) 55%,var(--surface))!important}
-.pf-legend2{display:flex;gap:14px;margin-top:6px;font-size:calc(12px*var(--ts));color:var(--muted)}.pf-legend2 span{display:inline-flex;align-items:center;gap:6px}.pf-legend2 i{width:10px;height:10px;border-radius:3px;background:color-mix(in srgb,var(--st-done,#3fa55a) 60%,var(--surface))}.pf-legend2 i.c{background:color-mix(in srgb,var(--danger) 55%,var(--surface))}
 .pf-col i{display:block;width:min(46px,70%);border-radius:7px 7px 0 0;background:color-mix(in srgb,var(--st-done,#3fa55a) 45%,var(--surface));transition:background .15s}
 .pf-bar.now .pf-col i{background:var(--st-done,#3fa55a)}
 .pf-bar:hover .pf-col i,.pf-bar:focus-visible .pf-col i{background:var(--st-done,#3fa55a)}
@@ -376,23 +374,7 @@ button.stat:hover{border-color:var(--line-strong)}
 .pf-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:12px;font-size:calc(12.5px*var(--ts))}
 .pf-legend span{display:inline-flex;align-items:center;gap:6px}.pf-legend span>i{width:10px;height:10px;border-radius:3px;background:var(--jc)}.pf-legend small{color:var(--muted)}
 .pf-ctr{display:inline-block;margin-top:3px;font-size:calc(12px*var(--ts));color:var(--muted)}.pf-ctr.soon{color:var(--st-rev,#d97706);font-weight:600}.pf-ctr.over{color:var(--danger);font-weight:600}
-.xp-addrow{display:flex;justify-content:flex-end;margin:-4px 0 14px}.xp-modal{max-width:560px}.xp-modal .m-body{padding:16px 18px}
-.xp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.xp-grid label:first-child,.xp-grid .xp-wide{grid-column:span 2}
-.xp-grid label{display:grid;gap:4px;font-size:calc(12px*var(--ts));color:var(--muted)}
-.xp-grid input,.xp-grid select{width:100%;box-sizing:border-box;height:38px;border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:9px;padding:7px 10px;font:500 calc(13.5px*var(--ts)) var(--body)}
-.xp-grid select{appearance:none;-webkit-appearance:none;padding-right:30px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23888' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:12px}
-.xp-grid input:focus,.xp-grid select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
-.xp-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:9px 12px;border-top:1px solid var(--line);font-size:calc(13px*var(--ts))}.xp-row:first-child{border-top:0}
-.xp-row.off{opacity:.6}.xp-main{min-width:0;display:grid;gap:3px}.xp-main b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.xp-main small{color:var(--muted);display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px}
-.xp-amt{text-align:right;font:600 calc(13px*var(--ts)) var(--mono);display:grid}.xp-amt small{font:500 calc(11.5px*var(--ts)) var(--body);color:var(--muted)}
-.xp-acts{display:flex;align-items:center;gap:4px}.xp-acts .icon-btn.armed{width:auto;padding:0 10px;border-radius:99px;background:var(--danger);color:#fff}
-.xp-more,.xp-menu{display:none}.xp-menu{flex-basis:100%;gap:8px;justify-content:flex-end}.xp-menu .btn.armed{background:var(--danger);border-color:var(--danger);color:#fff}
-.xp-cat{display:inline-block;padding:1px 7px;border-radius:99px;font-size:calc(11px*var(--ts));font-weight:600;color:var(--xc);background:color-mix(in srgb,var(--xc) 14%,transparent)}
-.xp-mh{display:flex;justify-content:space-between;gap:8px;padding:7px 12px;background:var(--bg);border-top:1px solid var(--line);font-size:calc(12px*var(--ts));color:var(--muted)}.xp-mh:first-child{border-top:0}.xp-mh b{color:var(--text)}.xp-mh span{font-family:var(--mono)}.xp-mh+.xp-row{border-top:1px solid var(--line)}
-.xp-stop{color:var(--danger);font-weight:600}
-.pf-tiles.xp-one{grid-template-columns:1fr!important}
-.pf-tc{font-style:normal;opacity:.85}
-@media (max-width:820px){.xp-ic{display:none!important}.xp-more{display:grid}.xp-menu{display:flex}.xp-acts{flex-wrap:wrap}.xp-more.on{background:var(--hover,var(--bg))}.pf-tiles.wide{grid-template-columns:1fr 1fr}.xp-grid{grid-template-columns:1fr 1fr}.xp-row{grid-template-columns:minmax(0,1fr) auto}.xp-acts{grid-column:1/-1;justify-content:flex-end}}
+@media (max-width:820px){.pf-tiles.wide{grid-template-columns:1fr 1fr}}
 .pf-me-t{flex:1;min-width:0}.pf-title{margin:2px 0 0;font-weight:600}
 .pf-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .pf-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
@@ -2050,10 +2032,8 @@ html{overscroll-behavior-y:contain}
   .wf-grid input,.wf-grid select{min-width:0;width:100%;min-height:46px;padding:10px 12px}
   .wf-grid input[type=time],.wf-grid input[type=date],.props2 input[type=date]{-webkit-appearance:none;appearance:none;text-align:left;display:block}
   /* iPhone draws date/month boxes taller and wider than text boxes: same look and size as the fields next to them */
-  .xp-grid input[type=date],.inv-form input[type=date],.inv-form input[type=month],.inv-edit input[type=date],.inv-edit input[type=month],.ivd-grid input[type=date]{-webkit-appearance:none;appearance:none;display:block;text-align:left;min-width:0;max-width:100%;width:100%;box-sizing:border-box}
-  .xp-grid input::-webkit-date-and-time-value,.inv-form input::-webkit-date-and-time-value,.inv-edit input::-webkit-date-and-time-value{text-align:left;margin:0}
-  .xp-grid input,.xp-grid select{height:46px;min-height:46px;line-height:normal;padding-top:0;padding-bottom:0}
-  .xp-grid{gap:12px}.xp-grid label{min-width:0}
+  .inv-form input[type=date],.inv-form input[type=month],.inv-edit input[type=date],.inv-edit input[type=month],.ivd-grid input[type=date]{-webkit-appearance:none;appearance:none;display:block;text-align:left;min-width:0;max-width:100%;width:100%;box-sizing:border-box}
+  .inv-form input::-webkit-date-and-time-value,.inv-edit input::-webkit-date-and-time-value{text-align:left;margin:0}
   .work-form,.wf{padding:14px}
   .props2 .date-ctl{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px;align-items:center}
   .props2 .date-ctl input{min-width:0;width:100%}
@@ -4819,8 +4799,7 @@ function jumpItems(q){
   for(const c of Object.values(S.clients)){const sc=score(c.name);if(sc)out.push({sc:sc+.3,icon:clientMark(c,16),label:c.name,sub:`Client · ${S.jobs[c.jobId]?.name||''}`,act:'nav',tab:c.jobId,client:c.id})}
   if(q)for(const t of Object.values(S.tasks)){if(t._draft||t.deleted)continue;const sc=Math.max(score(t.name),score(S.clients[t.clientId]?.name)*.6);if(sc)out.push({sc:sc+(t.archived?0:isClosed(t)?.05:.2),icon:`<span class="jdot" ${pillStyle(stOf(t))}></span>`,label:t.name||'Untitled task',sub:[S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name,t.archived?'Archived':stLabel(stOf(t))].filter(Boolean).join(' · '),act:'open',id:t.id})}
   if(q){for(const j of Object.values(S.jobs))for(const v of j.invoices||[]){const nm=v.number||v.file?.name||'Invoice',sc=Math.max(score(nm),score(v.file?.name)*.8,score(perLabel(invPer(v),v.half))*.7,score('invoice '+j.name)*.5);
-      if(sc)out.push({sc:sc+.1,icon:INV_IC,label:nm,sub:['Invoice',j.name,perLabel(invPer(v),v.half),v.amount!==''&&v.amount!=null?money(v.amount,v.currency||workOf(j).pay?.currency||'USD'):'',INV_ST[invState(v)]].filter(Boolean).join(' · '),act:'inv',job:j.id,id:v.kind==='made'?v.id:null})}
-    for(const e of xpItems()){const sc=Math.max(score(e.name),score(xpCat(e.cat)[1])*.5);if(sc)out.push({sc,icon:'<svg class="i" viewBox="0 0 16 16"><path d="M3.5 1.8h9v12.6l-1.8-1.1-1.5 1.1-1.7-1.1-1.7 1.1-1.5-1.1-1.8 1.1z"/><path d="M6 5.2h4M6 8h4"/></svg>',label:e.name,sub:['Expense',money(e.amount,e.currency),e.repeat==='month'?'every month':e.repeat==='year'?'every year':fmtDate(e.date)].filter(Boolean).join(' · '),act:'xp',id:e.id})}}
+      if(sc)out.push({sc:sc+.1,icon:INV_IC,label:nm,sub:['Invoice',j.name,perLabel(invPer(v),v.half),v.amount!==''&&v.amount!=null?money(v.amount,v.currency||workOf(j).pay?.currency||'USD'):'',INV_ST[invState(v)]].filter(Boolean).join(' · '),act:'inv',job:j.id,id:v.kind==='made'?v.id:null})}}
   return out.sort((a,b)=>b.sc-a.sc).slice(0,12);
 }
 function focusSearch(){const q=$('#q'),ts=$('#top-search');if(q&&ts&&!ts.hidden&&q.offsetParent){q.focus();q.select()}else openJump()}
@@ -4897,7 +4876,6 @@ function jumpGo(k){
   else if(x.act==='stickers')openStickers();
   else if(x.act==='profile')openProfile();
   else if(x.act==='inv'){u.from=u.tab;closeSide();invGo(x.job,x.id);window.scrollTo({top:0})}
-  else if(x.act==='xp'){openProfile('costs');const e=xpItems().find(y=>y.id===x.id);if(e&&XP)xpOpen(e)}
   else if(x.act==='path'){notePathOpen(x.p);location.href=pathOpenUrl(x.p)}
 }
 /* "Assigned 12 days ago" under the dates (or how long a finished task took) */
@@ -5808,63 +5786,14 @@ function payMonths(range){
 }
 function payChart(ms,cur,range){
   if(!cur)return '';
-  const max=Math.max(1,...ms.map(x=>Math.max(x.v,x.c||0))),cm=today().slice(0,7),hasC=ms.some(x=>x.c);
+  const max=Math.max(1,...ms.map(x=>x.v)),cm=today().slice(0,7);
   return `<div class="pf-chart"><div class="pf-ch-h"><h4>${esc((PAY_RANGES.find(x=>x[0]===range)||PAY_RANGES[0])[1])}</h4><select class="sel pf-range" data-act="prf-range" aria-label="Chart range">${PAY_RANGES.map(([k,l])=>`<option value="${k}" ${k===range?'selected':''}>${l}</option>`).join('')}</select></div>
     <div class="pf-bars" style="--n:${ms.length}">${ms.map((x,i)=>{const mo=MONTH_FULL[+x.m.slice(5,7)-1],pct=x.v?Math.max(4,x.v/max*100):0,edge=i===0?'first':i===ms.length-1?'last':'';
-    return `<button type="button" class="pf-bar ${x.m===cm?'now':''} ${edge}" aria-label="${esc(mo)} ${x.m.slice(0,4)}: ${esc(money(x.v,cur))} received"><span class="pf-tip"><b>${esc(money(x.v,cur))}</b>${esc(mo)} ${x.m.slice(0,4)}${x.n?` · ${x.n} invoice${x.n===1?'':'s'}`:''}${x.c?`<em class="pf-tc">Costs ${esc(money(x.c,cur))} · kept ${esc(money(x.v-x.c,cur))}</em>`:''}</span><span class="pf-col"><i style="height:${pct}%"></i>${hasC?`<i class="pf-cost" style="height:${x.c?Math.max(3,x.c/max*100):0}%"></i>`:''}</span><small>${esc(mo.slice(0,3))}</small><em>${esc(moneyShort(x.v,cur))}</em></button>`}).join('')}</div>${hasC?'<div class="pf-legend2"><span><i></i>Received</span><span><i class="c"></i>Costs</span></div>':''}</div>`;
+    return `<button type="button" class="pf-bar ${x.m===cm?'now':''} ${edge}" aria-label="${esc(mo)} ${x.m.slice(0,4)}: ${esc(money(x.v,cur))} received"><span class="pf-tip"><b>${esc(money(x.v,cur))}</b>${esc(mo)} ${x.m.slice(0,4)}${x.n?` · ${x.n} invoice${x.n===1?'':'s'}`:''}</span><span class="pf-col"><i style="height:${pct}%"></i></span><small>${esc(mo.slice(0,3))}</small><em>${esc(moneyShort(x.v,cur))}</em></button>`}).join('')}</div></div>`;
 }
 const relDays=d=>{const n=diffDays(d,today());return n===0?'today':n===1?'tomorrow':n>1?`in ${n} days`:n===-1?'yesterday':`${-n} days ago`};
-/* ================= expenses (Profile → Expenses; settings/expenses {items:[{id,name,amount,currency,date,cat,repeat 'none'|'month'|'year',until YYYY-MM,jobId}]}) =================
-   Subscriptions repeat every month or year from their date's month until `until` (the last month paid). Pay subtracts them for "Kept". */
-const XP_CATS=[['software','Software & apps','#6366f1'],['music','Music & stock','#ec4899'],['gear','Gear','#f59e0b'],['internet','Internet & phone','#0ea5e9'],['fees','Fees & taxes','#ef4444'],['learning','Courses','#10b981'],['other','Other','#94a3b8']];
-const xpCat=k=>XP_CATS.find(x=>x[0]===k)||XP_CATS[XP_CATS.length-1];
-let XP=null,xpDelArmed=null;
-const xpItems=()=>S.settings.expenses?.items||[];
-function xpSave(items){if(S.settings.expenses)patch('settings','expenses',{items});else create('settings',{items},'expenses')}
-function xpBlank(){const last=xpItems()[0];return {name:'',amount:'',currency:last?.currency||homeCur()||'USD',date:today(),cat:'software',repeat:'none',jobId:''}}
-/* the months an expense is paid in, between two YYYY-MM months */
-function xpMonths(e,from,to){
-  const st=(e.date||'').slice(0,7);if(!st)return [];
-  if(e.repeat!=='month'&&e.repeat!=='year')return st>=from&&st<=to?[st]:[];
-  const out=[],end=e.until&&e.until<to?e.until:to;
-  for(let m=st,i=0;m<=end&&i<600;m=ymNext(m,e.repeat==='year'?12:1),i++)if(m>=from)out.push(m);
-  return out;
-}
-const xpActive=e=>(e.repeat==='month'||e.repeat==='year')&&(!e.until||e.until>=today().slice(0,7));
-function xpForm(){
-  const d=XP.d,f=(k,l,type='text',ph='',extra='')=>`<label>${l}<input type="${type}" data-xp="${k}" data-fk="xp-${k}" value="${esc(d[k]??'')}" placeholder="${esc(ph)}" ${extra}></label>`;
-  const sel=(k,l,opts)=>`<label${k==='jobId'?' class="xp-wide"':''}>${l}<select class="sel" data-xp="${k}">${opts.map(([v,t])=>`<option value="${esc(v)}" ${String(d[k]??'')===v?'selected':''}>${esc(t)}</option>`).join('')}</select></label>`;
-  return `<div class="xp-grid">
-    ${f('name','What','text','e.g. Adobe Creative Cloud')}${f('amount','Amount','number','0','min="0" step="any"')}
-    ${sel('currency','Currency',[...new Set([...CURRENCIES,d.currency].filter(Boolean))].map(x=>[x,x]))}
-    ${sel('cat','Kind',XP_CATS.map(x=>[x[0],x[1]]))}${sel('repeat','Repeats',[['none','One time'],['month','Every month'],['year','Every year']])}
-    ${sel('jobId','For a job (optional)',[['','Not for one job'],...jobsSorted().filter(j=>!j.example).map(j=>[j.id,j.name])])}</div>`;
-}
-/* the add / edit expense dialog sits on the #crop layer, above the Profile dialog */
-function xpOpen(e){
-  XP.edit=e?e.id:null;XP.d=e?{name:e.name,amount:e.amount,currency:e.currency,date:e.date,cat:e.cat,repeat:e.repeat||'none',jobId:e.jobId||''}:xpBlank();XP.open=true;renderXpDlg();
-  requestAnimationFrame(()=>{if(!e&&matchMedia('(hover:hover)').matches)$('#crop [data-xp=name]')?.focus()});
-}
-function xpClose(){if(XP)XP.open=false;const c=$('#crop');c.hidden=true;c.innerHTML=''}
-function renderXpDlg(){
-  if(!XP?.open)return;const c=$('#crop');
-  withFocus(()=>{c.innerHTML=`<div class="modal xp-modal" role="dialog" aria-modal="true" aria-labelledby="xp-title">
-    <header><h2 id="xp-title">${XP.edit?'Edit expense':'Add an expense'}</h2><button class="icon-btn" data-act="xp-cancel" aria-label="Close" title="Close">${I.x}</button></header>
-    <div class="m-body">${xpForm()}</div>
-    <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="xp-cancel">Cancel</button><button type="button" class="btn primary" data-act="xp-add">${XP.edit?'Save changes':`${I.plus}Add expense`}</button></div></footer></div>`});
-  c.hidden=false;
-}
-function xpCommit(){
-  const d=XP.d,amt=parseFloat(d.amount);
-  if(!d.name.trim()||!(amt>0)){toast('Add what it was and an amount');return}
-  const e={name:d.name.trim(),amount:amt,currency:d.currency,date:XP.edit?(d.date||today()):today(),cat:d.cat,repeat:d.repeat,jobId:d.jobId||''};
-  const items=xpItems().slice();
-  if(XP.edit){const i=items.findIndex(x=>x.id===XP.edit);if(i>=0)items[i]={...items[i],...e}}
-  else{items.unshift({id:uid(),...e});logAct('job',`Expense added: ${e.name} (${money(amt,e.currency)}${e.repeat==='month'?' a month':e.repeat==='year'?' a year':''})`)}
-  const was=XP.edit;xpSave(items);xpClose();XP={edit:null,d:{...xpBlank(),currency:e.currency}};toast(was?'Expense saved':'Expense added');renderProfile();
-}
 function openProfile(sec){PRF={sec:sec||'me',mv:sec?'sec':'list',edit:false};renderProfile();$('#modal').hidden=false;closeSide();if(B.mode==='cloud'){if(B.cfg?.calendar&&!CAL.loaded)calStatus().then(()=>{if(PRF)renderProfile()});if(B.cfg?.clickup&&!CU.loaded)cuStatus().then(()=>{if(PRF)renderProfile()})}}
-function closeProfile(){xpClose();PRF=null;$('#modal').hidden=true;$('#modal').innerHTML='';renderMeBtn();renderTabbar()}
+function closeProfile(){PRF=null;$('#modal').hidden=true;$('#modal').innerHTML='';renderMeBtn();renderTabbar()}
 function renderProfile(){
   if(!PRF)return;
   const jobs=jobsSorted().filter(j=>!j.example||Object.values(S.jobs).every(x=>x.example)),t0=today(),ym=t0.slice(0,7),yr=t0.slice(0,4);
@@ -5881,11 +5810,9 @@ function renderProfile(){
   const conv=(n,c)=>{if(!cb||n==null)return null;if(c===cb)return +n||0;const r=fxRates(cb);return r&&r[c]?(+n||0)/r[c]:null};
   const recIn=f=>paidInv.filter(f).reduce((a,v)=>{const x=conv(v.amount,v.currency);return x==null?a:a+x},0);
   const recY=recIn(v=>invPer(v).startsWith(yr)),fxWait=!!cb&&paidInv.some(v=>conv(v.amount,v.currency)==null);
-  /* expenses in the same currency, by the month they're paid */
-  if(!XP)XP={edit:null,d:xpBlank(),year:yr};
-  const xps=xpItems(),cx=cb||xps[0]?.currency||'',xconv=(n,c)=>{if(!cx)return null;if(c===cx)return +n||0;const r=fxRates(cx);return r&&r[c]?(+n||0)/r[c]:null};
-  const costIn=(from,to,f=()=>true)=>xps.filter(f).reduce((a,e)=>{const x=xconv(e.amount,e.currency);return x==null?a:a+x*xpMonths(e,from,to).length},0);
-  const recM=payMonths(range).map(m=>({m,v:recIn(v=>invPer(v)===m),n:paidInv.filter(v=>invPer(v)===m).length,c:xps.length?costIn(m,m):0}));
+  /* the chart counts each paid invoice in the month it was due (its payday), else the month it covers */
+  const dueMon=v=>(v.due||'').slice(0,7)||invPer(v);
+  const recM=payMonths(range).map(m=>({m,v:recIn(v=>dueMon(v)===m),n:paidInv.filter(v=>dueMon(v)===m).length}));
   const rows=jobs.map(j=>{const w=workOf(j),own=paidInv.filter(v=>v.jobId===j.id&&invPer(v).startsWith(yr)),ph=perHour(w),cur=w.pay?.currency||'USD';
     return {j,w,got:cb&&own.length?(own.some(v=>conv(v.amount,v.currency)==null)?'…':recIn(v=>v.jobId===j.id&&invPer(v).startsWith(yr))):null,ph,cur,phc:ph==null?null:conv(ph,cur)}});
   const curSel=`<label class="inv-cur">Totals in<select class="sel" data-act="home-cur" aria-label="Show totals in"><option value="">Each job's currency</option>${[...new Set([...CURRENCIES,h].filter(Boolean))].map(x=>`<option ${x===h?'selected':''}>${esc(x)}</option>`).join('')}</select></label>`;
@@ -5927,7 +5854,7 @@ function renderProfile(){
     {id:'jobs',label:'My jobs',icon:I.briefcase,html:jobs.length?jobs.map(j=>{const w=workOf(j),r=rows.find(x=>x.j===j),nOpen=ts.filter(t=>t.jobId===j.id&&!isClosed(t)&&!t.archived).length;
       return `<div class="pf-job" style="--jc:${esc(j.color||'var(--accent)')}"><div class="pf-job-h">${jobMark(j,26)}${jobEmoji(j)}<div class="pf-jn"><b>${esc(j.name)}</b><small>${j.type==='agency'?`Agency · ${shownClients(j.id).length} client${shownClients(j.id).length===1?'':'s'}`:'Direct client'} · ${nOpen} open${r.ph!=null?` · about ${esc(money(r.ph,r.cur))} an hour`:''}</small>${ctr(w)}</div><button type="button" class="btn sm" data-act="prf-job" data-id="${j.id}">Open details</button></div>${workCard(j)}</div>`}).join(''):'<p class="hint">No jobs yet.</p>'},
     {id:'pay',label:'Pay',icon:'<svg class="i" viewBox="0 0 16 16"><rect x="1.8" y="4" width="12.4" height="8.5" rx="1.5"/><circle cx="8" cy="8.2" r="1.8"/></svg>',html:`<div class="pf-pay-top">${curSel}</div>
-      <div class="pf-tiles wide">${tile(cb?money(recY,cb):'—','received this year')}${tile(cb?money(recIn(v=>invPer(v)===ym),cb):'—','received this month')}${xps.length&&cb?tile(money(recY-costIn(yr+'-01',ym),cb),'kept this year after costs'):''}</div>
+      <div class="pf-tiles wide">${tile(cb?money(recY,cb):'—','received this year')}${tile(cb?money(recIn(v=>invPer(v)===ym),cb):'—','received this month')}</div>
       ${pays.length?`<div class="pf-block"><h5 class="pf-h5">Upcoming paydays</h5><div class="pf-list">${pays.map(x=>`<div class="pf-li"><span class="pf-tj">${jobMark(x.j,18)}${esc(x.j.name)}</span><span>${esc(fmtDate(x.d))} <small class="hint">${relDays(x.d)}</small></span><span class="pf-num">${esc(payLabel(x.w.pay)||'')}</span></div>`).join('')}</div></div>`:''}
       ${payChart(recM,cb,range)}
       ${splitTot?`<div class="pf-block"><h5 class="pf-h5">Where it came from in ${yr}</h5><div class="pf-split">${split.map(x=>`<i style="width:${(x.v/splitTot*100).toFixed(2)}%;--jc:${esc(x.r.j.color||'var(--accent)')}" title="${esc(x.r.j.name)}: ${esc(money(x.v,cb))}"></i>`).join('')}</div>
@@ -5935,19 +5862,7 @@ function renderProfile(){
       ${gaps.length?`<div class="pf-block"><h5 class="pf-h5">Missing invoices</h5><div class="pf-list">${gaps.slice(0,12).map(g=>`<div class="pf-li"><span class="pf-tj">${jobMark(g.j,18)}${esc(g.j.name)}</span><span>${esc(perLabel(g.m,g.h))}</span><span class="pf-gap">${esc(g.what)}</span><button type="button" class="btn sm" data-act="prf-inv" data-id="${g.j.id}">Invoices</button></div>`).join('')}</div></div>`:''}
       <div class="pf-block"><h5 class="pf-h5">By job</h5>
       <div class="pf-table">${rows.map(r=>`<div class="pf-tr"><span class="pf-tj">${jobMark(r.j,18)}${esc(r.j.name)}</span><span>${esc(payLabel(r.w.pay)||'—')}${r.ph!=null?`<small class="hint"> · about ${esc(money(r.phc??r.ph,r.phc!=null?cb:r.cur))}/h</small>`:''}</span><span class="pf-num">${r.got==null?'—':r.got==='…'?'…':money(r.got,cb)}<small>received for ${yr}</small></span><span class="pf-sub">${[r.w.pay?.payday?`Paid ${esc(r.w.pay.payday)}`:'',r.w.pay?.method?`via ${esc(r.w.pay.method)}`:''].filter(Boolean).join(' ')||''}</span></div>`).join('')}</div></div>
-      ${fxWait?'<p class="hint">Getting exchange rates… amounts in other currencies are added once they load.</p>':''}<p class="hint">From your invoices marked Paid, counted in the month each one covers (its Period)${cb&&inv.some(v=>v.currency!==cb)?`, converted to ${cb}`:''}. The hourly rate comes from each job's pay and schedule in Work details.</p>`},
-    {id:'costs',label:'Expenses',sub:'Subscriptions, gear and other costs',icon:'<svg class="i" viewBox="0 0 16 16"><path d="M3.5 1.8h9v12.6l-1.8-1.1-1.5 1.1-1.7-1.1-1.7 1.1-1.5-1.1-1.8 1.1z"/><path d="M6 5.2h4M6 8h4M8 10.2v.1"/></svg>',html:(()=>{
-      const subs=xps.filter(e=>e.repeat==='month'||e.repeat==='year'),once=xps.filter(e=>e.repeat!=='month'&&e.repeat!=='year').sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-      const acts=e=>{const del=xpDelArmed===e.id,open=XP.more===e.id;return `<button type="button" class="icon-btn xp-ic" data-act="xp-edit" data-id="${e.id}" title="Edit" aria-label="Edit expense">${I.pencil}</button><button type="button" class="icon-btn xp-ic ${del?'danger armed':''}" data-act="xp-del" data-id="${e.id}" title="${del?'Click again to delete':'Delete'}" aria-label="Delete expense">${del?'Sure?':I.trash}</button><button type="button" class="icon-btn xp-more ${open?'on':''}" data-act="xp-more" data-id="${e.id}" aria-expanded="${open}" title="More" aria-label="More for ${esc(e.name)}">${MORE_IC}</button>${open?`<div class="xp-menu"><button type="button" class="btn sm" data-act="xp-edit" data-id="${e.id}">${I.pencil}Edit</button><button type="button" class="btn sm ${del?'danger armed':''}" data-act="xp-del" data-id="${e.id}">${I.trash}${del?'Tap again to delete':'Delete'}</button></div>`:''}`};
-      const amt=(n,c)=>`${esc(money(n,c))}${cx&&c!==cx&&xconv(n,c)!=null?`<small>≈ ${esc(money(xconv(n,c),cx))}</small>`:''}`;
-      const chip=k=>{const c=xpCat(k);return `<span class="xp-cat" style="--xc:${c[2]}">${esc(c[1])}</span>`};
-      const perMonth=subs.filter(xpActive).reduce((a,e)=>{const x=xconv(e.amount,e.currency);return x==null?a:a+(e.repeat==='year'?x/12:x)},0);
-      return `<div class="pf-tiles wide xp-one">${tile(cx?money(perMonth,cx):'—','subscriptions a month')}</div>
-      <div class="xp-addrow"><button type="button" class="btn primary" data-act="xp-new">${I.plus}Add expense</button></div>
-      ${subs.length?`<div class="pf-block"><h5 class="pf-h5">Subscriptions</h5><div class="pf-list">${subs.map(e=>{const on=xpActive(e);return `<div class="xp-row ${on?'':'off'}"><div class="xp-main"><b>${esc(e.name)}</b><small>${chip(e.cat)}${e.repeat==='year'?'Every year':'Every month'} · since ${esc(monthLabel(e.date.slice(0,7)))}${e.until?` · <b class="xp-stop">Cancelled</b><span>last paid ${esc(monthLabel(e.until))}</span>`:''}${e.jobId&&S.jobs[e.jobId]?` · ${esc(S.jobs[e.jobId].name)}`:''}</small></div><div class="xp-amt">${amt(e.amount,e.currency)}<small>${e.repeat==='year'?'a year':'a month'}</small></div><div class="xp-acts">${!e.until?`<button type="button" class="btn sm" data-act="xp-stop" data-id="${e.id}" title="You've cancelled it: stop counting it after this month">Mark cancelled</button>`:`<button type="button" class="btn sm" data-act="xp-restart" data-id="${e.id}" title="Count it every month again">Paying again</button>`}${acts(e)}</div></div>`}).join('')}</div></div>`:''}
-      ${once.length?`<div class="pf-block"><h5 class="pf-h5">One-time costs</h5><div class="pf-list">${once.map(e=>`<div class="xp-row"><div class="xp-main"><b>${esc(e.name)}</b><small>${chip(e.cat)}${esc(fmtDate(e.date))}${e.jobId&&S.jobs[e.jobId]?` · ${esc(S.jobs[e.jobId].name)}`:''}</small></div><div class="xp-amt">${amt(e.amount,e.currency)}</div><div class="xp-acts">${acts(e)}</div></div>`).join('')}</div></div>`:''}
-      ${xps.length?'':`<p class="hint">No expenses yet. Add your software subscriptions, music and stock sites, gear and fees.</p>`}
-      <p class="hint">Expenses are dated the day you add them. Subscriptions count every month (or year) from then until you mark them Cancelled. Amounts in other currencies are converted with a recent exchange rate.</p>`})()},
+      ${fxWait?'<p class="hint">Getting exchange rates… amounts in other currencies are added once they load.</p>':''}<p class="hint">From your invoices marked Paid, counted in the month each one covers (its Period); the chart puts each one in the month it was due${cb&&inv.some(v=>v.currency!==cb)?`, converted to ${cb}`:''}. The hourly rate comes from each job's pay and schedule in Work details.</p>`},
     {id:'week',label:'My week',icon:I.cal,html:`<p class="hint">${wkTot?`${fmtNum(wkTot)} hours scheduled a week across ${jobs.filter(j=>(workOf(j).days||[]).length).length} jobs.`:'Add work days and hours in each job’s Work details to see your week here.'}</p>
       <div class="pf-week">${week.map(x=>`<div class="pf-day ${x.on.length?'':'off'} ${new Date().getDay()===x.d?'today':''}"><div class="pf-dh"><b>${WEEKDAY_FULL[x.d]}</b><small>${x.hrs?fmtNum(x.hrs)+' h':'Off'}</small></div><div class="pf-shifts">${x.on.map(j=>{const w=workOf(j);return `<span class="pf-shift" style="--jc:${esc(j.color||'var(--accent)')}"><span class="pf-sn">${jobEmoji(j)}${esc(j.name)}</span><em>${w.shiftStart&&w.shiftEnd?`${esc(fmtClock(w.shiftStart))} – ${esc(fmtClock(w.shiftEnd))}`:jobHoursDay(w)?`${fmtNum(jobHoursDay(w))} h`:''}</em></span>`}).join('')}</div></div>`).join('')}</div>`},
     {id:'account',label:'Account',icon:I.gear,html:`<div class="pf-acct-list">
@@ -6298,8 +6213,7 @@ const HELP=[
  ['Your work','New from ClickUp',`Tasks the ClickUp sync brings in get a purple New badge, and tasks with new ClickUp comments or status or due-date changes show “2 new”. Opening the task clears it. Click Review on the message that pops up, the notification, or pick New from ClickUp in the due-date filter to see them all; Mark all as reviewed clears every badge.`,null],
  ['Your work','ClickUp mentions',`ClickUp comments that tag you (like “Hi @Kim, please update”) are marked “mentioned you” in the task's Activity tab, come first in notifications for a week, and have their own Mentions filter.`,null],
  ['Your work','Duplicate clients',`When two clients on the same agency job have nearly the same name (often one made by the ClickUp sync), a banner on the job page offers to merge them. Merging moves the tasks over and keeps the brand guide and logo. Keep both hides the question for that pair.`,null],
- ['Your work','Expenses',`Open your Profile (the round picture top right) → Expenses to keep track of what your work costs: software subscriptions, music and stock sites, gear, internet and fees. Set a subscription to repeat every month or year and it counts each time until you mark it cancelled. Amounts in other currencies are converted. Pay then shows what you kept this year after costs, and each month in the chart shows its costs too.`,null],
- ['Your work','Invoices',`Each job has an Invoices & docs tab. Upload the invoices you send (PDF or a picture) and set their month and amount, or click Create invoice: it fills in from the job's pay in Details (amount, currency, payment method), adds the next number (INV-2026-001…), can list the videos you finished that month, and saves a PDF. Your own name, address and payment details are kept for next time. Mark each one Sent or Paid; a sent invoice past its due date shows as overdue in notifications. Pick a currency in “Totals in” to see every job's paid and waiting amounts converted with a recent exchange rate. Below the invoices, Documents holds the job's contract, NDA, onboarding files and briefs. Click Defaults on a job's Invoices tab to set what every new invoice starts with: billed to, your own numbering (like Invoice_JCUT_{n}, which carries on from the highest number already used), the line item, rate, currency, due days, tax, this job's payment details and your own details. The due date can be a number of days after the invoice date, or On payday: pick the day you get paid and each invoice is due on the first payday on or after its last day of work. If a job pays you twice a month, set “How often you bill” to Twice a month: each invoice covers 1–15 or 16–end (pick the half next to the month), the rate is the amount for each half, each half has its own payday (for example the 15th for 1–15, and the 1st for 16–end, which lands on the 1st of the next month), and the reminders look for both halves. With On payday set, “Make a draft before payday” (1, 3 or 7 days) has the next invoice waiting as a Draft when you open the app, with a notification that opens it; you pick its issue date and whether it lists the videos you finished. Nothing is sent for you.`,null],
+  ['Your work','Invoices',`Each job has an Invoices & docs tab. Upload the invoices you send (PDF or a picture) and set their month and amount, or click Create invoice: it fills in from the job's pay in Details (amount, currency, payment method), adds the next number (INV-2026-001…), can list the videos you finished that month, and saves a PDF. Your own name, address and payment details are kept for next time. Mark each one Sent or Paid; a sent invoice past its due date shows as overdue in notifications. Pick a currency in “Totals in” to see every job's paid and waiting amounts converted with a recent exchange rate. Below the invoices, Documents holds the job's contract, NDA, onboarding files and briefs. Click Defaults on a job's Invoices tab to set what every new invoice starts with: billed to, your own numbering (like Invoice_JCUT_{n}, which carries on from the highest number already used), the line item, rate, currency, due days, tax, this job's payment details and your own details. The due date can be a number of days after the invoice date, or On payday: pick the day you get paid and each invoice is due on the first payday on or after its last day of work. If a job pays you twice a month, set “How often you bill” to Twice a month: each invoice covers 1–15 or 16–end (pick the half next to the month), the rate is the amount for each half, each half has its own payday (for example the 15th for 1–15, and the 1st for 16–end, which lands on the 1st of the next month), and the reminders look for both halves. With On payday set, “Make a draft before payday” (1, 3 or 7 days) has the next invoice waiting as a Draft when you open the app, with a notification that opens it; you pick its issue date and whether it lists the videos you finished. Nothing is sent for you.`,null],
  ['Tasks','Merge duplicate tasks',`Settings → Duplicate tasks lists tasks in the same job with the same name. Pick the copy to keep and click Merge: it gets anything it was missing from the others (links, client, dates, notes, checklist steps, the ClickUp link and comments, updates and history), and the other copies go to Trash, where you can still restore them.`,['dupes','Duplicate tasks']],
  ['Tasks','Same name twice',`If you save a new task with the same name as an open one in that job, the panel asks whether to open the one you already have or save the new one anyway.`,null],
  ['Tasks','Select several',`Turn on Select in the toolbar, tick tasks (Shift-click for a range), then set status, priority, due date, move them to another job or client, archive or delete them together.`,null],
@@ -7700,15 +7614,6 @@ document.addEventListener('click',e=>{
     case 'inv-close': closeInv();break;
     case 'profile': openProfile();break;
     case 'prf-close': closeProfile();break;
-    case 'xp-new': if(XP)xpOpen();break;
-    case 'xp-more': if(XP){XP.more=XP.more===el.dataset.id?null:el.dataset.id;xpDelArmed=null;renderProfile()}break;
-    case 'xp-add': if(XP)xpCommit();break;
-    case 'xp-cancel': xpClose();break;
-    case 'xp-edit': {const e=xpItems().find(x=>x.id===el.dataset.id);if(e&&XP){XP.more=null;xpOpen(e)}break}
-    case 'xp-del': {const id=el.dataset.id;if(xpDelArmed!==id){xpDelArmed=id;renderProfile();setTimeout(()=>{if(xpDelArmed===id){xpDelArmed=null;if(PRF)renderProfile()}},3000);break}
-      xpDelArmed=null;const old=xpItems(),e=old.find(x=>x.id===id);xpSave(old.filter(x=>x.id!==id));if(XP?.edit===id){XP.edit=null;XP.d=xpBlank()}renderProfile();toast(`Deleted ${e?.name||'expense'}`,{label:'Undo',fn:()=>{xpSave(old);if(PRF)renderProfile()}});break}
-    case 'xp-stop': xpSave(xpItems().map(x=>x.id===el.dataset.id?{...x,until:today().slice(0,7)}:x));renderProfile();toast('Marked cancelled. It counts up to this month.');break;
-    case 'xp-restart': xpSave(xpItems().map(x=>{if(x.id!==el.dataset.id)return x;const {until,...rest}=x;return rest}));renderProfile();break;
     case 'prf-edit': if(PRF){PRF.edit=!PRF.edit;renderProfile();renderMeBtn()}break;
     case 'prf-inv': {const id=el.dataset.id;closeProfile();u.from=u.tab;u.tab=id;u.client='all';u.pane='invoices';saveUi();render();window.scrollTo({top:0});break}
     case 'prf-job': {const id=el.dataset.id;closeProfile();u.from=u.tab;u.tab=id;u.client='all';u.pane='details';saveUi();render();window.scrollTo({top:0});break}
@@ -7974,7 +7879,7 @@ document.addEventListener('keydown',e=>{
     return;
   }
   if(e.key==='Escape'&&SEL.size&&$('#drawer').hidden&&$('#modal').hidden){clearSel();return}
-  if(e.key==='Escape'){if(XP?.open){xpClose();return}if(POMO_OPEN){POMO_OPEN=false;renderPomo();return}if(!$('#filter-sheet').hidden){closeFilters();return}if($('#side').classList.contains('open')){closeSide();return}if(INV){closeInv();return}if(INVD){closeInvDefaults();return}if(STKB){closeStickers();return}if(PRF){closeProfile();return}if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
+  if(e.key==='Escape'){if(POMO_OPEN){POMO_OPEN=false;renderPomo();return}if(!$('#filter-sheet').hidden){closeFilters();return}if($('#side').classList.contains('open')){closeSide();return}if(INV){closeInv();return}if(INVD){closeInvDefaults();return}if(STKB){closeStickers();return}if(PRF){closeProfile();return}if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'');
   if(e.key==='Enter'&&!typing){const r=e.target.closest?.('[data-act="open"]');if(r){openTask(r.dataset.id);return}}
   if(typing||e.metaKey||e.ctrlKey||e.altKey)return;
@@ -8021,7 +7926,6 @@ document.addEventListener('change',e=>{
   if(act==='inv-sort'){S.ui.invSort=el.value;saveUi();render();return}
   if(act==='home-cur'){saveApp({homeCurrency:el.value});render();if(PRF)renderProfile();return}
   if(act==='prf-range'){S.ui.payRange=el.value;saveUi();renderProfile();return}
-  if(XP&&el.dataset.xp){XP.d[el.dataset.xp]=el.value;return}
   if(act==='doc-kind'){const job=S.jobs[S.ui.tab];if(job)patch('jobs',job.id,{docs:(job.docs||[]).map(d=>d.id===el.dataset.id?{...d,kind:el.value}:d)});return}
   if(el.id==='doc-file'){docUpload([...el.files]);el.value='';return}
   if(el.dataset&&el.dataset.docf){const job=S.jobs[S.ui.tab];if(job)patch('jobs',job.id,{docs:(job.docs||[]).map(d=>d.id===el.dataset.docf?{...d,name:el.value.trim()||d.name}:d)});return}
@@ -8060,7 +7964,6 @@ document.addEventListener('input',e=>{
   if(el.id==='s-greet'&&SM){SM.greetName=el.value;render();return}
   if(el.id==='s-catname'&&SM){SM.catName=el.value;catTick();return}
   if(PRF&&el.dataset.pf){saveProfile(el.dataset.pf,el.value.trim());return}
-  if(PRF&&XP&&el.dataset.xp){XP.d[el.dataset.xp]=el.value;return}
   if(SM&&el.dataset.pk){const k=el.dataset.pk,v=parseInt(el.value,10);if(v>=1&&v<=(k==='pomoEvery'?12:k==='plantGoal'?500:180)){SM[k]=v;if(k==='plantGoal')render()}return}
   if(el.id==='s-limit'&&SM){SM.dayLimit=el.value;return}
   if(SM&&el.dataset.stLabel!=null){const x=SM.statuses[+el.dataset.stLabel];if(x)x.label=el.value;return}
