@@ -662,6 +662,15 @@ textarea.notes{width:100%;min-height:110px;border:1px solid var(--line);backgrou
 .modal header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line)}
 .modal header h2{margin:0;font:700 calc(19px*var(--ts)) var(--display)}
 .modal .m-body{padding:18px;display:flex;flex-direction:column;gap:18px}
+.modal.ivd-modal{width:min(720px,100%)}
+.modal .m-body.ivd-body{gap:10px}.ivd-body .pref-group{margin:10px 0 0}.ivd-body .hint{margin:0}
+.ivd-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start}.ivd-grid.one{grid-template-columns:1fr}
+.ivd-grid label{display:grid;gap:4px;font-size:calc(12.5px*var(--ts));color:var(--muted)}
+.ivd-grid input,.ivd-grid textarea,.ivd-grid select{width:100%;box-sizing:border-box;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:9px;padding:8px 10px;font:500 calc(13.5px*var(--ts)) var(--body)}
+.ivd-grid textarea{resize:vertical}
+.ivd-grid input:focus,.ivd-grid textarea:focus,.ivd-grid select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.ivd-prev{font-family:var(--mono);color:var(--text)!important}
+@media (max-width:820px){.ivd-grid{grid-template-columns:1fr}}
 .modal footer{display:flex;justify-content:space-between;gap:10px;padding:14px 18px;border-top:1px solid var(--line);flex-wrap:wrap}
 .field{display:flex;flex-direction:column;gap:6px}
 .field > label,.field > .lbl{font-size:calc(12.5px*var(--ts));font-weight:600;color:var(--muted)}
@@ -3184,16 +3193,76 @@ function nextInvNumber(){
 }
 /* finished tasks of the job in a month (by doneAt), for "Add the videos you delivered" */
 const deliveredIn=(jobId,ym)=>Object.values(S.tasks).filter(t=>t.jobId===jobId&&!t.deleted&&!t._draft&&(t.doneAt||'').slice(0,7)===ym).sort((a,b)=>(a.doneAt||'').localeCompare(b.doneAt||''));
+
+/* ================= invoice defaults per job (job.invoiceDef + invoiceTo / invoiceNotes / invoiceTax; your details in settings/app.invoiceFrom) =================
+   Set once in the Invoices tab's Defaults dialog; Create invoice starts from them. job.invoiceDef = {number (pattern with {n} {yyyy} {yy} {mm}),
+   next, item (with {month}), qty, rate, currency, dueDays, payment (this job's payment details; empty = yours)} */
+let INVD=null;
+const invDef=j=>j?.invoiceDef||null;
+function invPatRe(pat){const esc2=x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return new RegExp('^'+esc2(pat).replace('\\{n\\}','(\\d+)').replace('\\{yyyy\\}','\\d{4}').replace('\\{yy\\}','\\d{2}').replace('\\{mm\\}','\\d{2}')+'$','i')}
+function invFill(pat,n,ym=today().slice(0,7)){const d=pat.match(/\{n\}/)?pat:pat+'{n}';return d.replace('{n}',String(n).padStart(3,'0')).replace('{yyyy}',ym.slice(0,4)).replace('{yy}',ym.slice(2,4)).replace('{mm}',ym.slice(5,7))}
+/* the next number for this job's pattern: one more than the highest already used (made or uploaded), or the "next number" you set, whichever is bigger */
+function invDefNext(job,def=invDef(job)){
+  if(!def?.number)return null;const re=invPatRe(def.number.match(/\{n\}/)?def.number:def.number+'{n}');let hi=0;
+  for(const v of job.invoices||[]){const nm=String(v.number||v.file?.name||'').replace(/\.[a-z0-9]+$/i,'').trim(),m=re.exec(nm);if(m)hi=Math.max(hi,+m[1])}
+  return Math.max(hi+1,+def.next||1);
+}
+function openInvDefaults(jobId){
+  const job=S.jobs[jobId];if(!job)return;const w=workOf(job),p=w.pay||{},def=invDef(job)||{},from=appSettings().invoiceFrom||{};
+  const last=(job.invoices||[]).filter(v=>v.kind==='made'&&v.doc).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0]?.doc;
+  INVD={jobId,d:{
+    toName:job.invoiceTo?.name??last?.to?.name??job.name,toDetails:job.invoiceTo?.details??last?.to?.details??[w.contact?.name,w.contact?.reach,w.location].filter(Boolean).join('\n'),
+    number:def.number||'',next:def.next||'',item:def.item||(p.period==='video'?'Videos delivered · {month}':'Video editing · {month}'),qty:def.qty??'',rate:def.rate??(p.amount||''),currency:def.currency||p.currency||'USD',
+    dueDays:def.dueDays??7,tax:job.invoiceTax??last?.tax??'',notes:job.invoiceNotes??last?.notes??(p.method?`Payment via ${p.method}.`:''),payment:def.payment||'',
+    fName:from.name||B.name||'',fEmail:from.email||B.email||'',fPhone:from.phone||'',fAddress:from.address||'',fTax:from.taxId||'',fPayment:from.payment||''}};
+  renderInvDefaults();$('#modal').hidden=false;
+}
+function closeInvDefaults(){INVD=null;$('#modal').hidden=true;$('#modal').innerHTML=''}
+function invDefPreview(){const job=S.jobs[INVD?.jobId];if(!job)return '';const d=INVD.d;if(!d.number)return `Next number: ${nextInvNumber()} (the app's own numbering)`;
+  const n=invDefNext(job,{number:d.number,next:d.next});return `Next number: ${invFill(d.number,n)}`}
+function renderInvDefaults(){
+  if(!INVD)return;const job=S.jobs[INVD.jobId],d=INVD.d;
+  const f=(k,l,ph='',type='text',extra='')=>`<label>${l}<input type="${type}" data-ivd="${k}" data-fk="ivd-${k}" value="${esc(d[k]??'')}" placeholder="${esc(ph)}" ${extra}></label>`;
+  const a=(k,l,ph='',rows=2)=>`<label>${l}<textarea data-ivd="${k}" data-fk="ivd-${k}" rows="${rows}" placeholder="${esc(ph)}">${esc(d[k]??'')}</textarea></label>`;
+  keepScroll('#modal',()=>withFocus(()=>{$('#modal').innerHTML=`<div class="modal ivd-modal" role="dialog" aria-modal="true" aria-labelledby="ivd-title">
+    <header><h2 id="ivd-title">Invoice defaults · ${esc(job?.name||'')}</h2><button class="icon-btn" data-act="ivd-close" aria-label="Close" title="Close">${I.x}</button></header>
+    <div class="m-body ivd-body">
+      <p class="hint">Every new invoice for this job starts with these. You can still change anything on a single invoice.</p>
+      <p class="pref-group">Billed to</p><div class="ivd-grid">${f('toName','Name or company',job?.name||'')}${a('toDetails','Details','Contact, address, email',3)}</div>
+      <p class="pref-group">Invoice number</p><div class="ivd-grid">${f('number','Pattern','e.g. Invoice_JCUT_{n}')}${f('next','Next number','1','number','min="1"')}</div>
+      <p class="hint ivd-prev" id="ivd-prev">${esc(invDefPreview())}</p>
+      <p class="hint">{n} is the number (001, 002…). You can also use {yyyy}, {yy} and {mm}. Leave the pattern empty to use INV-${today().slice(0,4)}-001. Numbers already used by this job's invoices are skipped.</p>
+      <p class="pref-group">Line item and terms</p><div class="ivd-grid">${f('item','Description','Video editing · {month}')}${f('qty','Quantity','1','number','min="0" step="any"')}${f('rate','Rate','0','number','min="0" step="any"')}
+        <label>Currency<select class="sel" data-ivd="currency">${[...new Set([...CURRENCIES,d.currency].filter(Boolean))].map(x=>`<option ${x===d.currency?'selected':''}>${esc(x)}</option>`).join('')}</select></label>
+        ${f('dueDays','Due after (days)','7','number','min="0"')}${f('tax','Tax %','0','number','min="0" step="any"')}</div>
+      <p class="hint">{month} becomes the invoice's month, e.g. “October 2026”. Leave Quantity empty to count the month's finished videos on per-video jobs.</p>
+      <p class="pref-group">Payment and notes</p><div class="ivd-grid one">${a('payment','Payment details for this job','Leave empty to use your usual payment details below',3)}${a('notes','Notes','Thanks! Payment terms, PO number…',2)}</div>
+      <p class="pref-group">Your details <small>(all jobs)</small></p><div class="ivd-grid">${f('fName','Your name')}${f('fEmail','Email','','email')}${f('fPhone','Phone')}${f('fTax','Tax ID (optional)')}</div>
+      <div class="ivd-grid one">${a('fAddress','Address','',2)}${a('fPayment','Your usual payment details','Bank, Wise, PayPal, Payoneer…',3)}</div>
+    </div>
+    <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn" data-act="ivd-close">Cancel</button><button type="button" class="btn primary" data-act="ivd-save">Save defaults</button></div></footer></div>`}));
+}
+function saveInvDefaults(){
+  const job=S.jobs[INVD?.jobId];if(!job)return;const d=INVD.d,num=(x)=>x===''||x==null?'':+x;
+  patch('jobs',job.id,{invoiceTo:{name:d.toName.trim(),details:d.toDetails.trim()},invoiceNotes:d.notes,invoiceTax:d.tax===''?'':+d.tax,
+    invoiceDef:{number:d.number.trim(),next:num(d.next),item:d.item.trim(),qty:num(d.qty),rate:num(d.rate),currency:d.currency,dueDays:d.dueDays===''?7:+d.dueDays,payment:d.payment.trim()}});
+  saveApp({invoiceFrom:{...(appSettings().invoiceFrom||{}),name:d.fName.trim(),email:d.fEmail.trim(),phone:d.fPhone.trim(),address:d.fAddress.trim(),taxId:d.fTax.trim(),payment:d.fPayment.trim()}});
+  logAct('job',`Invoice defaults saved for ${job.name}`,{jobId:job.id});closeInvDefaults();toast('Invoice defaults saved');render();
+}
+document.addEventListener('input',e=>{const el=e.target;if(INVD&&el.dataset&&el.dataset.ivd){INVD.d[el.dataset.ivd]=el.value;if(['number','next'].includes(el.dataset.ivd)){const pv=$('#ivd-prev');if(pv)pv.textContent=invDefPreview()}}});
+document.addEventListener('change',e=>{const el=e.target;if(INVD&&el.dataset&&el.dataset.ivd&&el.tagName==='SELECT')INVD.d[el.dataset.ivd]=el.value});
 function invNew(job){
   /* what you typed last time for this job (billed to, notes, tax) and your own details carry over */
   const last=(job.invoices||[]).filter(v=>v.kind==='made'&&v.doc).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0]?.doc;
   const w=workOf(job),p=w.pay||{},ym=today().slice(0,7),from=appSettings().invoiceFrom||{name:B.name||'',email:B.email||''};
   const n=p.period==='video'?deliveredIn(job.id,ym).length||1:1;
   const what={month:`Video editing · ${monthLabel(ym)}`,week:'Video editing · weekly',day:'Video editing · days',hour:'Video editing · hours',project:'Video editing · project',video:`Videos delivered · ${monthLabel(ym)}`}[p.period]||`Video editing · ${monthLabel(ym)}`;
-  return {number:nextInvNumber(),date:today(),due:addDays(today(),7),period:ym,currency:p.currency||'USD',
-    from:{name:from.name||'',email:from.email||'',phone:from.phone||'',address:from.address||'',payment:from.payment||'',taxId:from.taxId||''},
+  const def=invDef(job)||{},nd=invDefNext(job);
+  const item=def.item?def.item.replace('{month}',monthLabel(ym)):what,qty=def.qty!==''&&def.qty!=null?def.qty:n,rate=def.rate!==''&&def.rate!=null?def.rate:(p.amount||'');
+  return {number:nd?invFill(def.number,nd,ym):nextInvNumber(),date:today(),due:addDays(today(),def.dueDays!==''&&def.dueDays!=null?+def.dueDays:7),period:ym,currency:def.currency||p.currency||'USD',
+    from:{name:from.name||'',email:from.email||'',phone:from.phone||'',address:from.address||'',payment:def.payment||from.payment||'',taxId:from.taxId||''},
     to:job.invoiceTo?{...job.invoiceTo}:last?{...last.to}:{name:job.name,details:[w.contact?.name,w.contact?.reach,w.location].filter(Boolean).join('\n')},
-    items:[{d:what,q:n,r:p.amount||''}],tax:job.invoiceTax??last?.tax??'',notes:job.invoiceNotes??last?.notes??(p.method?`Payment via ${p.method}.`:''),list:[]};
+    items:[{d:item,q:qty,r:rate}],tax:job.invoiceTax??last?.tax??'',notes:job.invoiceNotes??last?.notes??(p.method?`Payment via ${p.method}.`:''),list:[]};
 }
 function invSheet(d){
   const t=invTotals(d),c=d.currency,ml=x=>esc(x||'').replace(/\n/g,'<br>');
@@ -3227,7 +3296,7 @@ function invoicesPane(job){
   const curSel=`<label class="inv-cur">Totals in<select class="sel" data-act="home-cur" aria-label="Show totals in"><option value="">Each job's currency</option>${[...new Set([...CURRENCIES,h].filter(Boolean))].map(x=>`<option ${x===h?'selected':''}>${esc(x)}</option>`).join('')}</select></label>`;
   return `<div class="inv-pane"><div class="inv-head"><div><h2>${INV_IC}Invoices</h2><p class="hint">${inYr.length?`${yr}: ${money(paid,c)} paid${open?` · ${money(open,c)} waiting`:''}${h&&h!==c&&(paid||open)?` <span class="fx">(${approx(paid,c)||'…'}${open?` · ${approx(open,c)||'…'}`:''})</span>`:''}`:'Upload the invoices you send, or make one here.'}</p>
     ${h?`<p class="hint inv-all">All jobs: ${hp==null||hw==null?'loading rates…':`${money(hp,h)} paid in ${yr}${hw?` · ${money(hw,h)} waiting`:''}`}</p>`:''}</div>
-    <div class="inv-btns">${curSel}<button type="button" class="btn" data-act="inv-upload">${I.upload}Upload</button><button type="button" class="btn primary" data-act="inv-new">${I.plus}Create invoice</button></div></div>
+    <div class="inv-btns">${curSel}<button type="button" class="btn" data-act="inv-defaults" title="What every new invoice for this job starts with">${I.gear}Defaults</button><button type="button" class="btn" data-act="inv-upload">${I.upload}Upload</button><button type="button" class="btn primary" data-act="inv-new">${I.plus}Create invoice</button></div></div>
     ${missing?`<div class="inv-nudge">${I.cal}<span>No invoice for ${monthLabel(ym)} yet.</span><button type="button" class="btn sm" data-act="inv-new">Create ${MONTH_FULL[+ym.slice(5,7)-1]}'s invoice</button></div>`:''}
     ${list.length>1?`<div class="inv-sort"><label>Sort<select class="sel" data-act="inv-sort" aria-label="Sort invoices">${[['period','Month covered, newest first'],['period-old','Month covered, oldest first'],['date','Date issued']].map(([k,l])=>`<option value="${k}" ${(S.ui.invSort||'period')===k?'selected':''}>${l}</option>`).join('')}</select></label></div>`:''}
     ${list.length?`<div class="inv-list">${(()=>{const srt=S.ui.invSort||'period',years=new Set(list.map(v=>(srt==='date'?v.date:invPer(v))?.slice(0,4)||''));let last=null;return list.map(v=>{const y=(srt==='date'?v.date:invPer(v))?.slice(0,4)||'';const hd=years.size>1&&y!==last?`<p class="inv-yr">${y||(srt==='date'?'No issue date':'No month set')}</p>`:'';last=y;return hd+row(v)}).join('')})()}</div>`:`<div class="empty"><h3>No invoices yet</h3><p>Upload a PDF or picture of an invoice you've sent, or create one: it fills in from this job's pay in Details.</p></div>`}
@@ -3289,7 +3358,8 @@ function invCommit(){
   const list=(job.invoices||[]).slice(),i=INV.id?list.findIndex(x=>x.id===INV.id):-1;
   const e={...(i>=0?list[i]:{id:uid(),kind:'made',status:'draft'}),number:d.number,date:d.date,due:d.due,period:d.period,amount:t.total,currency:d.currency,doc:JSON.parse(JSON.stringify(d))};
   if(i>=0)list[i]=e;else list.unshift(e);
-  patch('jobs',job.id,{invoices:list,invoiceTo:{name:d.to?.name||'',details:d.to?.details||''},invoiceNotes:d.notes||'',invoiceTax:d.tax??''});saveApp({invoiceFrom:{...d.from}});
+  if(invDef(job))patch('jobs',job.id,{invoices:list});
+  else{patch('jobs',job.id,{invoices:list,invoiceTo:{name:d.to?.name||'',details:d.to?.details||''},invoiceNotes:d.notes||'',invoiceTax:d.tax??''});saveApp({invoiceFrom:{...d.from}})}
   if(i<0)logAct('job',`Invoice ${d.number} created for ${job.name} (${money(t.total,d.currency)})`,{jobId:job.id});
   INV.id=e.id;return e;
 }
@@ -6015,7 +6085,7 @@ const HELP=[
  ['Tasks','Delivery specs',`When a task's notes hold a brief (ClickUp briefs land there), the panel shows its specs as chips under the details: resolution, orientation, aspect, bitrate, frame rate, codec, loudness, length and captions. If the brief's aspect differs from the task's format, one click sets it.`,null],
  ['Your work','New from ClickUp',`Tasks the ClickUp sync brings in get a purple New badge, and tasks with new ClickUp comments or status or due-date changes show “2 new”. Opening the task clears it. Click Review on the message that pops up, the notification, or pick New from ClickUp in the due-date filter to see them all; Mark all as reviewed clears every badge.`,null],
  ['Your work','ClickUp mentions',`ClickUp comments that tag you (like “Hi @Kim, please update”) are marked “mentioned you” in the task's Activity tab, come first in notifications for a week, and have their own Mentions filter.`,null],
- ['Your work','Invoices',`Each job has an Invoices & docs tab. Upload the invoices you send (PDF or a picture) and set their month and amount, or click Create invoice: it fills in from the job's pay in Details (amount, currency, payment method), adds the next number (INV-2026-001…), can list the videos you finished that month, and saves a PDF. Your own name, address and payment details are kept for next time. Mark each one Sent or Paid; a sent invoice past its due date shows as overdue in notifications. Pick a currency in “Totals in” to see every job's paid and waiting amounts converted with a recent exchange rate. Below the invoices, Documents holds the job's contract, NDA, onboarding files and briefs.`,null],
+ ['Your work','Invoices',`Each job has an Invoices & docs tab. Upload the invoices you send (PDF or a picture) and set their month and amount, or click Create invoice: it fills in from the job's pay in Details (amount, currency, payment method), adds the next number (INV-2026-001…), can list the videos you finished that month, and saves a PDF. Your own name, address and payment details are kept for next time. Mark each one Sent or Paid; a sent invoice past its due date shows as overdue in notifications. Pick a currency in “Totals in” to see every job's paid and waiting amounts converted with a recent exchange rate. Below the invoices, Documents holds the job's contract, NDA, onboarding files and briefs. Click Defaults on a job's Invoices tab to set what every new invoice starts with: billed to, your own numbering (like Invoice_JCUT_{n}, which carries on from the highest number already used), the line item, rate, currency, due days, tax, this job's payment details and your own details.`,null],
  ['Tasks','Merge duplicate tasks',`Settings → Duplicate tasks lists tasks in the same job with the same name. Pick the copy to keep and click Merge: it gets anything it was missing from the others (links, client, dates, notes, checklist steps, the ClickUp link and comments, updates and history), and the other copies go to Trash, where you can still restore them.`,['dupes','Duplicate tasks']],
  ['Tasks','Same name twice',`If you save a new task with the same name as an open one in that job, the panel asks whether to open the one you already have or save the new one anyway.`,null],
  ['Tasks','Select several',`Turn on Select in the toolbar, tick tasks (Shift-click for a range), then set status, priority, due date, move them to another job or client, archive or delete them together.`,null],
@@ -7401,6 +7471,9 @@ document.addEventListener('click',e=>{
     case 'brand-save': saveBrand();break;
     case 'pane': u.pane=el.dataset.pane;saveUi();render();break;
     case 'inv-new': openInv(u.tab);break;
+    case 'inv-defaults': openInvDefaults(u.tab);break;
+    case 'ivd-close': closeInvDefaults();break;
+    case 'ivd-save': saveInvDefaults();break;
     case 'doc-upload': $('#doc-file')?.click();break;
     case 'doc-del':{const job=S.jobs[u.tab],id=el.dataset.id;if(!job)break;if(docDelArmed!==id){docDelArmed=id;render();setTimeout(()=>{if(docDelArmed===id){docDelArmed=null;render()}},4000);break}
       docDelArmed=null;const d=(job.docs||[]).find(x=>x.id===id);patch('jobs',job.id,{docs:(job.docs||[]).filter(x=>x.id!==id)});if(d?.file?.v)setTimeout(()=>dropImage(d.file.v),300);logAct('job',`“${d?.name||'Document'}” removed from ${job.name}`,{jobId:job.id});toast('Document deleted');render();break}
@@ -7674,7 +7747,7 @@ document.addEventListener('keydown',e=>{
     return;
   }
   if(e.key==='Escape'&&SEL.size&&$('#drawer').hidden&&$('#modal').hidden){clearSel();return}
-  if(e.key==='Escape'){if(POMO_OPEN){POMO_OPEN=false;renderPomo();return}if(!$('#filter-sheet').hidden){closeFilters();return}if($('#side').classList.contains('open')){closeSide();return}if(INV){closeInv();return}if(STKB){closeStickers();return}if(PRF){closeProfile();return}if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
+  if(e.key==='Escape'){if(POMO_OPEN){POMO_OPEN=false;renderPomo();return}if(!$('#filter-sheet').hidden){closeFilters();return}if($('#side').classList.contains('open')){closeSide();return}if(INV){closeInv();return}if(INVD){closeInvDefaults();return}if(STKB){closeStickers();return}if(PRF){closeProfile();return}if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'');
   if(e.key==='Enter'&&!typing){const r=e.target.closest?.('[data-act="open"]');if(r){openTask(r.dataset.id);return}}
   if(typing||e.metaKey||e.ctrlKey||e.altKey)return;
