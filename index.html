@@ -2254,6 +2254,7 @@ select.rs-add{appearance:auto}
 .inv-edit{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
 .inv-edit label{display:grid;gap:2px;font-size:calc(11px*var(--ts));color:var(--muted)}
 .inv-edit input{padding:4px 6px;font-size:calc(13px*var(--ts));max-width:150px}
+.inv-edit select{padding:4px 26px 4px 6px;font-size:calc(13px*var(--ts));min-width:84px}
 .inv-amt{font-family:var(--mono);font-weight:600;white-space:nowrap}
 .inv-st{min-width:96px;font-weight:600}
 .inv-st.inv-paid{color:var(--st-done,#1f9d55)}
@@ -3133,7 +3134,7 @@ function invoicesPane(job){
   const row=v=>{const st=invState(v),href=v.kind==='file'&&v.file?imgSrc(v.file.v):'';
     return `<div class="inv-row st-${st}"><span class="inv-ic">${v.kind==='file'?I.file:INV_IC}</span>
       <div class="inv-main"><b>${esc(v.number||v.file?.name||'Invoice')}</b><small>${[v.period?monthLabel(v.period):'',v.date?'Issued '+fmtDate(v.date):'',v.due&&v.status!=='paid'?'Due '+fmtDate(v.due):'',v.paidAt?'Paid '+fmtDate(v.paidAt):'',v.kind==='file'?'Uploaded file':''].filter(Boolean).join(' · ')}</small>
-        ${v.kind==='file'?`<div class="inv-edit"><label>Period<input type="month" data-invf="${v.id}" data-k="period" value="${esc(v.period||'')}"></label><label>Amount<input type="number" step="any" min="0" data-invf="${v.id}" data-k="amount" value="${esc(v.amount??'')}" placeholder="0"></label><label>Due<input type="date" data-invf="${v.id}" data-k="due" value="${esc(v.due||'')}"></label></div>`:''}</div>
+        ${v.kind==='file'?`<div class="inv-edit"><label>Period<input type="month" data-invf="${v.id}" data-k="period" value="${esc(v.period||'')}"></label><label>Currency<select class="sel" data-invf="${v.id}" data-k="currency" aria-label="Currency">${[...new Set([...CURRENCIES,v.currency].filter(Boolean))].map(x=>`<option value="${esc(x)}" ${(v.currency||c)===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label><label>Amount<input type="number" step="any" min="0" data-invf="${v.id}" data-k="amount" value="${esc(v.amount??'')}" placeholder="0"></label><label>Due<input type="date" data-invf="${v.id}" data-k="due" value="${esc(v.due||'')}"></label></div>`:''}</div>
       <div class="inv-amt">${v.amount!==''&&v.amount!=null?money(v.amount,v.currency||c):'—'}${v.amount!==''&&v.amount!=null&&approx(v.amount,v.currency||c)?`<small>${approx(v.amount,v.currency||c)}</small>`:''}</div>
       <select class="sel inv-st inv-${st}" data-act="inv-status" data-id="${v.id}" aria-label="Status">${['draft','sent','paid'].map(x=>`<option value="${x}" ${v.status===x||(!v.status&&x==='draft')?'selected':''}>${x==='sent'&&st==='overdue'?'Overdue':INV_ST[x]}</option>`).join('')}</select>
       <div class="inv-acts">${v.kind==='made'?`<button type="button" class="btn sm" data-act="inv-open" data-id="${v.id}">Open</button><button type="button" class="icon-btn" data-act="inv-pdf" data-id="${v.id}" title="Download PDF" aria-label="Download PDF">${I.download}</button>`:href?`<a class="btn sm" href="${esc(href)}" target="_blank" rel="noopener">Open</a>`:''}
