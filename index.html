@@ -2358,6 +2358,13 @@ select.rs-add{appearance:auto}
 .inv-modal header h2{display:flex;align-items:center;gap:8px;min-width:0}
 .inv-modal header h2 .i{flex:none}
 .inv-form input,.inv-form select,.inv-form textarea{width:100%;min-width:0;box-sizing:border-box}
+.inv-form input,.inv-form select,.inv-form textarea{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:9px;padding:8px 10px;font:500 calc(13.5px*var(--ts)) var(--body);transition:border-color .15s}
+.inv-form input,.inv-form select{height:38px}
+.inv-form textarea{resize:vertical;line-height:1.4}
+.inv-form input:hover,.inv-form select:hover,.inv-form textarea:hover{border-color:var(--line-strong)}
+.inv-form input:focus,.inv-form select:focus,.inv-form textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.inv-form select{appearance:none;-webkit-appearance:none;padding-right:30px;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23888' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:12px}
+.inv-form input::placeholder,.inv-form textarea::placeholder{color:var(--faint)}
 .inv-form label{min-width:0}
 .inv-body{display:grid;grid-template-columns:minmax(320px,1fr) minmax(0,1.05fr);gap:18px;overflow:auto}
 .inv-form{display:grid;gap:10px;align-content:start}
@@ -3336,12 +3343,12 @@ function renderInv(){
     <div class="m-body inv-body"><div class="inv-form">
       <div class="iv-row3">${f('number','Invoice number')}${f('date','Issued','', 'date')}${f('due','Due','', 'date')}</div>
       <div class="iv-row3">${f('period','For the month','', 'month')}<label>Currency<select data-iv="currency">${[...new Set([...CURRENCIES,d.currency])].map(c=>`<option ${c===d.currency?'selected':''}>${esc(c)}</option>`).join('')}</select></label>${f('tax','Tax %','0','number')}</div>
-      <p class="pref-group">Billed to <small>(kept for this job’s next invoice)</small></p>${f('to.name','Name or company')}${a('to.details','Details','Contact, address, email',2)}
+      <p class="pref-group">Billed to <small>(${invDef(job)?'from this job’s Defaults':'kept for this job’s next invoice'})</small></p>${f('to.name','Name or company')}${a('to.details','Details','Contact, address, email',2)}
       <p class="pref-group">Line items</p>
       <div class="iv-items-form">${(d.items||[]).map((x,i)=>`<div class="iv-li"><input type="text" data-iv="items.${i}.d" data-fk="iv-items.${i}.d" value="${esc(x.d||'')}" placeholder="Description" aria-label="Description"><input type="number" step="any" min="0" data-iv="items.${i}.q" data-fk="iv-items.${i}.q" value="${esc(x.q??'')}" aria-label="Quantity" placeholder="Qty"><input type="number" step="any" min="0" data-iv="items.${i}.r" data-fk="iv-items.${i}.r" value="${esc(x.r??'')}" aria-label="Rate" placeholder="Rate"><button type="button" class="icon-btn" data-act="iv-rm" data-i="${i}" title="Remove line" aria-label="Remove line">${I.x}</button></div>`).join('')}</div>
       <div class="acct-btns"><button type="button" class="btn sm" data-act="iv-add">${I.plus}Add a line</button>
         <button type="button" class="btn sm" data-act="iv-list" ${done.length?'':'disabled'} title="List the tasks you finished in ${esc(monthLabel(d.period))}">${I.task}${(d.list||[]).length?'Update':'Add'} delivered videos (${done.length})</button>${(d.list||[]).length?`<button type="button" class="btn sm ghost" data-act="iv-list-rm">Remove the list</button>`:''}</div>
-      ${a('notes','Notes (kept for this job’s next invoice)','Thanks! Payment terms, PO number…',2)}
+      ${a('notes',invDef(job)?'Notes':'Notes (kept for this job’s next invoice)','Thanks! Payment terms, PO number…',2)}
       <p class="pref-group">Your details and payment <small>(kept for every invoice)</small></p>
       <div class="iv-row2">${f('from.name','Your name')}${f('from.email','Email','', 'email')}</div><div class="iv-row2">${f('from.phone','Phone')}${f('from.taxId','Tax ID (optional)')}</div>
       ${a('from.address','Address','',2)}${a('from.payment','Payment details','Bank, Wise, PayPal, Payoneer…',3)}
