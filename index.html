@@ -2242,6 +2242,10 @@ select.rs-add{appearance:auto}
 .inv-nudge{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-radius:10px;background:var(--accent-soft);margin-bottom:12px;font-size:calc(14px*var(--ts))}
 .inv-nudge span{flex:1}
 .inv-list{display:grid;gap:8px}
+.inv-sort{display:flex;justify-content:flex-end;margin:-4px 0 8px}
+.inv-sort label{display:flex;align-items:center;gap:6px;font-size:calc(12.5px*var(--ts));color:var(--muted)}
+.inv-yr{margin:8px 0 0;font:700 calc(12px*var(--ts)) var(--body);color:var(--muted);letter-spacing:.04em}
+.inv-yr:first-child{margin-top:0}
 .inv-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
 .inv-ic .i{width:20px;height:20px;color:var(--muted)}
 .inv-main{display:grid;gap:3px;min-width:0}
@@ -3074,7 +3078,14 @@ function dmMerge(k){const g=dupeGroups().find(x=>x.k===k);if(!g)return 0;mergeTa
    Your own details for new invoices live in settings/app.invoiceFrom. A made invoice prints from #print-root (html.print-invoice). */
 const INV_IC='<svg class="i" viewBox="0 0 16 16"><path d="M3.5 1.8h9v12.6l-1.8-1.1-1.5 1.1-1.7-1.1-1.7 1.1-1.5-1.1-1.8 1.1z"/><path d="M5.8 5h4.4M5.8 7.6h4.4M5.8 10.2h2.6"/></svg>';
 let INV=null,invDelArmed=null;
-const invList=j=>(j?.invoices||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.number||'').localeCompare(a.number||''));
+/* invoices are listed by the month they cover (S.ui.invSort: 'period' newest first, 'period-old', or 'date' issued);
+   one with no period counts by the month it was issued */
+const invPer=v=>v.period||(v.date||'').slice(0,7);
+const invList=(j,sort=S.ui.invSort||'period')=>(j?.invoices||[]).slice().sort((a,b)=>{
+  const byDate=(b.date||'').localeCompare(a.date||'')||(b.number||'').localeCompare(a.number||'');
+  if(sort==='date')return byDate;
+  const pa=invPer(a),pb=invPer(b);if(!pa!==!pb)return pa?-1:1;
+  return (sort==='period-old'?pa.localeCompare(pb):pb.localeCompare(pa))||byDate});
 const monthLabel=ym=>ym?`${MONTH_FULL[+ym.slice(5,7)-1]} ${ym.slice(0,4)}`:'';
 const money=(n,c)=>{try{return new Intl.NumberFormat(undefined,{style:'currency',currency:c||'USD'}).format(+n||0)}catch(e){return (c||'')+' '+fmtNum(+n||0)}};
 const invTotals=d=>{const sub=(d.items||[]).reduce((a,x)=>a+(+x.q||0)*(+x.r||0),0),tax=Math.round(sub*(+d.tax||0))/100;return {sub,tax,total:sub+tax}};
@@ -3131,7 +3142,8 @@ function invoicesPane(job){
     ${h?`<p class="hint inv-all">All jobs: ${hp==null||hw==null?'loading rates…':`${money(hp,h)} paid in ${yr}${hw?` · ${money(hw,h)} waiting`:''}`}</p>`:''}</div>
     <div class="inv-btns">${curSel}<button type="button" class="btn" data-act="inv-upload">${I.upload}Upload</button><button type="button" class="btn primary" data-act="inv-new">${I.plus}Create invoice</button></div></div>
     ${missing?`<div class="inv-nudge">${I.cal}<span>No invoice for ${monthLabel(ym)} yet.</span><button type="button" class="btn sm" data-act="inv-new">Create ${MONTH_FULL[+ym.slice(5,7)-1]}'s invoice</button></div>`:''}
-    ${list.length?`<div class="inv-list">${list.map(row).join('')}</div>`:`<div class="empty"><h3>No invoices yet</h3><p>Upload a PDF or picture of an invoice you've sent, or create one: it fills in from this job's pay in Details.</p></div>`}
+    ${list.length>1?`<div class="inv-sort"><label>Sort<select class="sel" data-act="inv-sort" aria-label="Sort invoices">${[['period','Month covered, newest first'],['period-old','Month covered, oldest first'],['date','Date issued']].map(([k,l])=>`<option value="${k}" ${(S.ui.invSort||'period')===k?'selected':''}>${l}</option>`).join('')}</select></label></div>`:''}
+    ${list.length?`<div class="inv-list">${(()=>{const srt=S.ui.invSort||'period',years=new Set(list.map(v=>(srt==='date'?v.date:invPer(v))?.slice(0,4)||''));let last=null;return list.map(v=>{const y=(srt==='date'?v.date:invPer(v))?.slice(0,4)||'';const hd=years.size>1&&y!==last?`<p class="inv-yr">${y||(srt==='date'?'No issue date':'No month set')}</p>`:'';last=y;return hd+row(v)}).join('')})()}</div>`:`<div class="empty"><h3>No invoices yet</h3><p>Upload a PDF or picture of an invoice you've sent, or create one: it fills in from this job's pay in Details.</p></div>`}
     <input type="file" id="inv-file" accept="application/pdf,image/png,image/jpeg,image/webp" multiple hidden></div>${docsHtml(job)}`;
 }
 function invSave(job,list){patch('jobs',job.id,{invoices:list})}
@@ -7470,6 +7482,7 @@ document.addEventListener('change',e=>{
   if(act==='row-prio'){const t=S.tasks[el.dataset.id],v=el.value;if(t&&(t.priority||'normal')!==v){patch('tasks',t.id,{priority:v});logAct('edit',`Priority set to ${(PRIORITIES.find(x=>x.id===v)||{}).label||v}`,{task:t})}render();return}
   if(act==='cu-job'){cuLink(el.dataset.team,el.value);return}
   if(act==='inv-status'){invStatus(el.dataset.id,el.value);return}
+  if(act==='inv-sort'){S.ui.invSort=el.value;saveUi();render();return}
   if(act==='home-cur'){saveApp({homeCurrency:el.value});render();return}
   if(act==='doc-kind'){const job=S.jobs[S.ui.tab];if(job)patch('jobs',job.id,{docs:(job.docs||[]).map(d=>d.id===el.dataset.id?{...d,kind:el.value}:d)});return}
   if(el.id==='doc-file'){docUpload([...el.files]);el.value='';return}
