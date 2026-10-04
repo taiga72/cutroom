@@ -3237,7 +3237,7 @@ function openInvDefaults(jobId){
   INVD={jobId,d:{
     toName:job.invoiceTo?.name??last?.to?.name??job.name,toDetails:job.invoiceTo?.details??last?.to?.details??[w.contact?.name,w.contact?.reach,w.location].filter(Boolean).join('\n'),
     number:def.number||'',next:def.next||'',item:def.item||(p.period==='video'?'Videos delivered · {month}':'Video editing · {month}'),qty:def.qty??'',rate:def.rate??(p.amount||''),currency:def.currency||p.currency||'USD',
-    dueDays:def.dueDays??7,dueMode:def.dueMode||'days',dueDay:def.dueDay??15,dueDay2:def.dueDay2??1,billing:def.billing||'month',tax:job.invoiceTax??last?.tax??'',notes:job.invoiceNotes??last?.notes??(p.method?`Payment via ${p.method}.`:''),payment:def.payment||'',
+    dueDays:def.dueDays??7,dueMode:def.dueMode||'days',dueDay:def.dueDay??15,dueDay2:def.dueDay2??1,autoDraft:String(def.autoDraft??0),autoIssue:def.autoIssue||'today',autoList:def.autoList===false?'0':'1',billing:def.billing||'month',tax:job.invoiceTax??last?.tax??'',notes:job.invoiceNotes??last?.notes??(p.method?`Payment via ${p.method}.`:''),payment:def.payment||'',
     fName:from.name||B.name||'',fEmail:from.email||B.email||'',fPhone:from.phone||'',fAddress:from.address||'',fTax:from.taxId||'',fPayment:from.payment||''}};
   renderInvDefaults();$('#modal').hidden=false;
 }
@@ -3272,6 +3272,10 @@ function renderInvDefaults(){
         ${s2('dueMode','Due date',[['days','A number of days after the invoice date'],['day','On payday']])}
         ${d.dueMode==='day'?(d.billing==='half'?dueRow('','Payday for the 1st–15th')+dueRow('2','Payday for the 16th–end'):dueRow('','Payday')):f('dueDays','Due after (days)','7','number','min="0"')}</div>
       <div class="hint ivd-due-prev" id="ivd-due">${invDuePreview()}</div>
+      <p class="pref-group">Drafts made for you</p>
+      ${d.dueMode==='day'?`<div class="ivd-grid">${s2('autoDraft','Make a draft before payday',[['0','Off'],['1','1 day before'],['3','3 days before'],['7','7 days before']])}
+        ${+d.autoDraft?s2('autoIssue','Issue date on the draft',[['today','The day it’s made'],['end','The last day of work'],['payday','Payday']])+s2('autoList','List the videos you finished',[['1','Yes'],['0','No']]):''}</div>
+      <p class="hint">${+d.autoDraft?'When you open the app close to payday, a Draft is made from these defaults and a notification takes you to it. Check it, change anything you need, download the PDF and mark it Sent. Nothing is sent for you. Deleting a draft that was made for you doesn’t bring it back.':'Turn this on to have the next invoice waiting for you as a Draft before each payday.'}</p>`:`<p class="hint">Set Due date to On payday above to have drafts made for you before each payday.</p>`}
       <p class="pref-group">Payment and notes</p><div class="ivd-grid one">${a('payment','Payment details for this job','Leave empty to use your usual payment details below',3)}${a('notes','Notes','Thanks! Payment terms, PO number…',2)}</div>
       <p class="pref-group">Your details <small>(all jobs)</small></p><div class="ivd-grid">${f('fName','Your name')}${f('fEmail','Email','','email')}${f('fPhone','Phone')}${f('fTax','Tax ID (optional)')}</div>
       <div class="ivd-grid one">${a('fAddress','Address','',2)}${a('fPayment','Your usual payment details','Bank, Wise, PayPal, Payoneer…',3)}</div>
@@ -3282,12 +3286,37 @@ function saveInvDefaults(){
   const job=S.jobs[INVD?.jobId];if(!job)return;const d=INVD.d,num=(x)=>x===''||x==null?'':+x;
   patch('jobs',job.id,{invoiceTo:{name:d.toName.trim(),details:d.toDetails.trim()},invoiceNotes:d.notes,invoiceTax:d.tax===''?'':+d.tax,
     invoiceDef:{number:d.number.trim(),next:num(d.next),item:d.item.trim(),qty:num(d.qty),rate:num(d.rate),currency:d.currency,dueDays:d.dueDays===''?7:+d.dueDays,
-      dueMode:d.dueMode,dueDay:d.dueDay==='last'?'last':+d.dueDay,dueDay2:d.dueDay2==='last'?'last':+d.dueDay2,billing:d.billing,payment:d.payment.trim()}});
+      dueMode:d.dueMode,dueDay:d.dueDay==='last'?'last':+d.dueDay,dueDay2:d.dueDay2==='last'?'last':+d.dueDay2,autoDraft:+d.autoDraft||0,autoIssue:d.autoIssue,autoList:d.autoList!=='0',billing:d.billing,payment:d.payment.trim()}});
   saveApp({invoiceFrom:{...(appSettings().invoiceFrom||{}),name:d.fName.trim(),email:d.fEmail.trim(),phone:d.fPhone.trim(),address:d.fAddress.trim(),taxId:d.fTax.trim(),payment:d.fPayment.trim()}});
   logAct('job',`Invoice defaults saved for ${job.name}`,{jobId:job.id});closeInvDefaults();toast('Invoice defaults saved');render();
 }
 document.addEventListener('input',e=>{const el=e.target;if(INVD&&el.dataset&&el.dataset.ivd){INVD.d[el.dataset.ivd]=el.value;if(['number','next'].includes(el.dataset.ivd)){const pv=$('#ivd-prev');if(pv)pv.textContent=invDefPreview()}if(el.dataset.ivd==='dueDays'){const pv=$('#ivd-due');if(pv)pv.innerHTML=invDuePreview()}}});
-document.addEventListener('change',e=>{const el=e.target;if(INVD&&el.dataset&&el.dataset.ivd&&el.tagName==='SELECT'){INVD.d[el.dataset.ivd]=el.value;if(['billing','dueMode'].includes(el.dataset.ivd))renderInvDefaults();else{const pv=$('#ivd-due');if(pv)pv.innerHTML=invDuePreview()}}});
+document.addEventListener('change',e=>{const el=e.target;if(INVD&&el.dataset&&el.dataset.ivd&&el.tagName==='SELECT'){INVD.d[el.dataset.ivd]=el.value;if(el.dataset.ivd==='billing'){const pa=+workOf(S.jobs[INVD.jobId]).pay?.amount,r=+INVD.d.rate;if(pa&&el.value==='half'&&r===pa)INVD.d.rate=Math.round(pa/2*100)/100;else if(pa&&el.value==='month'&&r===Math.round(pa/2*100)/100)INVD.d.rate=pa}if(['billing','dueMode','autoDraft'].includes(el.dataset.ivd))renderInvDefaults();else{const pv=$('#ivd-due');if(pv)pv.innerHTML=invDuePreview()}}});
+/* drafts made before payday (invoiceDef.autoDraft = days ahead, autoIssue 'today'|'end'|'payday', autoList): for each job with a payday,
+   the latest periods with no invoice get a Draft once their payday is that close (and not more than 10 days past). One per job per run;
+   job.invoiceAuto remembers the periods already made ('YYYY-MM:half'), so a deleted draft isn't made again. Runs on load and every minute. */
+function invAutoDraft(){
+  if(!S.ready)return;const t0=today(),made=[];
+  for(const j of Object.values(S.jobs)){
+    const def=invDef(j);if(!def||def.dueMode!=='day'||!+def.autoDraft||j.example)continue;
+    const done=new Set(j.invoiceAuto||[]),ym=t0.slice(0,7);
+    outer:for(const m of [ymNext(ym,-2),ymNext(ym,-1),ym])for(const h of def.billing==='half'?[1,2]:[0]){
+      const key=`${m}:${h}`;if(done.has(key)||`${m}-${h===2?'16':'01'}`>t0)continue;
+      if((j.invoices||[]).some(v=>invPer(v)===m&&(!h||!+v.half||+v.half===h)))continue;
+      const due=invDueFor(def,m,h),lead=diffDays(due,t0);if(lead>+def.autoDraft||lead<-10)continue;
+      const d=invNew(j,{ym:m,half:h}),end=h===1?`${m}-15`:`${m}-${ymDays(m)}`;
+      if(def.autoIssue==='payday')d.date=due;else if(def.autoIssue==='end')d.date=end<t0?end:t0;
+      if(def.autoList!==false)d.list=deliveredIn(j.id,m).filter(t=>!h||(h===1?t.doneAt.slice(8,10)<='15':t.doneAt.slice(8,10)>'15')).map(t=>[S.clients[t.clientId]?.name,t.name].filter(Boolean).join(' · '));
+      const e={id:uid(),kind:'made',status:'draft',auto:true,number:d.number,date:d.date,due:d.due,period:m,half:h||'',amount:invTotals(d).total,currency:d.currency,doc:d};
+      patch('jobs',j.id,{invoices:[e,...(j.invoices||[])],invoiceAuto:[...done,key].slice(-24)});
+      logAct('job',`Draft invoice ${d.number} made for ${j.name} (${perLabel(m,h)})`,{jobId:j.id});made.push({j,e});break outer;
+    }
+  }
+  if(!made.length)return;const {j,e}=made[0];
+  toast(made.length===1?`Draft invoice ready: ${j.name} · ${perLabel(e.period,e.half)}`:`${made.length} draft invoices ready`,{label:'Open',fn:()=>invGo(j.id,made.length===1?e.id:null)});
+  scheduleRender();
+}
+function invGo(jobId,id){const u=S.ui;u.tab=jobId;u.client='all';u.pane='invoices';saveUi();render();if(id)openInv(jobId,id)}
 /* which period a new invoice is for: this month, or when billed twice a month the half that just ended
    (from the 15th: this month's 1–15, before it: last month's 16–end), moved on past any half that already has an invoice */
 function invNextPer(job){
@@ -3296,11 +3325,11 @@ function invNextPer(job){
   for(let i=0;i<2&&has(m,h);i++){if(h===1)h=2;else{h=1;m=ymNext(m)}}
   return {ym:m,half:h};
 }
-function invNew(job){
+function invNew(job,per){
   /* what you typed last time for this job (billed to, notes, tax) and your own details carry over */
   const last=(job.invoices||[]).filter(v=>v.kind==='made'&&v.doc).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0]?.doc;
   const w=workOf(job),p=w.pay||{},from=appSettings().invoiceFrom||{name:B.name||'',email:B.email||''},def=invDef(job)||{},nd=invDefNext(job);
-  const {ym,half}=invNextPer(job);
+  const {ym,half}=per||invNextPer(job);
   const n=p.period==='video'?deliveredIn(job.id,ym).length||1:1;
   const what={month:`Video editing · ${monthLabel(ym)}`,week:'Video editing · weekly',day:'Video editing · days',hour:'Video editing · hours',project:'Video editing · project',video:`Videos delivered · ${monthLabel(ym)}`}[p.period]||`Video editing · ${monthLabel(ym)}`;
   const item=(def.item?def.item.replace('{month}',monthLabel(ym)):what).replace(PER_RE,perLabel(ym,half)),qty=def.qty!==''&&def.qty!=null?def.qty:n,
@@ -3331,7 +3360,7 @@ function invoicesPane(job){
   const missing=w.pay?.period==='month'&&(two?np.ym<=ym&&(np.ym<ym||np.half===1&&+today().slice(8)>=15):!list.some(v=>v.period===ym));
   const row=v=>{const st=invState(v),href=v.kind==='file'&&v.file?imgSrc(v.file.v):'',ed=ROW_EDIT.has(v.id);
     return `<div class="inv-row st-${st} ${ed?'editing':''}"><span class="inv-ic">${v.kind==='file'?I.file:INV_IC}</span>
-      <div class="inv-main"><b>${esc(v.number||v.file?.name||'Invoice')}</b><small>${[v.period?perLabel(v.period,v.half):'',v.date?'Issued '+fmtDate(v.date):'',v.due&&v.status!=='paid'?'Due '+fmtDate(v.due):'',v.paidAt?'Paid '+fmtDate(v.paidAt):'',v.kind==='file'?'Uploaded file':''].filter(Boolean).join(' · ')}</small>
+      <div class="inv-main"><b>${esc(v.number||v.file?.name||'Invoice')}</b><small>${[v.period?perLabel(v.period,v.half):'',v.date?'Issued '+fmtDate(v.date):'',v.due&&v.status!=='paid'?'Due '+fmtDate(v.due):'',v.paidAt?'Paid '+fmtDate(v.paidAt):'',v.kind==='file'?'Uploaded file':'',v.auto&&v.status==='draft'?'Made for you':''].filter(Boolean).join(' · ')}</small>
         ${v.kind==='file'&&ed?`<div class="inv-edit"><label>Period<input type="month" data-invf="${v.id}" data-k="period" value="${esc(v.period||'')}"></label>${invDef(job)?.billing==='half'||+v.half?`<label>Half<select class="sel" data-invf="${v.id}" data-k="half" aria-label="Which half">${[['','Whole month'],['1','1–15'],['2','16–end']].map(([x,l])=>`<option value="${x}" ${String(v.half||'')===x?'selected':''}>${l}</option>`).join('')}</select></label>`:''}<label>Currency<select class="sel" data-invf="${v.id}" data-k="currency" aria-label="Currency">${[...new Set([...CURRENCIES,v.currency].filter(Boolean))].map(x=>`<option value="${esc(x)}" ${(v.currency||c)===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label><label>Amount<input type="number" step="any" min="0" data-invf="${v.id}" data-k="amount" value="${esc(v.amount??'')}" placeholder="0"></label><label>Due<input type="date" data-invf="${v.id}" data-k="due" value="${esc(v.due||'')}"></label>${v.status==='paid'?`<label>Paid on<input type="date" data-invf="${v.id}" data-k="paidAt" value="${esc(dayOf(v.paidAt)||'')}"></label>`:''}</div>`:ed&&v.status==='paid'?`<div class="inv-edit">${v.status==='paid'?`<label>Paid on<input type="date" data-invf="${v.id}" data-k="paidAt" value="${esc(dayOf(v.paidAt)||'')}"></label>`:''}</div>`:''}</div>
       <div class="inv-amt">${v.amount!==''&&v.amount!=null?money(v.amount,v.currency||c):'—'}${v.amount!==''&&v.amount!=null&&approx(v.amount,v.currency||c)?`<small>${approx(v.amount,v.currency||c)}</small>`:''}</div>
       <select class="sel inv-st inv-${st}" data-act="inv-status" data-id="${v.id}" aria-label="Status">${['draft','sent','paid'].map(x=>`<option value="${x}" ${v.status===x||(!v.status&&x==='draft')?'selected':''}>${x==='sent'&&st==='overdue'?'Overdue':INV_ST[x]}</option>`).join('')}</select>
@@ -3765,7 +3794,7 @@ function applyLook(o){
   const pc=g('prioColors')||{};for(const p of ['urgent','high','low']){if(pc[p])r.style.setProperty('--pr-'+p,pc[p]);else r.style.removeProperty('--pr-'+p)}
 }
 function migrateStatuses(){
-  pruneLog();purgeOldTrash();setTimeout(autoArchive,1500);
+  pruneLog();purgeOldTrash();setTimeout(autoArchive,1500);setTimeout(invAutoDraft,2500);
   for(const t of Object.values(S.tasks)){
     if(t.status==='dropped')patch('tasks',t.id,{status:'done',doneAt:t.doneAt||today()});
     // Finder paths briefly went into the files link; they belong in the project folder now
@@ -4342,6 +4371,7 @@ function notifications(all){
   for(let i=0;i<7;i++){const d=addDays(t0,i),n=load[d]||0;if(n>=lim)out.push({key:`busy:${d}:${n}`,rank:2.5,kind:'warn',icon:'warn',day:d,title:`${i===0?'Today':i===1?'Tomorrow':WEEKDAY[parseD(d).getDay()]+' '+fmtDate(d)} is a busy day`,body:`${n} tasks are due.`})}
   {const rv=Object.values(S.tasks).filter(t=>cuUnreviewed(t)&&S.jobs[t.jobId]),nn=rv.filter(t=>t.cuNew).length;if(rv.length)out.push({key:`cunew:${rv.length}:${t0}`,rank:0.8,kind:'info',icon:'chat',cuReview:true,sub:'ClickUp',title:nn&&nn===rv.length?`${nn} new task${nn===1?'':'s'} from ClickUp to review`:`${rv.length} task${rv.length===1?'':'s'} with something new from ClickUp`,body:rv.slice(0,3).map(t=>t.name||'Untitled task').join(' · ')+(rv.length>3?` +${rv.length-3} more`:'')})}
   for(const j of Object.values(S.jobs)){const w=workOf(j);if(!w.until||j.example)continue;const n=diffDays(w.until,t0);if(n>=0&&n<=30)out.push({key:`ctr:${j.id}:${w.until}`,rank:2.7,kind:'info',icon:'cal',ctr:j.id,sub:j.name,title:`${j.name} contract ends ${n===0?'today':n===1?'tomorrow':`in ${n} days`}`,body:`On ${fmtDate(w.until)}. Renew it or update the end date in Work details.`})}
+  for(const j of Object.values(S.jobs))for(const v of j.invoices||[])if(v.auto&&v.status==='draft')out.push({key:`invd:${v.id}`,rank:2.4,kind:'info',icon:'cal',invOpen:[j.id,v.id],sub:j.name,title:`Draft invoice ready: ${perLabel(v.period,v.half)}`,body:`${v.amount!==''&&v.amount!=null?money(v.amount,v.currency)+' · ':''}due ${fmtDate(v.due)}. Check it, download the PDF and mark it Sent.`});
   for(const j of Object.values(S.jobs))for(const v of j.invoices||[])if(invState(v)==='overdue')out.push({key:`inv:${v.id}:${v.due}`,rank:2.6,kind:'warn',icon:'warn',inv:j.id,sub:j.name,title:`Invoice ${v.number||''} is overdue`,body:`${v.amount!==''&&v.amount!=null?money(v.amount,v.currency)+' · ':''}due ${fmtDate(v.due)}. Mark it paid once it arrives.`});
   {const b=backupDue();if(b)out.push({key:`backup:${b.last||'never'}:${Math.floor(b.days/30)}`,rank:7,kind:'info',icon:'download',backup:true,sub:'Settings → Backup',title:b.last?`Your last backup was ${b.days} days ago`:"You haven't downloaded a backup yet",body:'A backup file keeps a copy of every job and task on your computer. It takes a second.'})}
   out.forEach(n=>{n.sub=n.sub||(n.task?who(n.task):'All jobs')});
@@ -4400,6 +4430,7 @@ function openNote(key){
   if(n.backup){openSettings();SM.sec='backup';SM.mv='sec';renderSettings();return}
   if(n.cuReview){cuReview();return}
   if(n.ctr){const u=S.ui;u.tab=n.ctr;u.client='all';u.pane='details';saveUi();render();return}
+  if(n.invOpen){invGo(...n.invOpen);return}
   if(n.inv){const u=S.ui;u.tab=n.inv;u.client='all';u.pane='invoices';saveUi();render();return}
   if(n.task)openTask(n.task.id,n.tab);
   else if(n.day){const u=S.ui;u.tab='overview';u.client='all';u.view='calendar';u.month=n.day.slice(0,7);saveUi();render()}
@@ -6133,7 +6164,7 @@ const HELP=[
  ['Tasks','Delivery specs',`When a task's notes hold a brief (ClickUp briefs land there), the panel shows its specs as chips under the details: resolution, orientation, aspect, bitrate, frame rate, codec, loudness, length and captions. If the brief's aspect differs from the task's format, one click sets it.`,null],
  ['Your work','New from ClickUp',`Tasks the ClickUp sync brings in get a purple New badge, and tasks with new ClickUp comments or status or due-date changes show “2 new”. Opening the task clears it. Click Review on the message that pops up, the notification, or pick New from ClickUp in the due-date filter to see them all; Mark all as reviewed clears every badge.`,null],
  ['Your work','ClickUp mentions',`ClickUp comments that tag you (like “Hi @Kim, please update”) are marked “mentioned you” in the task's Activity tab, come first in notifications for a week, and have their own Mentions filter.`,null],
- ['Your work','Invoices',`Each job has an Invoices & docs tab. Upload the invoices you send (PDF or a picture) and set their month and amount, or click Create invoice: it fills in from the job's pay in Details (amount, currency, payment method), adds the next number (INV-2026-001…), can list the videos you finished that month, and saves a PDF. Your own name, address and payment details are kept for next time. Mark each one Sent or Paid; a sent invoice past its due date shows as overdue in notifications. Pick a currency in “Totals in” to see every job's paid and waiting amounts converted with a recent exchange rate. Below the invoices, Documents holds the job's contract, NDA, onboarding files and briefs. Click Defaults on a job's Invoices tab to set what every new invoice starts with: billed to, your own numbering (like Invoice_JCUT_{n}, which carries on from the highest number already used), the line item, rate, currency, due days, tax, this job's payment details and your own details. The due date can be a number of days after the invoice date, or On payday: pick the day you get paid and each invoice is due on the first payday on or after its last day of work. If a job pays you twice a month, set “How often you bill” to Twice a month: each invoice covers 1–15 or 16–end (pick the half next to the month), the rate is the amount for each half, each half has its own payday (for example the 15th for 1–15, and the 1st for 16–end, which lands on the 1st of the next month), and the reminders look for both halves.`,null],
+ ['Your work','Invoices',`Each job has an Invoices & docs tab. Upload the invoices you send (PDF or a picture) and set their month and amount, or click Create invoice: it fills in from the job's pay in Details (amount, currency, payment method), adds the next number (INV-2026-001…), can list the videos you finished that month, and saves a PDF. Your own name, address and payment details are kept for next time. Mark each one Sent or Paid; a sent invoice past its due date shows as overdue in notifications. Pick a currency in “Totals in” to see every job's paid and waiting amounts converted with a recent exchange rate. Below the invoices, Documents holds the job's contract, NDA, onboarding files and briefs. Click Defaults on a job's Invoices tab to set what every new invoice starts with: billed to, your own numbering (like Invoice_JCUT_{n}, which carries on from the highest number already used), the line item, rate, currency, due days, tax, this job's payment details and your own details. The due date can be a number of days after the invoice date, or On payday: pick the day you get paid and each invoice is due on the first payday on or after its last day of work. If a job pays you twice a month, set “How often you bill” to Twice a month: each invoice covers 1–15 or 16–end (pick the half next to the month), the rate is the amount for each half, each half has its own payday (for example the 15th for 1–15, and the 1st for 16–end, which lands on the 1st of the next month), and the reminders look for both halves. With On payday set, “Make a draft before payday” (1, 3 or 7 days) has the next invoice waiting as a Draft when you open the app, with a notification that opens it; you pick its issue date and whether it lists the videos you finished. Nothing is sent for you.`,null],
  ['Tasks','Merge duplicate tasks',`Settings → Duplicate tasks lists tasks in the same job with the same name. Pick the copy to keep and click Merge: it gets anything it was missing from the others (links, client, dates, notes, checklist steps, the ClickUp link and comments, updates and history), and the other copies go to Trash, where you can still restore them.`,['dupes','Duplicate tasks']],
  ['Tasks','Same name twice',`If you save a new task with the same name as an open one in that job, the panel asks whether to open the one you already have or save the new one anyway.`,null],
  ['Tasks','Select several',`Turn on Select in the toolbar, tick tasks (Shift-click for a range), then set status, priority, due date, move them to another job or client, archive or delete them together.`,null],
@@ -8062,7 +8093,7 @@ document.addEventListener('dragover',e=>{if(!calDrag)return;const d=e.target.clo
 document.addEventListener('dragend',()=>{if(!calDrag)return;calDrag=null;document.body.classList.remove('cal-dragging');document.querySelectorAll('.cal-drop,[data-caldrag].dragging').forEach(x=>x.classList.remove('cal-drop','dragging'))});
 document.addEventListener('drop',e=>{if(!calDrag)return;const d=e.target.closest?.('[data-calday]'),id=calDrag;calDrag=null;document.body.classList.remove('cal-dragging');document.querySelectorAll('.cal-drop').forEach(x=>x.classList.remove('cal-drop'));if(!d)return;e.preventDefault();moveDue(id,d.dataset.calday)});
 
-setInterval(()=>{if(S.ready&&!document.hidden&&$('#modal').hidden){autoArchive();scheduleRender()}},60000);
+setInterval(()=>{if(S.ready&&!document.hidden&&$('#modal').hidden){autoArchive();invAutoDraft();scheduleRender()}},60000);
 document.addEventListener('toggle',e=>{if(e.target.classList?.contains('d-brand')){S.ui.brandTaskOpen=e.target.open;saveUi()}},true);
 placeTopRight();
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('/sw.js').catch(()=>{});
