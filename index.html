@@ -315,6 +315,35 @@ button.stat:hover{border-color:var(--line-strong)}
 .top-right{display:flex;align-items:center;gap:8px;flex:0 1 350px;justify-content:flex-end;min-width:0}
 .top-search{flex:1 1 300px;min-width:180px;padding-block:1px}
 .bell-wrap{position:relative;flex:none}
+.me-btn{flex:none;width:38px;height:38px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;display:grid;place-items:center}
+.me-btn:hover .me-av{box-shadow:0 0 0 2px var(--accent)}
+.me-av{position:relative;width:var(--s);height:var(--s);border-radius:50%;background:color-mix(in srgb,var(--accent) 22%,var(--surface));color:var(--accent);display:grid;place-items:center;overflow:hidden;flex:none;box-shadow:0 0 0 1px var(--line)}
+.me-av b{font:700 calc(var(--s)*.38) var(--body)}.me-av .i{width:55%;height:55%}
+.me-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.pf-me{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.pf-me h4{margin:0;font:700 calc(18px*var(--ts)) var(--display)}.pf-me .hint{margin:2px 0 0}
+.pf-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px;margin-bottom:14px}
+.pf-tile{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg);display:grid;gap:2px;min-width:0}
+.pf-tile b{font:700 calc(17px*var(--ts)) var(--mono);overflow-wrap:anywhere}.pf-tile small{color:var(--muted);font-size:calc(12px*var(--ts))}
+.pf-btns{display:flex;gap:8px;flex-wrap:wrap}
+.pf-job{border:1px solid var(--line);border-left:3px solid var(--jc);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--surface)}
+.pf-job-h{display:flex;align-items:center;gap:8px;margin-bottom:8px}.pf-jn{flex:1;min-width:0;display:grid}.pf-jn small{color:var(--muted);font-size:calc(12px*var(--ts))}
+.pf-job .work{margin:0}
+.pf-pay-top{display:flex;justify-content:flex-end;margin-bottom:10px}
+.pf-table{display:grid;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.pf-tr{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center;padding:10px 12px;border-top:1px solid var(--line);font-size:calc(13px*var(--ts))}
+.pf-tr:first-child{border-top:0}
+.pf-tj{display:flex;align-items:center;gap:6px;font-weight:600;min-width:0}
+.pf-num{font-family:var(--mono);font-weight:600;display:grid}.pf-num small{color:var(--muted);font-weight:500}
+.pf-sub{color:var(--muted);font-size:calc(12px*var(--ts))}
+.pf-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.pf-day{border:1px solid var(--line);border-radius:10px;padding:8px 6px;display:flex;flex-direction:column;gap:4px;min-height:96px;background:var(--surface)}
+.pf-day b{font-size:calc(12.5px*var(--ts))}.pf-day>small{color:var(--muted);font-size:calc(11.5px*var(--ts))}
+.pf-day.off{background:var(--bg);opacity:.7}.pf-day.today{border-color:var(--accent)}
+.pf-shift{display:grid;font-size:calc(11.5px*var(--ts));font-weight:600;padding:3px 5px;border-radius:6px;background:color-mix(in srgb,var(--jc) 16%,transparent);border-left:3px solid var(--jc);min-width:0}
+.pf-sn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pf-shift em{font-style:normal;font-weight:500;color:var(--muted)}
+@media (max-width:820px){.pf-tr{grid-template-columns:minmax(0,1fr) auto}.pf-tr .pf-sub,.pf-tr>span:nth-child(2){grid-column:1/-1}.pf-week{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .bell{width:38px;height:38px;border:1px solid var(--line);background:var(--surface);border-radius:9px;position:relative}
 .bell.has{color:var(--text)}
 .bell-n{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--danger);color:#fff;font:700 calc(11px*var(--ts))/18px var(--body);text-align:center}
@@ -2345,7 +2374,7 @@ select.rs-add{appearance:auto}
   <div class="side-resize" id="side-resize" title="Drag to resize the sidebar · double-click to reset" aria-hidden="true"></div>
   <main class="main" id="main">
     <div id="banner"></div>
-    <div class="head-row"><div id="head"></div><div class="top-right"><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search tasks  ( / )" autocomplete="off"></label><div class="pomo-wrap"><button type="button" class="pomo-btn" id="pomo" data-act="pomo" aria-haspopup="true" aria-expanded="false" aria-controls="pomo-pop" title="Focus timer (P to start or pause)"></button><div class="notes-pop pomo-pop" id="pomo-pop" hidden role="dialog" aria-label="Focus timer"></div></div><div class="bell-wrap"><button type="button" class="icon-btn bell" id="bell" data-act="bell" aria-haspopup="true" aria-expanded="false" aria-controls="notes" title="Notifications"><svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bell-n" id="bell-n" hidden></span></button><div class="notes-pop" id="notes" hidden role="dialog" aria-label="Notifications"></div></div></div></div>
+    <div class="head-row"><div id="head"></div><div class="top-right"><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search tasks  ( / )" autocomplete="off"></label><div class="pomo-wrap"><button type="button" class="pomo-btn" id="pomo" data-act="pomo" aria-haspopup="true" aria-expanded="false" aria-controls="pomo-pop" title="Focus timer (P to start or pause)"></button><div class="notes-pop pomo-pop" id="pomo-pop" hidden role="dialog" aria-label="Focus timer"></div></div><div class="bell-wrap"><button type="button" class="icon-btn bell" id="bell" data-act="bell" aria-haspopup="true" aria-expanded="false" aria-controls="notes" title="Notifications"><svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bell-n" id="bell-n" hidden></span></button><div class="notes-pop" id="notes" hidden role="dialog" aria-label="Notifications"></div></div><button type="button" class="me-btn" id="me-btn" data-act="profile" title="Your profile" aria-label="Your profile"></button></div></div>
     <div id="subnav"></div>
     <div id="stats"></div>
     <div id="jobcards"></div>
@@ -2775,7 +2804,7 @@ async function cloudBoot(){
 }
 async function cloudStart(session){
   if(B.uid) return;
-  B.uid=session.user.id;B.email=session.user.email||'';B.name=session.user.user_metadata?.full_name||session.user.user_metadata?.name||'';
+  B.uid=session.user.id;B.email=session.user.email||'';B.name=session.user.user_metadata?.full_name||session.user.user_metadata?.name||'';B.avatar=session.user.user_metadata?.avatar_url||session.user.user_metadata?.picture||'';
   $('#auth').hidden=true;$('#auth').innerHTML='';$('.app').hidden=false;
   render();
   OUT=lsGet(outKey())||{};lsSet('cutroom.lastuid',{uid:B.uid,email:B.email});
@@ -3594,7 +3623,7 @@ function render(){
   document.title=(a.name||'').trim()||APP_NAME;pomoTitle();
   const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
   withFocus(()=>{renderSide();renderMain()});
-  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();stickerSoon();renderUpNextPage();boardRestore();document.body.classList.toggle('cal-page',S.ui.view==='calendar'&&!['archived','activity','trash','help','resume','upnext'].includes(S.ui.tab));
+  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();stickerSoon();renderMeBtn();renderUpNextPage();boardRestore();document.body.classList.toggle('cal-page',S.ui.view==='calendar'&&!['archived','activity','trash','help','resume','upnext'].includes(S.ui.tab));
   if(S.ready&&!SEASON_RAN){SEASON_RAN=true;setTimeout(()=>seasonFx(),900)}
 }
 
@@ -4529,6 +4558,7 @@ function jumpItems(q){
   if(IS_MAC){(lsGet(LS_PATHS)||[]).slice(0,q?8:5).forEach((x,k)=>{const sc=q?Math.max(score(x.label),score(pathName(x.p)),score(x.sub)*.6):1;if(sc)out.push({grp:'Recent folders',sc:q?sc+.1:8-k*.1,icon:I.folder,label:x.label===pathName(x.p)?x.label:`${x.label} · ${pathName(x.p)}`,sub:['Recent folder',x.sub].filter(Boolean).join(' · '),act:'path',p:x.p})})}
   if(!q||score('new task'))out.push({grp:'Actions',sc:q?3:.9,icon:I.plus,label:'New task',sub:'Action',act:'new-task'});
   if(q&&score('settings'))out.push({sc:3,icon:I.gear,label:'Settings',sub:'Action',act:'open-settings'});
+  if(q&&(score('profile')||score('my pay')||score('my week')))out.push({sc:3,icon:PERSON_IC,label:'Profile',sub:'Your jobs, pay and week',act:'profile'});
   if(q&&(score('sticker book')||score('stickers')))out.push({sc:3,icon:'<span aria-hidden="true">🏅</span>',label:'Sticker book',sub:'Action',act:'stickers'});
   for(const j of jobsSorted()){const sc=score(j.name);if(sc)out.push({sc:sc+.4,icon:jobMark(j,16),label:j.name,sub:j.type==='agency'?'Agency':'Direct client',act:'nav',tab:j.id})}
   for(const c of Object.values(S.clients)){const sc=score(c.name);if(sc)out.push({sc:sc+.3,icon:clientMark(c,16),label:c.name,sub:`Client · ${S.jobs[c.jobId]?.name||''}`,act:'nav',tab:c.jobId,client:c.id})}
@@ -4607,6 +4637,7 @@ function jumpGo(k){
   else if(x.act==='new-task'){const id=newTask();if(id){openTask(id);setTimeout(()=>$('.d-name')?.focus(),30)}}
   else if(x.act==='open-settings')openSettings();
   else if(x.act==='stickers')openStickers();
+  else if(x.act==='profile')openProfile();
   else if(x.act==='path'){notePathOpen(x.p);location.href=pathOpenUrl(x.p)}
 }
 /* "Assigned 12 days ago" under the dates (or how long a finished task took) */
@@ -5477,6 +5508,62 @@ function catPeek(){
   },60);
 }
 
+
+/* ================= profile (avatar button top right): you, your jobs, pay and your week, in a Settings-style dialog =================
+   Read-only overview built from each job's Work details (workOf) and invoices; editing goes through the job's own dialog. */
+let PRF=null;
+const meName=()=>String(appSettings().greetName||B.name||'').trim();
+const meInitials=()=>{const n=meName();return n?n.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase():''};
+function meAvatar(size){const s=B.avatar?`<img src="${esc(B.avatar)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:'';return `<span class="me-av" style="--s:${size}px">${s}<b>${esc(meInitials())||PERSON_IC}</b></span>`}
+const PERSON_IC='<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="5.5" r="2.8"/><path d="M2.8 14c.6-2.8 2.7-4.3 5.2-4.3s4.6 1.5 5.2 4.3"/></svg>';
+function renderMeBtn(){const b=$('#me-btn');if(!b)return;const k=[B.avatar,meInitials()].join('|');if(b._k===k)return;b._k=k;b.innerHTML=meAvatar(30)}
+/* about how much a job pays in a month, in its own currency (null when it can't be told, e.g. per project) */
+function payMonthly(job){
+  const w=workOf(job),p=w.pay||{},a=parseFloat(p.amount);if(!a)return null;
+  const days=(w.days||[]).length,hrs=weeklyHours(w);
+  switch(p.period||'month'){case 'month':return a;case 'week':return a*52/12;case 'day':return days?a*days*52/12:null;case 'hour':return hrs?a*hrs*52/12:null;case 'video':return a*deliveredIn(job.id,today().slice(0,7)).length;default:return null}
+}
+const jobHoursDay=w=>{let h=parseFloat(w.hours)||0;if(!h&&w.shiftStart&&w.shiftEnd){const [a,b]=[w.shiftStart,w.shiftEnd].map(x=>{const [hh,mm]=String(x).split(':').map(Number);return hh*60+(mm||0)});h=((b-a+1440)%1440||1440)/60}return h};
+function openProfile(sec){PRF={sec:sec||'me',mv:sec?'sec':'list'};renderProfile();$('#modal').hidden=false;closeSide()}
+function closeProfile(){PRF=null;$('#modal').hidden=true;$('#modal').innerHTML=''}
+function renderProfile(){
+  if(!PRF)return;
+  const jobs=jobsSorted().filter(j=>!j.example||Object.values(S.jobs).every(x=>x.example)),t0=today(),ym=t0.slice(0,7),yr=t0.slice(0,4);
+  const ts=Object.values(S.tasks).filter(t=>!t._draft&&!t.deleted&&S.jobs[t.jobId]);
+  const doneM=ts.filter(t=>(t.doneAt||'').slice(0,7)===ym).length,doneY=ts.filter(t=>(t.doneAt||'').slice(0,4)===yr).length,open=ts.filter(t=>!isClosed(t)&&!t.archived).length;
+  const pom=ts.reduce((n,t)=>n+(+t.pomos||0),0),stk=stickersGot().length,ncl=jobs.reduce((n,j)=>n+(j.type==='agency'?shownClients(j.id).length:0),0);
+  const tile=(n,l)=>`<div class="pf-tile"><b>${n}</b><small>${l}</small></div>`;
+  const h=homeCur();
+  /* pay rows */
+  const rows=jobs.map(j=>{const w=workOf(j),m=payMonthly(j),cur=w.pay?.currency||'USD';return {j,w,m,cur,mh:m==null?null:h?toHome(m,cur):m}});
+  const byCur={};rows.forEach(r=>{if(r.m!=null)byCur[r.cur]=(byCur[r.cur]||0)+r.m});
+  const homeTot=h?rows.reduce((a,r)=>r.m==null?a:(a==null||r.mh==null?null:a+r.mh),0):null;
+  const inv=jobs.flatMap(j=>(j.invoices||[]).map(v=>({...v,currency:v.currency||workOf(j).pay?.currency||'USD'})));
+  const sumSt=(st,f)=>{const out={};for(const v of inv){if(v.status!==st||v.amount===''||v.amount==null||!f(v))continue;out[v.currency]=(out[v.currency]||0)+(+v.amount||0)}return out};
+  const fmtCurs=o=>Object.entries(o).map(([c,n])=>money(n,c)).join(' + ')||'—';
+  const toH=o=>{if(!h)return null;let t=0;for(const [c,n] of Object.entries(o)){const x=toHome(n,c);if(x==null)return null;t+=x}return t};
+  const paidY=sumSt('paid',v=>(v.paidAt||v.date||'').startsWith(yr)),waiting=sumSt('sent',()=>true);
+  const curSel=`<label class="inv-cur">Totals in<select class="sel" data-act="home-cur" aria-label="Show totals in"><option value="">Each job's currency</option>${[...new Set([...CURRENCIES,h].filter(Boolean))].map(x=>`<option ${x===h?'selected':''}>${esc(x)}</option>`).join('')}</select></label>`;
+  /* week */
+  const week=DAY_ORDER.map(d=>{const on=jobs.filter(j=>(workOf(j).days||[]).map(Number).includes(d));return {d,on,hrs:on.reduce((a,j)=>a+jobHoursDay(workOf(j)),0)}});
+  const wkTot=week.reduce((a,x)=>a+x.hrs,0);
+  const secs=[
+    {id:'me',label:'You',icon:PERSON_IC,html:`<div class="pf-me">${meAvatar(64)}<div><h4>${esc(meName()||'Your name')}</h4>${B.email?`<p class="hint">${esc(B.email)}</p>`:''}${meName()?'':`<p class="hint">Add your name in Settings → Personalize & fun.</p>`}</div></div>
+      <div class="pf-tiles">${tile(jobs.length,jobs.length===1?'job':'jobs')}${tile(ncl,ncl===1?'client':'clients')}${tile(open,'open tasks')}${tile(doneM,'done this month')}${tile(doneY,`done in ${yr}`)}${tile(pom,'focus sessions')}${tile(`${stk}/${STICKERS.length}`,'stickers')}${tile(wkTot?fmtNum(wkTot)+' h':'—','scheduled a week')}</div>
+      <div class="pf-btns"><button type="button" class="btn sm" data-act="stk-open">Sticker book</button><button type="button" class="btn sm" data-act="open-settings">Settings</button></div>`},
+    {id:'jobs',label:'My jobs',icon:I.briefcase,html:jobs.length?jobs.map(j=>{const nOpen=ts.filter(t=>t.jobId===j.id&&!isClosed(t)&&!t.archived).length;return `<div class="pf-job" style="--jc:${esc(j.color||'var(--accent)')}"><div class="pf-job-h">${jobMark(j,26)}${jobEmoji(j)}<div class="pf-jn"><b>${esc(j.name)}</b><small>${j.type==='agency'?`Agency · ${shownClients(j.id).length} client${shownClients(j.id).length===1?'':'s'}`:'Direct client'} · ${nOpen} open</small></div><button type="button" class="btn sm" data-act="prf-job" data-id="${j.id}">Open details</button></div>${workCard(j)}</div>`}).join(''):'<p class="hint">No jobs yet.</p>'},
+    {id:'pay',label:'Pay',icon:'<svg class="i" viewBox="0 0 16 16"><rect x="1.8" y="4" width="12.4" height="8.5" rx="1.5"/><circle cx="8" cy="8.2" r="1.8"/></svg>',html:`<div class="pf-pay-top">${curSel}</div>
+      <div class="pf-tiles">${tile(h&&homeTot!=null?money(homeTot,h):fmtCurs(byCur),'about a month')}${tile(h&&homeTot!=null?money(homeTot*12,h):Object.keys(byCur).length?fmtCurs(Object.fromEntries(Object.entries(byCur).map(([c,n])=>[c,n*12]))):'—','about a year')}${tile(h&&toH(paidY)!=null?money(toH(paidY),h):fmtCurs(paidY),`paid in ${yr} (invoices)`)}${tile(h&&toH(waiting)!=null?money(toH(waiting),h):fmtCurs(waiting),'sent, waiting')}</div>
+      <div class="pf-table">${rows.map(r=>`<div class="pf-tr"><span class="pf-tj">${jobMark(r.j,18)}${esc(r.j.name)}</span><span>${esc(payLabel(r.w.pay)||'—')}</span><span class="pf-num">${r.m==null?'—':money(r.m,r.cur)+' / mo'}${r.m!=null&&h&&h!==r.cur&&r.mh!=null?`<small>≈ ${money(r.mh,h)}</small>`:''}</span><span class="pf-sub">${[r.w.pay?.payday?`Paid ${esc(r.w.pay.payday)}`:'',r.w.pay?.method?`via ${esc(r.w.pay.method)}`:''].filter(Boolean).join(' ')||''}</span></div>`).join('')}</div>
+      <p class="hint">Monthly amounts are worked out from each job's pay in Work details (weekly × 52 ÷ 12, daily and hourly from your schedule, per video from this month's finished videos). Per-project pay isn't counted.</p>`},
+    {id:'week',label:'My week',icon:I.cal,html:`<p class="hint">${wkTot?`${fmtNum(wkTot)} hours scheduled a week across ${jobs.filter(j=>(workOf(j).days||[]).length).length} jobs.`:'Add work days and hours in each job’s Work details to see your week here.'}</p>
+      <div class="pf-week">${week.map(x=>`<div class="pf-day ${x.on.length?'':'off'} ${new Date().getDay()===x.d?'today':''}"><b>${WEEKDAY[x.d]}</b><small>${x.hrs?fmtNum(x.hrs)+' h':'Off'}</small>${x.on.map(j=>{const w=workOf(j);return `<span class="pf-shift" style="--jc:${esc(j.color||'var(--accent)')}" title="${esc(j.name)}"><span class="pf-sn">${esc(j.name)}</span>${w.shiftStart&&w.shiftEnd?`<em>${esc(fmtClock(w.shiftStart))}–${esc(fmtClock(w.shiftEnd))}</em>`:jobHoursDay(w)?`<em>${fmtNum(jobHoursDay(w))} h</em>`:''}</span>`}).join('')}</div>`).join('')}</div>`}
+  ];
+  keepScroll('#modal',()=>{$('#modal').innerHTML=`<div class="modal pref-modal pf-modal" role="dialog" aria-modal="true" aria-labelledby="pf-title">
+    <header><h2 id="pf-title">Profile</h2><button class="icon-btn" data-act="prf-close" aria-label="Close" title="Close">${I.x}</button></header>
+    ${prefLayout('p',PRF.sec,secs)}
+    <footer><span></span><div style="display:flex;gap:8px"><button type="button" class="btn s-back" data-act="pref-back" data-key="p">${I.left}Back</button><button type="button" class="btn s-cancel" data-act="prf-close">Close</button></div></footer></div>`});
+}
 /* ================= sticker book: milestone stickers (settings/app.stickers {id: 'YYYY-MM-DD'}) =================
    Earned once and kept. Most are worked out from your data (stickerScan); Night owl is awarded when a task
    is finished late at night; Clean week counts days in a row the app saw nothing overdue (settings/app.clearRun). */
@@ -5830,6 +5917,7 @@ const HELP=[
  ['Getting work done','Recent project folders',`On your Mac, quick search (⌘K) lists the last 5 project folders you opened from the app, from tasks, jobs or notes. Pick one to open it in Finder again; type to search older ones by task, job or folder name.`,null],
  ['Look and feel','Your cat, your desk',`Name the office cat and pick its fur (orange, black, white, grey, calico or tuxedo) in Settings → Personalize & fun; its name shows when you hover over it. Under Your desk you can add a pixel you beside the cat (pick hair, hair color, skin tone and hoodie): you wear headphones and type during a focus session and stretch through breaks. Desk items sit on the sill too: a coffee mug that steams during focus and refills after each session, a desk lamp that comes on at 6 pm (click to switch it), a camera (click to take a picture) and a record player that spins while the timer runs.`,['fun','Personalize & fun']],
  ['Look and feel','Sticker book',`You earn stickers for milestones: your first finished task, 10, 50, 100 and 250 done, finishing early, five in one day, surviving three revision rounds, a clean week with nothing overdue, focus sessions, a late-night finish, getting paid, and more. The newest show on the cork board; click them (or open Settings → Personalize & fun → Sticker book, or search “stickers” with ⌘K) to see the whole book. Tap a sticker to see when you earned it.`,['fun','Personalize & fun']],
+ ['Your work','Profile',`The round picture at the top right opens your profile: you (your tasks done this month and year, focus sessions, stickers, hours a week), your jobs with their schedule, pay, location and contact, your pay (about how much a month and a year, what's been paid this year and what's still waiting, in one currency if you pick one under Totals in) and your week (which job you work each day and when). It reads from each job's Work details: edit those with Open details.`,null],
  ['Your work','Job emoji',`Give a job an emoji in Edit job → General. It shows next to the job in the sidebar, on its Overview card and in notifications.`,null],
  ['Look and feel','Little extras',`An “All clear” moment on the Overview when nothing is overdue or due today; emoji reactions on client updates (the smiley under an update); film-look color schemes (Portra, Fuji, Noir, Teal & Orange, Technicolor); the office cat on the sidebar (it wears headphones and nods along during a focus session, naps during breaks and when you're away, stretches when you finish a task, and purrs when you click it; a little window behind it shows the sky for your time of day, and it dresses up in December, on New Year's Day and on Halloween; it sweats when something's overdue, smiles on all-clear days and watches your mouse; a plant on the sill grows a leaf per task done this month; birds and butterflies drop by; now and then it naps on one of your tasks until you open it; it peeks over the updates you post; a treat jar fills with a treat per finished task (click it to feed the cat); and after 30 days a puppy, hamster or goldfish can join it on the sill); a cork board in the sidebar with your photos and sticky notes (click + to pin one, click a note to edit it); a photo strip of your own pictures in the sidebar (add them in Settings → Personalize & fun); and seasonal touches: a Christmas countdown from September, snow in December, fireworks on New Year's Day, bats on Halloween and hearts on Valentine's. Turn them off in Settings → Personalize & fun.`,['fun','Personalize & fun']],
  ['Getting work done','Installed app (Chrome)',`Install Splice & Co. from Chrome's address bar (the install icon) to get its own window and Dock icon. The Dock icon shows how many tasks are overdue or due today; right-click it for New task, Overview, Calendar and Quick search. The app's colors reach into the title bar (Chrome's chevron at the top right switches that off). To have task links from Slack or email open in the app, turn on "Open supported links" in the app's settings (⋮ menu in the app window → App info or Settings).`,null],
@@ -6172,6 +6260,7 @@ function dropImage(v){
 /* ================= job modal ================= */
 let M=null;
 function openJobModal(id){
+  PRF=null;
   const j=id?S.jobs[id]:null;
   M={sec:'general',id:id||null,name:j?.name||'',type:j?.type||'agency',color:j?.color||COLORS[Object.keys(S.jobs).length%COLORS.length],
     tools:{comms:'Slack',tracker:'ClickUp',upload:'Frame.io',storage:'Google Drive',...(j?.tools||{})},
@@ -6190,6 +6279,7 @@ if(BM){closeBrand();return}
 }
 let SM=null;
 function openSettings(){
+  PRF=null;
   const a=appSettings();
   SM={sec:'appearance',statuses:STATUSES.map(x=>({...x})),stMoves:{},stArm:null,stPick:null,stTo:null,restore:null,name:a.name||'',logo:a.logo||null,theme:a.theme||'system',scheme:a.scheme||'splice',textSize:+a.textSize||1,density:a.density||'comfortable',...Object.fromEntries(Object.keys(PREF_DEF).map(k=>[k,a[k]!==undefined&&a[k]!==null?a[k]:PREF_DEF[k]])),dayLimit:dayLimit(),holidays:[...holidayCountries()],holAuto:!Array.isArray(a.holidays),imp:null,impJob:S.jobs[S.ui.tab]?S.ui.tab:(jobsSorted()[0]?.id||''),orig:a.logo||null,uploaded:[],busy:false};
   CAL.disArmed=false;if(B.mode==='cloud'&&B.cfg.calendar)calStatus();
@@ -6784,13 +6874,13 @@ const PREF_SUBS={m:{general:'Name, logo, type and color',clients:'Agency clients
 function prefLayout(key,active,sections,tag='div',attrs=''){
   if(!sections.some(x=>x.id===active))active=sections[0].id;
   /* Settings on a phone: a Slack-style grouped list first, then one section at a time with a back button */
-  const st={s:SM,m:M,b:BM}[key],mlist=!!st&&st.mv!=='sec';let g='';
+  const st={s:SM,m:M,b:BM,p:PRF}[key],mlist=!!st&&st.mv!=='sec';let g='';
   sections.forEach(x=>{if(!x.sub&&PREF_SUBS[key]?.[x.id])x.sub=PREF_SUBS[key][x.id]});
   return `<${tag} class="pref pref-s ${mlist?'m-list':''}" ${attrs}><nav class="pref-nav" role="tablist" aria-label="Sections">${sections.map(x=>`${x.group&&x.group!==g?`<p class="pref-g">${esc(g=x.group)}</p>`:''}<button type="button" role="tab" data-act="pref-sec" data-key="${key}" data-sec="${x.id}" class="${x.id===active?'on':''}" aria-selected="${x.id===active}">${x.icon||''}<span>${x.label}${x.sub?`<em class="pn-sub">${esc(x.sub)}</em>`:''}</span>${x.badge?`<small>${x.badge}</small>`:''}<i class="pn-chev" aria-hidden="true">›</i></button>`).join('')}</nav>
     <div class="pref-body">${sections.map(x=>`<section class="pref-sec" data-sec="${x.id}" role="tabpanel" ${x.id===active?'':'hidden'}><h3 class="pref-h">${x.label}</h3>${x.html}</section>`).join('')}${key==='b'?`<label class="bm-note">What changed? (optional, goes in the change log)<input type="text" data-bm-note data-fk="bm-note" value="${esc(BM.note)}" placeholder="e.g. New end card from October"></label>`:''}</div></${tag}>`;
 }
 function showPrefSec(el){
-  const st={s:SM,m:M,b:BM}[el.dataset.key];if(st){st.sec=el.dataset.sec;st.mv='sec'}
+  const st={s:SM,m:M,b:BM,p:PRF}[el.dataset.key];if(st){st.sec=el.dataset.sec;st.mv='sec'}
   const box=el.closest('.pref');if(!box)return;box.classList.remove('m-list');
   box.querySelectorAll('.pref-nav button').forEach(b=>{const on=b===el;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
   box.querySelectorAll('.pref-sec').forEach(x=>x.hidden=x.dataset.sec!==el.dataset.sec);
@@ -7200,6 +7290,9 @@ document.addEventListener('click',e=>{
     case 'inv-del':{const job=S.jobs[u.tab],id=el.dataset.id;if(!job)break;if(invDelArmed!==id){invDelArmed=id;render();setTimeout(()=>{if(invDelArmed===id){invDelArmed=null;render()}},4000);break}
       invDelArmed=null;const v=(job.invoices||[]).find(x=>x.id===id);invSave(job,(job.invoices||[]).filter(x=>x.id!==id));if(v?.file?.v)setTimeout(()=>dropImage(v.file.v),300);logAct('job',`Invoice ${v?.number||''} deleted (${job.name})`,{jobId:job.id});toast('Invoice deleted');render();break}
     case 'inv-close': closeInv();break;
+    case 'profile': openProfile();break;
+    case 'prf-close': closeProfile();break;
+    case 'prf-job': {const id=el.dataset.id;closeProfile();u.from=u.tab;u.tab=id;u.client='all';u.pane='details';saveUi();render();window.scrollTo({top:0});break}
     case 'row-edit': {const id=el.dataset.id;if(ROW_EDIT.has(id))ROW_EDIT.delete(id);else ROW_EDIT.add(id);invDelArmed=null;docDelArmed=null;render();break}
     case 'inv-save': invCommit();closeInv();toast('Invoice saved');render();break;
     case 'inv-save-pdf':{const d=INV.d;invCommit();closeInv();render();invPrint(d);break}
@@ -7279,7 +7372,7 @@ document.addEventListener('click',e=>{
     case 'cat-feed': catFeed();break;
     case 'pet-poke': petPoke();break;
     case 'sill-me': case 'sill-mug': case 'sill-lamp': case 'sill-cam': case 'sill-vinyl': sillClick(a.slice(5));break;
-    case 'stk-open': if(SM)closeSettings(true);openStickers(el.dataset.id);break;
+    case 'stk-open': if(SM)closeSettings(true);if(PRF)PRF=null;openStickers(el.dataset.id);break;
     case 'stk-close': closeStickers();break;
     case 'stk-pick': if(STKB){STKB.sel=STKB.sel===el.dataset.id?null:el.dataset.id;renderStickers()}break;
     case 'm-emoji': M.emoji=el.dataset.e;renderModal();break;
@@ -7414,7 +7507,7 @@ document.addEventListener('click',e=>{
     case 'setup-local': $('#auth').hidden=true;$('#auth').innerHTML='';$('.app').hidden=false;localBoot();break;
     case 'auth-reset': showAuth({sent:null,error:''});$('#auth-email')?.focus();break;
     case 'pref-sec': showPrefSec(el);break;
-    case 'pref-back': {const st={s:SM,m:M,b:BM}[el.dataset.key];if(st){st.mv='list';$('#modal .pref-s')?.classList.add('m-list');$('#modal .pref-nav')?.scrollTo(0,0)}break}
+    case 'pref-back': {const st={s:SM,m:M,b:BM,p:PRF}[el.dataset.key];if(st){st.mv='list';$('#modal .pref-s')?.classList.add('m-list');$('#modal .pref-nav')?.scrollTo(0,0)}break}
     case 'st-add':{const used=new Set(SM.statuses.map(x=>x.color));SM.statuses.splice(Math.max(0,SM.statuses.findIndex(x=>x.id==='done')),0,{id:'st'+Date.now().toString(36),label:'New status',color:STATUS_COLORS.find(c=>!used.has(c))||STATUS_COLORS[0]});renderSettings();const ins=[...document.querySelectorAll('[data-st-label]')];const n=ins.find(x=>x.value==='New status');if(n){n.focus();n.select()}break}
     case 'st-move':{const i=+el.dataset.i,j=i+ +el.dataset.d,a=SM.statuses;if(j<0||j>=a.length)break;[a[i],a[j]]=[a[j],a[i]];SM.stPick=null;renderSettings();break}
     case 'st-color': SM.stPick=SM.stPick===+el.dataset.i?null:+el.dataset.i;renderSettings();break;
@@ -7459,7 +7552,7 @@ document.addEventListener('keydown',e=>{
     return;
   }
   if(e.key==='Escape'&&SEL.size&&$('#drawer').hidden&&$('#modal').hidden){clearSel();return}
-  if(e.key==='Escape'){if(POMO_OPEN){POMO_OPEN=false;renderPomo();return}if(!$('#filter-sheet').hidden){closeFilters();return}if($('#side').classList.contains('open')){closeSide();return}if(INV){closeInv();return}if(STKB){closeStickers();return}if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
+  if(e.key==='Escape'){if(POMO_OPEN){POMO_OPEN=false;renderPomo();return}if(!$('#filter-sheet').hidden){closeFilters();return}if($('#side').classList.contains('open')){closeSide();return}if(INV){closeInv();return}if(STKB){closeStickers();return}if(PRF){closeProfile();return}if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'');
   if(e.key==='Enter'&&!typing){const r=e.target.closest?.('[data-act="open"]');if(r){openTask(r.dataset.id);return}}
   if(typing||e.metaKey||e.ctrlKey||e.altKey)return;
@@ -7503,7 +7596,7 @@ document.addEventListener('change',e=>{
   if(act==='cu-job'){cuLink(el.dataset.team,el.value);return}
   if(act==='inv-status'){invStatus(el.dataset.id,el.value);return}
   if(act==='inv-sort'){S.ui.invSort=el.value;saveUi();render();return}
-  if(act==='home-cur'){saveApp({homeCurrency:el.value});render();return}
+  if(act==='home-cur'){saveApp({homeCurrency:el.value});render();if(PRF)renderProfile();return}
   if(act==='doc-kind'){const job=S.jobs[S.ui.tab];if(job)patch('jobs',job.id,{docs:(job.docs||[]).map(d=>d.id===el.dataset.id?{...d,kind:el.value}:d)});return}
   if(el.id==='doc-file'){docUpload([...el.files]);el.value='';return}
   if(el.dataset&&el.dataset.docf){const job=S.jobs[S.ui.tab];if(job)patch('jobs',job.id,{docs:(job.docs||[]).map(d=>d.id===el.dataset.docf?{...d,name:el.value.trim()||d.name}:d)});return}
