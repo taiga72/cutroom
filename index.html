@@ -1651,7 +1651,7 @@ body.side-mini .office-cat{display:none}
 .peek-cat svg{width:25px;height:17.5px;display:block;transform:translateY(100%)}
 .cork{margin:auto 10px 8px;padding:10px 8px 12px;border-radius:8px;display:flex;flex-wrap:wrap;gap:8px 6px;justify-content:center;align-items:flex-start;
   background:#c8995f radial-gradient(circle at 20% 30%,rgba(90,50,20,.18) 0 1px,transparent 1.5px) 0 0/7px 7px;box-shadow:inset 0 0 0 3px #8a5a2b,inset 0 2px 6px rgba(0,0,0,.25)}
-.cork.with-cat{margin-bottom:56px}
+.cork.with-cat{margin-bottom:calc(var(--sillh,44px) + 12px)}
 .cork .polaroid{width:48px}.cork .polaroid img{width:40px;height:40px}
 .sticky{position:relative;width:62px;min-height:54px;padding:10px 5px 5px;transform:rotate(var(--r));box-shadow:0 2px 4px rgba(0,0,0,.22);display:flex}
 .sticky.s-yellow{background:#fff3a3}.sticky.s-pink{background:#ffc9de}.sticky.s-blue{background:#c7e5ff}.sticky.s-green{background:#cdf2c4}
@@ -1687,7 +1687,72 @@ body.side-mini .cork{display:none}
 :root[data-motion="reduce"] .ld-reel{animation:none}
 
 /* ---------- cat moods, plant, visitors, photo strip ---------- */
-.cat-sill{align-self:flex-end;position:relative;display:flex;align-items:flex-end;gap:10px;margin:-44px 14px 0 0;height:44px}
+.cat-sill{align-self:flex-end;position:relative;display:flex;flex-direction:row-reverse;flex-wrap:wrap-reverse;justify-content:flex-start;align-items:flex-start;gap:14px 6px;margin:calc(-1*var(--sillh,44px)) 14px 0 0;min-height:44px}
+.sill-shelf{position:absolute;height:3px;background:#a86b32;border-radius:1px;box-shadow:0 2px 0 rgba(0,0,0,.18);pointer-events:none}
+.sill-shelf::before,.sill-shelf::after{content:'';position:absolute;top:3px;width:2px;height:5px;background:#6e4320}.sill-shelf::before{left:4px}.sill-shelf::after{right:4px}
+.cat-sill>[hidden]{display:none!important}
+.cat-sill .office-cat{order:1}.sill-me{order:2}.sill-mug{order:3}.sill-pet{order:4}.sill-jar{order:5}.sill-plant{order:6}.sill-lamp{order:7}.sill-vinyl{order:8}.sill-cam{order:9}
+.sill-me,.sill-mug,.sill-lamp,.sill-cam,.sill-vinyl{position:relative;z-index:1;padding:0;border:0;background:none;cursor:pointer;flex:none;display:block}
+.sill-me svg{width:30px;height:37.5px;display:block;transform-origin:50% 100%}
+.sill-me .me-arms,.sill-me .me-phones{display:none}
+.sill-me.focus .me-phones,.sill-me.break .me-arms{display:inline}
+.sill-me.break .me-hands{display:none}
+.sill-me.focus .me-hands{animation:meType .5s steps(1) infinite}
+@keyframes meType{0%{transform:translateY(0)}50%{transform:translateY(-1px)}}
+.sill-me.break .me-arms{animation:meArms 1.6s ease-in-out infinite}
+@keyframes meArms{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
+.sill-me .cat-eye{transform-box:fill-box;transform-origin:center;animation:catBlink 6s infinite}
+.sill-me .cat-bubble,.sill-mug .cat-bubble,.sill-cam .cat-bubble,.sill-vinyl .cat-bubble{color:var(--accent)}
+.sill-mug{color:var(--faint)}
+.sill-mug svg{width:17.5px;height:22.5px;display:block;transform-origin:30% 100%}
+.sill-mug .mug-steam{display:none}
+.sill-mug.steam .mug-steam{display:inline;animation:steam 2.2s ease-in-out infinite}
+@keyframes steam{0%{opacity:0;transform:translateY(1px)}40%{opacity:.85}100%{opacity:0;transform:translateY(-1px)}}
+.sill-lamp svg{width:17.5px;height:30px;display:block}
+.sill-lamp.on svg{filter:drop-shadow(0 0 5px rgba(255,216,77,.75))}
+.sill-cam svg{width:20px;height:15px;display:block}
+.sill-cam .cam-rec{opacity:.35}
+.sill-cam.rec .cam-rec{opacity:1;animation:camRec 1.2s steps(1) infinite}
+@keyframes camRec{50%{opacity:.2}}
+.cam-flash{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:radial-gradient(#fff 0 35%,rgba(255,255,255,0) 70%);pointer-events:none}
+.sill-vinyl svg{width:22.5px;height:22.5px;display:block}
+.sill-vinyl .vinyl-disc{transform-box:fill-box;transform-origin:center}
+.sill-vinyl.spin .vinyl-disc{animation:reelSpin 1.8s linear infinite}
+.sill-vinyl.spin .cat-notes{display:block;left:-6px}
+.cat-sill.sleepy .sill-vinyl .vinyl-disc{animation-play-state:running}
+:root[data-motion="reduce"] .sill-me .me-hands,:root[data-motion="reduce"] .sill-me .me-arms,:root[data-motion="reduce"] .sill-me .cat-eye,:root[data-motion="reduce"] .mug-steam,:root[data-motion="reduce"] .vinyl-disc,:root[data-motion="reduce"] .cam-rec{animation:none!important}
+.fur-row,.sw-row{display:flex;flex-wrap:wrap;gap:6px}
+.fur{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 8px 5px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;font:600 calc(11px*var(--ts)) var(--body);color:var(--muted)}
+.fur svg{width:30px;height:21px;display:block}
+.fur.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);color:var(--text)}
+.sw-row .sw{width:24px;height:24px;border-radius:50%;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line);background:var(--c);cursor:pointer;padding:0}
+.sw-row .sw.on{box-shadow:0 0 0 2px var(--accent)}
+.me-prev{padding:6px 10px;border-radius:10px;background:var(--bg);border:1px solid var(--line)}
+.me-prev svg{width:48px;height:60px;display:block}
+.pref-row.pr-wrap{flex-wrap:wrap}
+.cork-stickers{display:flex;align-items:center;gap:2px;padding:3px 6px 3px 4px;border:0;border-radius:999px;background:rgba(255,255,255,.4);cursor:pointer;align-self:center}
+.cork-stickers .stk{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transform:rotate(var(--r));font-size:calc(14px*var(--ts));line-height:1}
+.cork-stickers small{font:700 calc(10.5px*var(--ts)) var(--body);color:#4a3218;margin-left:3px}
+.stk-modal{width:min(640px,100%)}
+.stk-bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin:2px 0 14px}
+.stk-bar i{display:block;height:100%;background:var(--accent);border-radius:inherit}
+.stk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+.stk-card{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:14px 8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;color:var(--text);font:inherit}
+.stk-card .stk-e{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.18),inset 0 0 0 3px #f2f2f2;font-size:calc(28px*var(--ts));line-height:1;transform:rotate(var(--r))}
+.stk-card b{font-size:calc(13px*var(--ts))}
+.stk-card small{font-size:calc(11.5px*var(--ts));color:var(--muted);line-height:1.3}
+.stk-card.locked .stk-e{filter:grayscale(1);opacity:.35;box-shadow:none;background:var(--bg);transform:none}
+.stk-card.locked b{color:var(--muted)}
+.stk-card.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.stk-card.got.sel small{color:var(--accent);font-weight:600}
+.stk-lock{position:absolute;right:8px;top:6px;font-size:calc(12px*var(--ts));opacity:.6}
+.j-emo{flex:none;font-size:calc(14px*var(--ts));line-height:1}
+.job-card h3 .j-emo{font-size:calc(17px*var(--ts))}
+body.side-mini .nav-item .j-emo{display:none}
+.emo-row{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.emo-in{width:64px!important;text-align:center;font-size:calc(18px*var(--ts))!important}
+.emo{width:34px;height:34px;border:1px solid var(--line);border-radius:8px;background:var(--surface);cursor:pointer;font-size:calc(17px*var(--ts));line-height:1;padding:0}
+.emo.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .cat-sill .office-cat{margin:0}
 .sill-plant{width:22px;height:40px;display:block;position:relative;z-index:1}
 .sill-plant svg{width:22.5px;height:40px;display:block}
@@ -1702,7 +1767,7 @@ body.side-mini .cork{display:none}
 .visitor.v-butterfly svg{width:12.5px;height:10px;display:block;animation:flap .25s steps(2) infinite}
 @keyframes flap{50%{transform:scaleX(.4)}}
 .photo-strip{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;padding:4px 4px 10px;margin-top:auto}
-.photo-strip.with-cat{padding-bottom:60px}
+.photo-strip.with-cat{padding-bottom:calc(var(--sillh,44px) + 16px)}
 .photo-strip + .side-foot{margin-top:0}
 .polaroid{width:52px;padding:4px 4px 12px;background:#fff;border:0;border-radius:2px;box-shadow:0 2px 6px rgba(0,0,0,.18);transform:rotate(var(--r));transition:transform .2s ease;cursor:zoom-in}
 .polaroid img{width:44px;height:44px;object-fit:cover;display:block;background:#ddd}
@@ -2470,7 +2535,7 @@ const MONTH_FULL=['January','February','March','April','May','June','July','Augu
 const PREF_DEF={dateRel:false,dateFmt:'md',weekStart:'mon',hideWeekends:false,confetti:true,motion:'system',contrast:'normal',trashDays:30,darkShade:'standard',pillStyle:'tint',tips:true,
   iconWeight:'regular',depth:'soft',sideStyle:'colored',thinScroll:false,toastPos:'bottom',nameWrap:false,doneStyle:'struck',overdueTint:false,statusIcons:false,prioColors:{},logoShape:'rounded',numFont:'mono',readSpacing:'normal',sideCounts:true,
   compactHeader:false,greeting:true,greetName:'',drawerBand:true,boardTint:false,dueStyle:'text',jobProgress:'bar',calGrid:'lines',todayMark:'dot',
-  pomoFocus:25,pomoShort:5,pomoLong:15,pomoEvery:4,pomoAutoBreak:false,pomoAutoFocus:false,pomoSound:'chime',pomoPopup:false,allClear:true,seasonal:true,officeCat:true,catSky:true,catPlant:true,plantGoal:20,catVisitors:true,catNaps:true,catTreats:true,catPeek:true,sillPet:'none',corkBoard:true,autoArchive:0};
+  pomoFocus:25,pomoShort:5,pomoLong:15,pomoEvery:4,pomoAutoBreak:false,pomoAutoFocus:false,pomoSound:'chime',pomoPopup:false,allClear:true,seasonal:true,officeCat:true,catSky:true,catPlant:true,plantGoal:20,catVisitors:true,catNaps:true,catTreats:true,catPeek:true,sillPet:'none',corkBoard:true,catName:'',catFur:'orange',meShow:false,meHair:'short',meHairCol:'#3b2a20',meSkin:'#f1c27d',meTop:'#4c8dff',deskMug:true,deskLamp:true,deskCam:false,deskVinyl:false,stickerShow:true,autoArchive:0};
 const pref=k=>{let o=null;try{o=SM}catch(e){/* Settings state not set up yet */}o=o||S.settings?.app||{};return o[k]!==undefined&&o[k]!==null?o[k]:PREF_DEF[k]};
 const reducedMotion=()=>pref('motion')==='reduce'||matchMedia('(prefers-reduced-motion:reduce)').matches;
 function absDate(s){
@@ -2512,6 +2577,8 @@ function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 const imgSrc=v=>{if(!v)return null;v=String(v);if(v.startsWith('data:'))return v;if(v.startsWith('sb:'))return B.cfg?`${B.cfg.supabaseUrl}/storage/v1/object/public/pictures/${v.slice(3).split('/').map(encodeURIComponent).join('/')}`:null;return '/_blob/'+v};
 const initials=n=>String(n||'').trim().split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?';
 const jobMark=(j,size)=>{const s=imgSrc(j?.logo);return s?`<img class="logo" style="--s:${size}px" src="${esc(s)}" alt="" onerror="this.remove()">`:`<span class="dot" style="background:${esc(j?.color)}"></span>`};
+const jobEmoji=j=>j?.emoji?`<span class="j-emo" aria-hidden="true">${esc(j.emoji)}</span>`:'';
+const JOB_EMOJI=['🎬','🎞️','🎥','📹','✂️','🎧','📱','💼','☕','🚀','⭐','🔥','🌴','🌸','🐱','🎨'];
 const clientMark=(c,size)=>{const s=imgSrc(c?.logo);return s?`<img class="logo" style="--s:${size}px" src="${esc(s)}" alt="" onerror="this.remove()">`:''};
 const safeUrl=u=>{u=String(u||'').trim();if(!u)return '';if(!/^[a-z][a-z0-9+.-]*:/i.test(u))u='https://'+u;return /^https?:/i.test(u)?u:''};
 /* Finder paths. Browsers won't open file:// links from a website, so on a Mac a path opens through the
@@ -3496,7 +3563,7 @@ function render(){
   document.title=(a.name||'').trim()||APP_NAME;pomoTitle();
   const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
   withFocus(()=>{renderSide();renderMain()});
-  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();renderUpNextPage();boardRestore();document.body.classList.toggle('cal-page',S.ui.view==='calendar'&&!['archived','activity','trash','help','resume','upnext'].includes(S.ui.tab));
+  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();stickerSoon();renderUpNextPage();boardRestore();document.body.classList.toggle('cal-page',S.ui.view==='calendar'&&!['archived','activity','trash','help','resume','upnext'].includes(S.ui.tab));
   if(S.ready&&!SEASON_RAN){SEASON_RAN=true;setTimeout(()=>seasonFx(),900)}
 }
 
@@ -3513,7 +3580,7 @@ function renderSide(){
   <nav class="nav jobs" id="nav-jobs" aria-label="Jobs" ${jobsOpen?'':'hidden'}>`;
   for(const j of jobsSorted()){
     const on=u.tab===j.id;
-    html+=`<div class="nav-row" draggable="true" data-job="${j.id}"><button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}" ${u.sideMini?`title="${esc(j.name)}"`:''}>${jobMark(j,18)}<span class="name">${esc(j.name)}</span>${shiftDot(j)}<span class="count">${openCount(j.id)}</span></button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.pencil}</button></div>`;
+    html+=`<div class="nav-row" draggable="true" data-job="${j.id}"><button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}" ${u.sideMini?`title="${esc(j.name)}"`:''}>${jobMark(j,18)}${jobEmoji(j)}<span class="name">${esc(j.name)}</span>${shiftDot(j)}<span class="count">${openCount(j.id)}</span></button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.pencil}</button></div>`;
   }
   html+=`<button class="nav-item nav-new" data-act="new-job"${tt('New job')}>${I.plus}<span class="name">New job</span></button></nav>
   <nav class="nav" aria-label="More"><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived"${tt('Archived')}>${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item ${u.tab==='activity'?'on':''}" data-act="nav" data-tab="activity"${tt('Activity')}>${I.clock}<span class="name">Activity</span></button><button class="nav-item ${u.tab==='trash'?'on':''}" data-act="nav" data-tab="trash"${tt('Trash')}>${I.trash}<span class="name">Trash</span><span class="count">${S.ready&&trashed().length?trashed().length:''}</span></button></nav>
@@ -3832,7 +3899,7 @@ function jobCard(j){
     prog=`<div class="jring-row"><span class="jring" style="background:${segs.length?`conic-gradient(${segs.join(',')})`:'var(--surface-2)'}"><b>${pct}%</b></span><span>${dn} of ${ts.length} done</span></div>`}
   else if(jp!=='numbers')prog=`<div class="stack">${bar}</div>`;
   return `<div class="job-wrap"><button class="job-card" data-act="nav" data-tab="${j.id}">
-    <h3>${jobMark(j,24)}<span class="jn">${esc(j.name)}</span></h3>
+    <h3>${jobMark(j,24)}${jobEmoji(j)}<span class="jn">${esc(j.name)}</span></h3>
     <div class="meta jm-type">${j.type==='agency'?`Agency · ${cl} client${cl===1?'':'s'}`:'Direct client'} · ${esc(j.tools?.comms||'')} · ${esc(j.tools?.upload||'')}</div>
     ${prog}
     <div class="meta">${st.open} open${st.overdue?` · <span style="color:var(--danger);font-weight:600">${st.overdue} overdue</span>`:''}${st.revisions?` · ${st.revisions} in revisions`:''}</div>
@@ -4035,7 +4102,7 @@ function saveNotes(){
 function notifications(all){
   const t0=today(),out=[],lim=dayLimit();
   const open=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t));
-  const who=t=>{const c=S.clients[t.clientId],j=S.jobs[t.jobId];return c?`${j.name} · ${c.name}`:j.name};
+  const who=t=>{const c=S.clients[t.clientId],j=S.jobs[t.jobId];return (j.emoji?j.emoji+' ':'')+(c?`${j.name} · ${c.name}`:j.name)};
   const steps=t=>{const c=t.checklist||[],left=c.filter(x=>!x.done).length;return left?`${left} of ${c.length} checklist step${c.length===1?'':'s'} left.`:''};
   for(const t of open){
     const nm=`“${t.name||'Untitled task'}”`;
@@ -4431,6 +4498,7 @@ function jumpItems(q){
   if(IS_MAC){(lsGet(LS_PATHS)||[]).slice(0,q?8:5).forEach((x,k)=>{const sc=q?Math.max(score(x.label),score(pathName(x.p)),score(x.sub)*.6):1;if(sc)out.push({grp:'Recent folders',sc:q?sc+.1:8-k*.1,icon:I.folder,label:x.label===pathName(x.p)?x.label:`${x.label} · ${pathName(x.p)}`,sub:['Recent folder',x.sub].filter(Boolean).join(' · '),act:'path',p:x.p})})}
   if(!q||score('new task'))out.push({grp:'Actions',sc:q?3:.9,icon:I.plus,label:'New task',sub:'Action',act:'new-task'});
   if(q&&score('settings'))out.push({sc:3,icon:I.gear,label:'Settings',sub:'Action',act:'open-settings'});
+  if(q&&(score('sticker book')||score('stickers')))out.push({sc:3,icon:'<span aria-hidden="true">🏅</span>',label:'Sticker book',sub:'Action',act:'stickers'});
   for(const j of jobsSorted()){const sc=score(j.name);if(sc)out.push({sc:sc+.4,icon:jobMark(j,16),label:j.name,sub:j.type==='agency'?'Agency':'Direct client',act:'nav',tab:j.id})}
   for(const c of Object.values(S.clients)){const sc=score(c.name);if(sc)out.push({sc:sc+.3,icon:clientMark(c,16),label:c.name,sub:`Client · ${S.jobs[c.jobId]?.name||''}`,act:'nav',tab:c.jobId,client:c.id})}
   if(q)for(const t of Object.values(S.tasks)){if(t._draft||t.deleted)continue;const sc=Math.max(score(t.name),score(S.clients[t.clientId]?.name)*.6);if(sc)out.push({sc:sc+(t.archived?0:isClosed(t)?.05:.2),icon:`<span class="jdot" ${pillStyle(stOf(t))}></span>`,label:t.name||'Untitled task',sub:[S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name,t.archived?'Archived':stLabel(stOf(t))].filter(Boolean).join(' · '),act:'open',id:t.id})}
@@ -4507,6 +4575,7 @@ function jumpGo(k){
   else if(x.act==='open')openTask(x.id);
   else if(x.act==='new-task'){const id=newTask();if(id){openTask(id);setTimeout(()=>$('.d-name')?.focus(),30)}}
   else if(x.act==='open-settings')openSettings();
+  else if(x.act==='stickers')openStickers();
   else if(x.act==='path'){notePathOpen(x.p);location.href=pathOpenUrl(x.p)}
 }
 /* "Assigned 12 days ago" under the dates (or how long a finished task took) */
@@ -4972,6 +5041,7 @@ function setStatus(id,st,o={}){
   if(st==='done') p.doneAt=today(); else if(t.doneAt) p.doneAt=null;
   patch('tasks',id,p);
   if(st==='done'&&!o.quiet&&!t._draft){celebrate();haptic(15)}
+  if(st==='done'&&!t._draft&&!t.example){const h=new Date().getHours();if(h>=23||h<4)setTimeout(()=>stickerCheck({night:today()}),400)}
   if(!o.quiet&&!t._draft)toast(`${t.name?`“${t.name.length>40?t.name.slice(0,39)+'…':t.name}” → `:'Moved to '}${stLabel(st)}${p.revision?` · round R${p.revision}`:''}`,{label:'Undo',fn:()=>undoStatus([[id,prev]])});
   return prev;
 }
@@ -5018,7 +5088,7 @@ function seasonFx(force){
    (celebrate() calls catStretch); purrs when clicked. One element (CAT) is moved back into each redrawn sidebar. */
 let CAT=null,CAT_PM='',CAT_WAKE=0,CAT_ACT=Date.now(),CAT_OVER=0,VISITOR=null;
 const CAT_PAL={o:'#e8964a',d:'#b8651f',e:'#1b1b1b',p:'#ff8fa3',w:'#fff4e6',k:'#5a3a22',R:'#d62839',W:'#ffffff',Y:'#f5c542',B:'#4c8dff',K:'#262130',V:'#8e4bd6',b:'#a86b32',n:'#6e4320',E:'#1b1b1b',h:'#e8b86a',c:'#fff1dc',g:'#cfe8f5',G:'#8fbfdc',f:'#ff8a1f',F:'#d95a00',q:'#9fd4f2',s:'#e3cf9a',L:'#3aa655',T:'#c0392b',r:'#f5b041'};
-function pixSvg(rows,cls,extra=''){let r='',eyes='';rows.forEach((row,y)=>{for(let x=0;x<row.length;x++){const c=row[x];if(c==='.')continue;if(c==='e'){r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${CAT_PAL.o}"/>`;eyes+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${CAT_PAL.e}" class="cat-eye"/>`;continue}let n=1;while(row[x+n]===c)n++;r+=`<rect x="${x}" y="${y}" width="${n}" height="1" fill="${CAT_PAL[c]}"/>`;x+=n-1}});return `<g class="${cls}">${r}${extra}${eyes?`<g class="cat-eyes">${eyes}</g>`:''}</g>`}
+function pixSvg(rows,cls,extra='',pal=CAT_PAL){let r='',eyes='';rows.forEach((row,y)=>{for(let x=0;x<row.length;x++){const c=row[x];if(c==='.')continue;if(c==='e'){r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${pal.o}"/>`;eyes+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${pal.e}" class="cat-eye"/>`;continue}let n=1;while(row[x+n]===c)n++;r+=`<rect x="${x}" y="${y}" width="${n}" height="1" fill="${pal[c]}"/>`;x+=n-1}});return `<g class="${cls}">${r}${extra}${eyes?`<g class="cat-eyes">${eyes}</g>`:''}</g>`}
 const px1=(x,y,c,cls)=>`<rect x="${x}" y="${y}" width="1" height="1" fill="${c}"${cls?` class="${cls}"`:''}/>`;
 /* mood overlays: sweat drop when something is overdue, smile + blush on an all-clear day */
 const CAT_SIT_MOOD=`<g class="cat-sweat">${px1(10,2,'#6cc4ff')}${px1(9,3,'#6cc4ff')}${px1(10,3,'#6cc4ff')}</g><g class="cat-smile">${px1(4,6,CAT_PAL.k)}${px1(6,6,CAT_PAL.k)}${px1(5,7,CAT_PAL.k)}${px1(3,5,'#ff9db0')}${px1(7,5,'#ff9db0')}</g>`;
@@ -5027,6 +5097,11 @@ const CAT_PHONES=`<g class="cat-phones"><rect x="2" y="0" width="7" height="1" f
 const CAT_SLEEP_MOOD=`<g class="cat-sweat">${px1(8,3,'#6cc4ff')}${px1(8,4,'#6cc4ff')}</g>`;
 const CAT_SIT=['.............','..o.....o....','..oo...oo....','..ooooooo....','..oeoooeo....','..oowpwoo....','...ooooo.....','..ooddooo....','..ooooooo..o.','..oodoodo..o.','..ooooooo.oo.','..oooooooooo.','..ww.ww......'];
 const CAT_SLEEP=['................','................','................','..o...o.........','..oo.oo.........','.ooooooodoodo...','.okkokkoooooooo.','.oopwooooodoooo.','..oooooooooooooo','..ooooooooooooo.','..ww.......ww...','................','................'];
+/* fur (pref catFur) swaps the body colors; calico adds orange patches over a white coat */
+const CAT_FURS={orange:{label:'Orange',o:'#e8964a',d:'#b8651f',w:'#fff4e6'},black:{label:'Black',o:'#34343e',d:'#1f1f26',w:'#4a4a56',e:'#f2d64b',k:'#9a9aaa'},white:{label:'White',o:'#f4f1ea',d:'#d6cebd',w:'#ffffff',e:'#2f6fd1',k:'#9a8f7d'},grey:{label:'Grey',o:'#9aa0a8',d:'#6c727a',w:'#eceef1'},calico:{label:'Calico',o:'#fbf6ee',d:'#34343e',w:'#fbf6ee',k:'#7a5a3a'},tuxedo:{label:'Tuxedo',o:'#34343e',d:'#1f1f26',w:'#ffffff',e:'#c9f27a',k:'#9a9aaa'}};
+const catPal=(fur=pref('catFur'))=>({...CAT_PAL,...(CAT_FURS[fur]||{})});
+const CAT_CALICO=[[2,1],[2,2],[3,2],[2,3],[3,3],[4,3],[7,8],[8,8],[8,9],[7,10],[8,10],[11,8],[11,9]].map(([x,y])=>`<rect x="${x}" y="${y}" width="1" height="1" fill="#e8964a"/>`).join('');
+const catNm=()=>String(pref('catName')||'').trim();
 /* hats for the day (seasonal pref): rows start 3 above the head; x from 1 */
 const CAT_HATS={
   santa:['......W..','.....RR..','...RRRR..','..RRRRR..','.RRRRRRR.','WWWWWWWWW'],
@@ -5053,9 +5128,9 @@ function skySvg(ph){
   return `<svg class="cat-sky sky-${ph}" viewBox="0 0 ${W} ${H}" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
 }
 function catDraw(){
-  const hat=catHat(),ph=skyPhase(),key=hat+'|'+ph;if(CAT._key===key)return;CAT._key=key;
-  const hg=hat?pixSvg(CAT_HATS[hat],'cat-hat'):'';
-  CAT.innerHTML=`${skySvg(ph)}<svg class="cat-body" viewBox="0 -3 16 16" shape-rendering="crispEdges" aria-hidden="true">${pixSvg(CAT_SIT,'pose-sit',CAT_SIT_MOOD+CAT_PHONES)}${pixSvg(CAT_SLEEP,'pose-sleep',CAT_SLEEP_MOOD)}${hg?`<g class="pose-sit" transform="translate(1,-3)">${hg}</g><g class="pose-sleep" transform="translate(0,-1)">${hg}</g>`:''}</svg><span class="cat-z" aria-hidden="true"><i>z</i><i>z</i><i>Z</i></span><span class="cat-notes" aria-hidden="true"><i>♪</i><i>♫</i></span>`;
+  const hat=catHat(),ph=skyPhase(),fur=CAT_FURS[pref('catFur')]?pref('catFur'):'orange',key=hat+'|'+ph+'|'+fur;if(CAT._key===key)return;CAT._key=key;
+  const hg=hat?pixSvg(CAT_HATS[hat],'cat-hat'):'',pal=catPal(fur),mood=CAT_SIT_MOOD.replaceAll(CAT_PAL.k,pal.k);
+  CAT.innerHTML=`${skySvg(ph)}<svg class="cat-body" viewBox="0 -3 16 16" shape-rendering="crispEdges" aria-hidden="true">${pixSvg(CAT_SIT,'pose-sit',(fur==='calico'?CAT_CALICO:'')+mood+CAT_PHONES,pal)}${pixSvg(CAT_SLEEP,'pose-sleep',CAT_SLEEP_MOOD,pal)}${hg?`<g class="pose-sit" transform="translate(1,-3)">${hg}</g><g class="pose-sleep" transform="translate(0,-1)">${hg}</g>`:''}</svg><span class="cat-z" aria-hidden="true"><i>z</i><i>z</i><i>Z</i></span><span class="cat-notes" aria-hidden="true"><i>♪</i><i>♫</i></span>`;
   CAT.classList.toggle('has-sky',!!ph);
 }
 function catEl(){
@@ -5069,8 +5144,9 @@ let SILL=null;
 function placeCat(){
   if(!pref('officeCat')){SILL?.remove();return}
   const f=$('#side .side-foot');if(!f)return;
-  if(!SILL){SILL=document.createElement('div');SILL.className='cat-sill';SILL.innerHTML='<span class="sill-plant" aria-hidden="false"></span><button type="button" class="sill-jar" data-act="cat-feed" hidden></button><button type="button" class="sill-pet" data-act="pet-poke" hidden></button>';SILL.appendChild(catEl())}
-  if(SILL.parentNode!==f)f.prepend(SILL);catTick();plantDraw();jarDraw();petDraw();visitSoon(true);napSoon(true);
+  if(!SILL){SILL=document.createElement('div');SILL.className='cat-sill';SILL.innerHTML='<span class="sill-plant" aria-hidden="false"></span><button type="button" class="sill-jar" data-act="cat-feed" hidden></button><button type="button" class="sill-pet" data-act="pet-poke" hidden></button><button type="button" class="sill-me" data-act="sill-me" hidden></button><button type="button" class="sill-mug" data-act="sill-mug" hidden></button><button type="button" class="sill-lamp" data-act="sill-lamp" hidden></button><button type="button" class="sill-vinyl" data-act="sill-vinyl" hidden></button><button type="button" class="sill-cam" data-act="sill-cam" hidden></button>';SILL.appendChild(catEl());
+    if(window.ResizeObserver)new ResizeObserver(sillLayout).observe(SILL)}
+  if(SILL.parentNode!==f)f.prepend(SILL);requestAnimationFrame(sillLayout);catTick();plantDraw();jarDraw();petDraw();visitSoon(true);napSoon(true);
 }
 function catTick(){
   if(!CAT||!CAT.isConnected)return;
@@ -5079,12 +5155,16 @@ function catTick(){
     CAT.classList.toggle('worried',over>0);CAT.classList.toggle('happy',!over&&open.length>0&&!open.some(t=>t.due===t0));plantDraw();jarDraw();petDraw()}
   const T=pomoState(),now=Date.now(),focus=T.run==='running'&&T.mode==='focus',pm=T.run+'|'+T.mode;
   /* a focus session just ended and a break began: stretch, then nap through the break */
-  if(CAT_PM.startsWith('running|focus')&&T.mode!=='focus'){CAT_PM=pm;catStretch('stretch~')}
+  if(CAT_PM.startsWith('running|focus')&&T.mode!=='focus'){CAT_PM=pm;catStretch('stretch~');setTimeout(()=>meStretch(),500)}
   CAT_PM=pm;
   const sleep=now>CAT_WAKE&&((T.run==='running'&&T.mode!=='focus')||(!focus&&now-CAT_ACT>180000));
   CAT.classList.toggle('sleep',sleep);CAT.classList.toggle('focus',focus&&!sleep);CAT.classList.toggle('away',!!NAP);SILL?.classList.toggle('sleepy',sleep);
   if(NAP&&focus)napEnd('back');
-  CAT.title=sleep?'Shh… the cat is napping (click to pet)':focus?'Focusing with you (click to pet)':'Pet the cat';
+  const nm=catNm();
+  CAT.title=sleep?`Shh… ${nm||'the cat'} is napping (click to pet)`:focus?`${nm||'The cat'} is focusing with you (click to pet)`:nm?`Pet ${nm}`:'Pet the cat';
+  CAT.setAttribute('aria-label',nm?`${nm}, the office cat`:'Office cat');
+  meDraw(T);deskDraw(T);
+  if(SILL){const vs=[...SILL.children].map(e=>e.hidden?0:1).join('');if(SILL._vs!==vs){SILL._vs=vs;requestAnimationFrame(sillLayout)}}
 }
 ['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{CAT_ACT=Date.now()},{passive:true,capture:true}));
 function catBubble(txt){
@@ -5212,6 +5292,100 @@ function petPoke(){
   setTimeout(()=>b.remove(),1500);haptic(10);
   if(CAT&&!CAT.classList.contains('sleep')){const r=el.getBoundingClientRect();catLook(r.left+r.width/2,r.top+r.height/2);setTimeout(()=>catLook(null),1200)}
 }
+
+/* ================= you at your desk (pref meShow) and desk items on the sill (deskMug, deskLamp, deskCam, deskVinyl) =================
+   The editor wears headphones and types during a focus session and stretches (arms up) through breaks.
+   The mug steams during focus and its coffee goes down as the session runs, full again once it ends;
+   the lamp comes on from 6 pm to 6 am (click to switch it); the record spins while the timer runs. */
+const ME_BASE=['............','............','............','............','...SeSSeS...','...SSSSSS...','....SSSS....','..CCCCCCCC..','.CCCCCCCCCC.','.CCLLLLLLCC.','.CCLLllLLCC.','.CCLLLLLLCC.','DDDDDDDDDDDD','.n........n.','.n........n.'];
+const ME_HAIR={
+  short:['............','...HHHHHH...','..HHHHHHHH..','..HSSSSSSH..'],
+  long:['............','...HHHHHH...','..HHHHHHHH..','..HSSSSSSH..','..H......H..','..H......H..','..H......H..','..H......H..'],
+  bun:['.....HH.....','...HHHHHH...','..HHHHHHHH..','..HSSSSSSH..'],
+  curly:['..HHHHHHHH..','.HHHHHHHHHH.','.HHHHHHHHHH.','.HHSSSSSSHH.','.H........H.','.H........H.'],
+  buzz:['............','............','...HHHHHH...','...SSSSSS...']
+};
+const ME_HAIRS=[['short','Short'],['long','Long'],['bun','Bun'],['curly','Curly'],['buzz','Buzz']];
+const ME_HAIR_COLS=['#1f1a17','#3b2a20','#7a4a2a','#d9a441','#b4452a','#e87aa8','#5b7be0','#a0a0a8'];
+const ME_SKINS=['#ffe0c4','#f1c27d','#d9a066','#b07a4a','#8d5524','#5c3a1e'];
+const ME_TOPS=['#4c8dff','#e5484d','#3aa655','#8e4bd6','#f5b400','#2fb8a8','#262130','#f2f2f2','#ff8fa3'];
+function meSvg(o={}){
+  const g=k=>o[k]??pref(k),hair=ME_HAIR[g('meHair')]?g('meHair'):'short',sk=g('meSkin'),top=g('meTop');
+  const pal={H:g('meHairCol'),S:sk,o:sk,e:'#1b1b1b',C:top,L:'#c3c9d1',l:'#f2f4f7',D:'#a86b32',n:'#6e4320'};
+  const hr=ME_HAIR[hair],rows=ME_BASE.map((r,y)=>hr[y]?[...r].map((c,x)=>hr[y][x]!=='.'?hr[y][x]:c).join(''):r);
+  const K='#262130',B='#4c8dff';
+  const extra=`<g class="me-hands">${px1(2,11,sk)}${px1(9,11,sk)}</g><g class="me-arms">${[4,5,6].map(y=>px1(1,y,top)+px1(10,y,top)).join('')}${px1(1,3,sk)}${px1(10,3,sk)}</g><g class="me-phones"><rect x="3" y="0" width="6" height="1" fill="${K}"/><rect x="2" y="1" width="1" height="2" fill="${K}"/><rect x="9" y="1" width="1" height="2" fill="${K}"/><rect x="1" y="3" width="2" height="2" fill="${B}"/><rect x="9" y="3" width="2" height="2" fill="${B}"/></g>`;
+  return `<svg viewBox="0 0 12 15" shape-rendering="crispEdges" aria-hidden="true">${pixSvg(rows,'me-body',extra,pal)}</svg>`;
+}
+function meDraw(T=pomoState()){
+  const el=SILL?.querySelector('.sill-me');if(!el)return;
+  if(!pref('meShow')){el.hidden=true;el._key='';return}el.hidden=false;
+  const focus=T.run==='running'&&T.mode==='focus',brk=T.run==='running'&&T.mode!=='focus';
+  el.classList.toggle('focus',focus);el.classList.toggle('break',brk);
+  const tt=focus?'You, deep in a focus session':brk?'You, on a break. Stretch!':'You at your desk (click to wave)';if(el.title!==tt){el.title=tt;el.setAttribute('aria-label',tt)}
+  const key=['meHair','meHairCol','meSkin','meTop'].map(pref).join('|');if(el._key===key)return;el._key=key;
+  el.innerHTML=meSvg();
+}
+/* the sill wraps onto a wall shelf when it's full; --sillh keeps the cork board clear of it */
+function sillLayout(){
+  if(!SILL?.isConnected)return;
+  document.documentElement.style.setProperty('--sillh',Math.max(44,Math.ceil(SILL.offsetHeight))+'px');
+  let sh=SILL.querySelector('.sill-shelf');
+  const kids=[...SILL.children].filter(e=>!e.hidden&&e.offsetParent&&!e.matches('.sill-shelf,.visitor')),bot=Math.max(0,...kids.map(e=>e.offsetTop+e.offsetHeight)),up=kids.filter(e=>e.offsetTop+e.offsetHeight<bot-6);
+  if(!up.length){if(sh)sh.hidden=true;return}
+  if(!sh){sh=document.createElement('i');sh.className='sill-shelf';sh.setAttribute('aria-hidden','true');SILL.appendChild(sh)}
+  const l=Math.min(...up.map(e=>e.offsetLeft)),r=Math.max(...up.map(e=>e.offsetLeft+e.offsetWidth)),t=Math.max(...up.map(e=>e.offsetTop+e.offsetHeight));
+  sh.hidden=false;sh.style.left=(l-5)+'px';sh.style.width=(r-l+10)+'px';sh.style.top=t+'px';
+}
+function sillSay(el,txt){
+  if(!el?.isConnected)return;
+  const b=document.createElement('span');b.className='cat-bubble';b.textContent=txt;el.appendChild(b);
+  if(!reducedMotion())b.animate([{opacity:0,transform:'translate(-50%,4px)'},{opacity:1,transform:'translate(-50%,-4px)',offset:.2},{opacity:1,transform:'translate(-50%,-8px)',offset:.8},{opacity:0,transform:'translate(-50%,-14px)'}],{duration:1500,easing:'ease-out'});
+  setTimeout(()=>b.remove(),1500);
+}
+function meStretch(){const el=SILL?.querySelector('.sill-me');if(!el||el.hidden)return;if(!reducedMotion())el.querySelector('svg')?.animate([{transform:'scale(1,1)'},{transform:'scale(.94,1.1)'},{transform:'scale(1.04,.96)'},{transform:'scale(1,1)'}],{duration:900,easing:'ease-in-out'});sillSay(el,'*stretch*')}
+function mePoke(){
+  const el=SILL?.querySelector('.sill-me');if(!el)return;const T=pomoState();
+  sillSay(el,T.run==='running'&&T.mode==='focus'?['in the zone…','one more cut','shh, rendering','♪ ♫'][Math.floor(Math.random()*4)]:['👋','hi!','back to it!','coffee?','one more render…'][Math.floor(Math.random()*5)]);
+  if(!reducedMotion())el.querySelector('svg')?.animate([{transform:'translateY(0)'},{transform:'translateY(-4px)'},{transform:'translateY(0)'}],{duration:380,easing:'ease-out'});haptic(10);
+}
+const MUG=['MMMMM..','MqqqMMM','MWWWM.M','MMMMM.M','MMMMMMM','.MMM...'];
+const LAMP=['..AAA..','.AAAAA.','AAAAAAA','...y...','...p...','...p...','...p...','...p...','...p...','...p...','.ppppp.','ppppppp'];
+const CAMERA=['.kk...r.','kkkkkkkk','kkkGGkkk','kkGqqGkk','kkkGGkkk','kkkkkkkk'];
+const VINYL=['..VVV..','.VVhVV.','VVVRVVV','VhRoRVV','VVVRVVh','.VVVVV.','..VVV..'];
+let LAMP_OVR=null;
+const lampNight=()=>{const h=new Date().getHours();return h>=18||h<6};
+const lampOn=()=>LAMP_OVR&&LAMP_OVR.night===lampNight()?LAMP_OVR.on:lampNight();
+const pixRows=(rows,pal,dx=0,dy=0)=>rows.map((row,y)=>[...row].map((c,x)=>c==='.'||!pal[c]?'':px1(x+dx,y+dy,pal[c])).join('')).join('');
+function deskDraw(T=pomoState()){
+  if(!SILL)return;
+  const focus=T.run==='running'&&T.mode==='focus',run=T.run==='running';
+  const put=(cls,on,key,title,svg,toggles={})=>{const el=SILL.querySelector('.'+cls);if(!el)return;if(!on){el.hidden=true;el._key='';return}el.hidden=false;
+    for(const k in toggles)el.classList.toggle(k,!!toggles[k]);if(el.title!==title){el.title=title;el.setAttribute('aria-label',title)}if(el._key===key)return;el._key=key;el.innerHTML=svg()};
+  /* mug: coffee level follows the focus session */
+  const frac=T.mode==='focus'&&T.run!=='idle'?Math.max(0,Math.min(1,pomoLeft(T)/((+pref('pomoFocus')||25)*60000))):1,lvl=frac>.66?3:frac>.33?2:frac>0?1:0;
+  put('sill-mug',pref('deskMug'),'m'+lvl,lvl===3?(focus?'Fresh coffee (it refills after each focus session)':'A fresh cup of coffee'):`Coffee: about ${Math.round(frac*100)}% left · refills after this session`,
+    ()=>`<svg viewBox="0 -3 7 9" shape-rendering="crispEdges" aria-hidden="true"><g class="mug-steam">${px1(1,-1,'currentColor')+px1(2,-2,'currentColor')+px1(1,-3,'currentColor')+px1(3,-1,'currentColor')+px1(4,-2,'currentColor')+px1(3,-3,'currentColor')}</g>${pixRows(MUG,{M:'#e86f5a',W:'#fff4e6',q:['#d6cfc4','#a07050','#7a4a26','#4f2c14'][lvl]})}</svg>`,{steam:focus});
+  /* lamp */
+  const on=lampOn();
+  put('sill-lamp',pref('deskLamp'),'l'+on,on?'Desk lamp: on (click to switch off)':'Desk lamp: off (comes on at 6 pm; click to switch on)',
+    ()=>`<svg viewBox="0 0 7 12" shape-rendering="crispEdges" aria-hidden="true">${on?`<g class="lamp-glow" fill="#ffd84d" opacity=".35"><rect x="2" y="3" width="3" height="1"/><rect x="1" y="4" width="5" height="2"/><rect x="0" y="6" width="7" height="4"/></g>`:''}${pixRows(LAMP,{A:'#2fb8a8',y:on?'#fff3a0':'#8a8f98',p:'#6b7280'})}</svg>`,{on});
+  /* camera */
+  put('sill-cam',pref('deskCam'),'c','Camera (click to take a picture)',()=>`<svg viewBox="0 0 8 6" shape-rendering="crispEdges" aria-hidden="true">${pixRows(CAMERA,{k:'#5b616b',G:'#c3c9d1',q:'#4c8dff'})}${px1(6,0,'#e5484d','cam-rec')}</svg>`,{rec:focus});
+  /* record player */
+  put('sill-vinyl',pref('deskVinyl'),'v',run?'Record player: spinning while the timer runs':'Record player: spins while the focus timer runs',
+    ()=>`<svg viewBox="0 0 9 9" shape-rendering="crispEdges" aria-hidden="true"><g class="vinyl-disc">${pixRows(VINYL,{V:'#2b2b33',h:'#6a6a78',R:'#e5484d',o:'#0d0d10'},1,0)}</g>${pixRows(['bbbbbbbbb','b.......b'],{b:'#a86b32'},0,7)}</svg><span class="cat-notes" aria-hidden="true"><i>♪</i><i>♫</i></span>`,{spin:run});
+}
+function sillClick(k){
+  const el=SILL?.querySelector('.sill-'+k);if(!el)return;haptic(10);
+  if(k==='me'){mePoke();return}
+  if(k==='mug'){sillSay(el,['sip…','☕','ahh','*slurp*'][Math.floor(Math.random()*4)]);if(!reducedMotion())el.querySelector('svg')?.animate([{transform:'rotate(0)'},{transform:'rotate(-14deg)'},{transform:'rotate(0)'}],{duration:500,easing:'ease-out'});return}
+  if(k==='lamp'){const n=lampNight();LAMP_OVR={night:n,on:!lampOn()};deskDraw();return}
+  if(k==='cam'){sillSay(el,['click!','say cheese','📸','got it'][Math.floor(Math.random()*4)]);
+    if(!reducedMotion()){const f=document.createElement('span');f.className='cam-flash';el.appendChild(f);f.animate([{opacity:.95,transform:'scale(.3)'},{opacity:0,transform:'scale(2.4)'}],{duration:420,easing:'ease-out'}).onfinish=()=>f.remove()}
+    if(CAT?.isConnected&&!CAT.classList.contains('sleep'))setTimeout(()=>catBubble(['!','✨','*poses*'][Math.floor(Math.random()*3)]),250);return}
+  if(k==='vinyl'){sillSay(el,['♪ lo-fi beats','♫ render jazz','♪ timeline funk','♫ export ballad'][Math.floor(Math.random()*4)])}
+}
 /* ================= the cat naps on a task now and then (pref catNaps) =================
    It leaves the sill, curls up on a visible list row or board card for about 90 seconds, and hops back
    when that task is opened, when you click it, or when a focus session starts. */
@@ -5229,8 +5403,8 @@ function napStart(){
   const els=napTargets();if(!els.length)return retry();
   napSoon();
   const row=els[Math.floor(Math.random()*els.length)],id=row.dataset.id;
-  const el=document.createElement('button');el.type='button';el.className='nap-cat';el.title='The cat is napping on this task (click to wake it)';el.setAttribute('aria-label',el.title);
-  el.innerHTML=`<svg viewBox="0 3 16 8" shape-rendering="crispEdges" aria-hidden="true">${pixSvg(CAT_SLEEP,'nap-body')}</svg><span class="cat-z" aria-hidden="true"><i>z</i><i>z</i><i>Z</i></span>`;
+  const el=document.createElement('button');el.type='button';el.className='nap-cat';el.title=`${catNm()||'The cat'} is napping on this task (click to wake it)`;el.setAttribute('aria-label',el.title);
+  el.innerHTML=`<svg viewBox="0 3 16 8" shape-rendering="crispEdges" aria-hidden="true">${pixSvg(CAT_SLEEP,'nap-body','',catPal())}</svg><span class="cat-z" aria-hidden="true"><i>z</i><i>z</i><i>Z</i></span>`;
   el.addEventListener('click',e=>{e.stopPropagation();napEnd('wake')});
   document.body.appendChild(el);
   NAP={id,el,end:setTimeout(()=>napEnd('back'),90000)};
@@ -5264,12 +5438,94 @@ function catPeek(){
   setTimeout(()=>{
     const note=$('#drawer .tl-note');if(!note)return;
     const w=document.createElement('span');w.className='peek-cat';w.setAttribute('aria-hidden','true');
-    w.innerHTML=`<svg viewBox="1 0 10 7" shape-rendering="crispEdges">${pixSvg(CAT_SIT.slice(0,7),'peek-head')}</svg>`;
+    w.innerHTML=`<svg viewBox="1 0 10 7" shape-rendering="crispEdges">${pixSvg(CAT_SIT.slice(0,7),'peek-head','',catPal())}</svg>`;
     w.querySelectorAll('.cat-eyes').forEach(g=>g.setAttribute('transform','translate(-.35,.45)'));
     note.appendChild(w);const svg=w.firstChild;
     if(reducedMotion()){setTimeout(()=>w.remove(),2500);return}
     svg.animate([{transform:'translateY(100%)'},{transform:'translateY(8%)',offset:.18},{transform:'translateY(8%)',offset:.5},{transform:'translateY(0)',offset:.56},{transform:'translateY(8%)',offset:.62},{transform:'translateY(8%)',offset:.84},{transform:'translateY(100%)'}],{duration:3600,easing:'ease-in-out'}).onfinish=()=>w.remove();
   },60);
+}
+
+/* ================= sticker book: milestone stickers (settings/app.stickers {id: 'YYYY-MM-DD'}) =================
+   Earned once and kept. Most are worked out from your data (stickerScan); Night owl is awarded when a task
+   is finished late at night; Clean week counts days in a row the app saw nothing overdue (settings/app.clearRun). */
+const STICKERS=[
+  ['first','🎬','First cut','Finish your first task'],
+  ['d10','🎞️','Ten in the can','Finish 10 tasks'],
+  ['d50','🎥','Fifty reels','Finish 50 tasks'],
+  ['d100','💯','Hundred club','Finish 100 tasks'],
+  ['d250','🏆','Timeline legend','Finish 250 tasks'],
+  ['early','🐇','Early bird','Finish a task 2 or more days before it’s due'],
+  ['power','⚡','Power day','Finish 5 tasks in one day'],
+  ['survivor','🛡️','Revision survivor','Finish a task that went through 3 or more revision rounds'],
+  ['clean7','🌿','Clean week','Open the app 7 days in a row with nothing overdue'],
+  ['focus5','🍅','Five tomatoes','Finish 5 focus sessions on tasks'],
+  ['focus100','🎧','In the zone','Finish 100 focus sessions on tasks'],
+  ['night','🦉','Night owl','Finish a task between 11 pm and 4 am'],
+  ['paid','💸','Payday','Mark an invoice as paid'],
+  ['clickup','🔗','Connected','Bring tasks in from ClickUp'],
+  ['brand','🎨','On brand','Save a brand guide'],
+  ['photo','📸','Memories','Add a photo to the sidebar'],
+  ['treats','🐟','Spoiled cat','Feed the cat 25 treats'],
+  ['month','📅','One month in','Use the app for 30 days'],
+  ['year','🎂','One year in','Use the app for a whole year']
+];
+const STK_BY=Object.fromEntries(STICKERS.map(s=>[s[0],s]));
+const dayOf=v=>{const m=/^\d{4}-\d\d-\d\d/.exec(String(v||''));return m?m[0]:''};
+function stickerScan(){
+  const t0=today(),out={},ts=Object.values(S.tasks).filter(t=>!t._draft&&!t.example);
+  const done=ts.filter(t=>dayOf(t.doneAt)).sort((a,b)=>dayOf(a.doneAt).localeCompare(dayOf(b.doneAt)));
+  [[1,'first'],[10,'d10'],[50,'d50'],[100,'d100'],[250,'d250']].forEach(([n,k])=>{if(done[n-1])out[k]=dayOf(done[n-1].doneAt)});
+  const early=done.find(t=>t.due&&diffDays(t.due,dayOf(t.doneAt))>=2);if(early)out.early=dayOf(early.doneAt);
+  const per={};for(const t of done){const d=dayOf(t.doneAt);per[d]=(per[d]||0)+1;if(per[d]===5&&!out.power)out.power=d}
+  const sv=done.find(t=>(t.revision||0)>=3);if(sv)out.survivor=dayOf(sv.doneAt);
+  const pom=ts.reduce((n,t)=>n+(+t.pomos||0),0);if(pom>=5)out.focus5=t0;if(pom>=100)out.focus100=t0;
+  for(const j of Object.values(S.jobs)){if(j.example)continue;for(const v of j.invoices||[])if(v.status==='paid'){const d=dayOf(v.paidAt)||t0;if(!out.paid||d<out.paid)out.paid=d}}
+  if(ts.some(t=>t.cu))out.clickup=t0;
+  for(const x of [...Object.values(S.clients),...Object.values(S.jobs)])if(!x.example&&x.brand&&x.brand.updated){const d=dayOf(x.brand.updated)||t0;if(!out.brand||d<out.brand)out.brand=d}
+  if(photos().length)out.photo=t0;
+  if((+appSettings().catFed||0)>=25)out.treats=t0;
+  let first=Infinity;for(const t of ts)if(t.created)first=Math.min(first,+new Date(t.created));
+  if(first<Infinity){const f=ymd(new Date(first)),age=diffDays(t0,f);if(age>=30)out.month=addDays(f,30);if(age>=365)out.year=addDays(f,365)}
+  return out;
+}
+let STK_T=0;
+function stickerSoon(){if(STK_T||!S.ready)return;STK_T=setTimeout(()=>{STK_T=0;stickerCheck()},2000)}
+function stickerCheck(extra){
+  if(!S.ready)return;
+  const a=appSettings(),have=a.stickers||null,t0=today(),found={...stickerScan(),...(extra||{})},p={};
+  const run=a.clearRun||{};
+  if(run.d!==t0){const over=live().some(t=>!isClosed(t)&&t.due&&t.due<t0),n=over?0:(run.d===addDays(t0,-1)?(+run.n||0)+1:1);p.clearRun={d:t0,n}}
+  if((p.clearRun||run).n>=7)found.clean7=t0;
+  const fresh=Object.keys(found).filter(k=>STK_BY[k]&&!(have&&have[k]));
+  if(fresh.length)p.stickers={...(have||{}),...Object.fromEntries(fresh.map(k=>[k,found[k]]))};
+  if(!Object.keys(p).length)return;
+  saveApp(p);
+  if(!fresh.length)return;
+  /* wait for any other message (an Undo, say) to go away first */
+  const one=STK_BY[fresh[0]],say=(m,o,n=0)=>{if(!$('#toast').hidden&&n<12){setTimeout(()=>say(m,o,n+1),1500);return}toast(m,o)};
+  if(!have&&!extra&&fresh.length>1)say(`Your sticker book has ${fresh.length} stickers for what you’ve done so far`,{label:'Open',fn:()=>openStickers()});
+  else say(fresh.length===1?`New sticker: ${one[1]} ${one[2]}`:`${fresh.length} new stickers`,{label:'See',fn:()=>openStickers(fresh[0])});
+  if(CAT?.isConnected)setTimeout(()=>catBubble('✨'),300);
+  renderSide();
+}
+function stickersGot(){const h=appSettings().stickers||{};return STICKERS.filter(s=>h[s[0]]).map(s=>[s,h[s[0]]]).sort((a,b)=>b[1].localeCompare(a[1]))}
+function stickerCorkHtml(){
+  if(!pref('stickerShow'))return '';
+  const got=stickersGot();if(!got.length)return '';
+  return `<button type="button" class="cork-stickers" data-act="stk-open" title="Sticker book: ${got.length} of ${STICKERS.length}">${got.slice(0,4).map(([s],i)=>`<span class="stk" style="--r:${[-8,7,-4,10][i]}deg" aria-hidden="true">${s[1]}</span>`).join('')}<small>${got.length}/${STICKERS.length}</small></button>`;
+}
+let STKB=null;
+function openStickers(sel){STKB={sel:sel||null};renderStickers();$('#modal').hidden=false;closeSide()}
+function closeStickers(){STKB=null;$('#modal').hidden=true;$('#modal').innerHTML=''}
+function renderStickers(){
+  if(!STKB)return;
+  const h=appSettings().stickers||{},n=STICKERS.filter(s=>h[s[0]]).length;
+  keepScroll('#modal',()=>{$('#modal').innerHTML=`<div class="modal stk-modal" role="dialog" aria-modal="true" aria-labelledby="stk-title">
+    <header><h2 id="stk-title">Sticker book</h2><button class="icon-btn" data-act="stk-close" aria-label="Close" title="Close">${I.x}</button></header>
+    <div class="m-body"><p class="hint">${n} of ${STICKERS.length} collected. Tap a sticker to see when you earned it.</p>
+    <div class="stk-bar"><i style="width:${Math.round(n/STICKERS.length*100)}%"></i></div>
+    <div class="stk-grid">${STICKERS.map((s,i)=>{const d=h[s[0]],sel=STKB.sel===s[0];return `<button type="button" class="stk-card ${d?'got':'locked'} ${sel?'sel':''}" data-act="stk-pick" data-id="${s[0]}" aria-pressed="${sel}" style="--r:${[-4,3,-2,4,-3,2][i%6]}deg"><span class="stk-e" aria-hidden="true">${s[1]}</span><b>${esc(s[2])}</b><small>${sel&&d?`Earned ${esc(fmtDate(d))}`:esc(d?s[3]:s[3])}</small>${d?'':'<span class="stk-lock" aria-label="Not earned yet">🔒</span>'}</button>`}).join('')}</div></div></div>`});
 }
 /* ================= cork board in the sidebar (pref corkBoard): your photos plus sticky notes (settings/app.stickies) ================= */
 const STICKY_COLS=['yellow','pink','blue','green'],STICKY_TILT=[-4,3,-2,5,-5,2];
@@ -5282,6 +5538,7 @@ function corkHtml(){
   return `<div class="cork ${pref('officeCat')?'with-cat':''}" aria-label="Cork board">
     ${ps.map((v,i)=>`<button type="button" class="polaroid" data-act="photo-view" data-i="${i}" style="--r:${PHOTO_TILT[i]}deg" title="Open photo"><img src="${esc(imgSrc(v)||'')}" alt="" loading="lazy"></button>`).join('')}
     ${st.map((n,i)=>`<div class="sticky s-${esc(n.color||'yellow')}" style="--r:${STICKY_TILT[i%6]}deg"><i class="pin" aria-hidden="true"></i>${STICKY_EDIT===n.id?`<textarea id="sticky-in" data-fk="sticky-in" data-sid="${esc(n.id)}" maxlength="80" rows="3" aria-label="Sticky note">${esc(STICKY_DRAFT??n.text??'')}</textarea>`:`<button type="button" class="st-text" data-act="sticky-edit" data-id="${esc(n.id)}" title="Edit note">${esc(n.text||'')}</button><button type="button" class="st-x" data-act="sticky-rm" data-id="${esc(n.id)}" title="Take down this note" aria-label="Take down this note">${I.x}</button>`}</div>`).join('')}
+    ${stickerCorkHtml()}
     ${st.length<6?`<button type="button" class="cork-add" data-act="sticky-add" title="Pin a sticky note">${I.plus}${st.length?'':'Pin a note'}</button>`:''}
   </div>`;
 }
@@ -5540,6 +5797,9 @@ const HELP=[
  ['Getting work done','Type it all in the name',`When you add a task, type the client, the day and the priority right in the name: “Reel 7 Band fri !high”. A line under the name shows what will be picked up, and it's filled in when you save. Days: today, tomorrow, mon–sun, +3d, in 2 weeks, oct 2, 10/2. Priority: !urgent, !high, !low. Use @name to pick a client or job by its first letters.`,null],
  ['Getting work done','Focus timer',`A Pomodoro timer top-right, next to the bell: 25 minutes of focus, then a 5-minute break, and a 15-minute break after every 4 (change them in Settings). Press P or the tomato at the top of a task to focus on that task; each finished session adds 🍅 1 to it and a line to its activity. The same timer shows on all your devices and in the floating task window. Turn on the desktop pop-up in Settings to be told when time's up while you're in Premiere.`,['pomo','Focus timer']],
  ['Getting work done','Recent project folders',`On your Mac, quick search (⌘K) lists the last 5 project folders you opened from the app, from tasks, jobs or notes. Pick one to open it in Finder again; type to search older ones by task, job or folder name.`,null],
+ ['Look and feel','Your cat, your desk',`Name the office cat and pick its fur (orange, black, white, grey, calico or tuxedo) in Settings → Personalize & fun; its name shows when you hover over it. Under Your desk you can add a pixel you beside the cat (pick hair, hair color, skin tone and hoodie): you wear headphones and type during a focus session and stretch through breaks. Desk items sit on the sill too: a coffee mug that steams during focus and refills after each session, a desk lamp that comes on at 6 pm (click to switch it), a camera (click to take a picture) and a record player that spins while the timer runs.`,['fun','Personalize & fun']],
+ ['Look and feel','Sticker book',`You earn stickers for milestones: your first finished task, 10, 50, 100 and 250 done, finishing early, five in one day, surviving three revision rounds, a clean week with nothing overdue, focus sessions, a late-night finish, getting paid, and more. The newest show on the cork board; click them (or open Settings → Personalize & fun → Sticker book, or search “stickers” with ⌘K) to see the whole book. Tap a sticker to see when you earned it.`,['fun','Personalize & fun']],
+ ['Your work','Job emoji',`Give a job an emoji in Edit job → General. It shows next to the job in the sidebar, on its Overview card and in notifications.`,null],
  ['Look and feel','Little extras',`An “All clear” moment on the Overview when nothing is overdue or due today; emoji reactions on client updates (the smiley under an update); film-look color schemes (Portra, Fuji, Noir, Teal & Orange, Technicolor); the office cat on the sidebar (it wears headphones and nods along during a focus session, naps during breaks and when you're away, stretches when you finish a task, and purrs when you click it; a little window behind it shows the sky for your time of day, and it dresses up in December, on New Year's Day and on Halloween; it sweats when something's overdue, smiles on all-clear days and watches your mouse; a plant on the sill grows a leaf per task done this month; birds and butterflies drop by; now and then it naps on one of your tasks until you open it; it peeks over the updates you post; a treat jar fills with a treat per finished task (click it to feed the cat); and after 30 days a puppy, hamster or goldfish can join it on the sill); a cork board in the sidebar with your photos and sticky notes (click + to pin one, click a note to edit it); a photo strip of your own pictures in the sidebar (add them in Settings → Personalize & fun); and seasonal touches: a Christmas countdown from September, snow in December, fireworks on New Year's Day, bats on Halloween and hearts on Valentine's. Turn them off in Settings → Personalize & fun.`,['fun','Personalize & fun']],
  ['Getting work done','Installed app (Chrome)',`Install Splice & Co. from Chrome's address bar (the install icon) to get its own window and Dock icon. The Dock icon shows how many tasks are overdue or due today; right-click it for New task, Overview, Calendar and Quick search. The app's colors reach into the title bar (Chrome's chevron at the top right switches that off). To have task links from Slack or email open in the app, turn on "Open supported links" in the app's settings (⋮ menu in the app window → App info or Settings).`,null],
  ['Getting work done','Phone: pull the task down to close',`On a phone, a task opens as a sheet from the bottom. Pull it down from the top (or anywhere when it's scrolled to the top) to close it; swipe sideways to go to the next or previous task.`,null],
@@ -5884,7 +6144,7 @@ function openJobModal(id){
   const j=id?S.jobs[id]:null;
   M={sec:'general',id:id||null,name:j?.name||'',type:j?.type||'agency',color:j?.color||COLORS[Object.keys(S.jobs).length%COLORS.length],
     tools:{comms:'Slack',tracker:'ClickUp',upload:'Frame.io',storage:'Google Drive',...(j?.tools||{})},
-    toolLinks:{...(j?.toolLinks||{})},folder:j?.folder||'',account:j?.account||'',chromeProfile:j?.chromeProfile||'',
+    toolLinks:{...(j?.toolLinks||{})},folder:j?.folder||'',emoji:j?.emoji||'',account:j?.account||'',chromeProfile:j?.chromeProfile||'',
     logo:j?.logo||null,
     clients:id?clientsOf(id).map(c=>({id:c.id,name:c.name,logo:c.logo||null,hidden:!!c.hidden})):[],removed:[],delArmed:false,busy:false,uploaded:[],
     work:JSON.parse(JSON.stringify(workOf(j)))};
@@ -5970,6 +6230,8 @@ function renderSettings(){
       ${prefPick('confetti','Celebrate finished tasks',[[true,'On','A little confetti when a task moves to Done'],[false,'Off','']])}
       <p class="pref-group">Office cat</p>
       ${prefRow('officeCat','Office cat',[[true,'Show'],[false,'Hide']],'Naps at the bottom of the sidebar; wakes when you finish a task')}
+      ${SM.officeCat?`<div class="pref-row"><label class="pr-l" for="s-catname">Cat’s name<small>Shows when you hover over the cat</small></label><input type="text" id="s-catname" data-fk="s-catname" class="pr-input" value="${esc(SM.catName||'')}" maxlength="20" placeholder="e.g. Mochi"></div>
+      <div class="pref-row pr-wrap"><span class="pr-l">Fur</span><div class="fur-row" role="group" aria-label="Fur">${Object.entries(CAT_FURS).map(([k,f])=>`<button type="button" class="fur ${SM.catFur===k?'on':''}" data-act="s-pref" data-k="catFur" data-v='${esc(JSON.stringify(k))}' aria-pressed="${SM.catFur===k}"><svg viewBox="1 0 10 7" shape-rendering="crispEdges" aria-hidden="true">${pixSvg(CAT_SIT.slice(0,7),'fur-head',k==='calico'?CAT_CALICO:'',catPal(k))}</svg><span>${f.label}</span></button>`).join('')}</div></div>`:''}
       ${SM.officeCat?prefRow('catSky','Sky behind the cat',[[true,'Show'],[false,'Hide']],'Follows your clock: sunrise, day, sunset and stars at night'):''}
       ${SM.officeCat?prefRow('catPlant','Windowsill plant',[[true,'Show'],[false,'Hide']],'Grows a leaf for each task done this month; droops when 3+ tasks are overdue'):''}
       ${SM.officeCat&&SM.catPlant?`<div class="pref-row"><label class="pr-l" for="s-plantGoal">Plant blooms at<small>Tasks done in a month</small></label><input type="number" id="s-plantGoal" class="pr-input pr-num" min="1" max="500" data-pk="plantGoal" data-fk="s-plantGoal" value="${esc(String(SM.plantGoal))}"></div>`:''}
@@ -5978,8 +6240,21 @@ function renderSettings(){
       ${SM.officeCat?prefRow('catTreats','Treat jar',[[true,'Show'],[false,'Hide']],'Each finished task earns a treat; click the jar to feed the cat'):''}
       ${SM.officeCat?prefRow('catPeek','Cat reads your updates',[[true,'On'],[false,'Off']],'Peeks over a new update when you post it'):''}
       ${SM.officeCat?(petUnlocked()?prefRow('sillPet','A friend on the sill',[['none','None'],['puppy','Puppy'],['hamster','Hamster'],['fish','Goldfish']],'Click it to say hi'):`<div class="pref-row"><span class="pr-l">A friend on the sill<small>A puppy, hamster or goldfish to keep the cat company. Unlocks after 30 days of using ${esc((appSettings().name||'').trim()||APP_NAME)} (${Math.max(1,30-daysUsed())} day${30-daysUsed()===1?'':'s'} to go).</small></span><span class="pet-lock" aria-hidden="true">🔒</span></div>`):''}
+      ${SM.officeCat?`<p class="pref-group">Your desk</p>
+      ${prefRow('meShow','You at a desk',[[true,'Show'],[false,'Hide']],'A pixel you beside the cat: headphones during focus sessions, a stretch on breaks')}
+      ${SM.meShow?`<div class="pref-row pr-wrap"><span class="pr-l">Your look</span><div class="me-prev" aria-hidden="true">${meSvg({meHair:SM.meHair,meHairCol:SM.meHairCol,meSkin:SM.meSkin,meTop:SM.meTop})}</div></div>
+      ${prefRow('meHair','Hair',ME_HAIRS)}
+      ${swRow('meHairCol','Hair color',ME_HAIR_COLS)}
+      ${swRow('meSkin','Skin tone',ME_SKINS)}
+      ${swRow('meTop','Hoodie',ME_TOPS)}`:''}
+      ${prefRow('deskMug','Coffee mug',[[true,'Show'],[false,'Hide']],'Steams during a focus session and refills after each one')}
+      ${prefRow('deskLamp','Desk lamp',[[true,'Show'],[false,'Hide']],'Comes on at 6 pm; click it to switch')}
+      ${prefRow('deskCam','Camera',[[true,'Show'],[false,'Hide']],'Click it to take a picture')}
+      ${prefRow('deskVinyl','Record player',[[true,'Show'],[false,'Hide']],'Spins while the focus timer runs')}`:''}
       <p class="pref-group">Sidebar</p>
       ${prefRow('corkBoard','Cork board',[[true,'Show'],[false,'Hide']],'Your photos and sticky notes pinned to a cork board in the sidebar')}
+      ${SM.corkBoard?prefRow('stickerShow','Stickers on the cork board',[[true,'Show'],[false,'Hide']],'Your latest milestone stickers'):''}
+      <div class="pref-row"><span class="pr-l">Sticker book<small>Milestone stickers you’ve earned (${stickersGot().length} of ${STICKERS.length})</small></span><button type="button" class="btn sm" data-act="stk-open">Open</button></div>
       ${photoSettingsHtml()}`},
     {id:'a11y',label:'Accessibility',icon:I.a11y,html:`<div class="field"><span class="lbl" id="s-ts-lbl">Text size</span>
       <div class="pick-row" role="group" aria-labelledby="s-ts-lbl">${TEXT_SIZES.map(([v,l])=>`<button type="button" data-act="s-ts" data-v="${v}" class="${+SM.textSize===v?'on':''}" aria-pressed="${+SM.textSize===v}"><span class="aa" style="font-size:${Math.round(16*v)}px">Aa</span>${l}<small>${Math.round(v*100)}%</small></button>`).join('')}</div></div>
@@ -6121,6 +6396,7 @@ function renderModal(){
   <header><h2 id="m-title">${M.id?'Edit job':'New job'}</h2><button class="icon-btn" data-act="modal-close" aria-label="Close">${I.x}</button></header>
   ${prefLayout('m',M.sec,[
     {id:'general',label:'General',icon:I.briefcase,html:`    <div class="field"><label for="m-name">Job name</label><input type="text" id="m-name" data-m="name" data-fk="m-name" value="${esc(M.name)}" placeholder="e.g. Northlight Media"></div>
+    <div class="field"><label for="m-emoji">Emoji <span class="hint">(optional)</span></label><div class="emo-row"><input type="text" id="m-emoji" class="emo-in" data-m="emoji" data-fk="m-emoji" value="${esc(M.emoji||'')}" maxlength="8" placeholder="🎬" aria-label="Job emoji">${JOB_EMOJI.map(e=>`<button type="button" class="emo ${M.emoji===e?'on':''}" data-act="m-emoji" data-e="${e}" aria-label="Use ${e}" aria-pressed="${M.emoji===e}">${e}</button>`).join('')}${M.emoji?'<button type="button" class="btn sm ghost" data-act="m-emoji" data-e="">Clear</button>':''}</div><p class="hint">Shows next to the job in the sidebar, on its Overview card and in notifications.</p></div>
     <div class="field"><span class="lbl">Logo or picture</span><div class="logo-field">
       <button type="button" class="logo-box ${M.logo?'has':''}" data-act="m-logo-pick" style="${M.logo?'':`background:${esc(M.color)};border-color:transparent`}" aria-label="${M.logo?'Replace':'Upload'} job logo">${M.logo?`<img src="${esc(imgSrc(M.logo))}" alt="">`:esc(initials(M.name))}</button>
       <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${canUpload()?`<button type="button" class="btn sm" data-act="m-logo-pick">${I.image}${M.logo?'Replace':'Upload'}</button>`:''}${M.logo?'<button type="button" class="btn sm" data-act="m-logo-remove">Remove</button>':''}${M.busy?'<span class="hint">Uploading…</span>':''}</div>
@@ -6150,7 +6426,7 @@ function renderModal(){
 function saveModal(){
   const name=M.name.trim();if(!name){M.sec='general';M.mv='sec';renderModal();toast('Give the job a name.');$('#m-name')?.focus();return}
   const tools={...M.tools};
-  const data={name,type:M.type,color:M.color,tools,toolLinks:M.toolLinks,folder:(M.folder||'').trim(),account:(M.account||'').trim(),chromeProfile:(M.chromeProfile||'').trim(),logo:M.logo||null,work:{...M.work,days:[...M.work.days].sort()}};
+  const data={name,type:M.type,color:M.color,emoji:[...String(M.emoji||'').trim()].slice(0,4).join(''),tools,toolLinks:M.toolLinks,folder:(M.folder||'').trim(),account:(M.account||'').trim(),chromeProfile:(M.chromeProfile||'').trim(),logo:M.logo||null,work:{...M.work,days:[...M.work.days].sort()}};
   let id=M.id;
   if(id){patch('jobs',id,data);logAct('job','Job details edited',{jobId:id})}
   else{id=create('jobs',{...data,order:Math.max(-1,...Object.values(S.jobs).map(j=>j.order??0))+1});logAct('job','Job added',{jobId:id})}
@@ -6535,6 +6811,7 @@ function prioColorsHtml(){
   return `<div class="field"><span class="lbl">Priority colors</span><div class="prio-cols">${['urgent','high','low'].map(p=>`<div class="prio-col-row"><span>${PRIORITIES.find(x=>x.id===p).label}</span><button type="button" class="sw def ${pc[p]?'':'on'}" data-act="s-prio-col" data-p="${p}" data-c="" style="--c:${defs[p]}">Default</button>${STATUS_COLORS.map(c=>`<button type="button" class="sw ${pc[p]===c?'on':''}" data-act="s-prio-col" data-p="${p}" data-c="${c}" style="--c:${c}" aria-label="${p} ${c}"></button>`).join('')}</div>`).join('')}</div></div>`;
 }
 /* two-choice picker for a look/date preference (SM[k]); data-v holds JSON so booleans stay booleans */
+function swRow(k,label,cols){return `<div class="pref-row pr-wrap"><span class="pr-l">${label}</span><div class="sw-row" role="group" aria-label="${esc(label)}">${cols.map(c=>`<button type="button" class="sw ${SM[k]===c?'on':''}" data-act="s-pref" data-k="${k}" data-v='${esc(JSON.stringify(c))}' style="--c:${c}" aria-label="${esc(label)} ${c}" aria-pressed="${SM[k]===c}"></button>`).join('')}</div></div>`}
 function prefPick(k,label,opts){
   return `<div class="field"><span class="lbl" id="pp-${k}">${label}</span><div class="pick-row ${opts.length===2?'two':opts.length===3?'three':''}" role="group" aria-labelledby="pp-${k}">${opts.map(([v,l,d])=>`<button type="button" data-act="s-pref" data-k="${k}" data-v='${esc(JSON.stringify(v))}' class="${SM[k]===v?'on':''}" aria-pressed="${SM[k]===v}">${esc(l)}${d?`<small>${esc(d)}</small>`:''}</button>`).join('')}</div></div>`;
 }
@@ -6817,7 +7094,7 @@ function toast(msg,action){
 
 /* ================= events ================= */
 document.addEventListener('click',e=>{
-  if(narrow.matches&&$('#side').classList.contains('open')&&e.target.closest('#side [data-act]:not([data-act=toggle-jobs]):not([data-act^=sticky]):not([data-act=cat-feed]):not([data-act=pet-poke]):not([data-act=photo-view])'))setTimeout(closeSide,0);
+  if(narrow.matches&&$('#side').classList.contains('open')&&e.target.closest('#side [data-act]:not([data-act=toggle-jobs]):not([data-act^=sticky]):not([data-act=cat-feed]):not([data-act=pet-poke]):not([data-act^=sill-]):not([data-act=photo-view])'))setTimeout(closeSide,0);
   if(notesOpen&&!e.target.closest('.bell-wrap,#notes,[data-act="tb-notes"]')){notesOpen=false;renderBell()}
   if(POMO_OPEN&&!e.target.closest('.pomo-wrap,#pomo-pop,[data-act="pm-timer"]')){POMO_OPEN=false;renderPomo()}
   if(PLUS&&!e.target.closest('#plus-menu,[data-act="tb-plus"]')){PLUS=false;renderPlus()}
@@ -6969,6 +7246,11 @@ document.addEventListener('click',e=>{
     case 'jump-close': closeJump();break;
     case 'cat-feed': catFeed();break;
     case 'pet-poke': petPoke();break;
+    case 'sill-me': case 'sill-mug': case 'sill-lamp': case 'sill-cam': case 'sill-vinyl': sillClick(a.slice(5));break;
+    case 'stk-open': if(SM)closeSettings(true);openStickers(el.dataset.id);break;
+    case 'stk-close': closeStickers();break;
+    case 'stk-pick': if(STKB){STKB.sel=STKB.sel===el.dataset.id?null:el.dataset.id;renderStickers()}break;
+    case 'm-emoji': M.emoji=el.dataset.e;renderModal();break;
     case 'sticky-add': stickyAdd();break;
     case 'sticky-edit': STICKY_EDIT=el.dataset.id;STICKY_DRAFT=stickies().find(x=>x.id===el.dataset.id)?.text||'';renderSide();setTimeout(()=>{const i=$('#sticky-in');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},20);break;
     case 'sticky-rm': stickyRm(el.dataset.id);break;
@@ -7145,7 +7427,7 @@ document.addEventListener('keydown',e=>{
     return;
   }
   if(e.key==='Escape'&&SEL.size&&$('#drawer').hidden&&$('#modal').hidden){clearSel();return}
-  if(e.key==='Escape'){if(POMO_OPEN){POMO_OPEN=false;renderPomo();return}if(!$('#filter-sheet').hidden){closeFilters();return}if($('#side').classList.contains('open')){closeSide();return}if(INV){closeInv();return}if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
+  if(e.key==='Escape'){if(POMO_OPEN){POMO_OPEN=false;renderPomo();return}if(!$('#filter-sheet').hidden){closeFilters();return}if($('#side').classList.contains('open')){closeSide();return}if(INV){closeInv();return}if(STKB){closeStickers();return}if(BM){closeBrand();return}if(notesOpen){notesOpen=false;renderBell();$('#bell').focus();return}if(CR){closeCrop();return}if(SM)closeSettings(false);else if(!$('#modal').hidden)closeModal();else if(!$('#drawer').hidden)closeDrawer();return}
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'');
   if(e.key==='Enter'&&!typing){const r=e.target.closest?.('[data-act="open"]');if(r){openTask(r.dataset.id);return}}
   if(typing||e.metaKey||e.ctrlKey||e.altKey)return;
@@ -7225,6 +7507,7 @@ document.addEventListener('input',e=>{
   if(el.id==='jump-q'&&JUMP){JUMP.q=el.value;JUMP.i=0;renderJump();return}
   if(el.id==='s-name'&&SM){SM.name=el.value;return}
   if(el.id==='s-greet'&&SM){SM.greetName=el.value;render();return}
+  if(el.id==='s-catname'&&SM){SM.catName=el.value;catTick();return}
   if(SM&&el.dataset.pk){const k=el.dataset.pk,v=parseInt(el.value,10);if(v>=1&&v<=(k==='pomoEvery'?12:k==='plantGoal'?500:180)){SM[k]=v;if(k==='plantGoal')render()}return}
   if(el.id==='s-limit'&&SM){SM.dayLimit=el.value;return}
   if(SM&&el.dataset.stLabel!=null){const x=SM.statuses[+el.dataset.stLabel];if(x)x.label=el.value;return}
