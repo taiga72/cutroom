@@ -1639,6 +1639,8 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .chip.un-chip .i{width:11px;height:11px}
 #bulk-push{max-width:150px}
 @media (max-width:820px){.un-row{grid-template-columns:auto auto minmax(0,1fr) auto;gap:8px}.un-row .pill{display:none}.un-row .date{display:none}.upnext .un-hint{display:none}}
+.un-grip{display:none}
+@media (max-width:820px){.un-row{grid-template-columns:auto auto auto minmax(0,1fr) auto}.un-grip{display:grid;place-items:center;width:28px;height:40px;margin:-8px -4px -8px -6px;color:var(--faint);touch-action:none}.un-grip svg{width:14px;height:14px}.un-row.dragging{position:relative;z-index:3;box-shadow:var(--shadow-lg)}}
 
 /* ---------- focus timer ---------- */
 .pomo-wrap{position:relative;flex:none}
@@ -2056,7 +2058,16 @@ html{overscroll-behavior-y:contain}
   .pref-s .pref-nav button{padding:14px 18px}
   .modal footer .btn{min-height:46px}
 }
-:root[data-motion="reduce"] .plus-menu,:root[data-motion="reduce"] body > #notes,:root[data-motion="reduce"] .jump,:root[data-motion="reduce"] .upn-page{animation:none}
+/* phones: the task options, filter and long-press menus are bottom sheets too (grab bar, pull down to close) */
+@media (max-width:820px){
+  .topt,.fs-card{position:relative;padding-top:22px}
+  .topt::before,.fs-card::before,#ctx::before{content:'';position:absolute;top:7px;left:50%;width:38px;height:5px;margin-left:-19px;border-radius:3px;background:var(--line-strong)}
+  .fs-card{animation:sheetUp .25s cubic-bezier(.2,.8,.2,1)}
+  #ctx{left:0!important;right:0;top:auto!important;bottom:0;width:auto;max-width:none;max-height:85vh;overflow:auto;border-radius:20px 20px 0 0;border:0;padding:22px 12px calc(14px + env(safe-area-inset-bottom,0px));box-shadow:0 0 0 100vmax rgba(10,12,16,.4);animation:sheetUp .25s cubic-bezier(.2,.8,.2,1);will-change:transform}
+  #ctx .ctx-item{padding:11px 10px;font-size:calc(15.5px*var(--ts))}
+  #ctx .ctx-head{font-size:calc(16px*var(--ts));padding:2px 10px 8px}
+}
+:root[data-motion="reduce"] .plus-menu,:root[data-motion="reduce"] #ctx,:root[data-motion="reduce"] .fs-card,:root[data-motion="reduce"] body > #notes,:root[data-motion="reduce"] .jump,:root[data-motion="reduce"] .upn-page{animation:none}
 
 /* ---------- phones: roomier view switch, client rows, work details, task panel footer; no scroll bleed ---------- */
 .cl-ic.on{color:var(--accent);background:var(--accent-soft)}
@@ -2185,7 +2196,7 @@ html{overscroll-behavior-y:contain}
   .tb-fab{width:62px;height:62px;right:4px}
   .main{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
   /* task top bar: pin, up next, ⋯ */
-  .drawer .d-top [data-act="d-pomo"],.drawer .d-top [data-act="d-link"],.drawer .d-top [data-act="d-duplicate"],.drawer .d-top [data-act="d-pip"],.drawer .d-top .d-close{display:none}
+  .drawer .d-top [data-act="d-pomo"],.drawer .d-top [data-act="d-link"],.drawer .d-top [data-act="d-pip"],.drawer .d-top .d-close{display:none}
   .drawer .d-more{display:grid;place-items:center}
   .drawer .d-foot-btns{display:none!important}
   .drawer .d-foot:not(.d-save){border-top:0;padding-top:4px}
@@ -2363,8 +2374,8 @@ select.rs-add{appearance:auto}
 .spec-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .spec{display:inline-flex;align-items:center;padding:2px 9px;border-radius:999px;background:var(--accent-soft);color:var(--text);font-size:calc(12.5px*var(--ts));font-weight:600;white-space:nowrap}
 .spec-captions,.spec-lufs{background:color-mix(in srgb,var(--st-rev) 16%,var(--surface))}
-.nf-mini{display:flex;gap:4px;margin-left:auto;margin-right:6px}
-.nf-mini .na-chip{padding:3px 9px;font-size:calc(12px*var(--ts))}
+.nf-mini{display:flex;flex-wrap:wrap;gap:4px;padding:2px 12px 8px}
+.nf-mini .na-chip{padding:4px 11px;font:500 calc(12.5px*var(--ts)) var(--body);border:1px solid var(--line);background:none;color:var(--muted);border-radius:999px;cursor:pointer}.nf-mini .na-chip:hover{border-color:var(--line-strong);color:var(--text)}.nf-mini .na-chip.on{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 55%,transparent);color:var(--text);font-weight:600}.nf-mini .na-chip small{color:var(--faint)}
 .tl-item.cu-mention .cu-body{border-color:color-mix(in srgb,var(--st-rev) 55%,var(--line));background:color-mix(in srgb,var(--st-rev) 10%,var(--surface))}
 .mn-tag{color:var(--st-rev);font-weight:700}
 @media (max-width:820px){.doc-row{grid-template-columns:auto minmax(0,1fr) auto}.doc-row .sel{grid-column:2}.inv-cur{width:100%}.inv-cur .sel{max-width:none;flex:1}}
@@ -3979,7 +3990,7 @@ function renderMain(){
   const keys=statKeys(),labels=Object.fromEntries(statDefs());
   $('#stats').innerHTML=Object.keys(S.jobs).length?`<div class="stats-wrap"><div class="stats" style="grid-template-columns:repeat(${keys.length},minmax(0,1fr))">${keys.map(k=>statTile(k,labels[k],scope)).join('')}<button type="button" class="icon-btn stats-edit ${STATPOP?'on':''}" data-act="stat-edit" title="Choose tiles" aria-label="Choose which tiles show" aria-expanded="${STATPOP}">${I.pencil}</button></div>${statPopHtml()}</div>`:'';
 
-  $('#jobcards').innerHTML=(!job?allClearHtml():'')+(!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')+`<button type="button" class="job-card job-add" data-act="new-job" title="New job">${I.plus}<span>New job</span></button>`}</div>`:'')+pinnedStrip(scope);
+  $('#jobcards').innerHTML=(!job?allClearHtml():'')+(!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')+`<button type="button" class="job-card job-add" data-act="new-job" title="New job">${I.plus}<span>New job</span></button>`}</div>`:'');
 
   const tb=$('#toolbar');tb.hidden=!Object.keys(S.jobs).length;
   $('#top-search').hidden=tb.hidden;$('#fdot').hidden=u.prio==='all'&&u.due==='all';
@@ -4150,7 +4161,7 @@ document.addEventListener('contextmenu',e=>{
 /* long press on touch screens */
 let lpT=null,lpAt=null,lpFired=false;
 document.addEventListener('touchstart',e=>{
-  const r=e.target.closest?.(CTX_SEL);if(!r||e.touches.length>1||e.target.closest('input,textarea,select,a,button'))return;
+  const r=e.target.closest?.(CTX_SEL);if(!r||e.touches.length>1||e.target.closest('input,textarea,select,a,button,.un-grip'))return;
   const p=e.touches[0];lpAt={x:p.clientX,y:p.clientY};lpFired=false;clearTimeout(lpT);
   lpT=setTimeout(()=>{lpFired=true;haptic(12);openCtx(r.dataset.id,lpAt.x,lpAt.y)},480);
 },{passive:true});
@@ -4187,16 +4198,22 @@ function renderUpNextPage(){
 }
 function upNextStrip(){
   const list=upNextList();if(!list.length)return '';
-  return `<section class="upnext"><h3>${UP_IC}Up next<span class="count">${list.length}</span><span class="un-hint">Drag to reorder</span></h3><ol class="un-list">${list.map((t,i)=>`<li class="un-row" draggable="true" data-un="${t.id}" data-act="open" data-id="${t.id}" tabindex="0" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}"><span class="un-n">${i+1}</span>${taskMark(t)}<div class="pc-main"><b>${esc(t.name||'Untitled task')}</b><small>${esc([S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '))}</small></div><span class="pill" ${pillStyle(stOf(t))}><span class="pl">${esc(stLabel(stOf(t)))}</span></span><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):''}</span><button class="icon-btn" data-act="un-rm" data-id="${t.id}" data-stop title="Remove from Up next" aria-label="Remove from Up next">${I.x}</button></li>`).join('')}</ol></section>`;
+  return `<section class="upnext"><h3>${UP_IC}Up next<span class="count">${list.length}</span><span class="un-hint">Drag to reorder</span></h3><ol class="un-list">${list.map((t,i)=>`<li class="un-row" draggable="true" data-un="${t.id}" data-act="open" data-id="${t.id}" tabindex="0" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}"><span class="un-grip" data-stop aria-hidden="true">${GRIP_IC}</span><span class="un-n">${i+1}</span>${taskMark(t)}<div class="pc-main"><b>${esc(t.name||'Untitled task')}</b><small>${esc([S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '))}</small></div><span class="pill" ${pillStyle(stOf(t))}><span class="pl">${esc(stLabel(stOf(t)))}</span></span><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):''}</span><button class="icon-btn" data-act="un-rm" data-id="${t.id}" data-stop title="Remove from Up next" aria-label="Remove from Up next">${I.x}</button></li>`).join('')}</ol></section>`;
 }
 let unDrag=null;
 function unMark(e){document.querySelectorAll('.un-row').forEach(x=>x.classList.remove('drop-before','drop-after'));const r=e.target.closest?.('.un-row');if(!r||r.dataset.un===unDrag)return null;const b=r.getBoundingClientRect(),after=e.clientY>b.top+b.height/2;r.classList.add(after?'drop-after':'drop-before');return {id:r.dataset.un,after}}
 document.addEventListener('dragstart',e=>{const r=e.target.closest?.('.un-row');if(!r)return;unDrag=r.dataset.un;r.classList.add('dragging');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',unDrag)}catch(x){}});
 document.addEventListener('dragover',e=>{if(unDrag&&e.target.closest?.('.un-list')){e.preventDefault();unMark(e)}});
 document.addEventListener('dragend',()=>{if(!unDrag)return;unDrag=null;document.querySelectorAll('.un-row').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'))});
-document.addEventListener('drop',e=>{if(!unDrag)return;const m=unMark(e);const id=unDrag;unDrag=null;document.querySelectorAll('.un-row').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'));if(!m)return;e.preventDefault();
-  const ids=upNextList().map(t=>t.id).filter(x=>x!==id);let i=ids.indexOf(m.id);if(i<0)return;if(m.after)i++;ids.splice(i,0,id);
-  ids.forEach((tid,k)=>{if(S.tasks[tid].upNext!==(k+1)*1000)patch('tasks',tid,{upNext:(k+1)*1000})});render()});
+function unMove(id,m){const ids=upNextList().map(t=>t.id).filter(x=>x!==id);let i=ids.indexOf(m.id);if(i<0)return;if(m.after)i++;ids.splice(i,0,id);
+  ids.forEach((tid,k)=>{if(S.tasks[tid].upNext!==(k+1)*1000)patch('tasks',tid,{upNext:(k+1)*1000})});render();if(UPN)renderUpNextPage()}
+document.addEventListener('drop',e=>{if(!unDrag)return;const m=unMark(e);const id=unDrag;unDrag=null;document.querySelectorAll('.un-row').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'));if(!m)return;e.preventDefault();unMove(id,m)});
+/* touch screens: drag a row by its grip (HTML drag and drop doesn't work with a finger) */
+const GRIP_IC='<svg viewBox="0 0 12 12" fill="currentColor"><circle cx="4" cy="2.5" r="1.1"/><circle cx="8" cy="2.5" r="1.1"/><circle cx="4" cy="6" r="1.1"/><circle cx="8" cy="6" r="1.1"/><circle cx="4" cy="9.5" r="1.1"/><circle cx="8" cy="9.5" r="1.1"/></svg>';
+let UNT=null;
+document.addEventListener('touchstart',e=>{const g=e.target.closest?.('.un-grip');if(!g||e.touches.length>1)return;const r=g.closest('.un-row');UNT={id:r.dataset.un,row:r,y:e.touches[0].clientY};unDrag=UNT.id;r.classList.add('dragging');r.style.pointerEvents='none';haptic(8)},{passive:true});
+document.addEventListener('touchmove',e=>{if(!UNT)return;e.preventDefault();const t=e.touches[0];UNT.row.style.transform=`translateY(${t.clientY-UNT.y}px)`;UNT.m=unMark({target:document.elementFromPoint(t.clientX,t.clientY),clientY:t.clientY})},{passive:false});
+document.addEventListener('touchend',()=>{const g=UNT;if(!g)return;UNT=null;unDrag=null;g.row.style.transform='';g.row.style.pointerEvents='';document.querySelectorAll('.un-row').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'));SHD_EAT=Date.now()+450;if(g.m)unMove(g.id,g.m)});
 /* "All clear": nothing overdue and nothing due today (Overview, Settings → Appearance; hidden for the day with ×) */
 function allClearHtml(){
   if(!pref('allClear')||!jobsSorted().length)return '';
@@ -4210,10 +4227,6 @@ function allClearHtml(){
     <button type="button" class="icon-btn" data-act="clear-hide" title="Hide for today" aria-label="Hide for today">${I.x}</button></section>`;
 }
 /* the top of your Up next queue (pins were folded into Up next): first 3 queued tasks in this scope, with a link to the whole queue */
-function pinnedStrip(scope){
-  const ids=new Set(scope.map(t=>t.id)),all=upNextList().filter(t=>ids.has(t.id)),pins=all.slice(0,3);if(!pins.length)return '';
-  return `<section class="pins"><h3>${UP_IC}Up next<span class="count">${all.length}</span>${all.length>3?`<button type="button" class="btn sm ghost pins-all" data-act="nav" data-tab="upnext">See all</button>`:''}</h3><div class="pin-list">${pins.map(t=>`<div class="pin-card" data-act="open" data-id="${t.id}" tabindex="0"><span class="un-n">#${upNextPos(t)}</span>${taskMark(t)}<div class="pc-main"><b>${esc(t.name||'Untitled task')}</b><small>${esc([S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '))}</small></div><span class="pill" ${pillStyle(stOf(t))}><span class="pl">${esc(stLabel(stOf(t)))}</span></span><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):''}</span><button class="icon-btn" data-act="unpin" data-id="${t.id}" data-stop title="Remove from Up next" aria-label="Remove from Up next">${I.x}</button></div>`).join('')}</div></section>`;
-}
 /* "Good morning, Kim · Monday, Sep 28" above the Overview title (Settings → Appearance) */
 function greetHtml(){
   if(!pref('greeting'))return '';
@@ -4476,20 +4489,22 @@ function renderBell(){
   renderTabbar();sheetLock();
   const pop=$('#notes');pop.hidden=!notesOpen;if(!notesOpen)return;
   if(narrow.matches){pop.innerHTML=notesPageHtml(list,unread);return}
-  const mns=list.filter(n=>n.mention);if(NF==='mentions'&&mns.length)list=mns;
-  pop.innerHTML=`<div class="notes-head" data-sheet-grab><b>Notifications</b>${mns.length?`<span class="nf-mini"><button type="button" class="na-chip ${NF!=='mentions'?'on':''}" data-act="na-filter" data-f="all">All</button><button type="button" class="na-chip ${NF==='mentions'?'on':''}" data-act="na-filter" data-f="mentions">@ Mentions <small>${mns.length}</small></button></span>`:''}${unread?'<button type="button" class="btn sm ghost" data-act="notes-read">Mark all as read</button>':''}<button type="button" class="icon-btn notes-x" data-act="notes-close" aria-label="Close" title="Close">${I.x}</button></div>${list.length?'<p class="notes-tip">Swipe a notification left to dismiss it.</p>':''}
+  const f=naSets(list),all=list.length;if(NF==='mentions'&&!f.mentions.length)NF='all';list=f[NF]||list;
+  pop.innerHTML=`<div class="notes-head"><b>Notifications</b>${unread?'<button type="button" class="btn sm ghost" data-act="notes-read">Mark all as read</button>':''}<button type="button" class="icon-btn notes-x" data-act="notes-close" aria-label="Close" title="Close">${I.x}</button></div>${all?`<div class="nf-mini">${naChips(f)}</div>`:''}
     ${list.length?`<div class="notes-list">${list.map(n=>`<div data-nkey="${esc(n.key)}" class="note ${n.kind} ${NS.read[n.key]?'':'unread'}"><button type="button" class="note-main" data-act="note-open" data-key="${esc(n.key)}">${I[n.icon]}<span><b>${esc(n.title)}</b>${n.body?`<span>${esc(n.body)}</span>`:''}<small>${esc(n.sub)}</small></span></button><button type="button" class="icon-btn" data-act="note-hide" data-key="${esc(n.key)}" aria-label="Dismiss" title="Dismiss">${I.x}</button></div>`).join('')}</div>`
-    :`<p class="notes-empty">You're all caught up. Deadlines, busy days and tasks that need a nudge will show up here.</p>`}`;
+    :`<p class="notes-empty">${all?'Nothing here with this filter.':"You're all caught up. Deadlines, busy days and tasks that need a nudge will show up here."}</p>`}`;
 }
 /* phones: notifications as a full page like Slack's Activity: colored header, filter chips,
    rows with the task's logo, a kind badge, what happened, when, and the job; swipe a row left to dismiss */
 let NF='all';
 const NA_LBL={ctr:'Contract',over:'Overdue',today:'Due today',tmrw:'Due tomorrow',start:'Starts today',stale:'Needs a nudge',rev:'Many revisions',nodate:'No due date',busy:'Busy day',backup:'Backup',cu:'ClickUp comment',cum:'Mentioned you',cunew:'From ClickUp',inv:'Invoice'};
 const NA_DEAD=new Set(['over','today','tmrw','busy']);
+/* the filter chips are shared by the phone page and the desktop bell */
+function naSets(list){const kindOf=n=>n.key.split(':')[0];return {all:list,unread:list.filter(n=>!NS.read[n.key]),mentions:list.filter(n=>n.mention),deadlines:list.filter(n=>NA_DEAD.has(kindOf(n))),followups:list.filter(n=>!NA_DEAD.has(kindOf(n)))}}
+function naChips(f){return [['all','All'],['unread','Unread'],...(f.mentions.length?[['mentions','Mentions']]:[]),['deadlines','Deadlines'],['followups','Follow-ups']].map(([k,l])=>`<button type="button" class="na-chip ${NF===k?'on':''}" data-act="na-filter" data-f="${k}">${l}${k!=='all'&&f[k].length?` <small>${f[k].length}</small>`:''}</button>`).join('')}
 function notesPageHtml(list,unread){
   const kindOf=n=>n.key.split(':')[0];
-  const f={all:list,unread:list.filter(n=>!NS.read[n.key]),mentions:list.filter(n=>n.mention),deadlines:list.filter(n=>NA_DEAD.has(kindOf(n))),followups:list.filter(n=>!NA_DEAD.has(kindOf(n)))};
-  const chips=[['all','All'],['unread','Unread'],...(f.mentions.length?[['mentions','Mentions']]:[]),['deadlines','Deadlines'],['followups','Follow-ups']].map(([k,l])=>`<button type="button" class="na-chip ${NF===k?'on':''}" data-act="na-filter" data-f="${k}">${l}${k!=='all'&&f[k].length?` <small>${f[k].length}</small>`:''}</button>`).join('');
+  const f=naSets(list),chips=naChips(f);
   const rows=(f[NF]||list).map(n=>{
     const t=n.task,k=kindOf(n),j=t&&S.jobs[t.jobId],c=t&&S.clients[t.clientId];
     const av=t?taskMark(t):`<div class="tmark na-ic">${I[n.icon]}</div>`;
@@ -4882,23 +4897,17 @@ let SHD=null,SHD_EAT=0;
 document.addEventListener('click',e=>{if(Date.now()<SHD_EAT){e.stopPropagation();e.preventDefault();SHD_EAT=0}},true);
 document.addEventListener('touchstart',e=>{
   if(!narrow.matches||e.touches.length>1)return;const t=e.touches[0];
-  const grab=e.target.closest?.('[data-sheet-grab]'),sheet=grab&&(grab.closest('.jump')||grab.closest('#notes'));
-  if(sheet&&!e.target.closest('input')){SHD={kind:'sheet',el:sheet,y:t.clientY,x:t.clientX,at:Date.now(),d:0};return}
   const row=e.target.closest?.('#notes .note[data-nkey]');
-  if(row){SHD={kind:'note',el:row,x:t.clientX,y:t.clientY,d:0,lock:null}}
+  if(row){SHD={el:row,x:t.clientX,y:t.clientY,d:0,lock:null}}
 },{passive:true});
 document.addEventListener('touchmove',e=>{
   if(!SHD)return;const t=e.touches[0];
-  if(SHD.kind==='sheet'){SHD.d=Math.max(0,t.clientY-SHD.y);SHD.el.style.transition='none';SHD.el.style.transform=`translateY(${SHD.d}px)`;return}
   const dx=t.clientX-SHD.x,dy=t.clientY-SHD.y;
   if(SHD.lock===null&&(Math.abs(dx)>10||Math.abs(dy)>10))SHD.lock=Math.abs(dx)>Math.abs(dy)&&dx<0;
   if(SHD.lock){SHD.d=Math.min(0,dx);SHD.el.style.transition='none';SHD.el.style.transform=`translateX(${SHD.d}px)`;SHD.el.style.opacity=String(Math.max(.3,1+SHD.d/300))}
 },{passive:true});
 document.addEventListener('touchend',()=>{
   const g=SHD;SHD=null;if(!g)return;const el=g.el;el.style.transition='';if(g.d&&Math.abs(g.d)>8)SHD_EAT=Date.now()+450;
-  if(g.kind==='sheet'){
-    if(g.d>110||(Date.now()-g.at<300&&g.d>40)){el.style.transform=`translateY(100%)`;setTimeout(()=>{el.style.transform='';if(el.closest('#jump'))closeJump();else{notesOpen=false;renderBell()}},200)}
-    else el.style.transform='';return}
   if(!g.lock){el.style.transform='';el.style.opacity='';return}
   if(g.d<-90){el.style.transform='translateX(-110%)';el.style.opacity='0';haptic(8);const k=el.dataset.nkey;setTimeout(()=>{NS.hidden[k]=1;NS.read[k]=1;saveNotes();renderBell()},180)}
   else{el.style.transform='';el.style.opacity=''}
@@ -5221,7 +5230,7 @@ function renderDrawer(){
   withFocus(()=>{$('#drawer').innerHTML=`
   ${t._draft?`<div class="d-draft">${t.copiedFrom?I.copy:I.plus}<b>${t.copiedFrom?'Copy of a task':'New task'}</b><span>Not saved yet</span></div>`:''}
   <div class="d-top" style="--jc:${esc(j?.color||'transparent')}"><div class="crumb">${taskMark(t)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
-    ${t._draft?'':`${isClosed(t)?'':(()=>{const T=pomoState(),on=T.taskId===t.id&&T.mode==='focus'&&T.run!=='idle';return `<button class="icon-btn d-pomo ${on?'pin-on':''}" data-act="d-pomo" aria-pressed="${on}" aria-label="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task'}" title="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task (starts a focus session)'}${t.pomos?` · ${t.pomos} focus session${t.pomos===1?'':'s'} so far`:''}">${TOMATO_IC}${t.pomos?`<span class="dp-n">${t.pomos}</span>`:''}</button>`})()}${isClosed(t)?'':`<button class="icon-btn ${t.upNext?'pin-on':''}" data-act="d-upnext" aria-pressed="${!!t.upNext}" aria-label="${t.upNext?'Remove from Up next':'Add to Up next'}" title="${t.upNext?`Up next #${upNextPos(t)} · click to remove`:'Add to Up next (your queue across jobs)'}">${UP_IC}</button>`}<button class="icon-btn" data-act="d-link" aria-label="Copy link to this task" title="Copy link to this task">${LINK_IC}</button><button class="icon-btn" data-act="d-duplicate" aria-label="Duplicate task" title="Duplicate (make a copy to edit)">${I.copy}</button>${canPip()?`<button class="icon-btn ${PIP.win&&PIP.id===t.id?'pin-on':''}" data-act="d-pip" aria-pressed="${!!(PIP.win&&PIP.id===t.id)}" aria-label="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task in its own window'}" title="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task over Premiere or Resolve'}">${PIP_IC}</button>`:''}`}${t._draft?'':`<button class="icon-btn d-more" data-act="d-more" aria-label="Task options" title="Task options" aria-expanded="${!!TOPT}">${MORE_IC}</button>`}<button class="icon-btn d-close" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
+    ${t._draft?'':`${isClosed(t)?'':(()=>{const T=pomoState(),on=T.taskId===t.id&&T.mode==='focus'&&T.run!=='idle';return `<button class="icon-btn d-pomo ${on?'pin-on':''}" data-act="d-pomo" aria-pressed="${on}" aria-label="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task'}" title="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task (starts a focus session)'}${t.pomos?` · ${t.pomos} focus session${t.pomos===1?'':'s'} so far`:''}">${TOMATO_IC}${t.pomos?`<span class="dp-n">${t.pomos}</span>`:''}</button>`})()}${isClosed(t)?'':`<button class="icon-btn ${t.upNext?'pin-on':''}" data-act="d-upnext" aria-pressed="${!!t.upNext}" aria-label="${t.upNext?'Remove from Up next':'Add to Up next'}" title="${t.upNext?`Up next #${upNextPos(t)} · click to remove`:'Add to Up next (your queue across jobs)'}">${UP_IC}</button>`}<button class="icon-btn" data-act="d-link" aria-label="Copy link to this task" title="Copy link to this task">${LINK_IC}</button>${canPip()?`<button class="icon-btn ${PIP.win&&PIP.id===t.id?'pin-on':''}" data-act="d-pip" aria-pressed="${!!(PIP.win&&PIP.id===t.id)}" aria-label="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task in its own window'}" title="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task over Premiere or Resolve'}">${PIP_IC}</button>`:''}`}${t._draft?'':`<button class="icon-btn d-more" data-act="d-more" aria-label="Task options" title="Task options" aria-expanded="${!!TOPT}">${MORE_IC}</button>`}<button class="icon-btn d-close" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
   ${t._draft?'':`<div class="d-tabs" role="tablist"><button role="tab" data-act="d-tab" data-tab="details" class="${S.ui.dtab!=='activity'?'on':''}" aria-selected="${S.ui.dtab!=='activity'}">${I.info}Details</button><button role="tab" data-act="d-tab" data-tab="activity" class="${S.ui.dtab==='activity'?'on':''}" aria-selected="${S.ui.dtab==='activity'}">${I.clock}Activity<span class="mono">${taskActivity(t).length}</span></button></div>`}
   ${!t._draft&&S.ui.dtab==='activity'?activityPane(t):`  <div class="d-body">
     ${SPLIT&&SPLIT.id===t.id?splitHtml(t):''}
@@ -5897,9 +5906,6 @@ function renderProfile(){
       <p class="hint">${[pr.location,(pr.tz||MY_TZ)?`${esc(timeThere(pr.tz||MY_TZ))} · ${esc(pr.tz||MY_TZ)}`:'',B.email?esc(B.email):''].filter(Boolean).join(' · ')}</p>
       ${links.length?`<div class="pf-links">${links.map(([k,l])=>`<a class="btn sm" href="${esc(safeUrl(pr[k]))}" target="_blank" rel="noopener">${esc(l)}</a>`).join('')}</div>`:''}</div>
       <button type="button" class="icon-btn" data-act="prf-edit" title="Edit your details" aria-label="Edit your details">${I.pencil}</button></div>`;
-  const calLine=B.mode!=='cloud'?'':!B.cfg?.calendar?'Not set up':!CAL.loaded?'Checking…':CAL.connected?`Connected${CAL.email?` to ${esc(CAL.email)}`:''}${CAL.lastSync?` · updated ${esc(calAgo(CAL.lastSync))}`:''}${CAL.error==='reconnect'?' · <b class="acct-warn">needs reconnecting</b>':''}`:'Not connected';
-  const cuLine=B.mode!=='cloud'?'':!B.cfg?.clickup?'Not set up':!CU.loaded?'Checking…':CU.connected?`Connected · ${CU.teams.length} workspace${CU.teams.length===1?'':'s'}${CU.lastSync?` · checked ${esc(calAgo(CU.lastSync))}`:''}${CU.error?' · <b class="acct-warn">has a problem</b>':''}`:'Not connected';
-  const bk=appSettings().backupAt;
   const acctRow=(icon,name,line,sec,btn)=>`<div class="pf-acct">${icon}<div><b>${name}</b><small>${line}</small></div>${sec?`<button type="button" class="btn sm" data-act="help-go" data-sec="${sec}">${btn||'Manage'}</button>`:''}</div>`;
   const secs=[
     {id:'me',label:'You',icon:PERSON_IC,html:`${meCard}
@@ -5921,11 +5927,9 @@ function renderProfile(){
       <div class="pf-week">${week.map(x=>`<div class="pf-day ${x.on.length?'':'off'} ${new Date().getDay()===x.d?'today':''}"><div class="pf-dh"><b>${WEEKDAY_FULL[x.d]}</b><small>${x.hrs?fmtNum(x.hrs)+' h':'Off'}</small></div><div class="pf-shifts">${x.on.map(j=>{const w=workOf(j);return `<span class="pf-shift" style="--jc:${esc(j.color||'var(--accent)')}"><span class="pf-sn">${jobEmoji(j)}${esc(j.name)}</span><em>${w.shiftStart&&w.shiftEnd?`${esc(fmtClock(w.shiftStart))} – ${esc(fmtClock(w.shiftEnd))}`:jobHoursDay(w)?`${fmtNum(jobHoursDay(w))} h`:''}</em></span>`}).join('')}</div></div>`).join('')}</div>`},
     {id:'account',label:'Account',icon:I.gear,html:`<div class="pf-acct-list">
       ${acctRow(PERSON_IC,B.mode==='cloud'?'Signed in':'This browser',B.mode==='cloud'?esc(B.email||''):'Your work is saved in this browser only',null)}
-      ${B.mode==='cloud'?acctRow(I.cal,'Google Calendar',calLine,'account'):''}
-      ${B.mode==='cloud'?acctRow(CU_IC,'ClickUp',cuLine,'clickup'):''}
-      ${acctRow(I.download,'Backup',bk?`Last downloaded ${esc(fmtDate(bk))} · ${relDays(bk)}`:'Never downloaded','backup','Back up')}
-      ${acctRow(I.gear,'Settings','Look, statuses, workload, holidays and more','appearance','Open')}
-      </div>${B.mode==='cloud'?`<div class="pf-btns"><button type="button" class="btn sm" data-act="sign-out">Sign out</button></div>`:''}`}
+      ${B.mode==='cloud'&&CAL.error==='reconnect'?acctRow(I.cal,'Google Calendar','<b class="acct-warn">Needs reconnecting</b>','account','Fix'):''}
+      ${B.mode==='cloud'&&CU.connected&&CU.error?acctRow(CU_IC,'ClickUp','<b class="acct-warn">Has a problem</b>','clickup','Fix'):''}
+      </div><div class="pf-btns"><button type="button" class="btn sm" data-act="help-go" data-sec="appearance">Open Settings</button>${B.mode==='cloud'?'<button type="button" class="btn sm" data-act="sign-out">Sign out</button>':''}</div><p class="hint">Calendar, ClickUp and backups live in Settings.</p>`}
   ];
   keepScroll('#modal',()=>withFocus(()=>{$('#modal').innerHTML=`<div class="modal pref-modal pf-modal" role="dialog" aria-modal="true" aria-labelledby="pf-title">
     <header><h2 id="pf-title">Profile</h2><button class="icon-btn" data-act="prf-close" aria-label="Close" title="Close">${I.x}</button></header>
@@ -6272,7 +6276,7 @@ const HELP=[
  ['Tasks','Merge duplicate tasks',`Settings → Duplicate tasks lists tasks in the same job with the same name. Pick the copy to keep and click Merge: it gets anything it was missing from the others (links, client, dates, notes, checklist steps, the ClickUp link and comments, updates and history), and the other copies go to Trash, where you can still restore them.`,['dupes','Duplicate tasks']],
  ['Tasks','Same name twice',`If you save a new task with the same name as an open one in that job, the panel asks whether to open the one you already have or save the new one anyway.`,null],
  ['Tasks','Select several',`Turn on Select in the toolbar, tick tasks (Shift-click for a range), then set status, priority, due date, move them to another job or client, archive or delete them together.`,null],
- ['Tasks','Up next, templates and duplicates',`Add a task to Up next (the queue icon at the top of a task, or right-click) to line up what you'll work on; the first three show on the Overview and the job page. Pins were folded into Up next. Save checklist steps as a template per client. Duplicate makes an unsaved copy to edit: same client (so the same brand guide), due date, links, notes and checklist (unticked), with a fresh status.`,null],
+ ['Tasks','Up next, templates and duplicates',`Add a task to Up next (the queue icon at the top of a task, or right-click) to line up what you'll work on; it has its own page in the sidebar. Save checklist steps as a template per client. Duplicate makes an unsaved copy to edit: same client (so the same brand guide), due date, links, notes and checklist (unticked), with a fresh status.`,null],
  ['Updates and notes','Updates and revision notes',`In a task's Activity tab, post updates with formatting, timecodes and pictures (paste a screenshot or drop it in). Tick an update when it's done, reply to it, or edit it. Tasks with open updates show a speech-bubble count in lists.`,null],
  ['Updates and notes','Notes formatting',`Notes support bold (${IS_MAC?'⌘':'Ctrl '}B), italic (${IS_MAC?'⌘':'Ctrl '}I), bullet and numbered lists and links. ${IS_MAC?'⌘':'Ctrl '}Z undoes typing in any text box.`,['keys','Keyboard shortcuts']],
  ['Links and files','Finder folders and Chrome profiles',`Paste a Finder path into a task's Project folder (Mac) and it opens in Finder through a one-time Shortcuts setup. A job can open its links in its own Chrome profile or Google account.`,['finder','Finder & Chrome']],
@@ -6292,11 +6296,11 @@ const HELP=[
  ['Your work','Job emoji',`Give a job an emoji in Edit job → General. It shows next to the job in the sidebar, on its Overview card and in notifications.`,null],
  ['Look and feel','Little extras',`An “All clear” moment on the Overview when nothing is overdue or due today; emoji reactions on client updates (the smiley under an update); film-look color schemes (Portra, Fuji, Noir, Teal & Orange, Technicolor); the office cat on the sidebar (it wears headphones and nods along during a focus session, naps during breaks and when you're away, stretches when you finish a task, and purrs when you click it; a little window behind it shows the sky for your time of day, and it dresses up in December, on New Year's Day and on Halloween; it sweats when something's overdue, smiles on all-clear days and watches your mouse; a plant on the sill grows a leaf per task done this month; birds and butterflies drop by; now and then it naps on one of your tasks until you open it; it peeks over the updates you post; a treat jar fills with a treat per finished task (click it to feed the cat); and after 30 days a puppy, hamster or goldfish can join it on the sill); a cork board in the sidebar with your photos and sticky notes (click + to pin one, click a note to edit it); a photo strip of your own pictures in the sidebar (add them in Settings → Personalize & fun); and seasonal touches: a Christmas countdown from September, snow in December, fireworks on New Year's Day, bats on Halloween and hearts on Valentine's. Turn them off in Settings → Personalize & fun.`,['fun','Personalize & fun']],
  ['Getting work done','Installed app (Chrome)',`Install Splice & Co. from Chrome's address bar (the install icon) to get its own window and Dock icon. The Dock icon shows how many tasks are overdue or due today; right-click it for New task, Overview, Calendar and Quick search. The app's colors reach into the title bar (Chrome's chevron at the top right switches that off). To have task links from Slack or email open in the app, turn on "Open supported links" in the app's settings (⋮ menu in the app window → App info or Settings).`,null],
- ['Getting around','Phone: dialogs are sheets too',`On a phone, Settings, your profile, Edit job, New job, the focus timer, Search, Notifications and Up next slide up from the bottom. Pull one down from the top to close it: Settings, Edit job and the brand guide save as they close, and a new job with no name is just dropped. Inside a section, swipe right to go back to the list.`,null],
+ ['Getting around','Phone: dialogs are sheets too',`On a phone, Settings, your profile, Edit job, New job, the focus timer, Search, Notifications, Up next, the filter menu, Task options and the press-and-hold menu slide up from the bottom. Pull one down from the top to close it: Settings, Edit job and the brand guide save as they close, and a new job with no name is just dropped. Inside a section, swipe right to go back to the list.`,null],
  ['Getting work done','Phone: pull the task down to close',`On a phone, a task opens as a sheet from the bottom. Pull it down from the top (or anywhere when it's scrolled to the top) to close it; swipe sideways to go to the next or previous task.`,null],
  ['Getting work done','Pull to refresh',`At the top of any page, pull down (on a phone or tablet) or keep scrolling up with two fingers on the trackpad. When it says “Release to refresh”, let go and the app reloads with the latest data and any app updates.`,null],
  ['Getting work done','Save & add another',`Next to Save task: saves it and opens a fresh task for the same job, client and format, for entering a batch of reels in a row.`,null],
- ['Getting work done','Up next',`Your own queue across every job. Add a task from the right-click menu or the queue icon at the top of a task. The queue has its own page (Up next in the sidebar, or the Up next tab on a phone); drag to reorder. Finished tasks leave it on their own.`,null],
+ ['Getting work done','Up next',`Your own queue across every job. Add a task from the right-click menu or the queue icon at the top of a task. The queue has its own page (Up next in the sidebar, or the Up next tab on a phone); drag to reorder (on a phone, drag a row by its dotted handle). Finished tasks leave it on their own.`,null],
  ['Getting work done','Push due dates back',`Select tasks, then Push back… in the bar at the bottom: +1 day, +2 days, +1 week, or workdays that skip weekends. Undo puts the old dates back.`,null],
  ['Editing','Floating task window',`The window icon at the top of a task opens it in a small window that stays on top of Premiere or Resolve (Chrome on a computer). Tick checklist steps, resolve client updates, move the status on and open the links from there. The client's brand guide is there too: click a color to copy its hex code, or copy the fonts, CTA and end-card text. Click the icon again or close the window to stop.`,null],
  ['Editing','Safe-zone overlays',`See-through 1080×1920 PNG guides for TikTok, Reels and Shorts, plus one that combines all three. Put one on the top track of your timeline to keep text and faces clear of each app's buttons and captions, then turn it off before you export.`,['safezones','Safe-zone overlays']],
@@ -7585,10 +7589,10 @@ function sheetClose(){
 let MSW=null;
 document.addEventListener('touchstart',e=>{
   MSW=null;if(!narrow.matches||e.touches.length>1)return;
-  const sheet=e.target.closest?.('#modal .modal, body > #pomo-pop, body > #notes, #upnext-page, #jump .jump');if(!sheet||e.target.closest('input,textarea,select,[contenteditable="true"],.ck-grip'))return;
+  const sheet=e.target.closest?.('#modal .modal, body > #pomo-pop, body > #notes, #upnext-page, #jump .jump, #topt .topt, #filter-sheet .fs-card, #plus-menu, #ctx');if(!sheet||e.target.closest('input,textarea,select,[contenteditable="true"],.ck-grip,.un-grip'))return;
   let top=true;for(let n=e.target;n&&n!==sheet.parentElement;n=n.parentElement){if(n.scrollHeight>n.clientHeight+2&&n.scrollTop>0){top=false;break}}
   const pref=sheet.querySelector('.pref'),back=pref&&!pref.classList.contains('m-list')?sheet.querySelector('[data-act="pref-back"]'):null;
-  const t=e.touches[0];MSW={sheet,x:t.clientX,y:t.clientY,at:Date.now(),down:top||!!e.target.closest('.modal>header,.na-head,.jump-top')||sheet.id==='pomo-pop',back:back&&back.offsetParent&&!sideScroller(e.target)?back:null,lock:null,d:0};
+  const t=e.touches[0];MSW={sheet,x:t.clientX,y:t.clientY,at:Date.now(),down:top||!!e.target.closest('.modal>header,.na-head,.jump-top,.fs-head')||['pomo-pop','plus-menu','ctx'].includes(sheet.id),back:back&&back.offsetParent&&!sideScroller(e.target)?back:null,lock:null,d:0};
 },{passive:true});
 document.addEventListener('touchmove',e=>{
   if(!MSW)return;const t=e.touches[0],dx=t.clientX-MSW.x,dy=t.clientY-MSW.y;
@@ -7599,7 +7603,7 @@ document.addEventListener('touchmove',e=>{
 document.addEventListener('touchend',()=>{
   const g=MSW;MSW=null;if(!g||!g.lock||g.lock==='none')return;const fast=Date.now()-g.at<300;
   if(g.lock==='down'){if(g.d>8)SHD_EAT=Date.now()+450;const sh=g.sheet;sh.style.transition='transform .2s ease';
-    if(g.d>110||(fast&&g.d>40)){haptic(8);sh.style.transform='translateY(100%)';setTimeout(()=>{sh.style.transition='';sh.style.transform='';if(sh.id==='pomo-pop'){POMO_OPEN=false;renderPomo()}else if(sh.id==='notes'){notesOpen=false;renderBell()}else if(sh.id==='upnext-page'){UPN=false;renderUpNextPage();renderTabbar()}else if(sh.classList.contains('jump'))closeJump();else sheetClose()},190)}
+    if(g.d>110||(fast&&g.d>40)){haptic(8);sh.style.transform='translateY(100%)';setTimeout(()=>{sh.style.transition='';sh.style.transform='';if(sh.id==='pomo-pop'){POMO_OPEN=false;renderPomo()}else if(sh.id==='notes'){notesOpen=false;renderBell()}else if(sh.id==='upnext-page'){UPN=false;renderUpNextPage();renderTabbar()}else if(sh.classList.contains('jump'))closeJump();else if(sh.closest('#topt')){TOPT=false;renderTopt()}else if(sh.closest('#filter-sheet'))closeFilters();else if(sh.id==='plus-menu'){PLUS=false;renderPlus()}else if(sh.id==='ctx')closeCtx();else sheetClose()},190)}
     else sh.style.transform='';return}
   const b=g.sheet.querySelector('.pref-body');
   if(g.d>80||(fast&&g.d>35)){haptic(8);if(b){b.style.transform='';b.style.transition=''}g.back.click();SHD_EAT=Date.now()+450}
@@ -7609,7 +7613,7 @@ document.addEventListener('touchstart',e=>{
   SSW=null;if(!narrow.matches||e.touches.length>1)return;
   const t=e.touches[0],open=$('#side').classList.contains('open');
   if(!open&&(!$('#drawer').hidden||!$('#modal').hidden||($('#jump')&&!$('#jump').hidden)||!$('#lightbox')?.hidden||document.body.classList.contains('typing')))return;
-  if(!open&&e.target.closest?.('input,textarea,select,[contenteditable],.ck-grip,#ctx,#filter-sheet,.tabbar'))return;
+  if(!open&&e.target.closest?.('input,textarea,select,[contenteditable],.ck-grip,.un-grip,#ctx,#filter-sheet,#topt,#plus-menu,.tabbar'))return;
   if(!open&&t.clientX>28&&sideScroller(e.target))return;
   SSW={x:t.clientX,y:t.clientY,at:Date.now(),open,lock:null,edge:!open&&t.clientX<=28};
 },{passive:true});
@@ -7789,7 +7793,6 @@ document.addEventListener('click',e=>{
     case 'trash-restore': trashArmed=null;restoreTrash([el.dataset.id]);break;
     case 'trash-purge': if(trashArmed!==el.dataset.id){trashArmed=el.dataset.id;render();break}trashArmed=null;purgeTasks([el.dataset.id]);render();toast('Deleted for good');break;
     case 'trash-empty': if(trashArmed!=='all'){trashArmed='all';render();break}{const ids=trashed().map(t=>t.id);trashArmed=null;purgeTasks(ids);render();toast(`Deleted ${ids.length} task${ids.length===1?'':'s'} for good`)}break;
-    case 'unpin':{const id=el.dataset.id;if(S.tasks[id]?.upNext)toggleUpNext(id);break}
     case 'jump': openJump();break;
     case 'sel':{const id=el.dataset.id;
       if(e.shiftKey&&selLast){const all=[...document.querySelectorAll('[data-act="sel"]')].map(x=>x.dataset.id),a1=all.indexOf(selLast),b1=all.indexOf(id);if(a1>=0&&b1>=0){const on=el.checked;all.slice(Math.min(a1,b1),Math.max(a1,b1)+1).forEach(x=>on?SEL.add(x):SEL.delete(x))}}
