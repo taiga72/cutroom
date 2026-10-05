@@ -1627,6 +1627,11 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .tl-item.cu-c{align-items:flex-start}
 .tl-item.cu-c .tl-text{flex:1;min-width:0}
 .tl-item.cu-c small{color:var(--faint)}
+.cu-replies{margin:6px 0 0 14px;padding-left:10px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.cu-rn{font-size:calc(11.5px*var(--ts));color:var(--faint);font-weight:600}
+.cu-rh{display:flex;align-items:baseline;gap:6px;font-size:calc(12.5px*var(--ts))}.cu-rh time{margin-left:auto;color:var(--faint);font-size:calc(11.5px*var(--ts))}
+.cu-reply .cu-body{margin-top:2px}
+.cu-reply.cu-mention .cu-body{border-color:color-mix(in srgb,var(--st-rev) 55%,var(--line));background:color-mix(in srgb,var(--st-rev) 10%,var(--surface))}
 .cu-body{margin-top:3px;padding:7px 10px;border-radius:8px;background:var(--surface-2,var(--bg));border:1px solid var(--line);font-size:calc(13px*var(--ts));overflow-wrap:anywhere}
 .cu-body p{margin:0 0 4px}.cu-body p:last-child{margin:0}
 .l-ic.k-clickup{color:#7b68ee}
@@ -3602,8 +3607,13 @@ function specsRow(t,f){
   return f(SPEC_IC,'Specs',`<div class="spec-chips">${sp.map(x=>`<span class="spec spec-${x.k}">${esc(x.v)}</span>`).join('')}${mism?`<button type="button" class="btn sm ghost" data-act="fmt" data-fmt="${esc(asp.v)}" title="The brief asks for ${esc(asp.v)}">Set format to ${esc(asp.v)}</button>`:''}</div>`,'',true);
 }
 /* ================= ClickUp @mentions ================= */
+/* replies inside a ClickUp comment thread, shown under the comment */
+function cuRepliesHtml(e,t){
+  const rs=e.replies||[];if(!rs.length)return '';
+  return `<div class="cu-replies"><div class="cu-rn">${rs.length} repl${rs.length===1?'y':'ies'} in ClickUp</div>${rs.map(r=>{const rr={...r,k:'reply'},mn=cuMention(rr);return `<div class="cu-reply ${mn?'cu-mention':''}"><div class="cu-rh"><b>${esc(r.who||'Someone')}</b>${mn?' <span class="mn-tag">@ mentioned you</span>':''}<time datetime="${esc(r.at)}">${fmtTime(r.at)}</time></div><div class="cu-body md">${noteText(r.text,S.jobs[t.jobId])}</div></div>`}).join('')}</div>`;
+}
 function cuMention(f){
-  if(f.k!=='comment'||f.me)return false;if(f.mention)return true;
+  if((f.k!=='comment'&&f.k!=='reply')||f.me)return false;if(f.mention)return true;
   const names=[CU.name,B.name,appSettings().greetName].filter(Boolean),txt=String(f.text||'').toLowerCase();
   return names.some(n=>txt.includes('@'+String(n).toLowerCase())||txt.includes('@'+String(n).split(' ')[0].toLowerCase()+' '));
 }
@@ -4531,6 +4541,8 @@ function notifications(all){
     if((t.revision||0)>=3)out.push({key:`rev:${t.id}:${t.revision}`,rank:5,kind:'info',icon:'loop',task:t,title:`${nm} is on revision round ${t.revision}`,body:'Might be time to agree the remaining changes in one go.'});
     for(const f of (t.cu?.feed||[]).slice(-12)){if(f.k!=='comment'||f.me)continue;const mn=cuMention(f),age=Date.now()-new Date(f.at);if(age>(mn?7:3)*86400000)continue;
       out.push({key:`${mn?'cum':'cu'}:${t.id}:${f.cid}`,rank:mn?0.5:1.5,kind:mn?'warn':'info',icon:'chat',task:t,tab:'activity',mention:mn,title:mn?`${f.who||'Someone'} mentioned you on ${nm}`:`${f.who||'Someone'} commented on ${nm}`,body:String(f.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}
+    for(const f of (t.cu?.feed||[]).slice(-12))for(const r of f.replies||[]){if(r.me)continue;const rr={...r,k:'reply'},mn=cuMention(rr),age=Date.now()-new Date(r.at);if(age>(mn?7:3)*86400000)continue;
+      out.push({key:`${mn?'cum':'cu'}:${t.id}:${r.cid}`,rank:mn?0.5:1.5,kind:mn?'warn':'info',icon:'chat',task:t,tab:'activity',mention:mn,title:mn?`${r.who||'Someone'} mentioned you on ${nm}`:`${r.who||'Someone'} replied on ${nm}`,body:String(r.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}
     if(!t.due&&(t.priority==='urgent'||t.priority==='high'))out.push({key:`nodate:${t.id}`,rank:6,kind:'info',icon:'cal',task:t,title:`${nm} is ${t.priority==='urgent'?'urgent':'high priority'} but has no due date`,body:''});
   }
   const load=dueLoad();
@@ -4716,7 +4728,7 @@ let LSHOW=new Set();
 function taskActivity(t){
   const h=logItems().filter(e=>e.taskId===t.id);
   if(t.created&&!h.some(e=>e.kind==='create'))h.push({at:new Date(t.created).toISOString(),kind:'create',text:t.cu?'Brought in from ClickUp':'Created',taskId:t.id,synthetic:true});
-  for(const f of t.cu?.feed||[])h.push({at:f.at,kind:'clickup',k:f.k,who:f.who,me:f.me,text:f.text,taskId:t.id,synthetic:true});
+  for(const f of t.cu?.feed||[])h.push({at:f.at,kind:'clickup',k:f.k,who:f.who,me:f.me,mention:f.mention,text:f.text,replies:f.replies,taskId:t.id,synthetic:true});
   return h.sort((a,b)=>b.at.localeCompare(a.at));
 }
 let noteDelArmed=null;
@@ -4727,7 +4739,7 @@ function activityPane(t){
     const d=dayHeading(e.at);if(d!==day){day=d;rows+=`<div class="tl-day">${esc(d)}</div>`}
     if(e.kind==='note'&&e.done&&S.ui.hideResolved)continue;
     rows+=e.kind==='note'?noteHtml(e)
-      :e.kind==='clickup'&&e.k==='comment'?`<div class="tl-item cu-c ${cuMention(e)?'cu-mention':''}"><span class="l-ic k-clickup">${CU_IC}</span><div class="tl-text"><b>${esc(e.who||'Someone')}</b> <small>${cuMention(e)?'<span class="mn-tag">@ mentioned you</span> ':''}in ClickUp</small><div class="cu-body md">${noteText(e.text,S.jobs[t.jobId])}</div></div><time datetime="${esc(e.at)}">${fmtTime(e.at)}</time></div>`
+      :e.kind==='clickup'&&e.k==='comment'?`<div class="tl-item cu-c ${cuMention(e)?'cu-mention':''}"><span class="l-ic k-clickup">${CU_IC}</span><div class="tl-text"><b>${esc(e.who||'Someone')}</b> <small>${cuMention(e)?'<span class="mn-tag">@ mentioned you</span> ':''}in ClickUp</small><div class="cu-body md">${noteText(e.text,S.jobs[t.jobId])}</div>${cuRepliesHtml(e,t)}</div><time datetime="${esc(e.at)}">${fmtTime(e.at)}</time></div>`
       :`<div class="tl-item"><span class="l-ic k-${e.kind}">${LOG_ICON[e.kind]||I.info}</span><span class="tl-text">${esc(e.text)}</span><time datetime="${esc(e.at)}">${fmtTime(e.at)}</time></div>`;
   }
   return `<div class="d-body d-activity">
@@ -6329,7 +6341,7 @@ const HELP=[
  ['Tasks','Paste a link to add it',`With a task open, press ${IS_MAC?'⌘V':'Ctrl+V'} anywhere in the panel (not inside a text box) and the link goes into the right slot: Frame.io or Vimeo into the review link, Drive, OneDrive, Dropbox, LucidLink or Descript into the files link, ClickUp or Asana into the task link, and a Mac path into the project folder. The job's own tools (Edit job → Tools & folders) decide first. Undo is in the message that pops up.`,null],
  ['Tasks','Export file names',`Each task panel shows an export name, like 260930_Client_Title_V2, with a copy button (it's in the floating window too). Click Pattern to set the naming for that client, or for the job when a task has no client: {date} today, {due}, {client}, {job}, {title}, {v} version (revision round + 1), {r}, {format} and {length}.`,null],
  ['Tasks','Split into tasks',`In a task's panel (or the right-click menu), Split into tasks turns one task into several: one name per line, each with the same job, client, links, dates and notes, and the checklist unticked.`,null],
- ['Your work','ClickUp',`In Settings → ClickUp, paste your ClickUp API token (ClickUp → Settings → Apps), then pick a job for each workspace. Tasks assigned to you come in on their own, with the client, due date, priority and task link; ClickUp comments, status and due-date changes show in the task's Activity tab, and new comments from others show in Alerts. ClickUp gives each workspace its own token, so use Connect another workspace for the second one. Choose whether each video is the main task (subtasks become checklist steps) or a subtask (main tasks are batches). Nothing is sent back to ClickUp.`,['clickup','ClickUp']],
+ ['Your work','ClickUp',`In Settings → ClickUp, paste your ClickUp API token (ClickUp → Settings → Apps), then pick a job for each workspace. Tasks assigned to you come in on their own, with the client, due date, priority and task link; ClickUp comments, status and due-date changes show in the task's Activity tab, and new comments from others show in Alerts. Replies inside a comment thread come too: they sit under their comment, and new ones from others show in Alerts. ClickUp gives each workspace its own token, so use Connect another workspace for the second one. Choose whether each video is the main task (subtasks become checklist steps) or a subtask (main tasks are batches). Nothing is sent back to ClickUp.`,['clickup','ClickUp']],
  ['Tasks','Drag on the Calendar',`On a computer, drag a task in the Calendar (month or week) onto another day to move its due date. A toast says when the new day is busy and has Undo. On a phone, change the date in the task panel.`,null],
  ['Tasks','Archive finished tasks on their own',`Done tasks can move to Archived by themselves 3, 7 or 14 days after they were finished, so the Done column stays short. It's off until you pick a time. Each one is logged, and Undo brings them back. Set it in Settings → Tasks & calendar.`,['tasks','Tasks & calendar']],
  ['Tasks','Delivery specs',`When a task's notes hold a brief (ClickUp briefs land there), the panel shows its specs as chips under the details: resolution, orientation, aspect, bitrate, frame rate, codec, loudness, length and captions. If the brief's aspect differs from the task's format, one click sets it.`,null],

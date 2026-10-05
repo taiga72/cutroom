@@ -15,6 +15,8 @@ const FIRST_DAYS = 60;      // a task new to the app is imported when it was upd
 const WINDOW_DAYS = 180;    // how far back the assigned-task list goes (to tell batches from videos)
 const BUDGET = 70;          // ClickUp allows 100 requests a minute per token; stay well under it in one run
 const FEED_MAX = 80;
+const CU_V = 3;            // 3 = replies inside comment threads are read too; older tasks are re-read once
+const REPLY_MAX = 30;      // replies kept per comment
 
 class NeedsToken extends Error {}
 class RateLimited extends Error {}   // ClickUp's 100-requests-a-minute limit: stop and come back in a minute
@@ -187,7 +189,9 @@ async function syncUser(uid) {
 
       for (const [cuId, c] of cands) {
         const linked = Object.entries(D.tasks).find(([, x]) => x.cu && x.cu.id === cuId && !x.deleted) || Object.entries(D.tasks).find(([, x]) => x.cu && x.cu.id === cuId) || (state.seen[cuId] && D.tasks[state.seen[cuId]] ? [state.seen[cuId], D.tasks[state.seen[cuId]]] : null);
-        if (linked && linked[1].cu && linked[1].cu.v === 2 && +(linked[1].cu.at || 0) >= (state.redo || 0) && +linked[1].cu.upd >= c.upd) continue;      // nothing new in ClickUp
+        // a reply may not change the task's updated time, so tasks with comments in the last 14 days are re-read at most every 2 hours
+        const lc = linked && linked[1].cu, threadsLive = lc && statusId({ status: lc.status }) !== 'done' && (lc.feed || []).some(f => f.k === 'comment' && Date.parse(f.at) > now - 14 * DAY) && now - (+lc.at || 0) > 2 * 3600e3;
+        if (lc && lc.v === CU_V && +(lc.at || 0) >= (state.redo || 0) && +lc.upd >= c.upd && !threadsLive) continue;      // nothing new in ClickUp
         if (!linked && state.seen[cuId]) continue;                              // deleted in the app: don't bring it back
         if (calls >= BUDGET - 3) { res.more = true; continue; }
         if (!c.t) { const info = await parentInfo(cuId, true); if (!info || !info.task) { res.more = true; continue; } c.t = info.task; }
@@ -212,17 +216,37 @@ async function syncUser(uid) {
         const due = ymdIn(t.due_date, tz), start = ymdIn(t.start_date, tz), statusName = (t.status && t.status.status) || '';
         const feed = (prev.feed || []).slice();
         const seenC = new Set(feed.filter(f => f.cid).map(f => f.cid));
-        const backfill = prev.v !== 2;
+        const backfill = (prev.v || 0) < 2;
         const fresh = comments.filter(m => !seenC.has(String(m.id)) && (backfill || +m.date > (prev.lastComment || 0) || !existing))
           .sort((a, b) => +a.date - +b.date).slice(existing ? -40 : -12);
         for (const m of fresh) feed.push({ at: new Date(+m.date).toISOString(), k: 'comment', cid: String(m.id), who: (m.user && m.user.username) || 'Someone', me: String(m.user && m.user.id) === me, mention: (m.comment || []).some(x => x && x.type === 'tag' && String(x.user && x.user.id) === me) || undefined, text: String(m.comment_text || '').trim().slice(0, 4000) });
         let newCount = existing && !backfill ? fresh.filter(m => String(m.user && m.user.id) !== me).length : 0;
+        // replies inside a comment thread: read only threads whose reply count changed since the last read
+        let replyPending = false;
+        const byCid = new Map(feed.filter(f => f.k === 'comment' && f.cid).map(f => [f.cid, f]));
+        const quietReplies = (prev.v || 0) < 3; // first read of old threads: don't count them as new
+        for (const m of comments) {
+          const rc = +m.reply_count || 0, f = byCid.get(String(m.id));
+          if (!f || !rc || f.rc === rc) continue;
+          if (calls >= BUDGET - 3) { replyPending = true; res.more = true; break; }
+          const r = await call(`/comment/${m.id}/reply`).catch(e => {
+            if (e instanceof RateLimited || e instanceof NeedsToken) throw e;
+            replyPending = true; return null;
+          });
+          if (!r) continue;
+          const had = new Set((f.replies || []).map(x => x.cid));
+          const reps = (r.comments || []).map(x => ({ cid: String(x.id), at: new Date(+x.date).toISOString(), who: (x.user && x.user.username) || 'Someone', me: String(x.user && x.user.id) === me,
+            mention: (x.comment || []).some(y => y && y.type === 'tag' && String(y.user && y.user.id) === me) || undefined, text: String(x.comment_text || '').trim().slice(0, 4000) }))
+            .sort((a, b) => a.at.localeCompare(b.at)).slice(-REPLY_MAX);
+          if (existing && !quietReplies) newCount += reps.filter(x => !had.has(x.cid) && !x.me).length;
+          f.replies = reps; f.rc = rc;
+        }
         const iso = new Date(+t.date_updated || now).toISOString();
         if (existing && prev.status && prev.status !== statusName) { feed.push({ at: iso, k: 'status', text: `Status in ClickUp: ${prev.status} → ${statusName}` }); newCount++; }
         if (existing && prev.due !== undefined && prev.due !== due) { feed.push({ at: iso, k: 'due', text: due ? `Due date in ClickUp: ${due}` : 'Due date removed in ClickUp' }); newCount++; }
         feed.sort((a, b) => a.at.localeCompare(b.at));
         const lastComment = Math.max(prev.lastComment || 0, ...comments.map(m => +m.date || 0));
-        const cuInfo = { v: readFail ? 1 : 2, at: now, id: cuId, team, url: t.url, status: statusName, due, prio: prioOf(t), name: t.name, upd: c.upd, lastComment, feed: feed.slice(-FEED_MAX) };
+        const cuInfo = { v: readFail ? 1 : replyPending ? 2 : CU_V, at: now, id: cuId, team, url: t.url, status: statusName, due, prio: prioOf(t), name: t.name, upd: c.upd, lastComment, feed: feed.slice(-FEED_MAX) };
 
         // checklist steps from subtasks (main mode) and ClickUp checklists
         const steps = [];
