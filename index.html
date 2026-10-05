@@ -2004,7 +2004,7 @@ html{overscroll-behavior-y:contain}
   .tb-fab.on .i{transform:rotate(45deg)}
   body.sheet-open{overflow:hidden}
   /* notifications: a full page like Slack's Activity, under the bottom bar */
-  body > #notes{position:fixed;inset:0;width:auto;max-height:none;border:0;border-radius:0;z-index:17;overflow:auto;overscroll-behavior:contain;background:var(--bg);box-shadow:none;animation:jumpIn .18s ease-out;padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+  body > #notes{position:fixed;inset:12px 0 0 0;width:auto;max-height:none;border:0;border-radius:20px 20px 0 0;z-index:17;overflow:auto;overscroll-behavior:contain;background:var(--bg);box-shadow:0 0 0 100vmax rgba(10,12,16,.4);animation:sheetUp .3s cubic-bezier(.2,.8,.2,1);will-change:transform;padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
   .na-head{display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 22px) 18px 20px 22px;background:linear-gradient(160deg,var(--side-bg),color-mix(in srgb,var(--side-bg) 78%,#000))}
   :root[data-scheme] .na-head{color:#fff}
   .na-head h2{flex:1;min-width:0;margin:0;font:700 calc(28px*var(--ts))/1.1 var(--display)}
@@ -2036,8 +2036,11 @@ html{overscroll-behavior-y:contain}
   .na-tip,.na-empty{margin:16px 20px;color:var(--faint);font-size:calc(13px*var(--ts))}
   .na-empty{font-size:calc(15px*var(--ts));color:var(--muted);text-align:center;margin-top:40px}
   /* search: full screen like Slack: colored header, results, the search bar at the bottom (above the keyboard) */
-  .jump-wrap{background:var(--bg);padding:0}
-  .jump{border-radius:0;background:var(--bg);box-shadow:none;animation:jumpIn .18s ease-out}
+  .jump-wrap{background:rgba(10,12,16,.4);padding:12px 0 0}
+  .jump{border-radius:20px 20px 0 0;background:var(--bg);box-shadow:none;animation:sheetUp .3s cubic-bezier(.2,.8,.2,1);will-change:transform}
+  /* grab bars on the search, notifications and Up next sheets (pull down to close, like the dialogs) */
+  .na-head,.jump-top{position:relative}
+  .na-head::before,.jump-top::before{content:'';position:absolute;top:7px;left:50%;width:38px;height:5px;margin-left:-19px;border-radius:3px;background:currentColor;opacity:.35}
   @keyframes jumpIn{from{opacity:0}to{opacity:1}}
   .jump-top{position:relative;padding:calc(env(safe-area-inset-top,0px) + 22px) 22px 20px;background:linear-gradient(160deg,var(--side-bg),color-mix(in srgb,var(--side-bg) 78%,#000));border:0}
   :root[data-scheme] .jump-top{color:#fff}
@@ -2053,7 +2056,7 @@ html{overscroll-behavior-y:contain}
   .pref-s .pref-nav button{padding:14px 18px}
   .modal footer .btn{min-height:46px}
 }
-:root[data-motion="reduce"] .plus-menu,:root[data-motion="reduce"] body > #notes,:root[data-motion="reduce"] .jump{animation:none}
+:root[data-motion="reduce"] .plus-menu,:root[data-motion="reduce"] body > #notes,:root[data-motion="reduce"] .jump,:root[data-motion="reduce"] .upn-page{animation:none}
 
 /* ---------- phones: roomier view switch, client rows, work details, task panel footer; no scroll bleed ---------- */
 .cl-ic.on{color:var(--accent);background:var(--accent-soft)}
@@ -2104,7 +2107,7 @@ html{overscroll-behavior-y:contain}
   .head-ov{min-height:0;margin:0}
   .crumbs{display:none}
   #jobcards .upnext{display:none}
-  .upn-page{display:block;position:fixed;inset:0;z-index:17;overflow:auto;overscroll-behavior:contain;background:var(--bg);animation:jumpIn .18s ease-out;padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+  .upn-page{display:block;position:fixed;inset:12px 0 0 0;border-radius:20px 20px 0 0;box-shadow:0 0 0 100vmax rgba(10,12,16,.4);will-change:transform;z-index:17;overflow:auto;overscroll-behavior:contain;background:var(--bg);animation:sheetUp .3s cubic-bezier(.2,.8,.2,1);padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
   .upn-page[hidden]{display:none}
   .upn-n{flex:none;opacity:.8;font:600 calc(14px*var(--ts)) var(--body)}
   .upn-page .upnext{padding:14px 14px 0;margin:0}
@@ -6289,7 +6292,7 @@ const HELP=[
  ['Your work','Job emoji',`Give a job an emoji in Edit job → General. It shows next to the job in the sidebar, on its Overview card and in notifications.`,null],
  ['Look and feel','Little extras',`An “All clear” moment on the Overview when nothing is overdue or due today; emoji reactions on client updates (the smiley under an update); film-look color schemes (Portra, Fuji, Noir, Teal & Orange, Technicolor); the office cat on the sidebar (it wears headphones and nods along during a focus session, naps during breaks and when you're away, stretches when you finish a task, and purrs when you click it; a little window behind it shows the sky for your time of day, and it dresses up in December, on New Year's Day and on Halloween; it sweats when something's overdue, smiles on all-clear days and watches your mouse; a plant on the sill grows a leaf per task done this month; birds and butterflies drop by; now and then it naps on one of your tasks until you open it; it peeks over the updates you post; a treat jar fills with a treat per finished task (click it to feed the cat); and after 30 days a puppy, hamster or goldfish can join it on the sill); a cork board in the sidebar with your photos and sticky notes (click + to pin one, click a note to edit it); a photo strip of your own pictures in the sidebar (add them in Settings → Personalize & fun); and seasonal touches: a Christmas countdown from September, snow in December, fireworks on New Year's Day, bats on Halloween and hearts on Valentine's. Turn them off in Settings → Personalize & fun.`,['fun','Personalize & fun']],
  ['Getting work done','Installed app (Chrome)',`Install Splice & Co. from Chrome's address bar (the install icon) to get its own window and Dock icon. The Dock icon shows how many tasks are overdue or due today; right-click it for New task, Overview, Calendar and Quick search. The app's colors reach into the title bar (Chrome's chevron at the top right switches that off). To have task links from Slack or email open in the app, turn on "Open supported links" in the app's settings (⋮ menu in the app window → App info or Settings).`,null],
- ['Getting around','Phone: dialogs are sheets too',`On a phone, Settings, your profile, Edit job, New job and the focus timer slide up from the bottom. Pull one down from the top to close it: Settings, Edit job and the brand guide save as they close, and a new job with no name is just dropped. Inside a section, swipe right to go back to the list.`,null],
+ ['Getting around','Phone: dialogs are sheets too',`On a phone, Settings, your profile, Edit job, New job, the focus timer, Search, Notifications and Up next slide up from the bottom. Pull one down from the top to close it: Settings, Edit job and the brand guide save as they close, and a new job with no name is just dropped. Inside a section, swipe right to go back to the list.`,null],
  ['Getting work done','Phone: pull the task down to close',`On a phone, a task opens as a sheet from the bottom. Pull it down from the top (or anywhere when it's scrolled to the top) to close it; swipe sideways to go to the next or previous task.`,null],
  ['Getting work done','Pull to refresh',`At the top of any page, pull down (on a phone or tablet) or keep scrolling up with two fingers on the trackpad. When it says “Release to refresh”, let go and the app reloads with the latest data and any app updates.`,null],
  ['Getting work done','Save & add another',`Next to Save task: saves it and opens a fresh task for the same job, client and format, for entering a batch of reels in a row.`,null],
@@ -7582,10 +7585,10 @@ function sheetClose(){
 let MSW=null;
 document.addEventListener('touchstart',e=>{
   MSW=null;if(!narrow.matches||e.touches.length>1)return;
-  const sheet=e.target.closest?.('#modal .modal, body > #pomo-pop');if(!sheet||e.target.closest('input,textarea,select,[contenteditable="true"],.ck-grip'))return;
+  const sheet=e.target.closest?.('#modal .modal, body > #pomo-pop, body > #notes, #upnext-page, #jump .jump');if(!sheet||e.target.closest('input,textarea,select,[contenteditable="true"],.ck-grip'))return;
   let top=true;for(let n=e.target;n&&n!==sheet.parentElement;n=n.parentElement){if(n.scrollHeight>n.clientHeight+2&&n.scrollTop>0){top=false;break}}
   const pref=sheet.querySelector('.pref'),back=pref&&!pref.classList.contains('m-list')?sheet.querySelector('[data-act="pref-back"]'):null;
-  const t=e.touches[0];MSW={sheet,x:t.clientX,y:t.clientY,at:Date.now(),down:top||!!e.target.closest('.modal>header')||sheet.id==='pomo-pop',back:back&&back.offsetParent&&!sideScroller(e.target)?back:null,lock:null,d:0};
+  const t=e.touches[0];MSW={sheet,x:t.clientX,y:t.clientY,at:Date.now(),down:top||!!e.target.closest('.modal>header,.na-head,.jump-top')||sheet.id==='pomo-pop',back:back&&back.offsetParent&&!sideScroller(e.target)?back:null,lock:null,d:0};
 },{passive:true});
 document.addEventListener('touchmove',e=>{
   if(!MSW)return;const t=e.touches[0],dx=t.clientX-MSW.x,dy=t.clientY-MSW.y;
@@ -7596,7 +7599,7 @@ document.addEventListener('touchmove',e=>{
 document.addEventListener('touchend',()=>{
   const g=MSW;MSW=null;if(!g||!g.lock||g.lock==='none')return;const fast=Date.now()-g.at<300;
   if(g.lock==='down'){if(g.d>8)SHD_EAT=Date.now()+450;const sh=g.sheet;sh.style.transition='transform .2s ease';
-    if(g.d>110||(fast&&g.d>40)){haptic(8);sh.style.transform='translateY(100%)';setTimeout(()=>{sh.style.transition='';sh.style.transform='';if(sh.id==='pomo-pop'){POMO_OPEN=false;renderPomo()}else sheetClose()},190)}
+    if(g.d>110||(fast&&g.d>40)){haptic(8);sh.style.transform='translateY(100%)';setTimeout(()=>{sh.style.transition='';sh.style.transform='';if(sh.id==='pomo-pop'){POMO_OPEN=false;renderPomo()}else if(sh.id==='notes'){notesOpen=false;renderBell()}else if(sh.id==='upnext-page'){UPN=false;renderUpNextPage();renderTabbar()}else if(sh.classList.contains('jump'))closeJump();else sheetClose()},190)}
     else sh.style.transform='';return}
   const b=g.sheet.querySelector('.pref-body');
   if(g.d>80||(fast&&g.d>35)){haptic(8);if(b){b.style.transform='';b.style.transition=''}g.back.click();SHD_EAT=Date.now()+450}
