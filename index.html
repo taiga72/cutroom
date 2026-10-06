@@ -7779,15 +7779,15 @@ document.addEventListener('click',e=>{
   if(a!=='cal-disconnect'&&CAL.disArmed){CAL.disArmed=false;if(SM)renderSettings()}
   if(SM&&SM.stArm&&!/^st-(del|del-go)$/.test(a)&&!el.closest('.st-del-box')){SM.stArm=null;renderSettings()}
   switch(a){
-    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash','help','resume','upnext'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';{const v=u.views?.[u.tab];if(v)u.view=v}saveUi();render();window.scrollTo({top:0});break;
-    case 'view': u.view=el.dataset.view;(u.views=u.views||{})[u.tab]=u.view;saveUi();render();break;
+    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash','help','resume','upnext'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';{let v=u.views?.[u.tab]||u.view;if(narrow.matches&&v==='calendar')v=u.lastLB||'list';u.view=v}saveUi();render();window.scrollTo({top:0});break;
+    case 'view': u.view=el.dataset.view;(u.views=u.views||{})[u.tab]=u.view;if(u.view!=='calendar')u.lastLB=u.view;saveUi();render();break;
     case 'vopt': VOPT=!VOPT;renderVopt();break;
     case 'cx': ctxDo(el.dataset.do,el.dataset.v);break;
     case 'row-due-pick':{const inp=el.querySelector('.cell-date');if(!inp)break;try{inp.showPicker()}catch(x){inp.style.pointerEvents='auto';inp.focus();inp.click()}break}
     case 'tb-overview': notesOpen=false;UPN=false;if(u.tab!=='overview')u.from=u.tab;u.tab='overview';u.client='all';u.pane='tasks';if(u.view==='calendar')u.view=(u.views?.overview&&u.views.overview!=='calendar')?u.views.overview:'list';(u.views=u.views||{}).overview=u.view;saveUi();render();window.scrollTo({top:0});break;
     case 'tb-jobs': u.jobsOpen=true;saveUi();renderSide();openSide();break;
     case 'tb-cal': if(u.view==='calendar'&&!notesOpen&&!UPN&&u.calPrev){const c=u.calPrev;u.calPrev=null;u.tab=S.jobs[c.tab]||c.tab==='overview'?c.tab:'overview';u.client=c.client||'all';u.pane=c.pane||'tasks';u.view=c.view;(u.views=u.views||{})[u.tab]=c.view;saveUi();render();requestAnimationFrame(()=>window.scrollTo({top:c.y||0}));break}
-      if(u.view!=='calendar')u.calPrev={tab:u.tab,client:u.client,pane:u.pane,view:u.view,y:scrollY};
+      if(u.view!=='calendar'){u.calPrev={tab:u.tab,client:u.client,pane:u.pane,view:u.view,y:scrollY};u.lastLB=u.view}
       notesOpen=false;UPN=false;if(['archived','activity','trash','help','resume','upnext'].includes(u.tab)){u.tab='overview';u.client='all'}u.pane='tasks';u.view='calendar';(u.views=u.views||{})[u.tab]='calendar';saveUi();render();window.scrollTo({top:0});break;
     case 'tb-search': openJump();break;
     case 'tb-plus': PLUS=!PLUS;renderPlus();break;
