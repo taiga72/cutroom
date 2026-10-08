@@ -60,6 +60,12 @@ function statusId(st) {
   if (/wait|hold|blocked|pending|assets/.test(s)) return 'waiting_client';
   return 'not_started';
 }
+// per-job statuses copied from ClickUp: ids are scoped to the job so two jobs can share a name with different colors
+const slugOf = n => norm(n).replace(/[^a-z0-9 ]/g, '').trim().replace(/ /g, '-').slice(0, 40) || 'status';
+const cuStId = (jobId, name) => 'cu:' + jobId + ':' + slugOf(name);
+const capFirst = n => { const t = String(n || '').trim(); return t ? t[0].toUpperCase() + t.slice(1) : 'Status'; };
+// the stage the app's own behavior keys off (done, revision rounds, reminders): the user's pick, else a guess from ClickUp's type and name
+const stageFor = (job, name, type) => ((job.stageMap || {})[slugOf(name)]) || statusId({ status: name, type });
 const PRIO = { urgent: 'urgent', high: 'high', normal: 'normal', low: 'low' };
 const prioOf = t => PRIO[t.priority && t.priority.priority] || 'normal';
 function ymdIn(ms, tz) {
@@ -125,8 +131,6 @@ async function syncUser(uid) {
   const res = { connected: true, created: 0, updated: 0, more: false, docs: [] };
   try {
     const D = await loadDocs(uid);
-    const okStatus = new Set((D.app.statuses && D.app.statuses.length ? D.app.statuses.map(s => s.id) : ['waiting_client', 'not_started', 'in_progress', 'internal_review', 'revisions', 'client_review', 'done']));
-    const firstStatus = (D.app.statuses && D.app.statuses[0] && D.app.statuses[0].id) || 'not_started';
     const writes = new Map();
     const put = (col, id, data) => { writes.set(col + '/' + id, { col, id, data }); };
     const jobs = Object.entries(D.jobs).filter(([, j]) => j.clickup && j.clickup.team);
@@ -171,6 +175,30 @@ async function syncUser(uid) {
       const byId = new Map(list.map(t => [t.id, t]));
       const jobTasks = Object.values(D.tasks).filter(t => t.jobId === jobId);
 
+      // the job's statuses: each ClickUp list's own statuses in their order (read once a day), plus any status a task is in
+      state.lists = state.lists || {};
+      const listIds = [...list.reduce((m, t) => { const id = t.list && t.list.id; if (id) m.set(String(id), (m.get(String(id)) || 0) + 1); return m; }, new Map())].sort((a, b) => b[1] - a[1]).map(x => x[0]).slice(0, 6);
+      for (const lid of listIds) {
+        const c = state.lists[lid];
+        if (c && now - c.at < DAY) continue;
+        if (calls >= BUDGET - 8) break;
+        const L = await soft(`/list/${lid}`, null);
+        if (L && Array.isArray(L.statuses)) state.lists[lid] = { at: now, statuses: L.statuses.map(x => ({ status: x.status, color: x.color, type: x.type, orderindex: +x.orderindex || 0 })) };
+      }
+      {
+        const seenSt = new Map();
+        const add = x => { if (!x || !x.status) return; const k = slugOf(x.status); if (!seenSt.has(k)) seenSt.set(k, x); };
+        for (const lid of listIds) ((state.lists[lid] || {}).statuses || []).slice().sort((a, b) => a.orderindex - b.orderindex).forEach(add);
+        list.forEach(t => add(t.status));
+        if (seenSt.size) {
+          const sts = [...seenSt.values()].map(x => ({ id: cuStId(jobId, x.status), label: capFirst(x.status), color: x.color || '', cuType: x.type || '', stage: stageFor(job, x.status, x.type) }));
+          // closed statuses last, like ClickUp
+          sts.sort((a, b) => (a.stage === 'done') - (b.stage === 'done'));
+          if (JSON.stringify(sts) !== JSON.stringify(job.statuses || [])) { job.statuses = sts; D.jobs[jobId] = job; put('jobs', jobId, job); res.statuses = (res.statuses || 0) + 1; }
+        }
+      }
+      const jobSt = name => cuStId(jobId, name), jobStage = st => stageFor(job, st && st.status, st && st.type);
+
       // which ClickUp tasks become app tasks
       const cands = new Map(); // cuId → {t, upd, kids:[]}
       if (mode === 'sub') {
@@ -195,7 +223,7 @@ async function syncUser(uid) {
         if (!linked && state.seen[cuId]) continue;                              // deleted in the app: don't bring it back
         if (calls >= BUDGET - 3) { res.more = true; continue; }
         if (!c.t) { const info = await parentInfo(cuId, true); if (!info || !info.task) { res.more = true; continue; } c.t = info.task; }
-        const t = c.t, st = statusId(t.status);
+        const t = c.t, st = jobStage(t.status);
         // a match by name in the same job (added by hand or from the CSV import) is linked instead of duplicated
         let existing = linked;
         if (!existing) {
@@ -267,10 +295,10 @@ async function syncUser(uid) {
 
         if (!existing) {
           const notes = notesFrom(detail);
-          const id = rid(), mapped = okStatus.has(st) ? st : firstStatus;
+          const id = rid(), mapped = jobSt(t.status && t.status.status);
           const data = { jobId, clientId, name: t.name, status: mapped, priority: prioOf(t), start, due, format: formatOf(t, notes, jobTasks), length: '', revision: 0,
             links: { task: t.url || '', upload: '', file: '', project: '' }, thumb: null, notes, checklist: steps, created: +t.date_created || now, updated: now, cu: cuInfo, cuNew: true };
-          if (mapped === 'done') data.doneAt = ymdIn(t.date_closed || t.date_updated, tz);
+          if (st === 'done') data.doneAt = ymdIn(t.date_closed || t.date_updated, tz);
           D.tasks[id] = data; state.seen[cuId] = id; put('tasks', id, data); res.created++;
         } else {
           const [id, x] = existing, d = { ...x, cu: cuInfo, updated: now };
@@ -280,11 +308,14 @@ async function syncUser(uid) {
             if (!x.clientId && clientId) d.clientId = clientId;
           } else {
             if (prev.name !== t.name) d.name = t.name;
-            if (prev.status !== statusName && okStatus.has(st) && x.status !== st) {
-              d.status = st;
+            const sid = jobSt(statusName), moved = prev.status !== statusName;
+            // a move in ClickUp, or a task still on the app's old statuses (one-time switch to the job's ClickUp statuses)
+            if ((moved || !String(x.status || '').startsWith('cu:' + jobId + ':')) && x.status !== sid) {
+              d.status = sid;
               if (st === 'done' && !x.doneAt) d.doneAt = ymdIn(t.date_closed || t.date_updated, tz);
-              if (st === 'revisions') d.revision = (x.revision || 0) + 1;
-              if (st === 'in_progress' && !x.start) d.start = ymdIn(now, tz);
+              if (st !== 'done' && x.doneAt && moved) d.doneAt = null;
+              if (moved && st === 'revisions' && jobStage({ status: prev.status }) !== 'revisions') d.revision = (x.revision || 0) + 1;
+              if (moved && st === 'in_progress' && !x.start) d.start = ymdIn(now, tz);
             }
             if (prev.due !== due) d.due = due;
             if (prev.prio !== cuInfo.prio) d.priority = cuInfo.prio;

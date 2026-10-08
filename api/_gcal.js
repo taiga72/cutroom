@@ -132,9 +132,12 @@ async function syncUser(uid, appUrl) {
     const { jobs, clients, tasks, settings } = await loadDocs(uid);
     // the user's own status names (Settings → Statuses)
     const labels = Object.fromEntries((settings.app?.statuses || []).filter(x => x && x.id).map(x => [x.id, x.label]));
+    // ClickUp-linked jobs have their own statuses, each with a stage (a built-in id); 'done' stage = finished
+    const stage = {};
+    for (const j of Object.values(jobs)) for (const x of (j.clickup && j.clickup.team && j.statuses) || []) { labels[x.id] = x.label; stage[x.id] = ((j.stageMap || {})[String(x.id).split(':').pop()]) || x.stage; }
     const want = {};
     for (const t of Object.values(tasks)) {
-      if (t.archived || t.deleted || t.status === 'done' || t.status === 'dropped' || !/^\d{4}-\d{2}-\d{2}$/.test(t.due || '') || !jobs[t.jobId]) continue;
+      if (t.archived || t.deleted || t.status === 'done' || t.status === 'dropped' || stage[t.status] === 'done' || !/^\d{4}-\d{2}-\d{2}$/.test(t.due || '') || !jobs[t.jobId]) continue;
       want[t.id] = eventFor(t, jobs, clients, appUrl, labels);
     }
     const seen = new Set(), ops = [];
