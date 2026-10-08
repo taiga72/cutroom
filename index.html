@@ -1668,6 +1668,62 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .cu-reply .cu-body{margin-top:2px}
 .cu-reply.cu-mention .cu-body{border-color:color-mix(in srgb,var(--st-rev) 55%,var(--line));background:color-mix(in srgb,var(--st-rev) 10%,var(--surface))}
 .cu-body{margin-top:3px;padding:7px 10px;border-radius:8px;background:var(--surface-2,var(--bg));border:1px solid var(--line);font-size:calc(13px*var(--ts));overflow-wrap:anywhere}
+
+/* ClickUp-style activity: cards for comments, grey lines for changes, the box at the bottom */
+.drawer .d-activity{flex:1 0 auto;gap:10px;padding-bottom:0}
+.act-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.act-head h3{margin:0;font:700 calc(16px*var(--ts)) var(--display);flex:1}
+.act-head .notes-sum{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:calc(12.5px*var(--ts));margin:0;padding:0;border:0;background:none}
+.act-more{align-self:center;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:5px 14px;font-weight:600;font-size:calc(12.5px*var(--ts))}
+.act-more:hover{color:var(--accent);border-color:var(--accent)}
+.d-activity .timeline{gap:4px}
+.d-activity .tl-day{display:flex;align-items:center;gap:10px;margin:12px 0 4px}
+.d-activity .tl-day::before,.d-activity .tl-day::after{content:"";flex:1;height:1px;background:var(--line)}
+.act-line{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:8px;align-items:start;padding:3px 2px;color:var(--faint);font-size:calc(12.5px*var(--ts));line-height:1.45}
+.act-line .l-ic{width:20px;height:20px;border-radius:6px}
+.act-line .l-ic .i{width:12px;height:12px}
+.act-line b{color:var(--muted);font-weight:600}
+.act-line time{font:500 calc(11.5px*var(--ts)) var(--mono);color:var(--faint);white-space:nowrap;padding-top:1px}
+.cmt{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px 10px;margin:6px 0;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.cmt-h{display:flex;align-items:center;gap:9px;color:var(--text)}
+.tl-note-head.cmt-h b{flex:none}
+.cmt-who{flex:1;min-width:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.cmt-who b{font-weight:700;color:var(--text)}
+.cmt-who time{font:500 calc(12px*var(--ts)) var(--body)!important;color:var(--faint)}
+.av-o{background:var(--avc)!important;color:#fff!important;box-shadow:none}
+.cmt-src{display:inline-flex;align-items:center;gap:4px;font-size:calc(11.5px*var(--ts));color:var(--faint);font-weight:600}
+.cmt-src .i,.cmt-src svg{width:13px;height:13px}
+.cmt .note-body,.cmt>.cmt-body{margin:8px 0 0 39px}
+.cmt .cmt-body{font-size:calc(13.5px*var(--ts));line-height:1.55;overflow-wrap:anywhere;padding:0;border:0;background:none}
+.cmt .note-pics,.cmt>.reply-box{margin-left:39px}
+.cmt .note-foot{margin:8px 0 0 39px;flex-wrap:wrap}
+.cmt.cu-c>.cmt-rn{margin:8px 0 0 39px}
+.cmt-rn{border:0;background:none;padding:2px 0;display:inline-flex;align-items:center;gap:5px;color:var(--accent);font-weight:600;font-size:calc(13px*var(--ts))}
+.cmt-rn .i{width:14px;height:14px}
+.cmt-rn:hover{text-decoration:underline}
+.cmt-replies{margin:10px 0 0 39px;padding:0 0 0 12px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.cmt-reply .cmt-body{margin:4px 0 0 33px}
+.cmt-reply .icon-btn{width:22px;height:22px;opacity:0}
+.cmt-reply:hover .icon-btn,.cmt-reply .icon-btn.danger{opacity:.7}
+.cmt-reply .icon-btn.danger{opacity:1;color:var(--danger);background:var(--danger-soft)}
+@media (hover:none){.cmt-reply .icon-btn{opacity:.6}}
+.cmt.cu-mention{border-color:color-mix(in srgb,var(--st-rev) 55%,var(--line));background:color-mix(in srgb,var(--st-rev) 7%,var(--surface))}
+.cmt-reply.cu-mention .cmt-body{background:color-mix(in srgb,var(--st-rev) 10%,var(--surface));border-radius:8px;padding:4px 8px}
+.tl-note.cmt.resolved{background:var(--surface-2)}
+.cmt .md p{margin:0}.cmt .md p.gap{height:.6em}.cmt .md ul,.cmt .md ol{margin:2px 0;padding-left:22px}.cmt .md a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+@media (max-width:820px){.cmt-h .mn-tag{display:none}.cmt .note-body,.cmt>.cmt-body,.cmt .note-pics,.cmt>.reply-box,.cmt .note-foot,.cmt.cu-c>.cmt-rn,.cmt-replies{margin-left:0}.cmt-reply .cmt-body{margin-left:0}}
+.drawer .d-activity .composer{margin-top:auto;position:sticky;bottom:0;z-index:3;box-shadow:0 -10px 16px -12px rgba(0,0,0,.25)}
+.drawer .d-activity::after{content:"";display:block;height:14px;flex:none}
+/* full screen task: details on the left, activity on the right */
+.drawer.full{top:22px;left:22px;right:22px;bottom:22px;width:auto;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.drawer.full+.d-resize{display:none}
+.d-full .i{width:15px;height:15px}
+.d-split{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,42%)}
+.d-split-l,.d-split-r{overflow-y:auto;min-height:0;overscroll-behavior:contain}
+.d-split-r{border-left:1px solid var(--line);background:var(--surface-2);display:flex;flex-direction:column}
+.d-split-r .d-activity{min-height:100%}
+.d-split-r .d-activity .composer{margin-left:-2px;margin-right:-2px}
+.drawer.full .d-split-l .d-body{max-width:860px}
 .cu-body p{margin:0 0 4px}.cu-body p:last-child{margin:0}
 .l-ic.k-clickup{color:#7b68ee}
 .cu-new{display:inline-flex;align-items:center;gap:3px;vertical-align:1px;margin-right:6px;padding:1px 7px;border-radius:999px;background:#7b68ee;color:#fff;font-size:calc(10.5px*var(--ts));font-weight:800;letter-spacing:.03em;text-transform:uppercase;line-height:1.5;white-space:nowrap}
@@ -2265,7 +2321,8 @@ html{overscroll-behavior-y:contain}
   .tb-fab{width:62px;height:62px;right:4px}
   .main{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
   /* task top bar: pin, up next, ⋯ */
-  .drawer .d-top [data-act="d-pomo"],.drawer .d-top [data-act="d-link"],.drawer .d-top [data-act="d-pip"],.drawer .d-top .d-close{display:none}
+  .drawer .d-top [data-act="d-pomo"],.drawer .d-top [data-act="d-link"],.drawer .d-top [data-act="d-pip"],.drawer .d-top .d-close,.drawer .d-top .d-full{display:none}
+  .drawer .d-activity::after{display:none}
   .drawer .d-more{display:grid;place-items:center}
   .drawer .d-foot-btns{display:none!important}
   .drawer .d-foot:not(.d-save){border-top:0;padding-top:4px}
@@ -3660,8 +3717,8 @@ function specsRow(t,f){
 /* ================= ClickUp @mentions ================= */
 /* replies inside a ClickUp comment thread, shown under the comment */
 function cuRepliesHtml(e,t){
-  const rs=e.replies||[];if(!rs.length)return '';
-  return `<div class="cu-replies"><div class="cu-rn">${rs.length} repl${rs.length===1?'y':'ies'} in ClickUp</div>${rs.map(r=>{const rr={...r,k:'reply'},mn=cuMention(rr);return `<div class="cu-reply ${mn?'cu-mention':''}"><div class="cu-rh"><b>${esc(r.who||'Someone')}</b>${mn?' <span class="mn-tag">@ mentioned you</span>':''}<time datetime="${esc(r.at)}">${fmtTime(r.at)}</time></div><div class="cu-body md">${noteText(r.text,S.jobs[t.jobId])}</div></div>`}).join('')}</div>`;
+  const rs=e.replies||[];if(!rs.length)return '';const k='cu|'+e.at,open=RP_OPEN.has(k)||(!RP_SHUT.has(k)&&rs.some(r=>!r.me&&Date.now()-new Date(r.at)<3*864e5));
+  return `<button type="button" class="cmt-rn ${open?'on':''}" data-act="rp-toggle" data-k="${esc(k)}" aria-expanded="${open}">${rpIc}${rs.length} repl${rs.length===1?'y':'ies'}${rs.some(r=>cuMention({...r,k:'reply'}))&&!open?' <span class="mn-tag">@ you</span>':''}</button>${open?`<div class="cmt-replies">${rs.map(r=>{const rr={...r,k:'reply'},mn=cuMention(rr);return `<div class="cmt-reply ${mn?'cu-mention':''}"><div class="cmt-h">${avOther(r.who,24,r.me)}<div class="cmt-who"><b>${esc(r.who||'Someone')}</b><time datetime="${esc(r.at)}">${whenTxt(r.at)}</time></div>${mn?'<span class="mn-tag">@ mentioned you</span>':''}</div><div class="cmt-body md">${noteText(r.text,S.jobs[t.jobId])}</div></div>`}).join('')}</div>`:''}`;
 }
 function cuMention(f){
   if((f.k!=='comment'&&f.k!=='reply')||f.me)return false;if(f.mention)return true;
@@ -4808,24 +4865,48 @@ function taskActivity(t){
   return h.sort((a,b)=>b.at.localeCompare(a.at));
 }
 let noteDelArmed=null;
+/* ClickUp-style activity: oldest first, comments as cards (avatar, name, time, replies folded under "N replies"),
+   everything else as a small grey line, the newest ACT_SHOW items unless "Show older" was clicked (ACT_ALL), the box at the bottom */
+const ACT_SHOW=30,ACT_ALL=new Set(),RP_OPEN=new Set(),RP_SHUT=new Set();let ACT_BOTTOM=false;
+const AV_COLS=['#7b68ee','#e5484d','#f76808','#30a46c','#0091ff','#d6409f','#12a594','#8e4ec6'];
+function avOther(name,size,me){
+  if(me)return meAvatar(size);
+  const n=String(name||'?').trim();let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))>>>0;
+  const ini=(n.split(/\s+/).filter(Boolean).map(w=>w[0]).join('').slice(0,2)||'?').toUpperCase();
+  return `<span class="me-av av-o" style="--s:${size}px;--avc:${AV_COLS[h%AV_COLS.length]}"><b>${esc(ini)}</b></span>`;
+}
+const myName=()=>meName()||'You';
+function whenTxt(iso){const d=ymd(new Date(iso)),y=ymd(new Date(Date.now()-864e5));return `${d===today()?'Today':d===y?'Yesterday':absDate(d)} at ${fmtTime(iso)}`}
+const rpIc='<svg class="i" viewBox="0 0 16 16"><path d="M6.5 4 2.5 8l4 4M2.5 8h7a4 4 0 0 1 4 4v1"/></svg>';
+function actLine(e){
+  let txt=esc(e.text||''),m;
+  if(e.kind==='status'&&(m=/^(.*?) → (.*?)( \(.*\))?$/.exec(e.text||'')))txt=`<b>${esc(myName())}</b> changed status from <b>${esc(m[1])}</b> to <b>${esc(m[2])}</b>${esc(m[3]||'')}`;
+  else if(e.kind==='clickup'&&(m=/^Status in ClickUp: (.*?) → (.*)$/.exec(e.text||'')))txt=`Status changed in ClickUp from <b>${esc(m[1])}</b> to <b>${esc(m[2])}</b>`;
+  return `<div class="act-line"><span class="l-ic k-${e.kind}">${e.kind==='clickup'?CU_IC:LOG_ICON[e.kind]||I.info}</span><span class="al-t">${txt}</span><time datetime="${esc(e.at)}" title="${esc(whenTxt(e.at))}">${dayHeading(e.at)==='Today'?fmtTime(e.at):absDate(ymd(new Date(e.at)))}</time></div>`;
+}
+function cuCommentHtml(e,t){
+  const mn=cuMention(e);
+  return `<div class="cmt cu-c ${mn?'cu-mention':''}"><div class="cmt-h">${avOther(e.who,30,e.me)}<div class="cmt-who"><b>${esc(e.who||'Someone')}</b><time datetime="${esc(e.at)}">${whenTxt(e.at)}</time></div>${mn?'<span class="mn-tag">@ mentioned you</span>':''}<span class="cmt-src" title="Comment from ClickUp">${CU_IC}ClickUp</span></div>
+    <div class="cmt-body md">${noteText(e.text,S.jobs[t.jobId])}</div>${cuRepliesHtml(e,t)}</div>`;
+}
 function activityPane(t){
-  const h=taskActivity(t);let day='',rows='';
-  const notes=h.filter(e=>e.kind==='note'),nDone=notes.filter(e=>e.done).length;
-  for(const e of h){
-    const d=dayHeading(e.at);if(d!==day){day=d;rows+=`<div class="tl-day">${esc(d)}</div>`}
-    if(e.kind==='note'&&e.done&&S.ui.hideResolved)continue;
-    rows+=e.kind==='note'?noteHtml(e)
-      :e.kind==='clickup'&&e.k==='comment'?`<div class="tl-item cu-c ${cuMention(e)?'cu-mention':''}"><span class="l-ic k-clickup">${CU_IC}</span><div class="tl-text"><b>${esc(e.who||'Someone')}</b> <small>${cuMention(e)?'<span class="mn-tag">@ mentioned you</span> ':''}in ClickUp</small><div class="cu-body md">${noteText(e.text,S.jobs[t.jobId])}</div>${cuRepliesHtml(e,t)}</div><time datetime="${esc(e.at)}">${fmtTime(e.at)}</time></div>`
-      :`<div class="tl-item"><span class="l-ic k-${e.kind}">${LOG_ICON[e.kind]||I.info}</span><span class="tl-text">${esc(e.text)}</span><time datetime="${esc(e.at)}">${fmtTime(e.at)}</time></div>`;
+  const all=taskActivity(t).slice().reverse();
+  const notes=all.filter(e=>e.kind==='note'),nDone=notes.filter(e=>e.done).length;
+  const h=all.filter(e=>!(e.kind==='note'&&e.done&&S.ui.hideResolved));
+  const cut=ACT_ALL.has(t.id)?0:Math.max(0,h.length-ACT_SHOW);
+  let day='',rows='';
+  for(const e of h.slice(cut)){
+    const d=dayHeading(e.at);if(d!==day){day=d;rows+=`<div class="tl-day"><span>${esc(d)}</span></div>`}
+    rows+=e.kind==='note'?noteHtml(e):e.kind==='clickup'&&e.k==='comment'?cuCommentHtml(e,t):actLine(e);
   }
   return `<div class="d-body d-activity">
-    <h2 class="d-act-title">${esc(t.name||'Untitled task')}</h2>
+    <div class="act-head"><h3>Activity</h3>${notes.length?`<span class="notes-sum"><span><b>${notes.length-nDone}</b> open${nDone?` · <b>${nDone}</b> resolved`:''}</span>${nDone?`<button type="button" class="btn sm ghost" data-act="notes-hide-done">${S.ui.hideResolved?'Show resolved':'Hide resolved'}</button>`:''}</span>`:''}</div>
+    ${cut?`<button type="button" class="act-more" data-act="act-more">Show ${cut} older</button>`:''}
+    <div class="timeline">${rows||(S.ui.hideResolved&&nDone?'<p class="hint">Every update is resolved.</p>':'<p class="hint">Nothing yet. Changes to this task and your updates will show up here.</p>')}</div>
+    ${h.length&&!t.cu&&!logItems().some(e=>e.taskId===t.id&&e.kind!=='note')?'<p class="hint">Status, date and checklist changes are recorded from now on.</p>':''}
     <div class="composer" data-drop-pics="note">${fmtBar('note-in')}<textarea id="note-in" data-fk="note-in" rows="2" placeholder="Write an update…"></textarea>
       ${attHtml('note')}
       <div class="composer-foot"><button type="button" class="btn sm ghost" data-act="upd-attach" data-for="note" title="Attach pictures">${I.image}Picture</button><span class="hint">⌘/Ctrl + Enter to post</span><button class="btn sm primary" data-act="note-post" ${ATT.busy?'disabled':''} aria-label="Post update" title="Post update"><span class="np-l">Post update</span>${SEND_IC}</button></div></div>
-    ${notes.length?`<div class="notes-sum"><span><b>${notes.length-nDone}</b> open${nDone?` · <b>${nDone}</b> resolved`:''}</span>${nDone?`<button type="button" class="btn sm ghost" data-act="notes-hide-done">${S.ui.hideResolved?'Show resolved':'Hide resolved'}</button>`:''}</div>`:''}
-    <div class="timeline">${rows||(S.ui.hideResolved&&nDone?'<p class="hint">Every update is resolved.</p>':'<p class="hint">Nothing yet. Changes to this task will show up here.</p>')}</div>
-    ${h.length&&!t.cu&&!logItems().some(e=>e.taskId===t.id&&e.kind!=='note')?'<p class="hint">Status, date and checklist changes are recorded from now on.</p>':''}
   </div>`;
 }
 /* ================= updates: resolve and reply (Frame.io style) =================
@@ -4886,17 +4967,17 @@ function renderLightbox(){
     <img src="${esc(imgSrc(LB.list[LB.i])||'')}" alt=""><span class="lb-count">${n>1?`${LB.i+1} / ${n}`:''}</span><a class="btn sm lb-open" href="${esc(imgSrc(LB.list[LB.i])||'')}" target="_blank" rel="noopener">${I.ext}Open full size</a>`;
 }
 function noteHtml(e){
-  const reps=e.replies||[];
-  return `<div class="tl-note ${e.done?'resolved':''}"><div class="tl-note-head">${I.chat}<b>Update</b><time datetime="${esc(e.at)}">${fmtTime(e.at)}</time>
+  const reps=e.replies||[],open=RP_OPEN.has(e.at)||REPLY_AT===e.at;
+  return `<div class="tl-note cmt ${e.done?'resolved':''}"><div class="tl-note-head cmt-h">${meAvatar(30)}<div class="cmt-who"><b>${esc(myName())}</b><time datetime="${esc(e.at)}">${whenTxt(e.at)}${e.edited?' · edited':''}</time></div>
       <button class="icon-btn note-done ${e.done?'on':''}" data-act="note-done" data-at="${esc(e.at)}" title="${e.done?'Mark as not done':'Mark as done'}" aria-label="${e.done?'Mark as not done':'Mark as done'}" aria-pressed="${!!e.done}"><svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg></button>
       <button class="icon-btn" data-act="edit-open" data-at="${esc(e.at)}" title="Edit update" aria-label="Edit update">${I.pencil}</button>
       <button class="icon-btn ${noteDelArmed===e.at?'danger':''}" data-act="note-del" data-at="${esc(e.at)}" title="${noteDelArmed===e.at?'Click again to delete':'Delete update'}" aria-label="Delete update">${I.trash}</button></div>
     ${EDIT_AT===e.at?`<div class="reply-box">${fmtBar('edit-in')}<textarea id="edit-in" data-fk="edit-in" rows="4">${esc(e.text||'')}</textarea><div class="composer-foot"><span class="hint">⌘/Ctrl + Enter to save</span><button class="btn sm ghost" data-act="edit-cancel">Cancel</button><button class="btn sm primary" data-act="edit-save" data-at="${esc(e.at)}">Save</button></div></div>`
       :`<div class="note-body md">${noteText(e.text)}</div>`}
     ${picsHtml(e.pics,e.at,'')}
-    ${reps.length?`<div class="note-replies">${reps.map(r=>{const k=e.at+'|'+r.at;return `<div class="note-reply"><div class="md">${noteText(r.text)}${picsHtml(r.pics,e.at,r.at)}</div><time datetime="${esc(r.at)}">${fmtTime(r.at)}</time><button class="icon-btn ${replyDelArmed===k?'danger':''}" data-act="reply-del" data-at="${esc(e.at)}" data-rat="${esc(r.at)}" title="${replyDelArmed===k?'Click again to delete':'Delete reply'}" aria-label="Delete reply">${I.trash}</button></div>`}).join('')}</div>`:''}
-    ${REPLY_AT===e.at?`<div class="reply-box" data-drop-pics="reply">${fmtBar('reply-in')}<textarea id="reply-in" data-fk="reply-in" rows="2" placeholder="Reply… (paste or drop a picture to attach it)"></textarea>${attHtml('reply')}<div class="composer-foot"><button type="button" class="btn sm ghost" data-act="upd-attach" data-for="reply" title="Attach pictures">${I.image}Picture</button><span class="hint">⌘/Ctrl + Enter to reply</span><button class="btn sm ghost" data-act="reply-cancel">Cancel</button><button class="btn sm primary" data-act="reply-post" data-at="${esc(e.at)}" ${ATT.busy?'disabled':''}>Reply</button></div></div>`
-      :`<div class="note-foot">${reactsHtml(e)}<button type="button" class="note-reply-btn" data-act="reply-open" data-at="${esc(e.at)}"><svg class="i" viewBox="0 0 16 16"><path d="M6.5 4 2.5 8l4 4M2.5 8h7a4 4 0 0 1 4 4v1"/></svg>Reply${reps.length?` · ${reps.length}`:''}</button>${e.done&&e.doneAt?`<span class="done-when"><svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg>Done ${esc(fmtDate(e.doneAt.slice(0,10)))}</span>`:''}</div>`}
+    <div class="note-foot">${reactsHtml(e)}${reps.length?`<button type="button" class="cmt-rn ${open?'on':''}" data-act="rp-toggle" data-k="${esc(e.at)}" aria-expanded="${open}">${rpIc}${reps.length} repl${reps.length===1?'y':'ies'}</button>`:''}${REPLY_AT===e.at?'':`<button type="button" class="note-reply-btn" data-act="reply-open" data-at="${esc(e.at)}">${rpIc}Reply</button>`}${e.done&&e.doneAt?`<span class="done-when"><svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg>Done ${esc(fmtDate(e.doneAt.slice(0,10)))}</span>`:''}</div>
+    ${reps.length&&open?`<div class="note-replies cmt-replies">${reps.map(r=>{const k=e.at+'|'+r.at;return `<div class="note-reply cmt-reply"><div class="cmt-h">${meAvatar(24)}<div class="cmt-who"><b>${esc(myName())}</b><time datetime="${esc(r.at)}">${whenTxt(r.at)}</time></div><button class="icon-btn ${replyDelArmed===k?'danger':''}" data-act="reply-del" data-at="${esc(e.at)}" data-rat="${esc(r.at)}" title="${replyDelArmed===k?'Click again to delete':'Delete reply'}" aria-label="Delete reply">${I.trash}</button></div><div class="md cmt-body">${noteText(r.text)}${picsHtml(r.pics,e.at,r.at)}</div></div>`}).join('')}</div>`:''}
+    ${REPLY_AT===e.at?`<div class="reply-box" data-drop-pics="reply">${fmtBar('reply-in')}<textarea id="reply-in" data-fk="reply-in" rows="2" placeholder="Reply… (paste or drop a picture to attach it)"></textarea>${attHtml('reply')}<div class="composer-foot"><button type="button" class="btn sm ghost" data-act="upd-attach" data-for="reply" title="Attach pictures">${I.image}Picture</button><span class="hint">⌘/Ctrl + Enter to reply</span><button class="btn sm ghost" data-act="reply-cancel">Cancel</button><button class="btn sm primary" data-act="reply-post" data-at="${esc(e.at)}" ${ATT.busy?'disabled':''}>Reply</button></div></div>`:''}
   </div>`;
 }
 /* change one update (found by task + time) with fn(item) → new item */
@@ -4914,7 +4995,7 @@ function toggleNoteDone(at){updateNote(at,e=>e.done?{...e,done:false,doneAt:null
 function postReply(at){
   if(ATT.busy)return;
   const el=$('#reply-in');const v=el?.value.trim()||'',pics=ATT.task===S.ui.openTask?ATT.reply:[];if(!v&&!pics.length){el?.focus();return}
-  updateNote(at,e=>({...e,replies:[...(e.replies||[]),{at:new Date().toISOString(),text:v,...(pics.length?{pics:[...pics]}:{})}]}));ATT.reply=[];REPLY_AT=null;renderDrawer();
+  updateNote(at,e=>({...e,replies:[...(e.replies||[]),{at:new Date().toISOString(),text:v,...(pics.length?{pics:[...pics]}:{})}]}));ATT.reply=[];REPLY_AT=null;RP_OPEN.add(at);renderDrawer();
 }
 function deleteReply(at,rat){updateNote(at,e=>{const r=(e.replies||[]).find(r=>r.at===rat);(r?.pics||[]).forEach(dropImage);return {...e,replies:(e.replies||[]).filter(r=>r.at!==rat)}});replyDelArmed=null;renderDrawer()}
 function saveEdit(at){const v=$('#edit-in')?.value.trim();if(v==null)return;updateNote(at,e=>({...e,text:v,edited:new Date().toISOString()}));EDIT_AT=null;renderDrawer()}
@@ -4925,7 +5006,7 @@ const openNotes=t=>{if(!NOTE_OPEN){NOTE_OPEN={};for(const e of logItems())if(e.k
 function postNote(){
   const t=S.tasks[S.ui.openTask],el=$('#note-in');if(!t||!el||ATT.busy)return;
   const v=el.value.trim(),pics=ATT.task===t.id?ATT.note:[];if(!v&&!pics.length){el.focus();return}
-  logAct('note',v,{task:t,extra:pics.length?{pics:[...pics]}:{}});ATT.note=[];el.value='';renderDrawer();$('#note-in')?.focus();catPeek();
+  logAct('note',v,{task:t,extra:pics.length?{pics:[...pics]}:{}});ATT.note=[];el.value='';ACT_BOTTOM=true;renderDrawer();$('#note-in')?.focus();catPeek();
 }
 function deleteNote(at){
   const t=S.tasks[S.ui.openTask];
@@ -5378,13 +5459,15 @@ function renderDrawer(){
   const checklist=t.checklist||[];const doneN=checklist.filter(x=>x.done).length;
   const linkRow=(kind,icon)=>{const v=t.links?.[kind],u=linkHref(v,j);const label=linkLabel(j,kind);return `<div class="link-row"><label><span>${svcIcon(v)||icon}${esc(label)}</span><input type="${kind==='project'?'text':'url'}" data-field="links.${kind}" data-fk="d-link-${kind}" value="${esc(v||'')}" placeholder="${kind==='project'?'Paste the Finder path (⌥⌘C in Finder)':'Paste link'}" ${kind==='project'?'autocapitalize="off" spellcheck="false"':''}></label>
     <div class="acts"><a class="icon-btn ${u?'':'off'}" href="${esc(u||'#')}"${linkTarget(v,j)} title="${localPath(v)?'Open in Finder':'Open'}" aria-label="Open ${esc(label)}">${I.ext}</a><button class="icon-btn" data-act="copy" data-kind="${kind}" title="Copy" aria-label="Copy ${esc(label)}">${I.copy}</button></div>${kind==='project'?`<p class="hint path-hint" ${localPath(v)?'':'hidden'}>${pathHint()}</p>`:''}</div>`};
-  const DY=DRAW_ID===t.id+'|'+S.ui.dtab?$('#drawer').scrollTop:0;DRAW_ID=t.id+'|'+S.ui.dtab;
+  const FULL=!t._draft&&!!S.ui.dfull&&!narrow.matches,dk=t.id+'|'+(FULL?'full':S.ui.dtab),same=DRAW_ID===dk;
+  const DY=same?$('#drawer').scrollTop:0,DL=same?$('#drawer .d-split-l')?.scrollTop||0:0,DR=same?$('#drawer .d-split-r')?.scrollTop||0:0;DRAW_ID=dk;
+  $('#drawer').classList.toggle('full',FULL);
   withFocus(()=>{$('#drawer').innerHTML=`
   ${t._draft?`<div class="d-draft">${t.copiedFrom?I.copy:I.plus}<b>${t.copiedFrom?'Copy of a task':'New task'}</b><span>Not saved yet</span></div>`:''}
   <div class="d-top" style="--jc:${esc(j?.color||'transparent')}"><div class="crumb">${taskMark(t)}${esc(j?.name||'')}${t.clientId&&S.clients[t.clientId]?' / '+esc(S.clients[t.clientId].name):''}</div>
-    ${t._draft?'':`${isClosed(t)?'':(()=>{const T=pomoState(),on=T.taskId===t.id&&T.mode==='focus'&&T.run!=='idle';return `<button class="icon-btn d-pomo ${on?'pin-on':''}" data-act="d-pomo" aria-pressed="${on}" aria-label="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task'}" title="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task (starts a focus session)'}${t.pomos?` · ${t.pomos} focus session${t.pomos===1?'':'s'} so far`:''}">${TOMATO_IC}${t.pomos?`<span class="dp-n">${t.pomos}</span>`:''}</button>`})()}${isClosed(t)?'':`<button class="icon-btn ${t.upNext?'pin-on':''}" data-act="d-upnext" aria-pressed="${!!t.upNext}" aria-label="${t.upNext?'Remove from Up next':'Add to Up next'}" title="${t.upNext?`Up next #${upNextPos(t)} · click to remove`:'Add to Up next (your queue across jobs)'}">${UP_IC}</button>`}<button class="icon-btn" data-act="d-link" aria-label="Copy link to this task" title="Copy link to this task">${LINK_IC}</button>${canPip()?`<button class="icon-btn ${PIP.win&&PIP.id===t.id?'pin-on':''}" data-act="d-pip" aria-pressed="${!!(PIP.win&&PIP.id===t.id)}" aria-label="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task in its own window'}" title="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task over Premiere or Resolve'}">${PIP_IC}</button>`:''}`}${t._draft?'':`<button class="icon-btn d-more" data-act="d-more" aria-label="Task options" title="Task options" aria-expanded="${!!TOPT}">${MORE_IC}</button>`}<button class="icon-btn d-close" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
-  ${t._draft?'':`<div class="d-tabs" role="tablist"><button role="tab" data-act="d-tab" data-tab="details" class="${S.ui.dtab!=='activity'?'on':''}" aria-selected="${S.ui.dtab!=='activity'}">${I.info}Details</button><button role="tab" data-act="d-tab" data-tab="activity" class="${S.ui.dtab==='activity'?'on':''}" aria-selected="${S.ui.dtab==='activity'}">${I.clock}Activity<span class="mono">${taskActivity(t).length}</span></button></div>`}
-  ${!t._draft&&S.ui.dtab==='activity'?activityPane(t):`  <div class="d-body">
+    ${t._draft?'':`${isClosed(t)?'':(()=>{const T=pomoState(),on=T.taskId===t.id&&T.mode==='focus'&&T.run!=='idle';return `<button class="icon-btn d-pomo ${on?'pin-on':''}" data-act="d-pomo" aria-pressed="${on}" aria-label="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task'}" title="${on&&T.run==='running'?'Pause the focus timer':'Focus on this task (starts a focus session)'}${t.pomos?` · ${t.pomos} focus session${t.pomos===1?'':'s'} so far`:''}">${TOMATO_IC}${t.pomos?`<span class="dp-n">${t.pomos}</span>`:''}</button>`})()}${isClosed(t)?'':`<button class="icon-btn ${t.upNext?'pin-on':''}" data-act="d-upnext" aria-pressed="${!!t.upNext}" aria-label="${t.upNext?'Remove from Up next':'Add to Up next'}" title="${t.upNext?`Up next #${upNextPos(t)} · click to remove`:'Add to Up next (your queue across jobs)'}">${UP_IC}</button>`}<button class="icon-btn" data-act="d-link" aria-label="Copy link to this task" title="Copy link to this task">${LINK_IC}</button>${canPip()?`<button class="icon-btn ${PIP.win&&PIP.id===t.id?'pin-on':''}" data-act="d-pip" aria-pressed="${!!(PIP.win&&PIP.id===t.id)}" aria-label="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task in its own window'}" title="${PIP.win&&PIP.id===t.id?'Close the floating window':'Float this task over Premiere or Resolve'}">${PIP_IC}</button>`:''}`}${t._draft?'':`<button class="icon-btn d-full ${FULL?'pin-on':''}" data-act="d-full" aria-pressed="${FULL}" aria-label="${FULL?'Back to the side panel':'Full screen: details and activity side by side'}" title="${FULL?'Back to the side panel':'Full screen: details and activity side by side'}">${FULL?SHRINK_IC:EXPAND_IC}</button>`}${t._draft?'':`<button class="icon-btn d-more" data-act="d-more" aria-label="Task options" title="Task options" aria-expanded="${!!TOPT}">${MORE_IC}</button>`}<button class="icon-btn d-close" data-act="drawer-close" aria-label="Close task" title="Close (Esc)">${I.x}</button></div>
+  ${t._draft||FULL?'':`<div class="d-tabs" role="tablist"><button role="tab" data-act="d-tab" data-tab="details" class="${S.ui.dtab!=='activity'?'on':''}" aria-selected="${S.ui.dtab!=='activity'}">${I.info}Details</button><button role="tab" data-act="d-tab" data-tab="activity" class="${S.ui.dtab==='activity'?'on':''}" aria-selected="${S.ui.dtab==='activity'}">${I.clock}Activity<span class="mono">${taskActivity(t).length}</span></button></div>`}
+  ${FULL?'<div class="d-split"><div class="d-split-l">':''}${!t._draft&&!FULL&&S.ui.dtab==='activity'?activityPane(t):`  <div class="d-body">
     ${SPLIT&&SPLIT.id===t.id?splitHtml(t):''}
     ${t.deleted?`<div class="d-archived">${I.trash}<span><b>In Trash</b> since ${fmtDate(t.deletedAt)}. It's deleted for good after ${trashDays()} days.</span><button class="btn sm" data-act="trash-restore" data-id="${t.id}">Restore</button></div>`:''}
     ${t.archived?`<div class="d-archived">${I.archive}<span><b>Archived</b>${t.archivedAt?' '+fmtDate(t.archivedAt):''}. Hidden from Overview and job tabs.</span><button class="btn sm" data-act="restore" data-id="${t.id}">Restore</button></div>`:''}
@@ -5420,9 +5503,11 @@ function renderDrawer(){
     ${notesBlock(t)}
     ${t._draft?`<div class="d-foot d-save"><button class="btn" data-act="drawer-close">Cancel</button><button class="btn" data-act="save-draft-again" title="Save this task and start another for the same job and client">Save &amp; add another</button><button class="btn primary" data-act="save-draft">${I.plus}Save task</button></div>`:`<div class="d-foot"><span class="d-created">${t.created?'Created '+fmtDate(ymd(new Date(t.created))):''}${t.doneAt?' · Done '+fmtDate(t.doneAt):''}</span>
       <span class="d-foot-btns" style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" data-act="d-duplicate">${I.copy}Duplicate</button><button class="btn sm" data-act="split-open">${SPLIT_IC}Split into tasks</button>${isClosed(t)&&!t.archived?`<button class="btn sm" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}<button class="btn sm danger ${deleteArmed?'armed':''}" data-act="delete-task">${I.trash}${deleteArmed?'Click again to move to Trash':'Delete task'}</button></span></div>`}
-  </div>`}`});
+  </div>`}${FULL?`</div><div class="d-split-r">${activityPane(t)}</div></div>`:''}`});
   autosize($('.d-name'));
-  {const d=$('#drawer');if(d.scrollTop!==DY)d.scrollTop=DY}
+  {const d=$('#drawer');if(d.scrollTop!==DY)d.scrollTop=DY;
+    const l=$('#drawer .d-split-l'),r=$('#drawer .d-split-r'),act=FULL?r:S.ui.dtab==='activity'?d:null;if(l)l.scrollTop=DL;if(r)r.scrollTop=DR;
+    if(act&&(!same||ACT_BOTTOM))act.scrollTop=act.scrollHeight;ACT_BOTTOM=false}
   renderPip();
 }
 /* a hidden element measures 0, so leave the height alone until it can be measured */
@@ -5951,7 +6036,7 @@ addEventListener('resize',()=>{if(NAP)napPlace()});
 function catPeek(){
   if(!pref('officeCat')||!pref('catPeek'))return;
   setTimeout(()=>{
-    const note=$('#drawer .tl-note');if(!note)return;
+    const note=[...document.querySelectorAll('#drawer .tl-note')].pop();if(!note)return;
     const w=document.createElement('span');w.className='peek-cat';w.setAttribute('aria-hidden','true');
     w.innerHTML=`<svg viewBox="1 0 10 7" shape-rendering="crispEdges">${pixSvg(CAT_SIT.slice(0,7),'peek-head','',catPal())}</svg>`;
     w.querySelectorAll('.cat-eyes').forEach(g=>g.setAttribute('transform','translate(-.35,.45)'));
@@ -5969,6 +6054,7 @@ const myProfile=()=>appSettings().profile||{};
 const meName=()=>String(myProfile().name||appSettings().greetName||B.name||'').trim();
 const meInitials=()=>{const n=meName();return n?n.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase():''};
 function meAvatar(size){const s=B.avatar?`<img src="${esc(B.avatar)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:'';return `<span class="me-av" style="--s:${size}px">${s}<b>${esc(meInitials())||PERSON_IC}</b></span>`}
+const EXPAND_IC='<svg class="i" viewBox="0 0 16 16"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg>',SHRINK_IC='<svg class="i" viewBox="0 0 16 16"><path d="M13.5 6.5h-4v-4M9.5 6.5 14 2M2.5 9.5h4v4M6.5 9.5 2 14"/></svg>';
 const PERSON_IC='<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="5.5" r="2.8"/><path d="M2.8 14c.6-2.8 2.7-4.3 5.2-4.3s4.6 1.5 5.2 4.3"/></svg>';
 function renderMeBtn(){const b=$('#me-btn');if(!b)return;const k=[B.avatar,meInitials()].join('|');if(b._k===k)return;b._k=k;b.innerHTML=meAvatar(30)}
 function saveProfile(k,v){const cur={...myProfile(),[k]:v};if(S.settings.app)patch('settings','app',{profile:cur},600);else create('settings',{profile:cur},'app')}
@@ -6303,7 +6389,7 @@ let swp=null;
     if(!swp)return;const p=e.changedTouches[0],dx=p.clientX-swp.x,dy=p.clientY-swp.y,dt=Date.now()-swp.t;swp=null;
     if(dt>600||Math.abs(dx)<70||Math.abs(dy)>Math.abs(dx)*.6)return;
     const t=S.tasks[S.ui.openTask];if(!t||t._draft)return;
-    if(matchMedia('(max-width:820px)').matches){const want=dx<0?'activity':'details';if(S.ui.dtab===want||(want==='details'&&S.ui.dtab!=='activity'))return;S.ui.dtab=want;noteDelArmed=null;haptic(6);gestUsed('dtab');renderDrawer();d.scrollTop=0;const b=d.querySelector('.d-body');if(b&&!reducedMotion())b.animate([{transform:`translateX(${dx<0?40:-40}px)`,opacity:.4},{transform:'none',opacity:1}],{duration:200,easing:'ease-out'});return}
+    if(matchMedia('(max-width:820px)').matches){const want=dx<0?'activity':'details';if(S.ui.dtab===want||(want==='details'&&S.ui.dtab!=='activity'))return;S.ui.dtab=want;noteDelArmed=null;haptic(6);gestUsed('dtab');renderDrawer();if(want!=='activity')d.scrollTop=0;const b=d.querySelector('.d-body');if(b&&!reducedMotion())b.animate([{transform:`translateX(${dx<0?40:-40}px)`,opacity:.4},{transform:'none',opacity:1}],{duration:200,easing:'ease-out'});return}
     const ids=taskOrder(),i=ids.indexOf(t.id);if(i<0||ids.length<2)return;
     const j=dx<0?i+1:i-1;if(j<0||j>=ids.length){toast(dx<0?'That was the last task in this list':'That was the first task in this list');return}
     haptic(6);d.classList.remove('swipe-l','swipe-r');void d.offsetWidth;d.classList.add(dx<0?'swipe-l':'swipe-r');
@@ -6429,6 +6515,7 @@ const HELP=[
  ['Tasks','Same name twice',`If you save a new task with the same name as an open one in that job, the panel asks whether to open the one you already have or save the new one anyway.`,null],
  ['Tasks','Select several',`Turn on Select in the toolbar, tick tasks (Shift-click for a range), then set status, priority, due date, move them to another job or client, archive or delete them together.`,null],
  ['Tasks','Up next, templates and duplicates',`Add a task to Up next (the queue icon at the top of a task, or right-click) to line up what you'll work on; it has its own page in the sidebar. Save checklist steps as a template per client. Duplicate makes an unsaved copy to edit: same client (so the same brand guide), due date, links, notes and checklist (unticked), with a fresh status.`,null],
+ ['Updates and notes','Activity like ClickUp, and full screen',`A task's Activity reads like ClickUp's: oldest at the top, newest at the bottom next to the box where you write. Comments (yours and ClickUp's) are cards with a picture, name and time; replies fold under "N replies" (recent ones from others start open). Status, date and checklist changes are small grey lines between them, and "Show older" brings back the rest. The expand button in the task's top bar (computer only) opens the task full screen with the details on the left and the activity on the right; click it again for the side panel. It remembers your choice.`,null],
  ['Updates and notes','Updates and revision notes',`In a task's Activity tab, post updates with formatting, timecodes and pictures (paste a screenshot or drop it in). Tick an update when it's done, reply to it, or edit it. Tasks with open updates show a speech-bubble count in lists.`,null],
  ['Updates and notes','Notes formatting',`Notes support bold (${IS_MAC?'⌘':'Ctrl '}B), italic (${IS_MAC?'⌘':'Ctrl '}I), bullet and numbered lists and links. ${IS_MAC?'⌘':'Ctrl '}Z undoes typing in any text box.`,['keys','Keyboard shortcuts']],
  ['Links and files','Finder folders and Chrome profiles',`Paste a Finder path into a task's Project folder (Mac) and it opens in Finder through a one-time Shortcuts setup. A job can open its links in its own Chrome profile (as a tab in that profile's window) or Google account. Leave the Chrome profile empty for jobs that use the profile the app is open in: their links open as normal tabs.`,['finder','Finder & Chrome']],
@@ -7987,8 +8074,11 @@ document.addEventListener('click',e=>{
     case 'open': if(e.target.closest('select,a,input'))return;
       if(e.target.closest('.row .t-name,.card .t-name')){clearTimeout(nameClickT);if(e.detail>1)break;const id=el.dataset.id,dt=el.dataset.dtab;nameClickT=setTimeout(()=>openTask(id,dt),230);break}
       openTask(el.dataset.id,el.dataset.dtab);break;
-    case 'd-tab': S.ui.dtab=el.dataset.tab;noteDelArmed=null;renderDrawer();$('#drawer').scrollTop=0;if(S.ui.dtab==='details')autosize($('.d-name'));break;
+    case 'd-tab': S.ui.dtab=el.dataset.tab;noteDelArmed=null;renderDrawer();if(S.ui.dtab!=='activity')$('#drawer').scrollTop=0;if(S.ui.dtab==='details')autosize($('.d-name'));break;
     case 'note-post': postNote();break;
+    case 'd-full': S.ui.dfull=!S.ui.dfull;saveUi();renderDrawer();break;
+    case 'act-more': ACT_ALL.add(S.ui.openTask);renderDrawer();break;
+    case 'rp-toggle': {const k=el.dataset.k;if(el.getAttribute('aria-expanded')==='true'){RP_OPEN.delete(k);RP_SHUT.add(k)}else{RP_OPEN.add(k);RP_SHUT.delete(k)}renderDrawer();break}
     case 'd-duplicate': duplicateTask(u.openTask);break;
     case 'split-open': openSplit();break;
     case 'help-go': if(PRF)closeProfile();openSettings();SM.sec=el.dataset.sec;SM.mv='sec';renderSettings();break;
