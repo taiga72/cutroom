@@ -1714,6 +1714,40 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 @media (max-width:820px){.cmt-h .mn-tag{display:none}.cmt .note-body,.cmt>.cmt-body,.cmt .note-pics,.cmt>.reply-box,.cmt .note-foot,.cmt.cu-c>.cmt-rn,.cmt-replies{margin-left:0}.cmt-reply .cmt-body{margin-left:0}}
 .drawer .d-activity .composer{margin-top:auto;position:sticky;bottom:0;z-index:3;box-shadow:0 -10px 16px -12px rgba(0,0,0,.25)}
 .drawer .d-activity::after{content:"";display:block;height:14px;flex:none}
+
+/* brief links, files in comments, needs my reply, tags */
+.brief-links,.cfiles{display:flex;flex-direction:column;gap:2px}
+.brief-links{margin-top:10px;border:1px dashed var(--line);border-radius:10px;padding:8px 10px}
+.bl-h{display:flex;align-items:center;gap:6px;font:600 calc(11px*var(--ts)) var(--body);letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin-bottom:2px}
+.bl-h .i{width:13px;height:13px}
+.bl-row{display:flex;align-items:center;gap:8px;min-height:34px;padding:2px 0}
+.bl-row .svc,.bl-ic .i{width:16px;height:16px;flex:none}
+.bl-ic{display:grid;place-items:center;color:var(--faint)}
+.bl-name{font-weight:600;color:var(--text);text-decoration:none;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bl-name:hover{color:var(--accent);text-decoration:underline}
+.bl-row small{color:var(--faint);font-size:calc(12px*var(--ts));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.bl-row .icon-btn{width:28px;height:28px;flex:none}
+.bl-use{flex:none;white-space:nowrap}
+.cfiles .note-pics{margin-top:6px}
+.nr-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 0 39px;padding:6px 6px 6px 10px;border-radius:8px;background:color-mix(in srgb,var(--st-rev) 12%,var(--surface));color:color-mix(in srgb,var(--st-rev) 70%,var(--text));font-size:calc(12.5px*var(--ts));font-weight:600}
+.nr-bar span{flex:1;min-width:0}
+.nr-bar .i{width:14px;height:14px}
+.cmt-reply .nr-bar{margin-left:33px}
+.chip.nr-chip{background:color-mix(in srgb,var(--st-rev) 15%,var(--surface));color:color-mix(in srgb,var(--st-rev) 75%,var(--text))}
+.chip.nr-chip .i{width:12px;height:12px}
+.lane-nr{border:0;background:none;padding:0;font:inherit;color:color-mix(in srgb,var(--st-rev) 75%,var(--text));font-weight:700;display:inline-flex;align-items:center;gap:3px;cursor:pointer}
+.lane-nr .i{width:12px;height:12px}
+.lane-nr:hover{text-decoration:underline}
+.tag{display:inline-flex;align-items:center;gap:3px;height:20px;padding:0 7px;border-radius:999px;background:color-mix(in srgb,var(--tc) 14%,var(--surface));color:color-mix(in srgb,var(--tc) 80%,var(--text));font:600 calc(11.5px*var(--ts)) var(--body);white-space:nowrap}
+.tag::before{content:"#";opacity:.6}
+.tag button{border:0;background:none;padding:0 0 0 2px;color:inherit;font-size:calc(14px*var(--ts));line-height:1;cursor:pointer;opacity:.7}
+.tag button:hover{opacity:1}
+.tags-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-height:36px}
+.tag-add{flex:1;min-width:140px}
+.tag-add input{width:100%;border:0;background:none;outline:none;padding:6px 4px;color:var(--text);font:inherit}
+.tags-ctl .tag{height:24px;font-size:calc(12.5px*var(--ts))}
+.lc-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+@media (max-width:820px){.nr-bar{margin-left:0}.cmt-reply .nr-bar{margin-left:0}.tag-add input{font-size:16px}}
 /* full screen task: details on the left, activity on the right */
 .drawer.full{top:22px;left:22px;right:22px;bottom:22px;width:auto;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
 .drawer.full+.d-resize{display:none}
@@ -2637,8 +2671,9 @@ select.rs-add{appearance:auto}
       </select>
       <select class="sel" id="f-due" aria-label="Due date filter">
         <option value="all">Any due date</option><option value="overdue">Overdue</option><option value="today">Due today</option><option value="week">Due in 7 days</option><option value="nodate">No due date</option>
-        <optgroup label="ClickUp"><option value="cu-new">New from ClickUp</option></optgroup><optgroup label="Missing"><option value="miss-any">Missing a link</option><option value="miss-upload">No review link</option><option value="miss-file">No storage link</option><option value="miss-task">No task link</option></optgroup>
+        <optgroup label="ClickUp"><option value="cu-new">New from ClickUp</option><option value="cu-reply">Needs my reply</option></optgroup><optgroup label="Missing"><option value="miss-any">Missing a link</option><option value="miss-upload">No review link</option><option value="miss-file">No storage link</option><option value="miss-task">No task link</option></optgroup>
       </select>
+      <select class="sel" id="f-tag" aria-label="Tag filter" hidden></select>
       <select class="sel" id="f-sort" aria-label="Sort">
         <option value="due">Sort: Due date</option><option value="start">Sort: Start date</option><option value="priority">Sort: Priority</option><option value="name">Sort: Name</option><option value="created">Sort: Newest</option><option value="updated">Sort: Recently updated</option><option value="age">Sort: Oldest assigned</option><option value="revision">Sort: Most revisions</option><option value="client">Sort: Client</option><option value="manual">Sort: My order (drag)</option>
       </select></div>
@@ -3716,15 +3751,82 @@ function specsRow(t,f){
 }
 /* ================= ClickUp @mentions ================= */
 /* replies inside a ClickUp comment thread, shown under the comment */
-function cuRepliesHtml(e,t){
-  const rs=e.replies||[];if(!rs.length)return '';const k='cu|'+e.at,open=RP_OPEN.has(k)||(!RP_SHUT.has(k)&&rs.some(r=>!r.me&&Date.now()-new Date(r.at)<3*864e5));
-  return `<button type="button" class="cmt-rn ${open?'on':''}" data-act="rp-toggle" data-k="${esc(k)}" aria-expanded="${open}">${rpIc}${rs.length} repl${rs.length===1?'y':'ies'}${rs.some(r=>cuMention({...r,k:'reply'}))&&!open?' <span class="mn-tag">@ you</span>':''}</button>${open?`<div class="cmt-replies">${rs.map(r=>{const rr={...r,k:'reply'},mn=cuMention(rr);return `<div class="cmt-reply ${mn?'cu-mention':''}"><div class="cmt-h">${avOther(r.who,24,r.me)}<div class="cmt-who"><b>${esc(r.who||'Someone')}</b><time datetime="${esc(r.at)}">${whenTxt(r.at)}</time></div>${mn?'<span class="mn-tag">@ mentioned you</span>':''}</div><div class="cmt-body md">${noteText(r.text,S.jobs[t.jobId])}</div></div>`}).join('')}</div>`:''}`;
+function cuRepliesHtml(e,t,nr){
+  const rs=e.replies||[];if(!rs.length)return '';nr=nr||new Set();const k='cu|'+e.at,open=RP_OPEN.has(k)||(!RP_SHUT.has(k)&&rs.some(r=>(!r.me&&Date.now()-new Date(r.at)<3*864e5)||nr.has(r.cid||r.at)));
+  return `<button type="button" class="cmt-rn ${open?'on':''}" data-act="rp-toggle" data-k="${esc(k)}" aria-expanded="${open}">${rpIc}${rs.length} repl${rs.length===1?'y':'ies'}${rs.some(r=>cuMention({...r,k:'reply'}))&&!open?' <span class="mn-tag">@ you</span>':''}</button>${open?`<div class="cmt-replies">${rs.map(r=>{const rr={...r,k:'reply'},mn=cuMention(rr);return `<div class="cmt-reply ${mn?'cu-mention':''}"><div class="cmt-h">${avOther(r.who,24,r.me)}<div class="cmt-who"><b>${esc(r.who||'Someone')}</b><time datetime="${esc(r.at)}">${whenTxt(r.at)}</time></div>${mn?'<span class="mn-tag">@ mentioned you</span>':''}</div><div class="cmt-body md">${noteText(r.text,S.jobs[t.jobId])}</div>${nr.has(r.cid||r.at)?nrBar(r.cid||r.at):''}</div>`}).join('')}</div>`:''}`;
 }
 function cuMention(f){
   if((f.k!=='comment'&&f.k!=='reply')||f.me)return false;if(f.mention)return true;
   const names=[CU.name,B.name,appSettings().greetName].filter(Boolean),txt=String(f.text||'').toLowerCase();
   return names.some(n=>txt.includes('@'+String(n).toLowerCase())||txt.includes('@'+String(n).split(' ')[0].toLowerCase()+' '));
 }
+/* ================= brief links, files in comments, needs my reply, tags ================= */
+const URL_RE=/https?:\/\/[^\s<>()\[\]"'`]+[^\s<>()\[\]"'`.,;:!?*_]/g,MDLINK_RE=/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g;
+const hostOf=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch(e){return 'Link'}};
+const cleanLbl=x=>{x=String(x||'').replace(/\*\*|__|`/g,'').replace(/^[\s#>*\-–•\d.)]+/,'').replace(/[\s:\-–=|>(]+$/,'').trim();if(x.length>50)x=x.split(/[.;:!?]/).pop().trim();return x.length>50||x.length<2?'':x};
+const copyVal=(v,msg)=>{try{navigator.clipboard.writeText(v).then(()=>toast(msg||'Copied'),()=>toast(v))}catch(x){toast(v)}};
+/* named links in the task's notes (ClickUp briefs land there): "Raw Video: https://…", "[Script](https://…)", or a label line above a bare link */
+function briefLinks(t){
+  const lines=String(t.notes||'').split('\n'),out=[],seen=new Set(Object.values(t.links||{}).filter(Boolean).map(String));
+  const add=(label,url)=>{if(seen.has(url))return;seen.add(url);out.push({label:cleanLbl(label)||hostOf(url),url})};
+  lines.forEach((ln,i)=>{
+    for(const m of ln.matchAll(MDLINK_RE)){const pre=ln.slice(0,m.index);add(/[:\-–]\s*(\*\*|__)?\s*$/.test(pre)&&cleanLbl(pre)?pre:m[1],m[2])}
+    const rest=ln.replace(MDLINK_RE,' ');
+    for(const m of rest.matchAll(URL_RE)){let lbl=rest.slice(0,m.index).replace(/https?:\/\/\S+/g,'');
+      if(!cleanLbl(lbl)&&i>0){const prev=lines[i-1].trim();if(prev&&prev.length<=60&&!/https?:\/\//.test(prev))lbl=prev}
+      add(lbl,m[0])}
+  });
+  return out.slice(0,24);
+}
+/* links and pictures shared in comments and replies (ClickUp and your own updates), newest first */
+function commentFiles(t){
+  const out=[],seen=new Set(Object.values(t.links||{}).filter(Boolean).map(String));briefLinks(t).forEach(x=>seen.add(x.url));
+  const add=(name,url,who,at,pic)=>{if(!url||seen.has(url))return;seen.add(url);out.push({name:name||hostOf(url),url,who,at,pic})};
+  const scan=(txt,who,at,files)=>{for(const f of files||[])add(f.name,f.url,who,at);const x=String(txt||'');for(const m of x.matchAll(MDLINK_RE))add(m[1],m[2],who,at);for(const m of x.replace(MDLINK_RE,' ').matchAll(URL_RE))add(hostOf(m[0]),m[0],who,at)};
+  for(const f of t.cu?.feed||[]){if(f.k!=='comment')continue;scan(f.text,f.who,f.at,f.files);for(const r of f.replies||[])scan(r.text,r.who,r.at,r.files)}
+  for(const e of logItems())if(e.taskId===t.id&&e.kind==='note'){scan(e.text,myName(),e.at);(e.pics||[]).forEach(v=>add('Picture',v,myName(),e.at,true));for(const r of e.replies||[]){scan(r.text,myName(),r.at);(r.pics||[]).forEach(v=>add('Picture',v,myName(),r.at,true))}}
+  return out.sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+}
+function fileRow(x,j,sub,extra){const u=linkHref(x.url,j);return `<div class="bl-row">${svcIcon(x.url)||`<span class="bl-ic">${I.ext}</span>`}<a href="${esc(u)}"${linkTarget(x.url,j)} class="bl-name" title="${esc(x.url)}">${esc(x.label||x.name)}</a><small>${esc(sub)}</small>${extra||''}<button type="button" class="icon-btn" data-act="bl-copy" data-url="${esc(x.url)}" title="Copy link" aria-label="Copy link">${I.copy}</button></div>`}
+function briefLinksHtml(t,j){
+  const bl=briefLinks(t);if(!bl.length)return '';
+  return `<div class="brief-links"><div class="bl-h">${I.file}From the brief</div>${bl.map(x=>{const k=linkKind(x.url,t),use=k&&!String(t.links?.[k]||'').trim()?`<button type="button" class="btn sm ghost bl-use" data-act="bl-use" data-k="${k}" data-url="${esc(x.url)}" title="Save it as this task's ${esc(linkLabel(j,k))}">Use as ${esc(linkLabel(j,k))}</button>`:'';return fileRow(x,j,hostOf(x.url),use)}).join('')}</div>`;
+}
+let CF_ALL=null;
+function commentFilesHtml(t,j){
+  const all=commentFiles(t);if(!all.length)return '';
+  const pics=all.filter(x=>x.pic),links=all.filter(x=>!x.pic),showAll=CF_ALL===t.id,ls=showAll?links:links.slice(0,6);
+  return `<div class="cfiles"><h4 class="section-title">Files in comments<span class="mono">${all.length}</span></h4>
+    ${ls.map(x=>fileRow(x,j,[x.who,x.at?absDate(ymd(new Date(x.at))):''].filter(Boolean).join(' · '))).join('')}
+    ${links.length>6&&!showAll?`<button type="button" class="btn sm ghost" data-act="cf-all">Show all ${links.length} links</button>`:''}
+    ${pics.length?`<div class="note-pics">${pics.map((x,i)=>`<button type="button" class="note-pic" data-act="cf-pic" data-i="${i}" aria-label="Open picture ${i+1}"><img src="${esc(imgSrc(x.url)||'')}" alt="" loading="lazy"></button>`).join('')}</div>`:''}
+  </div>`;
+}
+/* ClickUp comments and replies from others that ask you something or @mention you, with no later answer from you
+   (a reply in the thread, or a newer comment of yours on the task) and not marked handled (task.nrDone:[cid]); last 21 days */
+const NR_ASK=/\?|^\s*(can|could|would|will) you\b|\b(let me know|lmk|please confirm|can you confirm)\b/i;
+function needsReply(t){
+  const feed=(t.cu?.feed||[]).filter(f=>f.k==='comment');if(!feed.length||t.deleted||t.archived||t._draft||isClosed(t))return [];
+  const done=new Set(t.nrDone||[]),cut=Date.now()-21*864e5,out=[];
+  const myLast=Math.max(0,...feed.filter(f=>f.me).map(f=>+new Date(f.at)));
+  for(const f of feed){
+    const msgs=[{...f,k:'comment'},...(f.replies||[]).map(r=>({...r,k:'reply'}))],mine=Math.max(0,...msgs.filter(m=>m.me).map(m=>+new Date(m.at)));
+    for(const m of msgs){const at=+new Date(m.at),key=m.cid||m.at;if(m.me||done.has(key)||at<cut||mine>at||(m.k==='comment'&&myLast>at))continue;
+      const mn=cuMention(m);if(mn||NR_ASK.test(m.text||''))out.push({key,at:m.at,who:m.who,text:m.text,mention:mn})}
+  }
+  return out.sort((a,b)=>a.at.localeCompare(b.at));
+}
+const nrKeys=t=>new Set(needsReply(t).map(x=>x.key));
+function nrDone(t,key){const nr=needsReply(t),keys=key?[key]:nr.map(x=>x.key);if(!keys.length)return;patch('tasks',t.id,{nrDone:[...(t.nrDone||[]),...keys].slice(-200)});logAct('edit',keys.length===1?'Comment marked as handled':`${keys.length} comments marked as handled`,{task:t});renderDrawer();scheduleRender()}
+/* tags: task.tags:[text], free labels with a filter */
+const TAG_IC='<svg class="i" viewBox="0 0 16 16"><path d="M2.5 2.5h5.2l5.8 5.8-5.2 5.2-5.8-5.8z"/><circle cx="5.3" cy="5.3" r="1"/></svg>';
+const tagCol=x=>{let h=0;for(const c of String(x).toLowerCase())h=(h*31+c.charCodeAt(0))>>>0;return AV_COLS[h%AV_COLS.length]};
+const tagChip=(x,rm)=>`<span class="tag" style="--tc:${tagCol(x)}">${esc(x)}${rm?`<button type="button" data-act="tag-rm" data-tag="${esc(x)}" aria-label="Remove tag ${esc(x)}" title="Remove tag">×</button>`:''}</span>`;
+function allTags(){const n={};for(const t of live())for(const x of t.tags||[])n[x]=(n[x]||0)+1;return Object.keys(n).sort((a,b)=>n[b]-n[a]||a.localeCompare(b))}
+function tagsCtl(t){const has=t.tags||[],sug=allTags().filter(x=>!has.includes(x));
+  return `<div class="tags-ctl">${has.map(x=>tagChip(x,true)).join('')}<form class="tag-add" data-act="tag-add"><input id="tag-in" data-fk="tag-in" list="tag-list" placeholder="${has.length?'Add':'Add a tag (e.g. reel, rush, B-roll)'}" maxlength="30" autocomplete="off" aria-label="Add a tag"><datalist id="tag-list">${sug.map(x=>`<option value="${esc(x)}">`).join('')}</datalist></form></div>`}
+function addTag(t,v){v=String(v||'').trim().replace(/^#/,'').replace(/\s+/g,' ').slice(0,30);if(!v)return;const ex=allTags().find(x=>x.toLowerCase()===v.toLowerCase())||v;if((t.tags||[]).some(x=>x.toLowerCase()===ex.toLowerCase()))return;patch('tasks',t.id,{tags:[...(t.tags||[]),ex]});if(!t._draft)logAct('edit',`Tag added: ${ex}`,{task:t})}
+function rmTag(t,v){patch('tasks',t.id,{tags:(t.tags||[]).filter(x=>x!==v)});if(!t._draft)logAct('edit',`Tag removed: ${v}`,{task:t})}
 /* ================= money in one currency (Invoices) =================
    settings/app.homeCurrency picks the currency for totals; rates come from /api/rates (hosted) or open.er-api.com,
    cached per base in localStorage (cutroom.fx.v1) for 12 hours. */
@@ -3852,9 +3954,11 @@ function filtered(){
   if(u.due==='week') list=list.filter(t=>t.due&&!isClosed(t)&&diffDays(t.due,t0)>=0&&diffDays(t.due,t0)<=7);
   if(u.due==='nodate') list=list.filter(t=>!t.due);
   if(u.due==='today') list=list.filter(t=>t.due===t0&&!isClosed(t));
-  if(q) list=list.filter(t=>[t.name,t.notes,S.clients[t.clientId]?.name,S.jobs[t.jobId]?.name,...(t.checklist||[]).map(c=>c.text),...Object.values(t.links||{})].some(x=>String(x||'').toLowerCase().includes(q)));
+  if(q) list=list.filter(t=>[t.name,t.notes,...(t.tags||[]),S.clients[t.clientId]?.name,S.jobs[t.jobId]?.name,...(t.checklist||[]).map(c=>c.text),...Object.values(t.links||{})].some(x=>String(x||'').toLowerCase().includes(q)));
   if(u.due.startsWith('miss-')) list=list.filter(t=>!isClosed(t)&&missing(t,u.due.slice(5)));
   if(u.due==='cu-new') list=list.filter(cuUnreviewed);
+  if(u.due==='cu-reply') list=list.filter(t=>needsReply(t).length);
+  if(u.tag&&u.tag!=='all') list=list.filter(t=>(t.tags||[]).includes(u.tag));
   const by={
     due:(a,b)=>(a.due||'9999').localeCompare(b.due||'9999')||PRIO_RANK[a.priority||'normal']-PRIO_RANK[b.priority||'normal'],
     start:(a,b)=>(a.start||'9999').localeCompare(b.start||'9999'),
@@ -4177,10 +4281,11 @@ function renderMain(){
   $('#jobcards').innerHTML=(!job?allClearHtml():'')+(!job&&jobsSorted().length&&u.view!=='lanes'?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')+`<button type="button" class="job-card job-add" data-act="new-job" title="New job">${I.plus}<span>New job</span></button>`}</div>`:'');
 
   const tb=$('#toolbar');tb.hidden=!Object.keys(S.jobs).length;
-  $('#top-search').hidden=tb.hidden;$('#fdot').hidden=u.prio==='all'&&u.due==='all';
+  $('#top-search').hidden=tb.hidden;$('#fdot').hidden=u.prio==='all'&&u.due==='all'&&(u.tag||'all')==='all';
   ['lanes','list','board','calendar'].forEach(v=>{const b=$('#v-'+v);b.classList.toggle('on',u.view===v);b.setAttribute('aria-selected',u.view===v)});$('#v-lanes').hidden=!!job;
   if(document.activeElement!==$('#q')) $('#q').value=u.q;
   $('#f-prio').value=u.prio;$('#f-due').value=u.due;$('#f-sort').value=u.sort;
+  {const tg=allTags(),ft=$('#f-tag');if(u.tag&&u.tag!=='all'&&!tg.includes(u.tag))u.tag='all';ft.hidden=!tg.length;const k=tg.join('\n');if(ft._k!==k){ft._k=k;ft.innerHTML=`<option value="all">Any tag</option>${tg.map(x=>`<option value="${esc(x)}">#${esc(x)}</option>`).join('')}`}ft.value=u.tag||'all'}
   $('#vopt-wrap').hidden=u.view!=='list';
   $('#sel-btn').hidden=u.view==='calendar'||u.view==='lanes';if(u.view==='calendar'&&(SELMODE||SEL.size)){SEL.clear();SELMODE=false}if(u.view!=='list')VOPT=false;renderVopt();
 
@@ -4430,11 +4535,12 @@ function lanesView(list){
     const over=open.filter(t=>t.due&&t.due<t0).length,today_=open.filter(t=>t.due===t0).length,tot=all.length||1;
     const bar=statusesFor(j.id).map(s=>{const n=all.filter(t=>stOf(t)===s.id).length;return n?`<i style="width:${n/tot*100}%;background:${stColor(s.id)}" title="${esc(stLabel(s.id))}: ${n}"></i>`:''}).join('');
     const cu=j.clickup?.team?`<span class="lane-cu" title="Statuses and tasks from ClickUp">${CU_IC}</span>`:'';
-    const meta=[`${open.length} open`,over?`<b class="over">${over} overdue</b>`:'',today_?`${today_} due today`:''].filter(Boolean).join(' · ');
+    const nrN=open.filter(t=>needsReply(t).length).length;
+    const meta=[`${open.length} open`,over?`<b class="over">${over} overdue</b>`:'',today_?`${today_} due today`:'',nrN?`<button type="button" class="lane-nr" data-act="lane-nr" title="Show tasks with ClickUp comments waiting for your reply">${rpIc}${nrN} need${nrN===1?'s':''} your reply</button>`:''].filter(Boolean).join(' · ');
     const card=t=>{const c=S.clients[t.clientId],nn=openNotes(t);return `<div class="lane-card ${dueClass(t)==='over'?'is-over':''}" data-act="open" data-id="${t.id}" tabindex="0">
       <div class="lc-name">${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</div>
-      ${c?`<div class="lc-client">${esc(c.name)}</div>`:''}
-      <div class="lc-foot"><span class="pill" ${pillStyle(stOf(t))}><span class="pl">${esc(stLabel(stOf(t)))}</span></span>${nn?`<span class="chip notes-chip" title="${nn} open update${nn===1?'':'s'}">${I.chat}${nn}</span>`:''}<span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,true):'No date'}</span></div></div>`};
+      ${c?`<div class="lc-client">${esc(c.name)}</div>`:''}${(t.tags||[]).length?`<div class="lc-tags">${t.tags.slice(0,3).map(x=>tagChip(x)).join('')}</div>`:''}
+      <div class="lc-foot"><span class="pill" ${pillStyle(stOf(t))}><span class="pl">${esc(stLabel(stOf(t)))}</span></span>${nn?`<span class="chip notes-chip" title="${nn} open update${nn===1?'':'s'}">${I.chat}${nn}</span>`:''}${(r=>r?`<span class="chip nr-chip" title="${r} comment${r===1?'':'s'} waiting for your reply">${rpIc}${r}</span>`:'')(needsReply(t).length)}<span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,true):'No date'}</span></div></div>`};
     return `<section class="lane" style="--jc:${esc(j.color||'var(--accent)')}">
       <header class="lane-h"><button type="button" class="lane-name" data-act="nav" data-tab="${j.id}">${jobMark(j,20)}${jobEmoji(j)}<b>${esc(j.name)}</b>${shiftDot(j)}</button>${cu}
         <div class="lane-meta">${meta}</div>${bar?`<div class="lane-bar">${bar}</div>`:''}</header>
@@ -4473,6 +4579,8 @@ function metaLine(t,job,showJob){
   if(t.pomos)bits.push(`<span class="chip pomo-chip" title="${t.pomos} focus session${t.pomos===1?'':'s'}">${TOMATO_IC}${t.pomos}</span>`);
   {const q=t.upNext&&!isClosed(t)&&!t.archived?upNextPos(t):0;if(q)bits.push(`<span class="chip un-chip" title="Up next #${q}">${UP_IC}${q}</span>`)}
   {const n=openNotes(t);if(n)bits.push(`<span class="chip notes-chip" title="${n} open update${n===1?'':'s'} to work through">${I.chat}${n}</span>`)}
+  {const n=needsReply(t).length;if(n)bits.push(`<span class="chip nr-chip" title="${n} ClickUp comment${n===1?'':'s'} waiting for your reply">${rpIc}${n}</span>`)}
+  for(const x of t.tags||[])bits.push(tagChip(x));
   if(!isClosed(t)&&!t.archived){const a=ageDays(t);if(a!==null&&a>=AGE_SHOW)bits.push(`<span class="chip age ${a>=AGE_OLD?'old':''}" title="Assigned ${a} days ago">${a}d</span>`)}
   return `<div class="t-meta">${bits.join('')}</div>`;
 }
@@ -4676,6 +4784,7 @@ function notifications(all){
       out.push({key:`${mn?'cum':'cu'}:${t.id}:${f.cid}`,rank:mn?0.5:1.5,kind:mn?'warn':'info',icon:'chat',task:t,tab:'activity',mention:mn,title:mn?`${f.who||'Someone'} mentioned you on ${nm}`:`${f.who||'Someone'} commented on ${nm}`,body:String(f.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}
     for(const f of (t.cu?.feed||[]).slice(-12))for(const r of f.replies||[]){if(r.me)continue;const rr={...r,k:'reply'},mn=cuMention(rr),age=Date.now()-new Date(r.at);if(age>(mn?7:3)*86400000)continue;
       out.push({key:`${mn?'cum':'cu'}:${t.id}:${r.cid}`,rank:mn?0.5:1.5,kind:mn?'warn':'info',icon:'chat',task:t,tab:'activity',mention:mn,title:mn?`${r.who||'Someone'} mentioned you on ${nm}`:`${r.who||'Someone'} replied on ${nm}`,body:String(r.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}
+    {const nr=needsReply(t);if(nr.length){const l=nr[nr.length-1];out.push({key:`nr:${t.id}:${l.key}`,rank:0.6,kind:'warn',icon:'chat',task:t,tab:'activity',reply:true,title:nr.length===1?`${l.who||'Someone'} is waiting for your reply on ${nm}`:`${nr.length} comments on ${nm} are waiting for your reply`,body:String(l.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}}
     if(!t.due&&(t.priority==='urgent'||t.priority==='high'))out.push({key:`nodate:${t.id}`,rank:6,kind:'info',icon:'cal',task:t,title:`${nm} is ${t.priority==='urgent'?'urgent':'high priority'} but has no due date`,body:''});
   }
   const load=dueLoad();
@@ -4698,7 +4807,7 @@ function renderBell(){
   renderTabbar();sheetLock();
   const pop=$('#notes');pop.hidden=!notesOpen;if(!notesOpen)return;
   if(narrow.matches){pop.innerHTML=notesPageHtml(list,unread);return}
-  const f=naSets(list),all=list.length;if(NF==='mentions'&&!f.mentions.length)NF='all';list=f[NF]||list;
+  const f=naSets(list),all=list.length;if((NF==='mentions'&&!f.mentions.length)||(NF==='replies'&&!f.replies.length))NF='all';list=f[NF]||list;
   pop.innerHTML=`<div class="notes-head"><b>Alerts</b>${unread?'<button type="button" class="btn sm ghost" data-act="notes-read">Mark all as read</button>':''}<button type="button" class="icon-btn notes-x" data-act="notes-close" aria-label="Close" title="Close">${I.x}</button></div>${all?`<div class="nf-mini">${naChips(f)}</div>`:''}
     ${list.length?`<div class="notes-list">${list.map(n=>`<div data-nkey="${esc(n.key)}" class="note ${n.kind} ${NS.read[n.key]?'':'unread'}"><button type="button" class="note-main" data-act="note-open" data-key="${esc(n.key)}">${I[n.icon]}<span><b>${esc(n.title)}</b>${n.body?`<span>${esc(n.body)}</span>`:''}<small>${esc(n.sub)}</small></span></button><button type="button" class="icon-btn" data-act="note-hide" data-key="${esc(n.key)}" aria-label="Dismiss" title="Dismiss">${I.x}</button></div>`).join('')}</div>`
     :`<p class="notes-empty">${all?'Nothing here with this filter.':"You're all caught up. Deadlines, busy days and tasks that need a nudge will show up here."}</p>`}`;
@@ -4706,11 +4815,11 @@ function renderBell(){
 /* phones: notifications as a full page like Slack's Activity: colored header, filter chips,
    rows with the task's logo, a kind badge, what happened, when, and the job; swipe a row left to dismiss */
 let NF='all';
-const NA_LBL={ctr:'Contract',over:'Overdue',today:'Due today',tmrw:'Due tomorrow',start:'Starts today',stale:'Needs a nudge',rev:'Many revisions',nodate:'No due date',busy:'Busy day',backup:'Backup',cu:'ClickUp comment',cum:'Mentioned you',cunew:'From ClickUp',inv:'Invoice'};
+const NA_LBL={ctr:'Contract',over:'Overdue',today:'Due today',tmrw:'Due tomorrow',start:'Starts today',stale:'Needs a nudge',rev:'Many revisions',nodate:'No due date',busy:'Busy day',backup:'Backup',cu:'ClickUp comment',cum:'Mentioned you',nr:'Needs reply',cunew:'From ClickUp',inv:'Invoice'};
 const NA_DEAD=new Set(['over','today','tmrw','busy']);
 /* the filter chips are shared by the phone page and the desktop bell */
-function naSets(list){const kindOf=n=>n.key.split(':')[0];return {all:list,unread:list.filter(n=>!NS.read[n.key]),mentions:list.filter(n=>n.mention),deadlines:list.filter(n=>NA_DEAD.has(kindOf(n))),followups:list.filter(n=>!NA_DEAD.has(kindOf(n)))}}
-function naChips(f){return [['all','All'],['unread','Unread'],...(f.mentions.length?[['mentions','Mentions']]:[]),['deadlines','Deadlines'],['followups','Follow-ups']].map(([k,l])=>`<button type="button" class="na-chip ${NF===k?'on':''}" data-act="na-filter" data-f="${k}">${l}${k!=='all'&&f[k].length?` <small>${f[k].length}</small>`:''}</button>`).join('')}
+function naSets(list){const kindOf=n=>n.key.split(':')[0];return {all:list,unread:list.filter(n=>!NS.read[n.key]),mentions:list.filter(n=>n.mention),replies:list.filter(n=>n.reply),deadlines:list.filter(n=>NA_DEAD.has(kindOf(n))),followups:list.filter(n=>!NA_DEAD.has(kindOf(n)))}}
+function naChips(f){return [['all','All'],['unread','Unread'],...(f.replies.length?[['replies','Needs reply']]:[]),...(f.mentions.length?[['mentions','Mentions']]:[]),['deadlines','Deadlines'],['followups','Follow-ups']].map(([k,l])=>`<button type="button" class="na-chip ${NF===k?'on':''}" data-act="na-filter" data-f="${k}">${l}${k!=='all'&&f[k].length?` <small>${f[k].length}</small>`:''}</button>`).join('')}
 function notesPageHtml(list,unread){
   const kindOf=n=>n.key.split(':')[0];
   const f=naSets(list),chips=naChips(f);
@@ -4861,7 +4970,7 @@ let LSHOW=new Set();
 function taskActivity(t){
   const h=logItems().filter(e=>e.taskId===t.id);
   if(t.created&&!h.some(e=>e.kind==='create'))h.push({at:new Date(t.created).toISOString(),kind:'create',text:t.cu?'Brought in from ClickUp':'Created',taskId:t.id,synthetic:true});
-  for(const f of t.cu?.feed||[])h.push({at:f.at,kind:'clickup',k:f.k,who:f.who,me:f.me,mention:f.mention,text:f.text,replies:f.replies,taskId:t.id,synthetic:true});
+  for(const f of t.cu?.feed||[])h.push({at:f.at,kind:'clickup',k:f.k,cid:f.cid,who:f.who,me:f.me,mention:f.mention,text:f.text,files:f.files,replies:f.replies,taskId:t.id,synthetic:true});
   return h.sort((a,b)=>b.at.localeCompare(a.at));
 }
 let noteDelArmed=null;
@@ -4884,10 +4993,11 @@ function actLine(e){
   else if(e.kind==='clickup'&&(m=/^Status in ClickUp: (.*?) → (.*)$/.exec(e.text||'')))txt=`Status changed in ClickUp from <b>${esc(m[1])}</b> to <b>${esc(m[2])}</b>`;
   return `<div class="act-line"><span class="l-ic k-${e.kind}">${e.kind==='clickup'?CU_IC:LOG_ICON[e.kind]||I.info}</span><span class="al-t">${txt}</span><time datetime="${esc(e.at)}" title="${esc(whenTxt(e.at))}">${dayHeading(e.at)==='Today'?fmtTime(e.at):absDate(ymd(new Date(e.at)))}</time></div>`;
 }
+const nrBar=k=>`<div class="nr-bar">${rpIc}<span>Waiting for your reply. Answer in ClickUp, or</span><button type="button" class="btn sm ghost" data-act="nr-done" data-k="${esc(k)}">Mark handled</button></div>`;
 function cuCommentHtml(e,t){
-  const mn=cuMention(e);
+  const mn=cuMention(e),nr=nrKeys(t),wait=nr.has(e.cid||e.at);
   return `<div class="cmt cu-c ${mn?'cu-mention':''}"><div class="cmt-h">${avOther(e.who,30,e.me)}<div class="cmt-who"><b>${esc(e.who||'Someone')}</b><time datetime="${esc(e.at)}">${whenTxt(e.at)}</time></div>${mn?'<span class="mn-tag">@ mentioned you</span>':''}<span class="cmt-src" title="Comment from ClickUp">${CU_IC}ClickUp</span></div>
-    <div class="cmt-body md">${noteText(e.text,S.jobs[t.jobId])}</div>${cuRepliesHtml(e,t)}</div>`;
+    <div class="cmt-body md">${noteText(e.text,S.jobs[t.jobId])}</div>${wait?nrBar(e.cid||e.at):''}${cuRepliesHtml(e,t,nr)}</div>`;
 }
 function activityPane(t){
   const all=taskActivity(t).slice().reverse();
@@ -5488,12 +5598,14 @@ function renderDrawer(){
       ${client||f(I.ratio,'Format',`<div class="fmt-pick">${FORMATS.map(x=>`<button data-act="fmt" data-fmt="${x}" class="${t.format===x?'on':''}" aria-pressed="${t.format===x}">${x}</button>`).join('')}${t.format==='9:16'?`<button type="button" class="fmt-sz" data-act="help-go" data-sec="safezones" title="Download safe-zone overlays for TikTok, Reels and Shorts">Safe zones</button>`:''}</div>`)}
       ${f(I.loop,'Revision',`<div class="stepper"><button data-act="rev" data-step="-1" aria-label="Decrease revision round">−</button><output>R${t.revision||0}</output><button data-act="rev" data-step="1" aria-label="Increase revision round">+</button></div>`)}
       ${client?f(I.ratio,'Format',`<div class="fmt-pick">${FORMATS.map(x=>`<button data-act="fmt" data-fmt="${x}" class="${t.format===x?'on':''}" aria-pressed="${t.format===x}">${x}</button>`).join('')}${t.format==='9:16'?`<button type="button" class="fmt-sz" data-act="help-go" data-sec="safezones" title="Download safe-zone overlays for TikTok, Reels and Shorts">Safe zones</button>`:''}</div>`):''}
+      ${f(TAG_IC,'Tags',tagsCtl(t),'',true)}
       ${specsRow(t,f)}
     </div>`})()}
     ${brandForTask(t)}
     ${(()=>{const kinds=[['task',I.task],['upload',I.film],['file',I.folder],['project',I.mac]];
       const shown=kinds.filter(([k])=>String(t.links?.[k]||'').trim()||LSHOW.has(t.id+':'+k)),empty=kinds.filter(x=>!shown.includes(x));
-      return `<div><h4 class="section-title">Links<span class="sec-hint">Paste a link here (${IS_MAC?'⌘':'Ctrl+'}V) to add it</span></h4>${shown.map(([k,ic])=>linkRow(k,ic)).join('')}${empty.length?`<div class="link-add">${empty.map(([k,ic])=>`<button type="button" class="btn sm ghost" data-act="link-add" data-kind="${k}">${I.plus}${esc(linkLabel(j,k))}</button>`).join('')}</div>`:''}</div>`})()}
+      return `<div><h4 class="section-title">Links<span class="sec-hint">Paste a link here (${IS_MAC?'⌘':'Ctrl+'}V) to add it</span></h4>${shown.map(([k,ic])=>linkRow(k,ic)).join('')}${empty.length?`<div class="link-add">${empty.map(([k,ic])=>`<button type="button" class="btn sm ghost" data-act="link-add" data-kind="${k}">${I.plus}${esc(linkLabel(j,k))}</button>`).join('')}</div>`:''}${briefLinksHtml(t,j)}</div>`})()}
+    ${t._draft?'':commentFilesHtml(t,j)}
     ${exportNameHtml(t)}
     <div><h4 class="section-title">Checklist<span class="mono">${checklist.length?`${doneN}/${checklist.length}`:''}</span>${!tplHome(t)?'':`<button type="button" class="tpl-btn ${TPL.open?'on':''}" data-act="tpl-toggle" aria-expanded="${TPL.open}">${I.task}Templates</button>`}</h4>
       ${TPL.open?tplMenu(t):''}
@@ -8070,13 +8182,20 @@ document.addEventListener('click',e=>{
       ($('#grp-'+CSS.escape(el.dataset.status))||$(`.group[data-stage="${el.dataset.status}"]`))?.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'start'});break}
     case 'log-clear': u.lq='';u.ljob='all';u.lkind='all';saveUi();render();break;
     case 'arch-clear': u.aq='';u.ajob='all';u.aclient='all';u.amonth='all';saveUi();render();break;
-    case 'reset-filters': u.q='';u.prio='all';u.due='all';$('#q').value='';render();break;
+    case 'reset-filters': u.q='';u.prio='all';u.due='all';u.tag='all';$('#q').value='';render();break;
     case 'open': if(e.target.closest('select,a,input'))return;
       if(e.target.closest('.row .t-name,.card .t-name')){clearTimeout(nameClickT);if(e.detail>1)break;const id=el.dataset.id,dt=el.dataset.dtab;nameClickT=setTimeout(()=>openTask(id,dt),230);break}
       openTask(el.dataset.id,el.dataset.dtab);break;
     case 'd-tab': S.ui.dtab=el.dataset.tab;noteDelArmed=null;renderDrawer();if(S.ui.dtab!=='activity')$('#drawer').scrollTop=0;if(S.ui.dtab==='details')autosize($('.d-name'));break;
     case 'note-post': postNote();break;
     case 'd-full': S.ui.dfull=!S.ui.dfull;saveUi();renderDrawer();break;
+    case 'tag-rm': {const t=S.tasks[S.ui.openTask];if(t){rmTag(t,el.dataset.tag);renderDrawer()}break}
+    case 'bl-copy': copyVal(el.dataset.url,'Link copied');break;
+    case 'bl-use': {const t=S.tasks[S.ui.openTask];if(t){patch('tasks',t.id,{links:{...(t.links||{}),[el.dataset.k]:el.dataset.url}});toast(`Saved as ${linkLabel(S.jobs[t.jobId],el.dataset.k)}`);renderDrawer()}break}
+    case 'cf-all': CF_ALL=S.ui.openTask;renderDrawer();break;
+    case 'cf-pic': {const t=S.tasks[S.ui.openTask];if(t)openLightbox(commentFiles(t).filter(x=>x.pic).map(x=>x.url),+el.dataset.i);break}
+    case 'nr-done': {const t=S.tasks[S.ui.openTask];if(t)nrDone(t,el.dataset.k||null);break}
+    case 'lane-nr': S.ui.due='cu-reply';render();break;
     case 'act-more': ACT_ALL.add(S.ui.openTask);renderDrawer();break;
     case 'rp-toggle': {const k=el.dataset.k;if(el.getAttribute('aria-expanded')==='true'){RP_OPEN.delete(k);RP_SHUT.add(k)}else{RP_OPEN.add(k);RP_SHUT.delete(k)}renderDrawer();break}
     case 'd-duplicate': duplicateTask(u.openTask);break;
@@ -8305,6 +8424,7 @@ document.addEventListener('change',e=>{
   if(el.id==='rs-file'){const f=el.files?.[0];el.value='';if(f)rsImport(f);return}
   if(el.id==='rs-fromjob'){const v=el.value;el.value='';if(v)rsFromJob(+el.dataset.si,v);return}
   if(el.id==='f-prio'){u.prio=el.value;render();return}
+  if(el.id==='f-tag'){u.tag=el.value;saveUi();render();return}
   if(el.id==='f-due'){u.due=el.value;render();return}
   if(el.dataset.statKey){const k=el.dataset.statKey,cur=statKeys(),order=statDefs().map(d=>d[0]);let next=el.checked?[...cur,k]:cur.filter(x=>x!==k);if(!next.length){render();return}next=order.filter(x=>next.includes(x)).slice(0,STAT_MAX);saveStatKeys(next);return}
   if(el.dataset.col&&el.closest('#vopt')){(u.hideCols=u.hideCols||{})[el.dataset.col]=!el.checked;saveUi();render();return}
@@ -8462,6 +8582,7 @@ document.addEventListener('submit',e=>{
   if(a==='tpl-save'){const t=S.tasks[S.ui.openTask],h=tplHome(t),name=($('#tpl-name')?.value||'').trim();if(!h)return;if(!name){$('#tpl-name')?.focus();return}
     const steps=(t.checklist||[]).map(c=>c.text.trim()).filter(Boolean);const others=(h.doc.templates||[]).filter(y=>y.name.toLowerCase()!==name.toLowerCase());
     patch(h.col,h.id,{templates:[...others,{id:uid().slice(0,10),name,steps}]});TPL={open:true,naming:false,del:null};renderDrawer();toast(`Saved “${name}” for ${h.name}`);return}
+  if(a==='tag-add'){const inp=f.querySelector('input'),t=S.tasks[S.ui.openTask];if(t&&inp.value.trim()){addTag(t,inp.value);renderDrawer();setTimeout(()=>$('#tag-in')?.focus(),0)}return}
   if(a==='check-add'){const inp=f.querySelector('input');const text=inp.value.trim();if(!text)return;const t=S.tasks[S.ui.openTask];patch('tasks',t.id,{checklist:[...(t.checklist||[]),{id:uid().slice(0,12),text,done:false}]});inp.value='';renderDrawer();$('[data-fk="ck-new"]')?.focus()}
   else if(a==='modal-save'){saveModal()}
   else if(a==='s-save'){closeSettings(true)}

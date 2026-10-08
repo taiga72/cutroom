@@ -15,7 +15,7 @@ const FIRST_DAYS = 60;      // a task new to the app is imported when it was upd
 const WINDOW_DAYS = 180;    // how far back the assigned-task list goes (to tell batches from videos)
 const BUDGET = 70;          // ClickUp allows 100 requests a minute per token; stay well under it in one run
 const FEED_MAX = 80;
-const CU_V = 3;            // 3 = replies inside comment threads are read too; older tasks are re-read once
+const CU_V = 4;            // 3 = replies inside comment threads are read too; 4 = links and attachments on comments; older tasks are re-read once
 const REPLY_MAX = 30;      // replies kept per comment
 
 class NeedsToken extends Error {}
@@ -83,6 +83,20 @@ function clientField(t) {
   if (f.type === 'labels') { const ids = Array.isArray(v) ? v : [v]; return ids.map(id => (opts.find(o => o.id === id) || {}).label || '').filter(Boolean)[0] || ''; }
   if (Array.isArray(v)) return (v[0] && (v[0].name || v[0].username)) || '';
   return typeof v === 'string' ? v : '';
+}
+// links and attachments inside a comment (linked text loses its URL in comment_text)
+function filesOf(items) {
+  const out = [], seen = new Set();
+  for (const x of items || []) {
+    if (!x || typeof x !== 'object') continue;
+    let url = '', name = '';
+    if (x.type === 'attachment' && x.attachment) { url = x.attachment.url || x.attachment.url_w_query || ''; name = x.attachment.title || x.attachment.name || x.text || 'Attachment'; }
+    else if (x.type === 'bookmark' && x.bookmark) { url = x.bookmark.url || ''; name = x.bookmark.title || ''; }
+    else if (x.attributes && typeof x.attributes.link === 'string') { url = x.attributes.link; name = String(x.text || '').trim(); }
+    if (!/^https?:\/\//i.test(url) || seen.has(url)) continue;
+    seen.add(url); out.push({ name: String(name || '').slice(0, 120), url: url.slice(0, 2000) });
+  }
+  return out.length ? out.slice(0, 20) : undefined;
 }
 // ClickUp markdown → the app's notes (pictures dropped, links kept)
 function notesFrom(t) {
@@ -247,7 +261,7 @@ async function syncUser(uid) {
         const backfill = (prev.v || 0) < 2;
         const fresh = comments.filter(m => !seenC.has(String(m.id)) && (backfill || +m.date > (prev.lastComment || 0) || !existing))
           .sort((a, b) => +a.date - +b.date).slice(existing ? -40 : -12);
-        for (const m of fresh) feed.push({ at: new Date(+m.date).toISOString(), k: 'comment', cid: String(m.id), who: (m.user && m.user.username) || 'Someone', me: String(m.user && m.user.id) === me, mention: (m.comment || []).some(x => x && x.type === 'tag' && String(x.user && x.user.id) === me) || undefined, text: String(m.comment_text || '').trim().slice(0, 4000) });
+        for (const m of fresh) feed.push({ at: new Date(+m.date).toISOString(), k: 'comment', cid: String(m.id), who: (m.user && m.user.username) || 'Someone', me: String(m.user && m.user.id) === me, mention: (m.comment || []).some(x => x && x.type === 'tag' && String(x.user && x.user.id) === me) || undefined, files: filesOf(m.comment), text: String(m.comment_text || '').trim().slice(0, 4000) });
         let newCount = existing && !backfill ? fresh.filter(m => String(m.user && m.user.id) !== me).length : 0;
         // replies inside a comment thread: read only threads whose reply count changed since the last read
         let replyPending = false;
@@ -255,6 +269,7 @@ async function syncUser(uid) {
         const quietReplies = (prev.v || 0) < 3; // first read of old threads: don't count them as new
         for (const m of comments) {
           const rc = +m.reply_count || 0, f = byCid.get(String(m.id));
+          if (f && !f.files) { const fl = filesOf(m.comment); if (fl) f.files = fl; }
           if (!f || !rc || f.rc === rc) continue;
           if (calls >= BUDGET - 3) { replyPending = true; res.more = true; break; }
           const r = await call(`/comment/${m.id}/reply`).catch(e => {
@@ -264,7 +279,7 @@ async function syncUser(uid) {
           if (!r) continue;
           const had = new Set((f.replies || []).map(x => x.cid));
           const reps = (r.comments || []).map(x => ({ cid: String(x.id), at: new Date(+x.date).toISOString(), who: (x.user && x.user.username) || 'Someone', me: String(x.user && x.user.id) === me,
-            mention: (x.comment || []).some(y => y && y.type === 'tag' && String(y.user && y.user.id) === me) || undefined, text: String(x.comment_text || '').trim().slice(0, 4000) }))
+            mention: (x.comment || []).some(y => y && y.type === 'tag' && String(y.user && y.user.id) === me) || undefined, files: filesOf(x.comment), text: String(x.comment_text || '').trim().slice(0, 4000) }))
             .sort((a, b) => a.at.localeCompare(b.at)).slice(-REPLY_MAX);
           if (existing && !quietReplies) newCount += reps.filter(x => !had.has(x.cid) && !x.me).length;
           f.replies = reps; f.rc = rc;
@@ -357,4 +372,4 @@ async function syncUser(uid) {
   }
 }
 
-module.exports = { RateLimited, api, whoAmI, getLink, saveLink, syncUser, statusId, clientField, notesFrom, ymdIn, NeedsToken };
+module.exports = { filesOf, RateLimited, api, whoAmI, getLink, saveLink, syncUser, statusId, clientField, notesFrom, ymdIn, NeedsToken };
