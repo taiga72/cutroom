@@ -1627,6 +1627,37 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .tl-item.cu-c{align-items:flex-start}
 .tl-item.cu-c .tl-text{flex:1;min-width:0}
 .tl-item.cu-c small{color:var(--faint)}
+/* Overview lanes */
+.lanes-wrap{overflow-x:auto;overscroll-behavior-x:contain;margin:0 -4px;padding:0 4px 8px}
+.lanes{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(270px,1fr);gap:12px;align-items:start}
+.lane{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--jc);border-radius:12px;display:flex;flex-direction:column;max-height:calc(100vh - 260px);min-height:220px;overflow:hidden}
+.lane-h{padding:10px 12px 10px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;align-items:center}
+.lane-name{display:flex;align-items:center;gap:7px;border:0;background:none;padding:0;color:var(--text);text-align:left;min-width:0;cursor:pointer}
+.lane-name b{font:700 calc(15.5px*var(--ts)) var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lane-name:hover b{text-decoration:underline}
+.lane-cu{color:#7b68ee;display:grid;place-items:center}.lane-cu svg{width:15px;height:15px}
+.lane-meta{grid-column:1/-1;font-size:calc(12.5px*var(--ts));color:var(--muted)}.lane-meta .over{color:var(--danger);font-weight:600}
+.lane-bar{grid-column:1/-1;display:flex;height:6px;border-radius:4px;overflow:hidden;background:var(--surface-2);margin-top:4px}.lane-bar i{height:100%}
+.lane-b{padding:10px;display:flex;flex-direction:column;gap:7px;overflow-y:auto;overscroll-behavior:contain;flex:1}
+.lane-card{border:1px solid var(--line);border-radius:9px;padding:8px 10px;cursor:pointer;background:var(--surface);transition:border-color .12s,box-shadow .12s}
+.lane-card:hover{border-color:var(--line-strong);box-shadow:var(--shadow)}
+.lane-card.is-over{border-color:color-mix(in srgb,var(--danger) 45%,var(--line))}
+.lc-name{font-weight:600;font-size:calc(13.5px*var(--ts));line-height:1.3;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lc-client{font-size:calc(12px*var(--ts));color:var(--muted);margin-top:2px}
+.lc-foot{display:flex;align-items:center;gap:6px;margin-top:6px}.lc-foot .pill{max-width:60%}.lc-foot .date{margin-left:auto;font:500 calc(12px*var(--ts)) var(--mono);color:var(--muted);white-space:nowrap}
+.lc-foot .date.over{color:var(--danger);font-weight:600}.lc-foot .date.soon{color:var(--warn)}
+.lane-empty{color:var(--faint);font-size:calc(13px*var(--ts));text-align:center;margin:18px 0}
+.lane-f{border:0;border-top:1px solid var(--line);background:none;padding:10px 12px;text-align:left;font-weight:600;color:var(--accent);font-size:calc(13px*var(--ts));cursor:pointer}
+.lane-f:hover{background:var(--surface-2)}
+.lane-add{border:1.5px dashed var(--line-strong);border-top-width:1.5px;background:none;align-items:center;justify-content:center;gap:6px;color:var(--muted);font-weight:600;min-height:160px;cursor:pointer}
+.lane-add .i{width:20px;height:20px}
+@media (max-width:820px){
+  .lanes-wrap{margin:0 -14px;padding:0 14px 8px;scroll-snap-type:x mandatory;scroll-padding:0 14px}
+  .lanes{display:flex;gap:10px}
+  .lane{flex:none;width:86vw;scroll-snap-align:start;max-height:calc(100dvh - 300px)}
+  .lane-add{width:46vw}
+  .lc-name{font-size:calc(15px*var(--ts))}
+}
 .jst-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 .jst-row{display:grid;grid-template-columns:minmax(0,1fr) 220px 70px;align-items:center;gap:10px}
 .jst-row .pill{justify-self:start}
@@ -2538,6 +2569,7 @@ select.rs-add{appearance:auto}
     <div id="jobcards"></div>
     <div class="toolbar" id="toolbar" hidden>
       <div class="seg" role="tablist" aria-label="View">
+        <button type="button" data-act="view" data-view="lanes" id="v-lanes" aria-label="Lanes: one per job" title="Lanes: one per job"><svg class="i" viewBox="0 0 16 16"><rect x="1.8" y="2.5" width="3.6" height="11" rx="1"/><rect x="6.2" y="2.5" width="3.6" height="7.5" rx="1"/><rect x="10.6" y="2.5" width="3.6" height="9.5" rx="1"/></svg><span class="vl">Lanes</span></button>
         <button type="button" data-act="view" data-view="list" id="v-list" aria-label="List view"><svg class="i" viewBox="0 0 16 16"><path d="M5.5 4h8M5.5 8h8M5.5 12h8M2.5 4h.01M2.5 8h.01M2.5 12h.01"/></svg><span class="vl">List</span></button>
         <button type="button" data-act="view" data-view="board" id="v-board" aria-label="Board view"><svg class="i" viewBox="0 0 16 16"><rect x="2" y="2.5" width="3.4" height="11" rx="1"/><rect x="6.3" y="2.5" width="3.4" height="7" rx="1"/><rect x="10.6" y="2.5" width="3.4" height="9" rx="1"/></svg><span class="vl">Board</span></button>
         <button type="button" data-act="view" data-view="calendar" id="v-calendar" aria-label="Calendar view"><svg class="i" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg><span class="vl">Calendar</span></button>
@@ -4056,6 +4088,8 @@ function renderMain(){
   if(u.tab==='help'){renderHelp();return}
   if(u.tab==='resume'){renderResume();return}
   if(u.tab==='upnext'){renderUpNextTab();return}
+  if(job&&u.view==='lanes')u.view='list';
+  if(!job&&!u.lanesInit){u.lanesInit=1;u.view='lanes';(u.views=u.views||{}).overview='lanes';saveUi()}
   const scope=tasksOfScope();
   if(!job){
     $('#head').innerHTML=`<div class="head head-ov"><div class="head-title">${greetHtml()}<h1>Overview</h1><div class="sub">${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients${(()=>{const h=jobsSorted().reduce((a,j)=>a+weeklyHours(workOf(j)),0);return h?` · ${fmtNum(h)} h/week scheduled`:''})()} <span class="sub-tail">· everything due across your work</span></div></div>
@@ -4083,22 +4117,22 @@ function renderMain(){
   const keys=statKeys(),labels=Object.fromEntries(statDefs());
   $('#stats').innerHTML=Object.keys(S.jobs).length?`<div class="stats-wrap"><div class="stats" style="grid-template-columns:repeat(${keys.length},minmax(0,1fr))">${keys.map(k=>statTile(k,labels[k],scope)).join('')}<button type="button" class="icon-btn stats-edit ${STATPOP?'on':''}" data-act="stat-edit" title="Choose tiles" aria-label="Choose which tiles show" aria-expanded="${STATPOP}">${I.pencil}</button></div>${statPopHtml()}</div>`:'';
 
-  $('#jobcards').innerHTML=(!job?allClearHtml():'')+(!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')+`<button type="button" class="job-card job-add" data-act="new-job" title="New job">${I.plus}<span>New job</span></button>`}</div>`:'');
+  $('#jobcards').innerHTML=(!job?allClearHtml():'')+(!job&&jobsSorted().length&&u.view!=='lanes'?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')+`<button type="button" class="job-card job-add" data-act="new-job" title="New job">${I.plus}<span>New job</span></button>`}</div>`:'');
 
   const tb=$('#toolbar');tb.hidden=!Object.keys(S.jobs).length;
   $('#top-search').hidden=tb.hidden;$('#fdot').hidden=u.prio==='all'&&u.due==='all';
-  ['list','board','calendar'].forEach(v=>{const b=$('#v-'+v);b.classList.toggle('on',u.view===v);b.setAttribute('aria-selected',u.view===v)});
+  ['lanes','list','board','calendar'].forEach(v=>{const b=$('#v-'+v);b.classList.toggle('on',u.view===v);b.setAttribute('aria-selected',u.view===v)});$('#v-lanes').hidden=!!job;
   if(document.activeElement!==$('#q')) $('#q').value=u.q;
   $('#f-prio').value=u.prio;$('#f-due').value=u.due;$('#f-sort').value=u.sort;
   $('#vopt-wrap').hidden=u.view!=='list';
-  $('#sel-btn').hidden=u.view==='calendar';if(u.view==='calendar'&&(SELMODE||SEL.size)){SEL.clear();SELMODE=false}if(u.view!=='list')VOPT=false;renderVopt();
+  $('#sel-btn').hidden=u.view==='calendar'||u.view==='lanes';if(u.view==='calendar'&&(SELMODE||SEL.size)){SEL.clear();SELMODE=false}if(u.view!=='list')VOPT=false;renderVopt();
 
   if(!Object.keys(S.jobs).length){
     $('#view').innerHTML=`<div class="empty"><h3>Add your first job</h3><p>A job is an agency you edit for (with its own clients) or a direct client. Each job keeps its own tools: where you talk, where tasks are assigned, where you upload, and where files live.</p><button class="btn primary" data-act="new-job">${I.plus}New job</button></div>`;
     return;
   }
   const list=filtered();
-  $('#view').innerHTML=(u.view!=='calendar'&&!tasksOfScope().length?noTasksHtml(job):'')+(u.view==='board'?boardView(list,job):u.view==='calendar'?calendarView(list):listView(list,job));
+  $('#view').innerHTML=u.view==='lanes'?lanesView(list):(u.view!=='calendar'&&!tasksOfScope().length?noTasksHtml(job):'')+(u.view==='board'?boardView(list,job):u.view==='calendar'?calendarView(list):listView(list,job));
 }
 
 /* ================= address bar: Back button and task links =================
@@ -4246,7 +4280,7 @@ function ctxDo(what,v){
   else if(what==='restore'){restoreTasks([id]);render()}
   else if(what==='del')deleteTasks([id]);
 }
-const CTX_SEL='.un-row[data-id],.row[data-id],.card[data-id],.wcard[data-id],.ev[data-id],.pin-card[data-id],.arow[data-id]';
+const CTX_SEL='.lane-card[data-id],.un-row[data-id],.row[data-id],.card[data-id],.wcard[data-id],.ev[data-id],.pin-card[data-id],.arow[data-id]';
 document.addEventListener('contextmenu',e=>{
   const r=e.target.closest?.(CTX_SEL);if(!r||e.target.closest('input,textarea,select,a'))return;
   e.preventDefault();openCtx(r.dataset.id,e.clientX,e.clientY);
@@ -4330,6 +4364,27 @@ function greetHtml(){
   return `<div class="greet">${esc(part)}${name?', '+esc(name):''} <span>· ${esc(day)}</span>${sea?`<span class="sea-note">${esc(sea)}</span>`:''}</div>`;
 }
 const WEEKDAY_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+/* Overview → Lanes (user's pick): one column per job, each in that job's own statuses, open tasks by due date */
+function lanesView(list){
+  const t0=today(),js=jobsSorted();
+  const laneOf=j=>{
+    const all=live().filter(t=>t.jobId===j.id),open=all.filter(t=>!isClosed(t)),shown=list.filter(t=>t.jobId===j.id&&!isClosed(t))
+      .sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')||(PRIO_RANK[a.priority||'normal']-PRIO_RANK[b.priority||'normal']));
+    const over=open.filter(t=>t.due&&t.due<t0).length,today_=open.filter(t=>t.due===t0).length,tot=all.length||1;
+    const bar=statusesFor(j.id).map(s=>{const n=all.filter(t=>stOf(t)===s.id).length;return n?`<i style="width:${n/tot*100}%;background:${stColor(s.id)}" title="${esc(stLabel(s.id))}: ${n}"></i>`:''}).join('');
+    const cu=j.clickup?.team?`<span class="lane-cu" title="Statuses and tasks from ClickUp">${CU_IC}</span>`:'';
+    const meta=[`${open.length} open`,over?`<b class="over">${over} overdue</b>`:'',today_?`${today_} due today`:''].filter(Boolean).join(' · ');
+    const card=t=>{const c=S.clients[t.clientId],nn=openNotes(t);return `<div class="lane-card ${dueClass(t)==='over'?'is-over':''}" data-act="open" data-id="${t.id}" tabindex="0">
+      <div class="lc-name">${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</div>
+      ${c?`<div class="lc-client">${esc(c.name)}</div>`:''}
+      <div class="lc-foot"><span class="pill" ${pillStyle(stOf(t))}><span class="pl">${esc(stLabel(stOf(t)))}</span></span>${nn?`<span class="chip notes-chip" title="${nn} open update${nn===1?'':'s'}">${I.chat}${nn}</span>`:''}<span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,true):'No date'}</span></div></div>`};
+    return `<section class="lane" style="--jc:${esc(j.color||'var(--accent)')}">
+      <header class="lane-h"><button type="button" class="lane-name" data-act="nav" data-tab="${j.id}">${jobMark(j,20)}${jobEmoji(j)}<b>${esc(j.name)}</b>${shiftDot(j)}</button>${cu}
+        <div class="lane-meta">${meta}</div>${bar?`<div class="lane-bar">${bar}</div>`:''}</header>
+      <div class="lane-b">${shown.length?shown.map(card).join(''):`<p class="lane-empty">${open.length?'Nothing matches the filters.':'Nothing open. 🎉'}</p>`}</div>
+      <button type="button" class="lane-f" data-act="nav" data-tab="${j.id}">Open ${esc(j.name)} ›</button></section>`};
+  return `<div class="lanes-wrap"><div class="lanes">${js.map(laneOf).join('')}<button type="button" class="lane lane-add" data-act="new-job">${I.plus}<span>New job</span></button></div></div>`;
+}
 function jobCard(j){
   const ts=live().filter(t=>t.jobId===j.id);
   const st=statsFor(ts);
@@ -6393,6 +6448,7 @@ const HELP=[
  ['Your work','Job emoji',`Give a job an emoji in Edit job → General. It shows next to the job in the sidebar, on its Overview card and in Alerts.`,null],
  ['Look and feel','Little extras',`An “All clear” moment on the Overview when nothing is overdue or due today; emoji reactions on client updates (the smiley under an update); film-look color schemes (Portra, Fuji, Noir, Teal & Orange, Technicolor); the office cat on the sidebar (it wears headphones and nods along during a focus session, naps during breaks and when you're away, stretches when you finish a task, and purrs when you click it; a little window behind it shows the sky for your time of day, and it dresses up in December, on New Year's Day and on Halloween; it sweats when something's overdue, smiles on all-clear days and watches your mouse; a plant on the sill grows a leaf per task done this month; birds and butterflies drop by; now and then it naps on one of your tasks until you open it; it peeks over the updates you post; a treat jar fills with a treat per finished task (click it to feed the cat); and after 30 days a puppy, hamster or goldfish can join it on the sill); a cork board in the sidebar with your photos and sticky notes (click + to pin one, click a note to edit it); a photo strip of your own pictures in the sidebar (add them in Settings → Personalize & fun); and seasonal touches: a Christmas countdown from September, snow in December, fireworks on New Year's Day, bats on Halloween and hearts on Valentine's. Turn them off in Settings → Personalize & fun.`,['fun','Personalize & fun']],
  ['Getting work done','Installed app (Chrome)',`Install Splice & Co. from Chrome's address bar (the install icon) to get its own window and Dock icon. The Dock icon shows how many tasks are overdue or due today; right-click it for New task, Overview, Calendar and Quick search. The app's colors reach into the title bar (Chrome's chevron at the top right switches that off). To have task links from Slack or email open in the app, turn on "Open supported links" in the app's settings (⋮ menu in the app window → App info or Settings).`,null],
+ ['Getting around','Overview lanes',`The Overview opens in Lanes: one column per job with its open tasks (soonest due first), its overdue and due-today counts and a bar of its statuses, so you can see what's going on in each job without opening it. Click a card to open the task, the job's name to go to the job. The priority and due filters work here too. List, Board and Calendar are still in the view switch.`,null],
  ['Tasks','Statuses from ClickUp',`A job linked to ClickUp uses that ClickUp list's own statuses: same names, colors and order, kept in sync. In Edit job → Statuses you pick what each one means (to do, in progress, internal review, revisions, client review, waiting, done), which decides when a task counts as finished, starts a revision round or needs a nudge. Other jobs keep the statuses in Settings.`,null],
  ['Getting around','Hints, saving and offline',`On a phone, small hints show where you can swipe (pull down to close, swipe right to go back) until you've used each gesture a couple of times. When you type in a task, a little “Saved” tick appears by the field once it's stored. If your connection drops, a strip under the top bar says you're offline; changes stay on this device and sync when you're back.`,null],
  ['Getting around','Leaving without saving',`If you close Edit job or the brand guide editor with Cancel, × or Esc after changing something, it asks whether to save, discard, or keep editing. Less-used settings sit under “More options” in each Settings section; searching Settings opens them.`,null],
