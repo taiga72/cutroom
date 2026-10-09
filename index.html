@@ -2704,7 +2704,7 @@ select.rs-add{appearance:auto}
     <div id="jobcards"></div>
     <div class="toolbar" id="toolbar" hidden>
       <div class="seg" role="tablist" aria-label="View">
-        <button type="button" data-act="view" data-view="home" id="v-home" aria-label="Home" title="Home: what needs you today"><svg class="i" viewBox="0 0 16 16"><path d="M2.5 7.2 8 2.8l5.5 4.4V13a.8.8 0 0 1-.8.8H9.6V10H6.4v3.8H3.3a.8.8 0 0 1-.8-.8z"/></svg><span class="vl">Home</span></button>
+        
         <button type="button" data-act="view" data-view="list" id="v-list" aria-label="List view"><svg class="i" viewBox="0 0 16 16"><path d="M5.5 4h8M5.5 8h8M5.5 12h8M2.5 4h.01M2.5 8h.01M2.5 12h.01"/></svg><span class="vl">List</span></button>
         <button type="button" data-act="view" data-view="board" id="v-board" aria-label="Board view"><svg class="i" viewBox="0 0 16 16"><rect x="2" y="2.5" width="3.4" height="11" rx="1"/><rect x="6.3" y="2.5" width="3.4" height="7" rx="1"/><rect x="10.6" y="2.5" width="3.4" height="9" rx="1"/></svg><span class="vl">Board</span></button>
         <button type="button" data-act="view" data-view="calendar" id="v-calendar" aria-label="Calendar view"><svg class="i" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg><span class="vl">Calendar</span></button>
@@ -3924,7 +3924,7 @@ const cuUnreviewed=t=>!t.deleted&&!t._draft&&(t.cuNew||(t.cuUnseen||0)>0);
 const cuBadge=t=>t.cuNew?`<span class="cu-new" title="New from ClickUp">New</span>`:(t.cuUnseen||0)>0?`<span class="cu-new upd" title="${t.cuUnseen} new in ClickUp since you last opened it">${t.cuUnseen} new</span>`:'';
 function cuSeen(id){const t=S.tasks[id];if(t&&cuUnreviewed(t))patch('tasks',id,{cuNew:false,cuUnseen:0})}
 function cuReviewAll(){const ts=Object.values(S.tasks).filter(cuUnreviewed);ts.forEach(t=>patch('tasks',t.id,{cuNew:false,cuUnseen:0}));toast(`Marked ${ts.length} as reviewed`);S.ui.due='all';saveUi();render()}
-function cuReview(){const u=S.ui;if(u.openTask&&!DRAFT)closeDrawer();u.tab='overview';u.client='all';u.pane='tasks';u.due='cu-new';if(u.view==='calendar')u.view='list';saveUi();notesOpen=false;render();window.scrollTo({top:0})}
+function cuReview(){const u=S.ui;if(u.openTask&&!DRAFT)closeDrawer();u.tab='overview';u.client='all';u.pane='tasks';if(u.due==='cu-new')u.due='all';saveUi();notesOpen=false;render();window.scrollTo({top:0})}
 
 /* ================= derived ================= */
 const jobsSorted=()=>Object.values(S.jobs).sort((a,b)=>(a.order??0)-(b.order??0)||a.name.localeCompare(b.name));
@@ -3957,7 +3957,7 @@ const archived=()=>Object.values(S.tasks).filter(t=>t.archived&&!t.deleted&&S.jo
 const trashed=()=>Object.values(S.tasks).filter(t=>t.deleted&&S.jobs[t.jobId]);
 /* how long deleted tasks stay in Trash (Settings → Backup: 7, 30 or 90 days) */
 const trashDays=()=>{const d=+pref('trashDays');return [7,30,90].includes(d)?d:30};
-const tasksOfScope=()=>live().filter(t=>S.jobs[t.jobId]&&(S.ui.tab==='overview'||t.jobId===S.ui.tab)&&(S.ui.tab==='overview'||S.ui.client==='all'||t.clientId===S.ui.client));
+const tasksOfScope=()=>{const all=!S.jobs[S.ui.tab];return live().filter(t=>S.jobs[t.jobId]&&(all||t.jobId===S.ui.tab)&&(all||S.ui.client==='all'||t.clientId===S.ui.client))};
 const whoName=t=>(S.clients[t.clientId]?.name||S.jobs[t.jobId]?.name||'').toLowerCase();
 /* "Missing info" filter: open tasks without a due date or a given link */
 function missing(t,k){
@@ -4251,7 +4251,7 @@ function renderSide(){queueMicrotask(renderOffline);
   document.body.classList.toggle('side-mini',!!u.sideMini);
   const tt=n=>u.sideMini?` title="${n}"`:'';
   let html=`<button type="button" class="icon-btn side-toggle" data-act="side-mini" aria-label="${u.sideMini?'Expand sidebar':'Collapse sidebar'}" title="${u.sideMini?'Expand sidebar':'Collapse sidebar'}">${I.left}</button><button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Overview">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
-  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview"${tt('Home')}>${I.grid}<span class="name">Home</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='upnext'?'on':''}" data-act="nav" data-tab="upnext"${tt('Up next')}>${UP_IC}<span class="name">Up next</span><span class="count">${S.ready?upNextList().length||'':''}</span></button>
+  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview"${tt('Home')}>${I.grid}<span class="name">Home</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='upnext'?'on':''}" data-act="nav" data-tab="upnext"${tt('Up next')}>${UP_IC}<span class="name">Up next</span><span class="count">${S.ready?upNextList().length||'':''}</span></button><button class="nav-item ${u.tab==='calendar'?'on':''}" data-act="nav" data-tab="calendar"${tt('Calendar')}>${I.cal}<span class="name">Calendar</span></button>
   <button class="nav-item jobs-toggle ${jobsOpen?'open':''}"${tt('Jobs')} data-act="toggle-jobs" aria-expanded="${jobsOpen}" aria-controls="nav-jobs">${I.briefcase}<span class="name">Jobs</span><span class="count">${S.ready?jobsSorted().length:''}</span>${I.chev}</button></nav>
   <nav class="nav jobs" id="nav-jobs" aria-label="Jobs" ${jobsOpen?'':'hidden'}>`;
   for(const j of jobsSorted()){
@@ -4276,7 +4276,7 @@ function renderMain(){
   const u=S.ui;
   $('#subnav').innerHTML='';
   if(!S.ready){$('#view').innerHTML=`<div class="loading"><svg class="ld-reel" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="20" cy="20" r="3.5" fill="currentColor"/>${[0,72,144,216,288].map(a=>`<circle cx="${(20+9.5*Math.cos(a*Math.PI/180)).toFixed(2)}" cy="${(20+9.5*Math.sin(a*Math.PI/180)).toFixed(2)}" r="4.2" fill="currentColor" opacity=".55"/>`).join('')}</svg><b>${esc(LOAD_LINE)}</b><small>Loading your tasks</small></div>`;$('#toolbar').hidden=true;return}
-  if(u.tab!=='overview'&&u.tab!=='archived'&&u.tab!=='activity'&&u.tab!=='trash'&&u.tab!=='help'&&u.tab!=='resume'&&u.tab!=='upnext'&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
+  if(!PAGES.includes(u.tab)&&!S.jobs[u.tab]){u.tab='overview';u.client='all'}
   if(u.client!=='all'&&!S.clients[u.client]) u.client='all';
   const job=u.tab==='overview'?null:S.jobs[u.tab];
 
@@ -4295,17 +4295,17 @@ function renderMain(){
   if(u.tab==='upnext'){renderUpNextTab();return}
   if(u.view==='lanes')u.view='home';if(u.views?.overview==='lanes')u.views.overview='home';
   if(job&&u.view==='home')u.view='list';
-  if(!job&&!u.homeInit){u.homeInit=1;u.view='home';(u.views=u.views||{}).overview='home';saveUi()}
-  const HOME=!job&&u.view==='home';
+  if(u.tab==='overview')u.view='home';if(u.tab==='calendar')u.view='calendar';
+  const HOME=u.tab==='overview';
   const scope=tasksOfScope();
   if(!job){
-    $('#head').innerHTML=`<div class="head head-ov"><div class="head-title">${greetHtml()}<h1>Home</h1><div class="sub">${HOME?homeSummary():`${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients${(()=>{const h=jobsSorted().reduce((a,j)=>a+weeklyHours(workOf(j)),0);return h?` · ${fmtNum(h)} h/week scheduled`:''})()} <span class="sub-tail">· everything due across your work</span>`}</div></div>
+    $('#head').innerHTML=`<div class="head head-ov"><div class="head-title">${HOME?greetHtml():''}<h1>${HOME?'Home':'Calendar'}</h1><div class="sub">${HOME?homeSummary():u.tab==='calendar'?'Due dates across every job':`${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients${(()=>{const h=jobsSorted().reduce((a,j)=>a+weeklyHours(workOf(j)),0);return h?` · ${fmtNum(h)} h/week scheduled`:''})()} <span class="sub-tail">· everything due across your work</span>`}</div></div>
       </div>`;
   }else{
     const cl=shownClients(job.id);
     if(u.client!=='all'&&!cl.some(c=>c.id===u.client))u.client='all';
 
-    const from=u.from==='archived'?['archived','Archived',I.archive]:u.from==='activity'?['activity','Activity',I.clock]:['overview','Home',I.grid],cur=u.client!=='all'&&S.clients[u.client];
+    const from=u.from==='archived'?['archived','Archived',I.archive]:u.from==='activity'?['activity','Activity',I.clock]:u.from==='calendar'?['calendar','Calendar',I.cal]:['overview','Home',I.grid],cur=u.client!=='all'&&S.clients[u.client];
     const paneName={details:'Details',brand:'Brand guide',invoices:'Invoices & docs'}[u.pane];
     const crumbs=[`<button type="button" data-act="nav" data-tab="${from[0]}">${from[2]}${from[1]}</button>`,
       (cur||paneName)?`<button type="button" data-act="nav" data-tab="${job.id}" data-pane="tasks">${jobMark(job,14)}${esc(job.name)}</button>`:`<span aria-current="page">${jobMark(job,14)}${esc(job.name)}</span>`];
@@ -4322,13 +4322,13 @@ function renderMain(){
     $('#view').innerHTML=u.pane==='brand'?brandPane(job):u.pane==='invoices'?invoicesPane(job):detailsPane(job);return;
   }
   const keys=statKeys(),labels=Object.fromEntries(statDefs());
-  $('#stats').innerHTML=HOME?'':Object.keys(S.jobs).length?`<div class="stats-wrap"><div class="stats" style="grid-template-columns:repeat(${keys.length},minmax(0,1fr))">${keys.map(k=>statTile(k,labels[k],scope)).join('')}<button type="button" class="icon-btn stats-edit ${STATPOP?'on':''}" data-act="stat-edit" title="Choose tiles" aria-label="Choose which tiles show" aria-expanded="${STATPOP}">${I.pencil}</button></div>${statPopHtml()}</div>`:'';
+  $('#stats').innerHTML=!job?'':Object.keys(S.jobs).length?`<div class="stats-wrap"><div class="stats" style="grid-template-columns:repeat(${keys.length},minmax(0,1fr))">${keys.map(k=>statTile(k,labels[k],scope)).join('')}<button type="button" class="icon-btn stats-edit ${STATPOP?'on':''}" data-act="stat-edit" title="Choose tiles" aria-label="Choose which tiles show" aria-expanded="${STATPOP}">${I.pencil}</button></div>${statPopHtml()}</div>`:'';
 
-  $('#jobcards').innerHTML=HOME?'':(!job?allClearHtml():'')+(!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')+`<button type="button" class="job-card job-add" data-act="new-job" title="New job">${I.plus}<span>New job</span></button>`}</div>`:'');
+  $('#jobcards').innerHTML=!job?'':(!job?allClearHtml():'')+(!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')+`<button type="button" class="job-card job-add" data-act="new-job" title="New job">${I.plus}<span>New job</span></button>`}</div>`:'');
 
   const tb=$('#toolbar');tb.hidden=!Object.keys(S.jobs).length;tb.classList.toggle('tb-home',HOME);
   $('#top-search').hidden=tb.hidden;$('#fdot').hidden=u.prio==='all'&&u.due==='all'&&(u.tag||'all')==='all';
-  ['home','list','board','calendar'].forEach(v=>{const b=$('#v-'+v);b.classList.toggle('on',u.view===v);b.setAttribute('aria-selected',u.view===v)});$('#v-home').hidden=!!job;
+  ['list','board','calendar'].forEach(v=>{const b=$('#v-'+v);b.classList.toggle('on',u.view===v);b.setAttribute('aria-selected',u.view===v)});tb.querySelector('.seg').hidden=!job;
   if(document.activeElement!==$('#q')) $('#q').value=u.q;
   $('#f-prio').value=u.prio;$('#f-due').value=u.due;$('#f-sort').value=u.sort;
   {const tg=allTags(),ft=$('#f-tag');if(u.tag&&u.tag!=='all'&&!tg.includes(u.tag))u.tag='all';ft.hidden=!tg.length;const k=tg.join('\n');if(ft._k!==k){ft._k=k;ft.innerHTML=`<option value="all">Any tag</option>${tg.map(x=>`<option value="${esc(x)}">#${esc(x)}</option>`).join('')}`}ft.value=u.tag||'all'}
@@ -4346,7 +4346,7 @@ function renderMain(){
 /* ================= address bar: Back button and task links =================
    The page's place is kept in the URL hash (#/overview, #/job/<id>/client/<id>/pane/brand, …/task/<id>), so the
    browser's Back closes the task panel or returns to the previous page, and a task link opens that task. */
-const PAGES=['overview','upnext','archived','activity','trash','help','resume','upnext'];
+const PAGES=['overview','calendar','upnext','archived','activity','trash','help','resume','upnext'];
 let URL_READY=false,URL_LAST=null,URL_TASK_PUSHED=false,URL_APPLYING=false;
 const LINK_IC='<svg class="i" viewBox="0 0 16 16"><path d="M6.8 9.2a2.8 2.8 0 0 0 4 0l2.2-2.2a2.8 2.8 0 0 0-4-4l-.9.9"/><path d="M9.2 6.8a2.8 2.8 0 0 0-4 0L3 9a2.8 2.8 0 0 0 4 4l.9-.9"/></svg>';
 function urlOf(){
@@ -4360,7 +4360,7 @@ function urlOf(){
 function appAction(a){
   const u=S.ui;
   if(a==='new'){const id=newTask();if(id){render();openTask(id);setTimeout(()=>$('.d-name')?.focus(),60)}}
-  else if(a==='calendar'){if(u.openTask&&!DRAFT)closeDrawer();u.tab='overview';u.client='all';u.pane='tasks';u.view='calendar';u.views={...(u.views||{}),overview:'calendar'};saveUi();render()}
+  else if(a==='calendar'){if(u.openTask&&!DRAFT)closeDrawer();u.tab='calendar';u.client='all';u.pane='tasks';saveUi();render()}
   else if(a==='search'){render();openJump()}
   else render();
 }
@@ -4962,7 +4962,7 @@ function openNote(key){
   if(n.invOpen){invGo(...n.invOpen);return}
   if(n.inv){const u=S.ui;u.tab=n.inv;u.client='all';u.pane='invoices';saveUi();render();return}
   if(n.task)openTask(n.task.id,n.tab);
-  else if(n.day){const u=S.ui;u.tab='overview';u.client='all';u.view='calendar';u.month=n.day.slice(0,7);saveUi();render()}
+  else if(n.day){const u=S.ui;u.tab='calendar';u.client='all';u.view='calendar';u.month=n.day.slice(0,7);saveUi();render()}
 }
 
 /* ================= archive ================= */
@@ -5306,7 +5306,7 @@ document.addEventListener('click',e=>{
 function jumpItems(q){
   q=q.trim().toLowerCase();
   const out=[],score=(txt)=>{txt=(txt||'').toLowerCase();if(!q)return 1;const i=txt.indexOf(q);return i<0?0:i===0?3:(txt[i-1]===' '?2:1)};
-  const pages=[['overview','Home',I.grid],['activity','Activity',I.clock],['archived','Archived',I.archive],['trash','Trash',I.trash],['upnext','Up next',UP_IC],['resume','Resume',RS_IC],['help','Help & tips',HELP_IC]];
+  const pages=[['overview','Home',I.grid],['calendar','Calendar',I.cal],['activity','Activity',I.clock],['archived','Archived',I.archive],['trash','Trash',I.trash],['upnext','Up next',UP_IC],['resume','Resume',RS_IC],['help','Help & tips',HELP_IC]];
   for(const [id,l,ic] of pages){const sc=score(l);if(sc)out.push({grp:'Pages',sc:sc+.5,icon:ic,label:l,sub:'Page',act:'nav',tab:id})}
   if(!q){(S.ui.recent||[]).map(id=>S.tasks[id]).filter(t=>t&&!t._draft).forEach((t,k)=>out.push({grp:'Recently opened',sc:10-k*.1,icon:`<span class="jdot" ${pillStyle(stOf(t))}></span>`,label:t.name||'Untitled task',sub:['Recent',S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '),act:'open',id:t.id}))}
   if(IS_MAC){(lsGet(LS_PATHS)||[]).slice(0,q?8:5).forEach((x,k)=>{const sc=q?Math.max(score(x.label),score(pathName(x.p)),score(x.sub)*.6):1;if(sc)out.push({grp:'Recent folders',sc:q?sc+.1:8-k*.1,icon:I.folder,label:x.label===pathName(x.p)?x.label:`${x.label} · ${pathName(x.p)}`,sub:['Recent folder',x.sub].filter(Boolean).join(' · '),act:'path',p:x.p})})}
@@ -6734,7 +6734,7 @@ const HELP=[
  ['Tasks','Same name twice',`If you save a new task with the same name as an open one in that job, the panel asks whether to open the one you already have or save the new one anyway.`,null],
  ['Tasks','Select several',`Turn on Select in the toolbar, tick tasks (Shift-click for a range), then set status, priority, due date, move them to another job or client, archive or delete them together.`,null],
  ['Tasks','Up next, templates and duplicates',`Add a task to Up next (the queue icon at the top of a task, or right-click) to line up what you'll work on; it has its own page in the sidebar. Save checklist steps as a template per client. Duplicate makes an unsaved copy to edit: same client (so the same brand guide), due date, links, notes and checklist (unticked), with a fresh status.`,null],
- ['Getting around','Home',`Home shows what needs you across every job. Today has what's late, what's due today and the tasks you're working on that have no due date. No due date lists the rest of the undated tasks, oldest first, with a Set date button. What's new collects ClickUp comments, replies, status changes and new tasks since you last pressed Mark all seen, and comments waiting for your reply stay on top until you answer or press Handled. Click a job chip at the top to see just that job. Edit home turns blocks on or off (Up next is off at first) and changes their order.`,null],
+ ['Getting around','Home',`Home shows what needs you across every job. Today has what's late, what's due today and the tasks you're working on that have no due date. No due date lists the rest of the undated tasks, oldest first, with a Set date button. What's new collects ClickUp comments, replies, status changes and new tasks since you last pressed Mark all seen, and comments waiting for your reply stay on top until you answer or press Handled. Click a job chip at the top to see just that job. Edit home turns blocks on or off (Up next is off at first) and changes their order. For every job's due dates on a calendar, open Calendar in the sidebar.`,null],
  ['Tasks','Tags',`Give a task free labels like rush, reel or B-roll in its Tags row. Tags show on the task in lists, boards and Home, the search box finds them, and the tag filter in the toolbar shows only tasks with that tag.`,null],
  ['Links and files','Links from the brief and from comments',`When a task's notes name links (Raw Video: …, Script: …, Editing Brief, Style Guide), they show under Links as From the brief, with a button to save one as the task's Drive or Frame.io link. Links and attachments posted in ClickUp comments and your own updates are gathered under Files in comments.`,null],
  ['Updates and notes','Comments waiting for your reply',`A ClickUp comment that @mentions you or asks you something is marked Needs your reply until you answer it in ClickUp (the next sync sees it) or press Mark handled. They show in Alerts under Needs reply, at the top of What's new on Home, and in the Needs my reply filter.`,null],
@@ -8178,16 +8178,16 @@ document.addEventListener('click',e=>{
   if(a!=='cal-disconnect'&&CAL.disArmed){CAL.disArmed=false;if(SM)renderSettings()}
   if(SM&&SM.stArm&&!/^st-(del|del-go)$/.test(a)&&!el.closest('.st-del-box')){SM.stArm=null;renderSettings()}
   switch(a){
-    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','archived','activity','trash','help','resume','upnext'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';{let v=u.views?.[u.tab]||u.view;if(narrow.matches&&v==='calendar')v=u.lastLB||'list';u.view=v}saveUi();render();window.scrollTo({top:0});break;
+    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','calendar','archived','activity','trash','help','resume','upnext'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';{let v=u.views?.[u.tab]||(['home','calendar'].includes(u.view)&&S.jobs[u.tab]?'list':u.view);if(narrow.matches&&v==='calendar')v=u.lastLB||'list';u.view=v}saveUi();render();window.scrollTo({top:0});break;
     case 'view': u.view=el.dataset.view;(u.views=u.views||{})[u.tab]=u.view;if(u.view!=='calendar')u.lastLB=u.view;saveUi();render();break;
     case 'vopt': VOPT=!VOPT;renderVopt();break;
     case 'cx': ctxDo(el.dataset.do,el.dataset.v);break;
     case 'row-due-pick':{const inp=el.querySelector('.cell-date');if(!inp)break;try{inp.showPicker()}catch(x){inp.style.pointerEvents='auto';inp.focus();inp.click()}break}
     case 'tb-overview': notesOpen=false;UPN=false;if(u.tab!=='overview')u.from=u.tab;u.tab='overview';u.client='all';u.pane='tasks';if(u.view==='calendar')u.view=(u.views?.overview&&u.views.overview!=='calendar')?u.views.overview:'list';(u.views=u.views||{}).overview=u.view;saveUi();render();window.scrollTo({top:0});break;
     case 'tb-jobs': u.jobsOpen=true;saveUi();renderSide();openSide();break;
-    case 'tb-cal': if(u.view==='calendar'&&!notesOpen&&!UPN&&u.calPrev){const c=u.calPrev;u.calPrev=null;u.tab=S.jobs[c.tab]||c.tab==='overview'?c.tab:'overview';u.client=c.client||'all';u.pane=c.pane||'tasks';u.view=c.view;(u.views=u.views||{})[u.tab]=c.view;saveUi();render();requestAnimationFrame(()=>window.scrollTo({top:c.y||0}));break}
+    case 'tb-cal': if(u.view==='calendar'&&!notesOpen&&!UPN&&u.calPrev){const c=u.calPrev;u.calPrev=null;u.tab=S.jobs[c.tab]||PAGES.includes(c.tab)?c.tab:'overview';u.client=c.client||'all';u.pane=c.pane||'tasks';u.view=c.view;(u.views=u.views||{})[u.tab]=c.view;saveUi();render();requestAnimationFrame(()=>window.scrollTo({top:c.y||0}));break}
       if(u.view!=='calendar'){u.calPrev={tab:u.tab,client:u.client,pane:u.pane,view:u.view,y:scrollY};u.lastLB=u.view}
-      notesOpen=false;UPN=false;if(['archived','activity','trash','help','resume','upnext'].includes(u.tab)){u.tab='overview';u.client='all'}u.pane='tasks';u.view='calendar';(u.views=u.views||{})[u.tab]='calendar';saveUi();render();window.scrollTo({top:0});break;
+      notesOpen=false;UPN=false;if(!S.jobs[u.tab]){u.tab='calendar';u.client='all'}u.pane='tasks';u.view='calendar';(u.views=u.views||{})[u.tab]='calendar';saveUi();render();window.scrollTo({top:0});break;
     case 'tb-search': openJump();break;
     case 'tb-plus': PLUS=!PLUS;renderPlus();break;
     case 'pm-timer': PLUS=false;renderPlus();POMO_OPEN=true;notesOpen=false;renderBell();renderPomo();break;
@@ -8311,7 +8311,7 @@ document.addEventListener('click',e=>{
     case 'hm-seen': lsSet('cutroom.homeseen',String(Date.now()));if(Object.values(S.tasks).some(t=>t.cuNew))cuReviewAll();NEWS_ALL=false;render();break;
     case 'hm-newsall': NEWS_ALL=!NEWS_ALL;render();break;
     case 'hm-ndall': ND_ALL=!ND_ALL;render();break;
-    case 'hm-day': S.ui.view='calendar';S.ui.calMode='week';S.ui.week=el.dataset.d;(S.ui.views=S.ui.views||{}).overview='calendar';saveUi();render();break;
+    case 'hm-day': S.ui.from='overview';S.ui.tab='calendar';S.ui.view='calendar';S.ui.calMode='week';S.ui.week=el.dataset.d;saveUi();render();window.scrollTo({top:0});break;
     case 'hm-edit': HOME_EDIT=!HOME_EDIT;render();break;
     case 'hm-toggle': {const c=homeCfg(),k=el.dataset.k;c.off.has(k)?c.off.delete(k):c.off.add(k);S.ui.home={order:c.order,off:[...c.off]};saveUi();render();break}
     case 'hm-move': {const c=homeCfg(),k=el.dataset.k,i=c.order.indexOf(k),n=i+(+el.dataset.d);if(n<0||n>=c.order.length)break;c.order.splice(i,1);c.order.splice(n,0,k);S.ui.home={order:c.order,off:[...c.off]};saveUi();render();break}
