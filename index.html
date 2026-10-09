@@ -1790,6 +1790,25 @@ button.hn-t:hover{text-decoration:underline;text-underline-offset:3px}
   .hm-row>.date{grid-column:3;grid-row:1}.hm-row>.hm-x{grid-column:3;grid-row:1/3;flex-direction:column;align-items:flex-end;gap:4px}
   .hm-dot{align-self:start;margin-top:7px}.hm-now .hm-dot,.ib-when .hm-dot{align-self:center;margin-top:0}
 }
+/* Calendar page: job chips and the No date tray */
+.cal-jobs{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0 16px}
+.cj-chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:99px;padding:6px 14px;font-weight:500;font-size:calc(13.5px*var(--ts));cursor:pointer;white-space:nowrap}
+.cj-chip:hover{color:var(--text);border-color:var(--line-strong)}
+.cj-chip.on{background:var(--text);border-color:var(--text);color:var(--surface)}
+.cj-chip small{color:var(--faint);font-size:calc(12px*var(--ts))}.cj-chip small b{color:var(--danger);font-weight:600}.cj-chip.on small{color:color-mix(in srgb,var(--surface) 70%,transparent)}
+.cj-sp{flex:1}
+.cal-jobs .btn{display:inline-flex;gap:6px;align-items:center}.cal-jobs .btn em{font-style:normal;color:var(--faint)}.cal-jobs .btn.on{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.cal-wrap{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:start}
+.cal-wrap.with-tray{grid-template-columns:minmax(0,1fr) 260px}
+.cal-main{min-width:0}
+.cal-tray{position:sticky;top:12px;max-height:calc(100vh - 40px);overflow-y:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:12px;overscroll-behavior:contain}
+.ct-h{display:flex;align-items:center;gap:8px}.ct-h span{color:var(--faint)}.ct-h .icon-btn{margin-left:auto;width:28px;height:28px}
+.cal-tray .hint{margin:4px 0 8px;font-size:calc(12px*var(--ts))}
+.ct-it{display:flex;gap:9px;align-items:flex-start;padding:8px;border-radius:9px;border:1px solid var(--line);border-left:3px solid var(--jc);margin-bottom:6px;cursor:grab;background:var(--surface)}
+.ct-it:hover{background:var(--surface-2)}.ct-it .hm-dot{display:none}
+.ct-n{min-width:0;display:flex;flex-direction:column}.ct-n b{font-weight:500;font-size:calc(13px*var(--ts));overflow-wrap:anywhere}.ct-n small{color:var(--faint);font-size:calc(11.5px*var(--ts))}
+@media (max-width:1100px){.cal-wrap.with-tray{grid-template-columns:minmax(0,1fr)}.cal-tray{position:static;max-height:none}}
+@media (max-width:820px){.cal-jobs{flex-wrap:nowrap;overflow-x:auto;margin:0 -14px 10px;padding:0 14px;scrollbar-width:none}.cal-jobs::-webkit-scrollbar{display:none}.cal-jobs .btn.primary{display:none}.cj-sp{display:none}.ct-it{cursor:pointer}.cal-tray .hint{display:none}}
 /* full screen task: details on the left, activity on the right */
 .drawer.full{top:22px;left:22px;right:22px;bottom:22px;width:auto;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
 .drawer.full+.d-resize{display:none}
@@ -4324,7 +4343,7 @@ function renderMain(){
 
   $('#jobcards').innerHTML=!job?'':(!job?allClearHtml():'')+(!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')+`<button type="button" class="job-card job-add" data-act="new-job" title="New job">${I.plus}<span>New job</span></button>`}</div>`:'');
 
-  const tb=$('#toolbar');tb.hidden=!Object.keys(S.jobs).length;tb.classList.toggle('tb-home',HOME);
+  const tb=$('#toolbar');tb.hidden=!Object.keys(S.jobs).length;tb.classList.toggle('tb-home',HOME||u.tab==='calendar');
   $('#top-search').hidden=tb.hidden;$('#fdot').hidden=u.prio==='all'&&u.due==='all'&&(u.tag||'all')==='all';
   ['list','board','calendar'].forEach(v=>{const b=$('#v-'+v);b.classList.toggle('on',u.view===v);b.setAttribute('aria-selected',u.view===v)});tb.querySelector('.seg').hidden=!job;
   if(document.activeElement!==$('#q')) $('#q').value=u.q;
@@ -4338,7 +4357,7 @@ function renderMain(){
     return;
   }
   const list=filtered();
-  $('#view').innerHTML=HOME?homeView():(u.view!=='calendar'&&!tasksOfScope().length?noTasksHtml(job):'')+(u.view==='board'?boardView(list,job):u.view==='calendar'?calendarView(list):listView(list,job));
+  $('#view').innerHTML=HOME?homeView():u.tab==='calendar'?calPageView():(u.view!=='calendar'&&!tasksOfScope().length?noTasksHtml(job):'')+(u.view==='board'?boardView(list,job):u.view==='calendar'?calendarView(list):listView(list,job));
 }
 
 /* ================= address bar: Back button and task links =================
@@ -4673,6 +4692,23 @@ function homeView(){
     <div class="hm-list">${rows||`<p class="hm-empty">${empty}</p>`}${L.length>8?`<button type="button" class="hm-more" data-act="hm-more">${HM_MORE?'Show fewer':`Show ${L.length-8} more`}</button>`:''}</div></div>
     <aside class="hm-side">${inboxHtml()}</aside></div>`;
 }
+/* ================= Calendar page (tab 'calendar') =================
+   Job chips on top (S.ui.cjob) instead of the filters, and a No date tray (S.ui.ctray) whose tasks drag onto a day
+   to set their due date (Todoist / ClickUp style; desktop drag and drop, phones tap to open). */
+const calCol=t=>S.ui.tab==='calendar'?(S.jobs[t.jobId]?.color||stColor(stOf(t))):stColor(stOf(t));
+function calJob(){const j=S.ui.cjob;return j&&S.jobs[j]?j:'all'}
+function calPageView(){
+  const u=S.ui,jf=calJob(),q=(u.q||'').trim().toLowerCase(),t0=today();
+  const all=tasksOfScope().filter(t=>!q||[t.name,S.clients[t.clientId]?.name,S.jobs[t.jobId]?.name,...(t.tags||[])].some(x=>String(x||'').toLowerCase().includes(q)));
+  const list=all.filter(t=>jf==='all'||t.jobId===jf);
+  const open=all.filter(t=>!isClosed(t)),nod=list.filter(t=>!isClosed(t)&&!t.due).sort((a,b)=>(assignedOn(a)||'9').localeCompare(assignedOn(b)||'9'));
+  const tray=u.ctray!==false&&nod.length>0;
+  const chip=(id,label,mark,ts)=>{const late=ts.filter(t=>t.due&&t.due<t0).length;return `<button type="button" class="cj-chip ${jf===id?'on':''}" data-act="cal-job" data-j="${id}" aria-pressed="${jf===id}">${mark}${esc(label)}<small>${ts.length}${late?` · <b>${late} late</b>`:''}</small></button>`};
+  return `<div class="cal-jobs">${chip('all','All jobs','',open)}${jobsSorted().map(j=>chip(j.id,j.name,`<span class="hm-dot" style="--jc:${esc(j.color||'var(--accent)')}"></span>`,open.filter(t=>t.jobId===j.id))).join('')}
+      <span class="cj-sp"></span>${nod.length?`<button type="button" class="btn sm ${tray?'on':''}" data-act="cal-tray" aria-pressed="${tray}">No date <em>${nod.length}</em></button>`:''}<button type="button" class="btn sm primary" data-act="new-task">${I.plus}New task</button></div>
+    <div class="cal-wrap ${tray?'with-tray':''}"><div class="cal-main">${calendarView(list)}</div>${tray?`<aside class="cal-tray"><div class="ct-h"><b>No due date</b><span>${nod.length}</span><button type="button" class="icon-btn" data-act="cal-tray" title="Hide" aria-label="Hide the no date list">${I.x}</button></div><p class="hint">Drag a task onto a day to give it that due date.</p>
+      ${nod.map(t=>{const j=S.jobs[t.jobId],c=S.clients[t.clientId],a=ageDays(t);return `<div class="ct-it" data-act="open" data-id="${t.id}" data-caldrag draggable="true" tabindex="0" style="--jc:${esc(j.color||'var(--accent)')}"><span class="hm-dot"></span><span class="ct-n"><b>${esc(t.name||'Untitled task')}</b><small>${esc([jf==='all'?j.name:'',c?.name].filter(Boolean).join(' · '))}${a!=null&&a>=AGE_SHOW?` · ${a}d`:''}</small></span></div>`}).join('')}</aside>`:''}</div>`;
+}
 function jobCard(j){
   const ts=live().filter(t=>t.jobId===j.id);
   const st=statsFor(ts);
@@ -4800,7 +4836,7 @@ function weekView(list){
   let cols='';
   for(let i=0;i<7;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=ymd(d),evs=byDay[k]||[],heavy=(load[k]||0)>=lim,hs=hol[k]||[];
     cols+=`<div data-calday="${k}" class="wday ${k===t0?'today':''} ${heavy?'busy':''} ${hs.length?'holiday':''} ${pref('hideWeekends')&&isWeekend(d)?'wk-min':''} ${wd&&!wd.has(d.getDay())?'offday':''}" ${wd&&!wd.has(d.getDay())?'title="Not a work day for this job"':''}><div class="wd-head"><span>${WEEKDAY[d.getDay()]}</span><b>${d.getDate()}</b>${hoursOn(d)}${heavy?`<span class="busy-tag" title="${load[k]} tasks due across all jobs">${I.warn}${load[k]}</span>`:''}</div>${holHtml(hs)}${shiftsOn(d)}
-      ${evs.map(t=>`<div class="wcard ${isClosed(t)?'is-done':''}" style="--c:${stColor(stOf(t))}" data-act="open" data-id="${t.id}" data-caldrag draggable="true" tabindex="0"><b>${esc(t.name||'Untitled task')}</b><small>${esc([S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '))}</small><span class="wc-st">${esc(stLabel(stOf(t)))}</span></div>`).join('')||'<span class="wd-empty">—</span>'}</div>`}
+      ${evs.map(t=>`<div class="wcard ${isClosed(t)?'is-done':''}" style="--c:${calCol(t)}" data-act="open" data-id="${t.id}" data-caldrag draggable="true" tabindex="0"><b>${esc(t.name||'Untitled task')}</b><small>${esc([S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '))}</small><span class="wc-st">${esc(stLabel(stOf(t)))}</span></div>`).join('')||'<span class="wd-empty">—</span>'}</div>`}
   const lbl=start.getMonth()===end.getMonth()?`${MONTH_FULL[start.getMonth()]} ${start.getDate()}–${end.getDate()}`:`${MONTH_FULL[start.getMonth()].slice(0,3)} ${start.getDate()} – ${MONTH_FULL[end.getMonth()].slice(0,3)} ${end.getDate()}`;
   return `<div class="cal-bar">${calModeSeg()}<h2>${lbl}, ${end.getFullYear()}</h2><button class="icon-btn" data-act="cal" data-step="-1" aria-label="Previous week">${I.left}</button><button class="btn sm" data-act="cal" data-step="0">Today</button><button class="icon-btn" data-act="cal" data-step="1" aria-label="Next week">${I.left.replace('<svg','<svg style="transform:scaleX(-1)"')}</button></div>
     <div class="week" style="grid-template-columns:${weekCols()}">${cols}</div>`;
@@ -4808,7 +4844,7 @@ function weekView(list){
 /* on a job's page, the job's work days (Set of 0-6), so the Calendar can shade the others */
 function workDaysHere(){const j=S.jobs[S.ui.tab];const d=j&&workOf(j).days;return d&&d.length&&d.length<7?new Set(d.map(Number)):null}
 const calFilterBtn=()=>`<button type="button" class="icon-btn cal-filter" data-act="filters" aria-label="Filter and sort" title="Filter and sort"><svg class="i" viewBox="0 0 16 16"><path d="M2.5 3.5h11L9.2 8.6v4l-2.4 1.1V8.6z"/></svg></button>`;
-const calModeSeg=()=>calFilterBtn()+`<div class="seg cal-mode" role="tablist" aria-label="Calendar range"><button type="button" data-act="cal-mode" data-mode="month" class="${S.ui.calMode!=='week'?'on':''}">Month</button><button type="button" data-act="cal-mode" data-mode="week" class="${S.ui.calMode==='week'?'on':''}">Week</button></div>`;
+const calModeSeg=()=>(S.ui.tab==='calendar'?'':calFilterBtn())+`<div class="seg cal-mode" role="tablist" aria-label="Calendar range"><button type="button" data-act="cal-mode" data-mode="month" class="${S.ui.calMode!=='week'?'on':''}">Month</button><button type="button" data-act="cal-mode" data-mode="week" class="${S.ui.calMode==='week'?'on':''}">Week</button></div>`;
 function calendarView(list){
   if(S.ui.calMode==='week')return weekView(list);
   const [y,m]=S.ui.month.split('-').map(Number);
@@ -4826,7 +4862,7 @@ function calendarView(list){
     const evs=byDay[k]||[],hs=hol[k]||[];
     const heavy=(load[k]||0)>=lim;
     cells+=`<div data-calday="${k}" class="day ${d.getMonth()!==m-1?'out':''} ${k===t0?'today':''} ${heavy?'busy':''} ${hs.length?'holiday':''} ${pref('hideWeekends')&&isWeekend(d)?'wk-min':''} ${wd&&!wd.has(d.getDay())?'offday':''}"><div class="dn"><b>${d.getDate()}</b>${heavy?`<span class="busy-tag" title="${load[k]} tasks due across all jobs">${I.warn}${load[k]}</span>`:''}</div>${holHtml(hs.slice(0,2))}${hs.length>2?`<div class="hol" title="${esc(hs.slice(2).map(h=>h.cc+': '+h.name).join('\n'))}"><span>+${hs.length-2} more</span></div>`:''}
-      ${evs.slice(0,4).map(t=>`<button class="ev ${isClosed(t)?'is-done':''}" style="--c:${stColor(stOf(t))}" data-act="open" data-id="${t.id}" data-caldrag draggable="true"><span>${esc(t.name||'Untitled task')}</span></button>`).join('')}
+      ${evs.slice(0,4).map(t=>`<button class="ev ${isClosed(t)?'is-done':''}" style="--c:${calCol(t)}" data-act="open" data-id="${t.id}" data-caldrag draggable="true"><span>${esc(t.name||'Untitled task')}</span></button>`).join('')}
       ${evs.length>4?`<span class="more">+${evs.length-4} more</span>`:''}</div>`;
   }
   const noDate=list.filter(t=>!t.due&&!isClosed(t)).length;
@@ -6753,6 +6789,7 @@ const HELP=[
  ['Tasks','Select several',`Turn on Select in the toolbar, tick tasks (Shift-click for a range), then set status, priority, due date, move them to another job or client, archive or delete them together.`,null],
  ['Tasks','Up next, templates and duplicates',`Add a task to Up next (the queue icon at the top of a task, or right-click) to line up what you'll work on; it has its own page in the sidebar. Save checklist steps as a template per client. Duplicate makes an unsaved copy to edit: same client (so the same brand guide), due date, links, notes and checklist (unticked), with a fresh status.`,null],
  ['Getting around','Home',`Home starts with Up now: the one task to do first (your Up next #1, else the most overdue, then what's due today). Open it, start a focus session, mark it done, or press › for the next one. Below it, the tabs show Today (late, due today and in-progress tasks with no date), In progress, No date (with Set date) and This week; the job picker narrows everything to one job. The Inbox on the right puts everything that happened on a task in one entry: the newest comment, plus tags for status and date changes. Comments waiting for your reply stay until you answer in ClickUp or press Handled. On a phone the Inbox is a tab. For every job's due dates on a calendar, open Calendar in the sidebar.`,null],
+ ['Calendar','Calendar page and tasks with no date',`Calendar in the sidebar shows every job's due dates, colored by job. The chips on top show one job at a time. No date opens a list of tasks without a due date: drag one onto a day to give it that date (on a computer), or drag a task from one day to another to move it.`,null],
  ['Tasks','Tags',`Give a task free labels like rush, reel or B-roll in its Tags row. Tags show on the task in lists, boards and Home, the search box finds them, and the tag filter in the toolbar shows only tasks with that tag.`,null],
  ['Links and files','Links from the brief and from comments',`When a task's notes name links (Raw Video: …, Script: …, Editing Brief, Style Guide), they show under Links as From the brief, with a button to save one as the task's Drive or Frame.io link. Links and attachments posted in ClickUp comments and your own updates are gathered under Files in comments.`,null],
  ['Updates and notes','Comments waiting for your reply',`A ClickUp comment that @mentions you or asks you something is marked Needs your reply until you answer it in ClickUp (the next sync sees it) or press Mark handled. They show in Alerts under Needs reply, at the top of What's new on Home, and in the Needs my reply filter.`,null],
@@ -8323,6 +8360,8 @@ document.addEventListener('click',e=>{
     case 'cf-all': CF_ALL=S.ui.openTask;renderDrawer();break;
     case 'cf-pic': {const t=S.tasks[S.ui.openTask];if(t)openLightbox(commentFiles(t).filter(x=>x.pic).map(x=>x.url),+el.dataset.i);break}
     case 'nr-done': {const t=S.tasks[S.ui.openTask];if(t)nrDone(t,el.dataset.k||null);break}
+    case 'cal-job': S.ui.cjob=el.dataset.j;saveUi();render();break;
+    case 'cal-tray': S.ui.ctray=S.ui.ctray===false;saveUi();render();break;
     case 'hm-tab': S.ui.htab=el.dataset.t;HM_MORE=false;saveUi();render();break;
     case 'hm-open': if(e.target.closest('button,a'))break;openTask(el.dataset.id,'activity');break;
     case 'hm-handled': {const t=S.tasks[el.dataset.id];if(t){nrDone(t,null);toast('Marked as handled')}render();break}
