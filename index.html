@@ -1714,83 +1714,81 @@ body:has(.bulk:not([hidden])) .toast{bottom:calc(84px + env(safe-area-inset-bott
 .tags-ctl .tag{height:24px;font-size:calc(12.5px*var(--ts))}
 @media (max-width:820px){.nr-bar{margin-left:0}.cmt-reply .nr-bar{margin-left:0}.tag-add input{font-size:16px}}
 
-/* Home (Overview default view) */
-.toolbar.tb-home :is(#filters,#filter-btn,#vopt-wrap,#sel-btn){display:none!important}
-.hs-late{color:var(--danger)}.hs-wait{color:color-mix(in srgb,var(--st-rev) 75%,var(--text))}
-.hm-jobs{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
-.hm-chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:6px 12px 6px 8px;font-weight:600;color:var(--text);font-size:calc(13.5px*var(--ts));min-height:36px}
-.hm-chip:first-child{padding-left:12px}
-.hm-chip small{color:var(--faint);font-weight:500;font-size:calc(12px*var(--ts))}.hm-chip small b{color:var(--danger)}
-.hm-chip:hover{border-color:var(--line-strong)}
-.hm-chip.on{background:var(--text);border-color:var(--text);color:var(--surface)}.hm-chip.on small{color:color-mix(in srgb,var(--surface) 70%,transparent)}.hm-chip.on small b{color:#ff8a8a}
-.hm-editwrap{margin-left:auto;position:relative}
-.hm-editbtn.on{background:var(--accent-soft);color:var(--accent)}
-.hm-editpop{position:absolute;right:0;top:calc(100% + 6px);z-index:30;width:290px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);padding:14px;display:flex;flex-direction:column;gap:4px}
-.hm-editpop .hint{margin:0 0 6px}
-.hm-erow{display:flex;align-items:center;gap:4px;padding:5px 0;border-bottom:1px solid var(--line)}
-.hm-erow span{flex:1;font-weight:600}.hm-erow .icon-btn{width:28px;height:28px}.hm-erow .icon-btn[disabled]{opacity:.3}
-.hm-sw{width:36px;height:22px;border-radius:99px;border:0;background:var(--line-strong);position:relative;margin-left:4px;flex:none;cursor:pointer}
-.hm-sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
-.hm-sw.on{background:var(--accent)}.hm-sw.on::after{left:17px}
-.hm-editpop .btn{margin-top:8px;justify-content:center}
-.home{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,1fr);gap:16px;align-items:start}
-.hm-col{display:flex;flex-direction:column;gap:16px;min-width:0}
-.hm-blk{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px 10px;min-width:0}
-.hm-h{display:flex;align-items:center;gap:9px;margin-bottom:4px}
-.hm-h h3{margin:0;font:700 calc(15px*var(--ts)) var(--display)}
-.hm-ic{width:26px;height:26px;border-radius:8px;background:var(--surface-2);display:grid;place-items:center;color:var(--muted);font-weight:700;flex:none}
-.hm-ic .i{width:15px;height:15px}
-.hb-news .hm-ic{background:var(--accent-soft);color:var(--accent)}
-.hm-r{margin-left:auto;color:var(--faint);font-size:calc(12px*var(--ts));text-align:right}
-.linkish{border:0;background:none;padding:0;color:var(--accent);font:inherit;font-weight:600;cursor:pointer}.linkish:hover{text-decoration:underline}
-.hm-sec{font:700 calc(11px*var(--ts)) var(--body);letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:10px 0 2px}
-.hm-sec i{font-style:normal;letter-spacing:0;text-transform:none;font-weight:500}
-.hm-sec.late{color:var(--danger)}.hm-sec.due{color:var(--warn)}.hm-sec.act{color:var(--accent)}
-.hm-row{display:grid;grid-template-columns:10px minmax(0,1fr) auto auto auto;gap:10px;align-items:center;padding:7px 4px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:6px}
-.hm-row:last-of-type{border-bottom:0}
-.hm-row:hover{background:var(--surface-2)}
+/* Home ("Focus" layout) */
+.toolbar.tb-home{display:none!important}
+.hm-new{flex:none;width:34px;height:34px;border-radius:10px;background:var(--accent);color:var(--accent-ink)}.hm-new:hover{filter:brightness(1.08)}
+.head-home .hm-hi{color:var(--muted);font-size:calc(13px*var(--ts))}
+.head-home h1{font:650 calc(30px*var(--ts))/1.2 var(--display);letter-spacing:-.4px;margin:4px 0 6px}
+.head-home .sub{font-size:calc(16px*var(--ts));color:var(--muted)}.head-home .sub b{color:var(--text);font-weight:600}
+.head-home .sub .hs-late{color:var(--danger)}.head-home .sub .hs-wait{color:var(--accent)}
+.home{display:grid;grid-template-columns:minmax(0,1fr) minmax(290px,340px);gap:36px;align-items:start;margin-top:6px}
+.hm-main,.hm-side{min-width:0}
 .hm-dot{width:8px;height:8px;border-radius:50%;background:var(--jc);display:inline-block;flex:none}
-.hm-name{min-width:0;display:flex;align-items:baseline;gap:8px}
+.hm-now{border:1px solid color-mix(in srgb,var(--accent) 28%,var(--line));background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 9%,var(--surface)),var(--surface) 70%);border-radius:18px;padding:18px 20px;display:flex;gap:14px 20px;align-items:center;flex-wrap:wrap}
+.hm-now.calm{border-color:var(--line);background:var(--surface)}
+.hn-main{flex:1 1 280px;min-width:0}
+.hn-k{font:700 calc(11.5px*var(--ts)) var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}.hn-k.late{color:var(--danger)}
+.hn-t{display:block;border:0;background:none;padding:0;margin:5px 0 7px;font:650 calc(21px*var(--ts))/1.3 var(--display);color:var(--text);text-align:left;cursor:pointer;overflow-wrap:anywhere}
+button.hn-t:hover{text-decoration:underline;text-underline-offset:3px}
+.hn-m{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:calc(13px*var(--ts));flex-wrap:wrap}
+.hn-b{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.hn-b .btn{display:inline-flex;gap:6px;align-items:center}.hn-b .btn svg{width:15px;height:15px}
+.hn-b .btn.on{background:var(--accent-soft);color:var(--accent)}
+.qst{display:inline-flex;gap:7px;align-items:center;font-size:calc(12.5px*var(--ts));color:var(--muted);white-space:nowrap;min-width:0}.qst i{width:7px;height:7px;border-radius:2px;background:var(--c);flex:none}
+.hm-bar{display:flex;align-items:center;gap:12px;margin:22px 0 4px}
+.hm-tabs{display:inline-flex;gap:3px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:3px;overflow-x:auto;scrollbar-width:none;max-width:100%}.hm-tabs::-webkit-scrollbar{display:none}
+.hm-tab{border:0;background:none;padding:6px 12px;border-radius:9px;color:var(--muted);font-weight:500;white-space:nowrap;display:flex;gap:6px;align-items:center;cursor:pointer;font-size:calc(13.5px*var(--ts))}
+.hm-tab:hover{color:var(--text)}.hm-tab.on{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.14)}
+.hm-tab em{font-style:normal;color:var(--faint);font-size:calc(12px*var(--ts))}.hm-tab em b{color:var(--danger);font-weight:600}
+.hm-tab.ht-inbox{display:none}
+.hm-jsel{margin-left:auto;width:auto;flex:none;border:0;background:none;color:var(--muted);font:inherit;font-size:calc(13.5px*var(--ts));cursor:pointer;max-width:220px;padding:4px}
+.hm-jsel:hover{color:var(--text)}
+.hm-bar .hm-jsel{width:auto!important;min-width:0!important;max-width:170px;flex:0 1 auto;padding-right:24px;text-align:left;text-align-last:left}
+.hm-tabs{flex:none}
+.hm-bar{flex-wrap:wrap}
+.hn-b .btn.primary{flex-grow:1.4}
+.hm-row{display:grid;grid-template-columns:10px minmax(0,1fr) auto minmax(110px,150px) 84px;gap:14px;align-items:center;padding:11px 6px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:6px}
+.hm-row:hover{background:var(--surface-2)}
+.hm-name{min-width:0;display:flex;align-items:baseline;gap:9px}
 .hm-t{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.hm-name small{color:var(--faint);font-size:calc(12px*var(--ts));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:none;max-width:45%}
+.hm-name small{color:var(--faint);font-size:calc(12.5px*var(--ts));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:none;max-width:45%}
 .hm-chips{display:flex;gap:4px;align-items:center}
-.hm-row .pill{max-width:150px}
-.hm-row .date{font:500 calc(12.5px*var(--ts)) var(--mono);color:var(--muted);min-width:76px;text-align:right;white-space:nowrap}
-.hm-row .date.over{color:var(--danger);font-weight:700}.hm-row .date.soon,.hm-row .date.today{color:var(--warn);font-weight:600}
-.hm-age{font:600 calc(12px*var(--ts)) var(--mono);color:var(--faint);min-width:30px;text-align:right}.hm-age.old{color:var(--warn)}
+.hm-row .date{font-size:calc(12.5px*var(--ts));color:var(--muted);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.hm-row .date.over{color:var(--danger);font-weight:600}.hm-row .date.soon,.hm-row .date.today{color:var(--warn);font-weight:600}
+.hm-age{font-size:calc(12px*var(--ts));color:var(--faint);font-variant-numeric:tabular-nums}.hm-age.old{color:var(--warn)}
 .hm-set{position:relative;white-space:nowrap}
-.hm-x{display:flex;align-items:center;gap:8px}
-.hm-h h3{white-space:nowrap}
-.hm-more{border:0;background:none;color:var(--accent);font-weight:600;padding:8px 4px 2px;cursor:pointer}
-.hm-empty{color:var(--faint);margin:8px 2px 6px;font-size:calc(13.5px*var(--ts))}
-.nw-it{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;padding:9px 4px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:6px;font-size:calc(13.5px*var(--ts))}
-.nw-it:last-child{border-bottom:0}.nw-it:hover{background:var(--surface-2)}
-.nw-it.wait{background:color-mix(in srgb,var(--st-rev) 6%,var(--surface))}
-.nw-k{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;color:#fff}.nw-k .i{width:15px;height:15px}
-.nw-b{min-width:0}.nw-b b{font-weight:650}
-.nw-q{color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.hm-meta{display:flex;gap:6px;align-items:center;font-size:calc(11.5px*var(--ts));color:var(--faint);margin-top:4px}
-.nw-list{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:2px}.nw-list span{color:var(--faint)}
-.nw-wait{display:flex;align-items:center;gap:8px;margin-top:6px}
-.wait-tag{display:inline-flex;align-items:center;gap:4px;font-size:calc(11.5px*var(--ts));font-weight:700;color:color-mix(in srgb,var(--st-rev) 75%,var(--text));background:color-mix(in srgb,var(--st-rev) 15%,var(--surface));border-radius:6px;padding:2px 7px}
-.wait-tag .i{width:12px;height:12px}
-.hm-week{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:6px}
-.hm-day{border:0;border-radius:9px;background:var(--surface-2);padding:6px 5px;min-height:64px;display:flex;flex-direction:column;gap:3px;align-items:stretch;text-align:left;cursor:pointer;color:var(--text)}
-.hm-day b{font-size:calc(12px*var(--ts))}.hm-day i{display:block;height:5px;border-radius:3px;background:var(--jc)}.hm-day small{font-size:calc(10.5px*var(--ts));color:var(--faint)}
-.hm-day.on{outline:2px solid var(--accent);background:var(--accent-soft)}.hm-day.busy{background:color-mix(in srgb,var(--warn) 14%,var(--surface))}.hm-day.past{opacity:.55}
-.hm-day:hover{filter:brightness(.97)}
-@media (max-width:1100px){.home{grid-template-columns:minmax(0,1fr)}.hm-col{display:contents}.home{display:flex;flex-direction:column;align-items:stretch}}
+.hm-x{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.hm-row:has(.hm-x){grid-template-columns:10px minmax(0,1fr) auto minmax(110px,150px) auto}
+.hm-more{border:0;background:none;color:var(--muted);font-weight:500;padding:12px 6px 2px;cursor:pointer}.hm-more:hover{color:var(--accent)}
+.hm-empty{color:var(--faint);margin:14px 6px;font-size:calc(13.5px*var(--ts))}
+.linkish{border:0;background:none;padding:0;color:var(--accent);font:inherit;font-weight:500;cursor:pointer}.linkish:hover{text-decoration:underline}
+.hm-sh{display:flex;align-items:center;gap:8px;font:600 calc(11.5px*var(--ts)) var(--body);letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:4px 0 4px}
+.hm-sh em{font-style:normal;letter-spacing:0}.hm-sh button{margin-left:auto;text-transform:none;letter-spacing:0;font-size:calc(12.5px*var(--ts));color:var(--muted)}
+.ib-it{display:grid;grid-template-columns:28px minmax(0,1fr);gap:11px;padding:11px 6px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:6px}
+.ib-it:hover{background:var(--surface-2)}
+.ib-av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;background:var(--jc)}.ib-av .i{width:14px;height:14px}
+.ib-b{min-width:0}
+.ib-t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:calc(13.5px*var(--ts))}
+.ib-s{color:var(--muted);font-size:calc(13px*var(--ts));margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.ib-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;align-items:center}
+.ib-tag{display:inline-flex;gap:4px;align-items:center;font-size:calc(11.5px*var(--ts));color:var(--muted);background:var(--surface-2);border-radius:6px;padding:2px 7px;white-space:nowrap}
+.ib-tag.acc{color:var(--accent);background:var(--accent-soft);font-weight:600}.ib-tag .i{width:12px;height:12px}
+.ib-when{display:inline-flex;gap:6px;align-items:center;font-size:calc(11.5px*var(--ts));color:var(--faint)}
+.ib-done{margin-left:auto;min-height:26px;padding:2px 10px}
+.ib-list{display:flex;flex-wrap:wrap;gap:3px 10px;margin-top:2px;font-size:calc(13px*var(--ts))}.ib-list span{color:var(--faint)}
+@media (max-width:1100px){.home{grid-template-columns:minmax(0,1fr);gap:28px}}
 @media (max-width:820px){
-  .hm-jobs{flex-wrap:nowrap;overflow-x:auto;margin:0 -14px 12px;padding:0 14px;scrollbar-width:none}.hm-jobs::-webkit-scrollbar{display:none}
-  .hm-chip{flex:none}.hm-editwrap{position:static}.hm-editpop{position:fixed;left:12px;right:12px;top:auto;bottom:calc(100px + env(safe-area-inset-bottom,0px));width:auto}
-  .hm-blk{border-radius:18px}
-  .hm-row{grid-template-columns:8px minmax(0,1fr) auto;row-gap:2px}
+  .hm-new{display:none}
+  .head-ov.head-home{margin:0 0 4px}.head-home .head-title,.head-home .sub{display:block!important}
+  .head-home h1{font-size:calc(25px*var(--ts))}.head-home .sub{font-size:calc(14.5px*var(--ts))}
+  .hm-now{padding:16px}.hn-t{font-size:calc(18px*var(--ts))}.hn-b{width:100%;flex-wrap:nowrap}.hn-b .btn{flex:1;min-width:0;justify-content:center;padding-inline:8px}.hn-b .icon-btn{flex:none;width:34px}
+  .hm-bar{flex-direction:column;align-items:stretch;gap:8px}.hm-tabs{display:flex}.hm-tab{flex:1 0 auto;justify-content:center}.hm-jsel{margin-left:0;align-self:flex-start}
+  .hm-tab.ht-inbox{display:flex}.hm-side{display:none}.home.tab-inbox .hm-side{display:block}.home.tab-inbox .hm-list{display:none}.home.tab-inbox .hm-sh{display:none}
+  .hm-row,.hm-row:has(.hm-x){grid-template-columns:8px minmax(0,1fr) auto;row-gap:3px;padding:12px 2px}
   .hm-name{flex-direction:column;align-items:stretch;gap:1px}.hm-name small{max-width:100%}
   .hm-t{font-size:calc(15px*var(--ts));white-space:normal;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-  .hm-chips{display:none}.hm-row .pill{grid-column:2;grid-row:2;justify-self:start;max-width:60%}
-  .hm-row>.date,.hm-row>.hm-age{grid-column:3;grid-row:1}.hm-row>.hm-x{grid-column:3;grid-row:1/3;flex-direction:column;align-items:flex-end;gap:4px}
-  .hm-h{flex-wrap:wrap}.hm-r{flex:1 1 auto}
-  .hm-dot{align-self:start;margin-top:7px}
+  .hm-chips{display:none}.hm-row .qst{grid-column:2;grid-row:2}
+  .hm-row>.date{grid-column:3;grid-row:1}.hm-row>.hm-x{grid-column:3;grid-row:1/3;flex-direction:column;align-items:flex-end;gap:4px}
+  .hm-dot{align-self:start;margin-top:7px}.hm-now .hm-dot,.ib-when .hm-dot{align-self:center;margin-top:0}
 }
 /* full screen task: details on the left, activity on the right */
 .drawer.full{top:22px;left:22px;right:22px;bottom:22px;width:auto;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
@@ -4299,7 +4297,7 @@ function renderMain(){
   const HOME=u.tab==='overview';
   const scope=tasksOfScope();
   if(!job){
-    $('#head').innerHTML=`<div class="head head-ov"><div class="head-title">${HOME?greetHtml():''}<h1>${HOME?'Home':'Calendar'}</h1><div class="sub">${HOME?homeSummary():u.tab==='calendar'?'Due dates across every job':`${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients${(()=>{const h=jobsSorted().reduce((a,j)=>a+weeklyHours(workOf(j)),0);return h?` · ${fmtNum(h)} h/week scheduled`:''})()} <span class="sub-tail">· everything due across your work</span>`}</div></div>
+    $('#head').innerHTML=`<div class="head head-ov ${HOME?'head-home':''}"><div class="head-title">${HOME?`<div class="hm-hi">${esc(homeGreet().hi)}</div>`:''}<h1>${HOME?esc(homeGreet().h1):'Calendar'}</h1><div class="sub">${HOME?homeSummary():u.tab==='calendar'?'Due dates across every job':`${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients${(()=>{const h=jobsSorted().reduce((a,j)=>a+weeklyHours(workOf(j)),0);return h?` · ${fmtNum(h)} h/week scheduled`:''})()} <span class="sub-tail">· everything due across your work</span>`}</div></div>
       </div>`;
   }else{
     const cl=shownClients(job.id);
@@ -4573,44 +4571,43 @@ function greetHtml(){
 }
 const WEEKDAY_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 /* Overview → Lanes (user's pick): one column per job, each in that job's own statuses, open tasks by due date */
-/* ================= Home: the Overview's default view =================
-   Blocks (S.ui.home {order, off}, per device, Edit home): Today (late, due today, and tasks you're working on
-   that have no due date), No due date (not started yet, oldest first), What's new (ClickUp comments, replies,
-   status/due changes since you last marked it seen, cutroom.homeseen; comments waiting for your reply stay),
-   This week, Up next. Job chips at the top (S.ui.hjob) narrow every block to one job. */
-const HOME_BLOCKS={news:["What's new",'r'],today:['Today','l'],nodate:['No due date','l'],week:['This week','r'],upnext:['Up next','r']};
+/* ================= Home (the Overview tab), "Focus" layout =================
+   Greeting and one summary line; an Up now card (Up next #1, else the most urgent open task) with Open / Focus / Mark done / Not now;
+   one quiet list under tabs (S.ui.htab: today | active | nodate | week, plus inbox on phones), narrowed by the job picker (S.ui.hjob);
+   the Inbox groups ClickUp comments, replies and status/due changes per task since cutroom.homeseen (comments waiting for your reply stay). */
 const ACTIVE_STAGES=new Set(['in_progress','internal_review','revisions']);
-let HOME_EDIT=false,NEWS_ALL=false;
-function homeCfg(){const h=S.ui.home||{},order=(h.order||[]).filter(k=>HOME_BLOCKS[k]);for(const k of Object.keys(HOME_BLOCKS))if(!order.includes(k))order.push(k);return {order,off:new Set(h.off||['upnext'])}}
+let HM_MORE=false,INBOX_ALL=false;const UPNOW_SKIP=new Set();
 function hmJob(){const j=S.ui.hjob;return j&&S.jobs[j]?j:'all'}
 function homeTasks(){const jf=hmJob(),q=(S.ui.q||'').trim().toLowerCase();
   return live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)&&(jf==='all'||t.jobId===jf)&&(!q||[t.name,S.clients[t.clientId]?.name,S.jobs[t.jobId]?.name,...(t.tags||[])].some(x=>String(x||'').toLowerCase().includes(q))))}
 const isActive=t=>ACTIVE_STAGES.has(stageOf(stOf(t)));
-function homeParts(ts){const t0=today(),byDue=(a,b)=>a.due.localeCompare(b.due)||PRIO_RANK[a.priority||'normal']-PRIO_RANK[b.priority||'normal'],byAge=(a,b)=>(assignedOn(a)||'9').localeCompare(assignedOn(b)||'9');
-  return {late:ts.filter(t=>t.due&&t.due<t0).sort(byDue),today:ts.filter(t=>t.due===t0).sort(byDue),active:ts.filter(t=>!t.due&&isActive(t)).sort(byAge),idle:ts.filter(t=>!t.due&&!isActive(t)).sort(byAge)}}
-function homeSummary(){const p=homeParts(homeTasks()),w=homeNews().filter(x=>x.wait).length;
-  const b=[p.late.length?`<b class="hs-late">${p.late.length} late</b>`:'',`${p.today.length} due today`,p.active.length?`${p.active.length} in progress with no date`:'',w?`<b class="hs-wait">${w} comment${w===1?'':'s'} waiting for you</b>`:''].filter(Boolean);
+function homeParts(ts){const t0=today(),w=addDays(t0,7),byDue=(a,b)=>a.due.localeCompare(b.due)||PRIO_RANK[a.priority||'normal']-PRIO_RANK[b.priority||'normal'],byAge=(a,b)=>(assignedOn(a)||'9').localeCompare(assignedOn(b)||'9');
+  return {late:ts.filter(t=>t.due&&t.due<t0).sort(byDue),today:ts.filter(t=>t.due===t0).sort(byDue),active:ts.filter(t=>!t.due&&isActive(t)).sort(byAge),idle:ts.filter(t=>!t.due&&!isActive(t)).sort(byAge),
+    week:ts.filter(t=>t.due&&t.due>t0&&t.due<=w).sort(byDue),busy:ts.filter(isActive).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'))}}
+function upNow(ts){
+  const q=upNextList().filter(t=>ts.includes(t)&&!UPNOW_SKIP.has(t.id));if(q.length)return {t:q[0],why:`Up next #${upNextPos(q[0])}`};
+  const p=homeParts(ts),t=[...p.late,...p.today,...p.active,...p.week].find(t=>!UPNOW_SKIP.has(t.id));if(!t)return null;
+  const t0=today(),d=t.due?-diffDays(t.due,t0):0;
+  return {t,late:d>0,why:d>0?`${d} day${d===1?'':'s'} late`:t.due===t0?'Due today':!t.due?'In progress':`Due ${fmtRel(t.due,true).toLowerCase()}`};
+}
+function homeGreet(){
+  const d=new Date(),day=`${WEEKDAY_FULL[d.getDay()]}, ${absDate(today()).replace(/ ’\d+$/,'')}`,sea=pref('seasonal')?seasonNote():'';
+  if(!pref('greeting'))return {hi:day+(sea?' · '+sea:''),h1:'Home'};
+  const h=d.getHours(),part=h<5?'Good evening':h<12?'Good morning':h<18?'Good afternoon':'Good evening',name=String(pref('greetName')||B.name||'').trim().split(/\s+/)[0]||'';
+  return {hi:day+(sea?' · '+sea:''),h1:part+(name?', '+name:'')};
+}
+function homeSummary(){const p=homeParts(homeTasks()),w=inboxGroups().filter(g=>g.wait).length;
+  const b=[p.late.length?`<b class="hs-late">${p.late.length} late</b>`:'',p.today.length?`<b>${p.today.length} due today</b>`:'',w?`<b class="hs-wait">${w} waiting on you</b>`:'',!p.late.length&&!p.today.length&&!w?'Nothing urgent. Nice.':''].filter(Boolean);
   return b.join(' · ')}
 function homeRow(t,extra){
   const j=S.jobs[t.jobId],c=S.clients[t.clientId],st=stOf(t),nr=needsReply(t).length,nn=openNotes(t);
   const where=[hmJob()==='all'?j.name:'',c?.name].filter(Boolean).join(' · ');
-  return `<div class="hm-row ${dueClass(t)==='over'?'is-over':''}" data-act="open" data-id="${t.id}" tabindex="0" style="--jc:${esc(j.color||'var(--accent)')}"><span class="hm-dot"></span>
+  return `<div class="hm-row" data-act="open" data-id="${t.id}" tabindex="0" style="--jc:${esc(j.color||'var(--accent)')}"><span class="hm-dot"></span>
     <span class="hm-name"><span class="hm-t">${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</span>${where?`<small>${esc(where)}</small>`:''}</span>
     <span class="hm-chips">${nr?`<span class="chip nr-chip" title="${nr} comment${nr===1?'':'s'} waiting for your reply">${rpIc}${nr}</span>`:''}${nn?`<span class="chip notes-chip" title="${nn} open update${nn===1?'':'s'}">${I.chat}${nn}</span>`:''}${(t.tags||[]).slice(0,2).map(x=>tagChip(x)).join('')}</span>
-    <span class="pill" ${pillStyle(st)}><span class="pl">${esc(stLabel(st))}</span></span>
+    <span class="qst" style="--c:${esc(stColor(st))}"><i></i>${esc(stLabel(st))}</span>
     ${extra??`<span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,true):'No date'}</span>`}</div>`}
 const setDateBtn=t=>`<span class="btn sm hm-set dedit" data-act="row-due-pick">Set date<input type="date" class="cell-date" data-act="row-due" data-id="${t.id}" value="" tabindex="-1" aria-label="Due date for ${esc(t.name||'task')}"></span>`;
-function blk(k,icon,title,right,body){return `<section class="hm-blk hb-${k}" style="order:${homeCfg().order.indexOf(k)}"><header class="hm-h"><span class="hm-ic">${icon}</span><h3>${title}</h3>${right?`<span class="hm-r">${right}</span>`:''}</header>${body}</section>`}
-function homeTodayHtml(p){
-  const sec=(cls,label,list,hint)=>list.length?`<div class="hm-sec ${cls}">${label} <i>${list.length}${hint?` · ${hint}`:''}</i></div>${list.map(t=>homeRow(t)).join('')}`:'';
-  const n=p.late.length+p.today.length+p.active.length;
-  let body=sec('late','Late',p.late)+sec('due','Due today',p.today)+sec('act','In progress, no due date',p.active,"you're working on these");
-  if(!n){const nx=homeTasks().filter(t=>t.due&&t.due>today()).sort((a,b)=>a.due.localeCompare(b.due))[0];body=`<p class="hm-empty">Nothing late or due today.${nx?` Next up: <button type="button" class="linkish" data-act="open" data-id="${nx.id}">${esc(nx.name||'Untitled task')}</button>, ${esc(fmtRel(nx.due,true).toLowerCase())}.`:''}</p>`}
-  return blk('today',I.task,'Today',n?`${n} to work on`:'',body)}
-let ND_ALL=false;
-function homeNodateHtml(p){const L=p.idle;if(!L.length)return blk('nodate','?','No due date','',`<p class="hm-empty">Every task that isn't started has a due date.</p>`);
-  const show=ND_ALL?L:L.slice(0,5);
-  return blk('nodate','?','No due date, not started',`${L.length} · oldest first`,show.map(t=>{const a=ageDays(t);return homeRow(t,`<span class="hm-x">${a!=null?`<span class="hm-age ${a>=AGE_OLD?'old':''}" title="Assigned ${a} day${a===1?'':'s'} ago">${a}d</span>`:''}${setDateBtn(t)}</span>`)}).join('')+(L.length>5?`<button type="button" class="hm-more" data-act="hm-ndall">${ND_ALL?'Show fewer':`Show ${L.length-5} more`}</button>`:''))}
 const agoTxt=iso=>{const m=(Date.now()-new Date(iso))/6e4;if(m<1)return 'just now';if(m<60)return `${Math.floor(m)}m ago`;if(m<24*60)return `${Math.floor(m/60)}h ago`;const d=ymd(new Date(iso));return d===ymd(new Date(Date.now()-864e5))?'yesterday':absDate(d)};
 function homeSeen(){return +(lsGet('cutroom.homeseen')||0)||Date.now()-3*864e5}
 function homeNews(){
@@ -4628,33 +4625,54 @@ function homeNews(){
   return out.sort((a,b)=>(b.wait?1:0)-(a.wait?1:0)||b.at.localeCompare(a.at));
 }
 const plain=x=>String(x||'').replace(/\*\*|__|`/g,'').replace(/\[([^\]]+)\]\([^)]+\)/g,'$1').replace(/\s+/g,' ').trim();
-function newsItem(x){
-  const t=x.t,j=S.jobs[x.jobId||t?.jobId],meta=`<span class="hm-meta"><span class="hm-dot" style="--jc:${esc(j?.color||'var(--accent)')}"></span>${esc(j?.name||'')}${x.kind==='status'||x.kind==='due'?' · in ClickUp':''} · ${agoTxt(x.at)}</span>`;
-  if(x.kind==='new')return `<div class="nw-it"><span class="nw-k" style="background:#7b68ee">${I.plus}</span><div class="nw-b"><div><b>${x.tasks.length} new task${x.tasks.length===1?'':'s'}</b> from ClickUp</div><div class="nw-list">${x.tasks.slice(0,4).map(t=>`<button type="button" class="linkish" data-act="open" data-id="${t.id}">${esc(t.name||'Untitled task')}</button>`).join('')}${x.tasks.length>4?`<span>+${x.tasks.length-4} more</span>`:''}</div>${meta}</div></div>`;
-  if(x.kind==='status'||x.kind==='due'){const m=/: (.*?) → (.*)$/.exec(x.text||''),txt=x.kind==='status'&&m?`moved to <b>${esc(m[2])}</b>`:esc(String(x.text||'').replace(/ in ClickUp/,'').replace(/^Due date/,'due date').replace(/^Status/,'status'));
-    return `<div class="nw-it" data-act="hm-open" data-id="${t.id}"><span class="nw-k" style="background:${x.kind==='status'?'var(--st-done)':'var(--faint)'}">${x.kind==='status'?I.loop:I.cal}</span><div class="nw-b"><div><b>${esc(t.name||'Untitled task')}</b> ${txt}</div>${meta}</div></div>`}
-  const verb=x.mention?'mentioned you on':x.kind==='reply'?'replied on':'commented on';
-  return `<div class="nw-it ${x.wait?'wait':''}" data-act="hm-open" data-id="${t.id}">${avOther(x.who,30)}<div class="nw-b"><div><b>${esc(x.who||'Someone')}</b> ${verb} <b>${esc(t.name||'Untitled task')}</b></div><div class="nw-q">“${esc(plain(x.text).slice(0,160))}”</div>${meta}${x.wait?`<div class="nw-wait"><span class="wait-tag">${rpIc}Needs your reply</span><button type="button" class="btn sm ghost" data-act="hm-handled" data-id="${t.id}" data-k="${esc(x.key)}" title="Answered somewhere else, or no answer needed">Handled</button></div>`:''}</div></div>`;
+/* one Inbox entry per task: its newest comment leads, everything else that happened shows as tags */
+function inboxGroups(){
+  const by=new Map(),out=[];
+  for(const x of homeNews()){if(x.kind==='new'){out.push(x);continue}
+    let g=by.get(x.t.id);if(!g){g={kind:'task',t:x.t,items:[],at:x.at,wait:false,mention:false};by.set(x.t.id,g);out.push(g)}
+    g.items.push(x);if(x.at>g.at)g.at=x.at;if(x.wait)g.wait=true;if(x.mention)g.mention=true}
+  return out.sort((a,b)=>(b.wait?1:0)-(a.wait?1:0)||b.at.localeCompare(a.at));
 }
-function homeNewsHtml(){
-  const L=homeNews(),show=NEWS_ALL?L:L.slice(0,8),since=lsGet('cutroom.homeseen');
-  const right=`${since?`since ${esc(agoTxt(new Date(+since).toISOString()))}`:'last 3 days'}${L.some(x=>!x.wait)?` · <button type="button" class="linkish" data-act="hm-seen">Mark all seen</button>`:''}`;
-  return blk('news','<svg class="i" viewBox="0 0 16 16"><path d="M3 3.5h10v7H7l-3 2.5v-2.5H3z"/></svg>',"What's new",right,L.length?`<div class="nw">${show.map(newsItem).join('')}</div>${L.length>8?`<button type="button" class="hm-more" data-act="hm-newsall">${NEWS_ALL?'Show fewer':`Show all ${L.length}`}</button>`:''}`
-    :`<p class="hm-empty">You're caught up. Comments, replies, status changes and new tasks from ClickUp show up here.</p>`)}
-function homeWeekHtml(){
-  const t0=today(),d=parseD(t0),st=addDays(t0,-((d.getDay()-WS()+7)%7)),lim=dayLimit(),ts=homeTasks();
-  const days=[...Array(7)].map((_,i)=>addDays(st,i));
-  return blk('week',I.cal,'This week','',`<div class="hm-week">${days.map(x=>{const due=ts.filter(t=>t.due===x),busy=dueLoad()[x]>=lim,dd=parseD(x);
-    return `<button type="button" class="hm-day ${x===t0?'on':''} ${busy?'busy':''} ${x<t0?'past':''}" data-act="hm-day" data-d="${x}" title="${esc(fmtLong(x))}: ${due.length} due${busy?' · busy day':''}"><b>${WEEKDAY[dd.getDay()].slice(0,1)} ${dd.getDate()}</b>${due.slice(0,4).map(t=>`<i style="--jc:${esc(S.jobs[t.jobId]?.color||'var(--accent)')}"></i>`).join('')}${due.length>4?`<small>+${due.length-4}</small>`:''}</button>`}).join('')}</div>`)}
-function homeUpnextHtml(){const L=upNextList().filter(t=>hmJob()==='all'||t.jobId===hmJob());return blk('upnext',UP_IC,'Up next',L.length?String(L.length):'',L.length?L.slice(0,5).map((t,i)=>homeRow(t,`<span class="hm-age">#${i+1}</span>`)).join(''):`<p class="hm-empty">Your queue is empty. Add tasks from the right-click menu.</p>`)}
-function homeEditHtml(){const c=homeCfg();return `<div class="hm-editpop" data-stop><b>Blocks on Home</b><p class="hint">Switch off what you don't need. Arrows change the order.</p>${c.order.map((k,i)=>`<div class="hm-erow"><span>${HOME_BLOCKS[k][0]}</span><button type="button" class="icon-btn" data-act="hm-move" data-k="${k}" data-d="-1" ${i?'':'disabled'} aria-label="Move up" title="Move up">↑</button><button type="button" class="icon-btn" data-act="hm-move" data-k="${k}" data-d="1" ${i<c.order.length-1?'':'disabled'} aria-label="Move down" title="Move down">↓</button><button type="button" class="hm-sw ${c.off.has(k)?'':'on'}" data-act="hm-toggle" data-k="${k}" role="switch" aria-checked="${!c.off.has(k)}" aria-label="Show ${HOME_BLOCKS[k][0]}"></button></div>`).join('')}<button type="button" class="btn sm primary" data-act="hm-edit">Done</button></div>`}
+const chgTxt=x=>{const m=/: (.*?) → (.*)$/.exec(x.text||'');return x.kind==='status'&&m?`moved to ${m[2]}`:String(x.text||'').replace(/ in ClickUp/,'').replace(/^Due date/,'due date').replace(/^Status/,'status')};
+function inboxItem(g){
+  if(g.kind==='new'){const j=S.jobs[g.jobId];return `<div class="ib-it"><span class="ib-av" style="--jc:${esc(j?.color||'var(--accent)')}">${I.plus}</span><div class="ib-b"><div class="ib-t">${esc(j?.name||'')} · ${g.tasks.length} new task${g.tasks.length===1?'':'s'}</div><div class="ib-list">${g.tasks.slice(0,4).map(t=>`<button type="button" class="linkish" data-act="open" data-id="${t.id}">${esc(t.name||'Untitled task')}</button>`).join('')}${g.tasks.length>4?`<span>+${g.tasks.length-4} more</span>`:''}</div><div class="ib-tags"><span class="ib-tag">from ClickUp</span><span class="ib-when">${agoTxt(g.at)}</span></div></div></div>`}
+  const t=g.t,j=S.jobs[t.jobId],its=g.items.slice().sort((a,b)=>b.at.localeCompare(a.at)),lead=its.find(x=>x.wait)||its.find(x=>x.mention)||its.find(x=>x.kind==='comment'||x.kind==='reply')||its[0];
+  const rest=its.filter(x=>x!==lead),tags=[];
+  if(g.wait)tags.push(`<span class="ib-tag acc">${rpIc}Needs your reply</span>`);else if(g.mention)tags.push(`<span class="ib-tag acc">@ mentioned you</span>`);
+  const nc=rest.filter(x=>x.kind==='comment'||x.kind==='reply').length;if(nc)tags.push(`<span class="ib-tag">${nc} more comment${nc===1?'':'s'}</span>`);
+  rest.filter(x=>x.kind==='status'||x.kind==='due').slice(0,2).forEach(x=>tags.push(`<span class="ib-tag">${esc(chgTxt(x))}</span>`));
+  const more=rest.filter(x=>x.kind==='status'||x.kind==='due').length-2;if(more>0)tags.push(`<span class="ib-tag">+${more}</span>`);
+  const isC=lead.kind==='comment'||lead.kind==='reply';
+  return `<div class="ib-it ${g.wait?'wait':''}" data-act="hm-open" data-id="${t.id}">${isC?avOther(lead.who,28):`<span class="ib-av" style="--jc:${esc(j.color||'var(--accent)')}">${lead.kind==='status'?I.loop:I.cal}</span>`}<div class="ib-b">
+    <div class="ib-t">${esc(t.name||'Untitled task')}</div><div class="ib-s">${isC?`${esc(String(lead.who||'Someone').split(' ')[0])}: “${esc(plain(lead.text).slice(0,140))}”`:esc(chgTxt(lead).replace(/^./,c=>c.toUpperCase()))}</div>
+    <div class="ib-tags">${tags.join('')}<span class="ib-when"><span class="hm-dot" style="--jc:${esc(j.color||'var(--accent)')}"></span>${esc(j.name)} · ${agoTxt(g.at)}</span>${g.wait?`<button type="button" class="btn sm ghost ib-done" data-act="hm-handled" data-id="${t.id}" title="Answered somewhere else, or no answer needed">Handled</button>`:''}</div></div></div>`;
+}
+function inboxHtml(){
+  const L=inboxGroups(),show=INBOX_ALL?L:L.slice(0,8);
+  return `<div class="hm-sh">Inbox${L.length?` <em>${L.length}</em>`:''}${L.some(g=>!g.wait)?`<button type="button" class="linkish" data-act="hm-seen">Mark all seen</button>`:''}</div>
+    ${L.length?show.map(inboxItem).join('')+(L.length>8?`<button type="button" class="hm-more" data-act="hm-inall">${INBOX_ALL?'Show fewer':`Show ${L.length-8} more`}</button>`:''):`<p class="hm-empty">You're caught up. ClickUp comments, replies, status changes and new tasks show up here.</p>`}`;
+}
 function homeView(){
-  const jf=hmJob(),all=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)),t0=today(),c=homeCfg();
-  const chip=(id,label,mark,ts)=>{const late=ts.filter(t=>t.due&&t.due<t0).length;return `<button type="button" class="hm-chip ${jf===id?'on':''}" data-act="hm-job" data-j="${id}" aria-pressed="${jf===id}">${mark}${esc(label)}<small>${ts.length}${late?` · <b>${late} late</b>`:''}</small></button>`};
-  const p=homeParts(homeTasks()),R={today:()=>homeTodayHtml(p),nodate:()=>homeNodateHtml(p),news:homeNewsHtml,week:homeWeekHtml,upnext:homeUpnextHtml};
-  const col=side=>c.order.filter(k=>!c.off.has(k)&&HOME_BLOCKS[k][1]===side).map(k=>R[k]()).join('');
-  return `<div class="hm-jobs">${chip('all','All jobs','',all)}${jobsSorted().map(j=>chip(j.id,j.name,jobMark(j,20)+jobEmoji(j),all.filter(t=>t.jobId===j.id))).join('')}<span class="hm-editwrap"><button type="button" class="btn sm ghost hm-editbtn ${HOME_EDIT?'on':''}" data-act="hm-edit" aria-expanded="${HOME_EDIT}">${I.pencil}Edit home</button>${HOME_EDIT?homeEditHtml():''}</span></div>
-    <div class="home"><div class="hm-col">${col('l')}</div><div class="hm-col">${col('r')}</div></div>`}
+  const ts=homeTasks(),p=homeParts(ts),un=upNow(ts),T=pomoState(),jf=hmJob(),all=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)),t0=today();
+  let tab=S.ui.htab||'today';if(!['today','active','nodate','week','inbox'].includes(tab))tab='today';
+  const listOf={today:[...p.late,...p.today,...p.active],active:p.busy,nodate:p.idle,week:p.week,inbox:[...p.late,...p.today,...p.active]};
+  const L=listOf[tab].filter(t=>t.id!==un?.t.id),show=HM_MORE?L:L.slice(0,8),nIn=inboxGroups().length;
+  const tb=(k,label,n,extra='')=>`<button type="button" class="hm-tab ${tab===k?'on':''} ${k==='inbox'?'ht-inbox':''}" data-act="hm-tab" data-t="${k}" aria-pressed="${tab===k}">${label}<em>${extra}${n}</em></button>`;
+  let card='';
+  if(un){const t=un.t,j=S.jobs[t.jobId],c=S.clients[t.clientId],st=stOf(t),on=T.taskId===t.id&&T.mode==='focus'&&T.run==='running';
+    card=`<section class="hm-now" style="--jc:${esc(j.color||'var(--accent)')}"><div class="hn-main"><div class="hn-k ${un.late?'late':''}">Up now · ${esc(un.why)}</div>
+      <button type="button" class="hn-t" data-act="open" data-id="${t.id}">${esc(t.name||'Untitled task')}</button>
+      <div class="hn-m"><span class="hm-dot"></span>${esc([j.name,c?.name].filter(Boolean).join(' · '))}<span class="qst" style="--c:${esc(stColor(st))}"><i></i>${esc(stLabel(st))}</span>${needsReply(t).length?`<span class="ib-tag acc">${rpIc}Needs your reply</span>`:''}</div></div>
+      <div class="hn-b"><button type="button" class="btn" data-act="open" data-id="${t.id}">Open</button><button type="button" class="btn ${on?'on':''}" data-act="hn-focus" data-id="${t.id}">${TOMATO_IC}${on?'Pause':'Focus'}</button><button type="button" class="btn primary" data-act="hn-done" data-id="${t.id}">Mark done</button><button type="button" class="icon-btn" data-act="hn-skip" data-id="${t.id}" title="Not now: show the next one" aria-label="Not now">›</button></div></section>`}
+  else card=`<section class="hm-now calm"><div class="hn-main"><div class="hn-k">All clear</div><div class="hn-t">Nothing late, due today or in progress.</div><div class="hn-m">${ts.length?`${ts.length} open task${ts.length===1?'':'s'} later on.`:'No open tasks.'}</div></div></section>`;
+  const rows=show.map(t=>{if(tab!=='nodate')return homeRow(t);const a=ageDays(t);return homeRow(t,`<span class="hm-x">${a!=null?`<span class="hm-age ${a>=AGE_OLD?'old':''}" title="Assigned ${a} day${a===1?'':'s'} ago">${a}d</span>`:''}${setDateBtn(t)}</span>`)}).join('');
+  const empty={today:'Nothing else late, due today or in progress.',active:'Nothing in progress.',nodate:'Every task that isn\'t started has a due date.',week:'Nothing else due in the next 7 days.',inbox:''}[tab];
+  return `<div class="home ${tab==='inbox'?'tab-inbox':''}"><div class="hm-main">${card}
+    <div class="hm-bar"><div class="hm-tabs" role="tablist">${tb('today','Today',p.late.length+p.today.length+p.active.length,p.late.length?`<b>${p.late.length}</b> · `:'')}${tb('inbox','Inbox',nIn)}${tb('active','In progress',p.busy.length)}${tb('nodate','No date',p.idle.length)}${tb('week','This week',p.week.length)}</div>
+      <select class="hm-jsel" id="hm-jsel" aria-label="Show one job"><option value="all">All jobs</option>${jobsSorted().map(j=>{const n=all.filter(t=>t.jobId===j.id),late=n.filter(t=>t.due&&t.due<t0).length;return `<option value="${j.id}" ${jf===j.id?'selected':''}>${esc(j.name)} · ${n.length}${late?` (${late} late)`:''}</option>`}).join('')}</select><button type="button" class="icon-btn hm-new" data-act="new-task" title="New task (N)" aria-label="New task">${I.plus}</button></div>
+    <div class="hm-list">${rows||`<p class="hm-empty">${empty}</p>`}${L.length>8?`<button type="button" class="hm-more" data-act="hm-more">${HM_MORE?'Show fewer':`Show ${L.length-8} more`}</button>`:''}</div></div>
+    <aside class="hm-side">${inboxHtml()}</aside></div>`;
+}
 function jobCard(j){
   const ts=live().filter(t=>t.jobId===j.id);
   const st=statsFor(ts);
@@ -6734,7 +6752,7 @@ const HELP=[
  ['Tasks','Same name twice',`If you save a new task with the same name as an open one in that job, the panel asks whether to open the one you already have or save the new one anyway.`,null],
  ['Tasks','Select several',`Turn on Select in the toolbar, tick tasks (Shift-click for a range), then set status, priority, due date, move them to another job or client, archive or delete them together.`,null],
  ['Tasks','Up next, templates and duplicates',`Add a task to Up next (the queue icon at the top of a task, or right-click) to line up what you'll work on; it has its own page in the sidebar. Save checklist steps as a template per client. Duplicate makes an unsaved copy to edit: same client (so the same brand guide), due date, links, notes and checklist (unticked), with a fresh status.`,null],
- ['Getting around','Home',`Home shows what needs you across every job. Today has what's late, what's due today and the tasks you're working on that have no due date. No due date lists the rest of the undated tasks, oldest first, with a Set date button. What's new collects ClickUp comments, replies, status changes and new tasks since you last pressed Mark all seen, and comments waiting for your reply stay on top until you answer or press Handled. Click a job chip at the top to see just that job. Edit home turns blocks on or off (Up next is off at first) and changes their order. For every job's due dates on a calendar, open Calendar in the sidebar.`,null],
+ ['Getting around','Home',`Home starts with Up now: the one task to do first (your Up next #1, else the most overdue, then what's due today). Open it, start a focus session, mark it done, or press › for the next one. Below it, the tabs show Today (late, due today and in-progress tasks with no date), In progress, No date (with Set date) and This week; the job picker narrows everything to one job. The Inbox on the right puts everything that happened on a task in one entry: the newest comment, plus tags for status and date changes. Comments waiting for your reply stay until you answer in ClickUp or press Handled. On a phone the Inbox is a tab. For every job's due dates on a calendar, open Calendar in the sidebar.`,null],
  ['Tasks','Tags',`Give a task free labels like rush, reel or B-roll in its Tags row. Tags show on the task in lists, boards and Home, the search box finds them, and the tag filter in the toolbar shows only tasks with that tag.`,null],
  ['Links and files','Links from the brief and from comments',`When a task's notes name links (Raw Video: …, Script: …, Editing Brief, Style Guide), they show under Links as From the brief, with a button to save one as the task's Drive or Frame.io link. Links and attachments posted in ClickUp comments and your own updates are gathered under Files in comments.`,null],
  ['Updates and notes','Comments waiting for your reply',`A ClickUp comment that @mentions you or asks you something is marked Needs your reply until you answer it in ClickUp (the next sync sees it) or press Mark handled. They show in Alerts under Needs reply, at the top of What's new on Home, and in the Needs my reply filter.`,null],
@@ -8305,16 +8323,15 @@ document.addEventListener('click',e=>{
     case 'cf-all': CF_ALL=S.ui.openTask;renderDrawer();break;
     case 'cf-pic': {const t=S.tasks[S.ui.openTask];if(t)openLightbox(commentFiles(t).filter(x=>x.pic).map(x=>x.url),+el.dataset.i);break}
     case 'nr-done': {const t=S.tasks[S.ui.openTask];if(t)nrDone(t,el.dataset.k||null);break}
-    case 'hm-job': S.ui.hjob=el.dataset.j;ND_ALL=false;NEWS_ALL=false;saveUi();render();break;
+    case 'hm-tab': S.ui.htab=el.dataset.t;HM_MORE=false;saveUi();render();break;
     case 'hm-open': if(e.target.closest('button,a'))break;openTask(el.dataset.id,'activity');break;
-    case 'hm-handled': {const t=S.tasks[el.dataset.id];if(t){nrDone(t,el.dataset.k);toast('Marked as handled')}render();break}
-    case 'hm-seen': lsSet('cutroom.homeseen',String(Date.now()));if(Object.values(S.tasks).some(t=>t.cuNew))cuReviewAll();NEWS_ALL=false;render();break;
-    case 'hm-newsall': NEWS_ALL=!NEWS_ALL;render();break;
-    case 'hm-ndall': ND_ALL=!ND_ALL;render();break;
-    case 'hm-day': S.ui.from='overview';S.ui.tab='calendar';S.ui.view='calendar';S.ui.calMode='week';S.ui.week=el.dataset.d;saveUi();render();window.scrollTo({top:0});break;
-    case 'hm-edit': HOME_EDIT=!HOME_EDIT;render();break;
-    case 'hm-toggle': {const c=homeCfg(),k=el.dataset.k;c.off.has(k)?c.off.delete(k):c.off.add(k);S.ui.home={order:c.order,off:[...c.off]};saveUi();render();break}
-    case 'hm-move': {const c=homeCfg(),k=el.dataset.k,i=c.order.indexOf(k),n=i+(+el.dataset.d);if(n<0||n>=c.order.length)break;c.order.splice(i,1);c.order.splice(n,0,k);S.ui.home={order:c.order,off:[...c.off]};saveUi();render();break}
+    case 'hm-handled': {const t=S.tasks[el.dataset.id];if(t){nrDone(t,null);toast('Marked as handled')}render();break}
+    case 'hm-seen': lsSet('cutroom.homeseen',String(Date.now()));if(Object.values(S.tasks).some(t=>t.cuNew))cuReviewAll();INBOX_ALL=false;render();break;
+    case 'hm-inall': INBOX_ALL=!INBOX_ALL;render();break;
+    case 'hm-more': HM_MORE=!HM_MORE;render();break;
+    case 'hn-done': setStatus(el.dataset.id,'done');render();break;
+    case 'hn-focus': {const T=pomoState(),id=el.dataset.id;if(T.taskId===id&&T.mode==='focus'&&T.run!=='idle')pomoToggle();else pomoStart('focus',id);render();break}
+    case 'hn-skip': UPNOW_SKIP.add(el.dataset.id);render();break;
     case 'act-more': ACT_ALL.add(S.ui.openTask);renderDrawer();break;
     case 'rp-toggle': {const k=el.dataset.k;if(el.getAttribute('aria-expanded')==='true'){RP_OPEN.delete(k);RP_SHUT.add(k)}else{RP_OPEN.add(k);RP_SHUT.delete(k)}renderDrawer();break}
     case 'd-duplicate': duplicateTask(u.openTask);break;
@@ -8543,6 +8560,7 @@ document.addEventListener('change',e=>{
   if(el.id==='rs-file'){const f=el.files?.[0];el.value='';if(f)rsImport(f);return}
   if(el.id==='rs-fromjob'){const v=el.value;el.value='';if(v)rsFromJob(+el.dataset.si,v);return}
   if(el.id==='f-prio'){u.prio=el.value;render();return}
+  if(el.id==='hm-jsel'){S.ui.hjob=el.value;HM_MORE=false;saveUi();render();return}
   if(el.id==='f-tag'){u.tag=el.value;saveUi();render();return}
   if(el.id==='f-due'){u.due=el.value;render();return}
   if(el.dataset.statKey){const k=el.dataset.statKey,cur=statKeys(),order=statDefs().map(d=>d[0]);let next=el.checked?[...cur,k]:cur.filter(x=>x!==k);if(!next.length){render();return}next=order.filter(x=>next.includes(x)).slice(0,STAT_MAX);saveStatKeys(next);return}
