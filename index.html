@@ -1873,6 +1873,38 @@ button.hn-t:hover{text-decoration:underline;text-underline-offset:3px}
   .cs .hm-side{display:block!important}
   .cs .hm-set{min-height:32px}
 }
+
+/* Sidebar, call sheet style: brand over a heavy rule, plain rows with a bar for the current page, job color bars,
+   and only the middle scrolls so the footer (Resume, Help, Settings) never drops off a short screen */
+.side-scroll{display:flex;flex-direction:column;gap:inherit;min-height:0}
+@media (min-width:821px){
+  .side{overflow:hidden}
+  .side-scroll{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;margin:0 -12px;padding:0 12px 4px;scrollbar-width:thin}
+  body.side-mini .side-scroll{margin:0 -8px;padding:0 8px;width:calc(100% + 16px);align-items:center}
+}
+.side .brand{padding-bottom:16px;margin-bottom:-4px;border-bottom:2px solid var(--text);margin-inline:0;padding-inline:8px}
+.side .brand b{font-weight:800;letter-spacing:-.02em}
+.side .nav-item.on{background:none;font-weight:700;box-shadow:inset 3px 0 0 var(--text);border-radius:2px 8px 8px 2px}
+.side .nav-item.on:hover{background:var(--surface-2)}
+.side .nav-item .count{font:600 calc(12px*var(--ts)) var(--display);font-variant-numeric:tabular-nums;color:var(--faint)}
+.side .nav-item.on .count{color:var(--text)}
+.side .jobs-toggle .name{font:700 calc(15px*var(--ts)) var(--display)}
+.side .nav-row .nav-item>.dot{width:4px;height:18px;border-radius:2px}
+.side .nav.jobs{border-left-color:transparent;margin-left:12px}
+.side .cork{margin-top:auto}
+.side .cork.with-cat{margin-bottom:8px}
+@media (min-width:821px){.side-scroll.more{-webkit-mask-image:linear-gradient(#000 calc(100% - 44px),transparent);mask-image:linear-gradient(#000 calc(100% - 44px),transparent)}}.side .photo-strip.with-cat{padding-bottom:16px}
+.side .side-foot .cat-sill{margin:0;align-self:stretch;padding-right:14px;box-shadow:inset 0 -1px 0 var(--line)}
+.side button.brand{border-radius:0}
+.side-foot{border-top:0}
+.foot-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;border-top:1px solid var(--line);padding-top:6px;margin-top:2px}
+.foot-links .nav-item{flex-direction:column;gap:3px;padding:7px 2px;justify-content:center;text-align:center;font-size:calc(12px*var(--ts));color:var(--muted)}
+.foot-links .nav-item .name{flex:none;max-width:100%}
+.foot-links .nav-item svg{width:18px;height:18px}
+.foot-links .nav-item.on{box-shadow:inset 0 3px 0 var(--text);border-radius:2px 2px 8px 8px;color:var(--text)}
+body.side-mini .foot-links{display:flex;flex-direction:column;border:0}
+body.side-mini .side .brand{border-bottom:0;padding-bottom:0;margin-bottom:0}
+@media (max-width:820px){.side .brand{padding-bottom:14px}.foot-links .nav-item{padding:10px 2px;font-size:calc(13px*var(--ts))}}
 /* Calendar page: job chips and the No date tray */
 .cal-jobs{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0 16px}
 .cj-chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:99px;padding:6px 14px;font-weight:500;font-size:calc(13.5px*var(--ts));cursor:pointer;white-space:nowrap}
@@ -4351,7 +4383,7 @@ function renderSide(){queueMicrotask(renderOffline);
   document.body.classList.toggle('side-mini',!!u.sideMini);
   const tt=n=>u.sideMini?` title="${n}"`:'';
   let html=`<button type="button" class="icon-btn side-toggle" data-act="side-mini" aria-label="${u.sideMini?'Expand sidebar':'Collapse sidebar'}" title="${u.sideMini?'Expand sidebar':'Collapse sidebar'}">${I.left}</button><button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Overview">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
-  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview"${tt('Home')}>${I.grid}<span class="name">Home</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='calendar'?'on':''}" data-act="nav" data-tab="calendar"${tt('Calendar')}>${I.cal}<span class="name">Calendar</span></button>
+  <div class="side-scroll"><nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview"${tt('Home')}>${I.grid}<span class="name">Home</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='calendar'?'on':''}" data-act="nav" data-tab="calendar"${tt('Calendar')}>${I.cal}<span class="name">Calendar</span></button>
   <button class="nav-item jobs-toggle ${jobsOpen?'open':''}"${tt('Jobs')} data-act="toggle-jobs" aria-expanded="${jobsOpen}" aria-controls="nav-jobs">${I.briefcase}<span class="name">Jobs</span><span class="count">${S.ready?jobsSorted().length:''}</span>${I.chev}</button></nav>
   <nav class="nav jobs" id="nav-jobs" aria-label="Jobs" ${jobsOpen?'':'hidden'}>`;
   for(const j of jobsSorted()){
@@ -4360,18 +4392,21 @@ function renderSide(){queueMicrotask(renderOffline);
   }
   html+=`<button class="nav-item nav-new" data-act="new-job"${tt('New job')}>${I.plus}<span class="name">New job</span></button></nav>
   <nav class="nav" aria-label="More"><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived"${tt('Archived')}>${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item ${u.tab==='activity'?'on':''}" data-act="nav" data-tab="activity"${tt('Activity')}>${I.clock}<span class="name">Activity</span></button><button class="nav-item ${u.tab==='trash'?'on':''}" data-act="nav" data-tab="trash"${tt('Trash')}>${I.trash}<span class="name">Trash</span><span class="count">${S.ready&&trashed().length?trashed().length:''}</span></button></nav>
-  ${u.sideMini?'':corkHtml()}
+  ${u.sideMini?'':corkHtml()}</div>
   <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='cloud'&&(B.offline||Object.keys(OUT).length)?`<span class="sync-dot local"></span>Offline · ${Object.keys(OUT).length?`${Object.keys(OUT).length} change${Object.keys(OUT).length===1?'':'s'} waiting to sync`:'changes will sync'}`:B.mode==='db'||B.mode==='cloud'?'<span class="sync-dot"></span>Saved to your account':B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
     ${B.mode==='cloud'&&B.syncedAt?`<small class="synced" title="Last time this device heard back from your account">Last synced ${syncedAgo()}</small>`:''}
     ${B.mode==='cloud'&&CU.connected&&cuJobs().length?`<button type="button" class="synced cu-synced" data-act="cu-sync" title="Check ClickUp now">${CU_IC}${cuRunning?'Checking ClickUp…':`ClickUp checked ${CU.lastSync?calAgo(CU.lastSync):'—'}`}</button>`:''}
-    <button class="nav-item foot-settings ${u.tab==='resume'?'on':''}" data-act="nav" data-tab="resume"${tt('Resume')}>${RS_IC}<span class="name">Resume</span></button>
+    <div class="foot-links"><button class="nav-item foot-settings ${u.tab==='resume'?'on':''}" data-act="nav" data-tab="resume"${tt('Resume')}>${RS_IC}<span class="name">Resume</span></button>
     <button class="nav-item foot-settings ${u.tab==='help'?'on':''}" data-act="nav" data-tab="help"${tt('Help & tips')}>${HELP_IC}<span class="name">Help &amp; tips</span></button>
-    <button class="nav-item foot-settings" data-act="open-settings"${tt('Settings')}>${I.gear}<span class="name">Settings</span></button></div>`;
+    <button class="nav-item foot-settings" data-act="open-settings"${tt('Settings')}>${I.gear}<span class="name">Settings</span></button></div></div>`;
   $('#side').innerHTML=html;
-  placeCat();
+  placeCat();sideFade();
   $('#mbrand').innerHTML=`${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b>`;
 }
 
+/* fade the bottom of the sidebar's scrolling middle while there's more below (short screens) */
+function sideFade(){const el=$('#side .side-scroll');if(!el)return;if(!el._fade){el._fade=1;el.addEventListener('scroll',sideFade,{passive:true})}el.classList.toggle('more',el.scrollHeight-el.scrollTop-el.clientHeight>4)}
+addEventListener('resize',()=>sideFade());
 function renderMain(){
   const u=S.ui;
   $('#subnav').innerHTML='';
