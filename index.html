@@ -1799,6 +1799,112 @@ button.hn-t:hover{text-decoration:underline;text-underline-offset:3px}
   .hm-row>.date{grid-column:3;grid-row:1}.hm-row>.hm-x{grid-column:3;grid-row:1/3;flex-direction:column;align-items:flex-end;gap:4px}
   .hm-dot{align-self:start;margin-top:7px}.hm-now .hm-dot,.ib-when .hm-dot{align-self:center;margin-top:0}
 }
+
+/* Home as a call sheet */
+.head-cs{min-height:0;margin:0}
+.cs-top{display:flex;align-items:flex-end;justify-content:space-between;gap:20px 28px;border-bottom:2px solid var(--text);padding-bottom:18px;flex-wrap:wrap}
+.cs-hl small{display:block;font:600 calc(15px*var(--ts)) var(--body);color:var(--muted);margin-bottom:8px}
+.cs-hl h1{margin:0;font:800 calc(68px*var(--ts))/.9 var(--display);letter-spacing:-2px;color:var(--text)}
+.cs-tally{display:flex;gap:6px 26px;flex-wrap:wrap}
+.cs-t{border:0;background:none;padding:0;text-align:right;cursor:pointer;color:var(--text)}
+.cs-t b{display:block;font:700 calc(34px*var(--ts))/1 var(--display);font-variant-numeric:tabular-nums}
+.cs-t span{display:block;font:500 calc(13px*var(--ts)) var(--body);color:var(--muted);margin-top:6px}
+.cs-t:hover span{color:var(--text);text-decoration:underline;text-underline-offset:3px}
+.cs-t.late b{color:var(--danger)}.cs-t.wait b{color:var(--accent)}
+.cs-t:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:4px}
+.cs-sub{display:flex;align-items:center;gap:4px 20px;padding:14px 0 0;flex-wrap:wrap}
+.cs-sub>button:not(.btn){border:0;background:none;padding:4px 0;font:500 calc(14px*var(--ts)) var(--body);color:var(--muted);display:inline-flex;align-items:center;gap:7px;cursor:pointer;white-space:nowrap}
+.cs-sub>button:not(.btn):hover{color:var(--text)}.cs-sub>button.on{color:var(--text);font-weight:700}
+.cs-sub em{font-style:normal;color:var(--faint);font-weight:500}
+.cs-sp{flex:1}.cs-new{display:inline-flex;gap:6px;align-items:center}.cs-new svg{width:15px;height:15px}
+.cs-home{margin-top:6px;gap:44px}
+.cs-g{margin-top:28px;scroll-margin-top:16px}
+.cs-gh{display:flex;align-items:baseline;gap:12px;padding:0 0 8px;border-bottom:1px solid var(--line)}
+.cs-gh b{font:700 calc(19px*var(--ts)) var(--display);color:var(--text)}.cs-gh span{color:var(--faint);font-size:calc(14px*var(--ts))}
+.cs-gh em{margin-left:auto;font-style:normal;color:var(--faint);font-size:calc(12.5px*var(--ts))}
+.cs-gh.late b{color:var(--danger)}
+.cs-r{display:grid;grid-template-columns:44px 4px minmax(0,1fr) minmax(110px,150px) minmax(70px,110px) minmax(84px,auto);gap:14px;align-items:center;padding:11px 8px 11px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.cs-r:hover{background:color-mix(in srgb,var(--surface-2) 70%,transparent)}
+.cs-r:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.cs-sl{font:600 calc(13px*var(--ts)) var(--display);color:var(--faint);font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:4px;padding-left:2px}
+.cs-sl .un-grip{color:var(--faint);cursor:grab;display:grid;place-items:center;opacity:.5}.cs-sl .un-grip svg{width:12px;height:12px}.cs-un:hover .un-grip{opacity:1}
+.cs-bar{align-self:stretch;min-height:34px;border-radius:2px;background:var(--jc)}
+.cs-nm{min-width:0}
+.cs-nm b{display:block;font-weight:600;color:var(--text);overflow-wrap:anywhere;line-height:1.35}
+.cs-nm small{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:calc(13px*var(--ts));margin-top:1px;flex-wrap:wrap}
+.cs-chips{display:inline-flex;gap:4px;align-items:center}
+.cs-st{display:flex;gap:7px;align-items:center;color:var(--muted);font-size:calc(13.5px*var(--ts));min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-st i{width:8px;height:8px;border-radius:2px;background:var(--c);flex:none}
+.cs-tg{display:flex;gap:6px;align-items:center;font-size:calc(12.5px*var(--ts));color:var(--muted);white-space:nowrap}
+.cs-tg i{font-style:normal;border:1px solid var(--line);border-radius:5px;padding:0 6px;line-height:1.5}
+.cs-end{display:flex;align-items:center;justify-content:flex-end;gap:6px}
+.cs-due{font-weight:600;font-size:calc(14px*var(--ts));color:var(--text);white-space:nowrap;font-variant-numeric:tabular-nums}
+.cs-due.over{color:var(--danger)}.cs-due.today,.cs-due.soon{color:var(--warn)}
+.cs-end .icon-btn{width:26px;height:26px;opacity:.5}.cs-un:hover .cs-end .icon-btn{opacity:1}
+.cs-now{background:color-mix(in srgb,var(--accent) 8%,transparent);border-radius:10px;border-bottom-color:transparent;padding-top:14px;padding-bottom:14px}
+.cs-now:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.cs-now .cs-sl{color:var(--accent)}
+.cs-now .cs-nm b{font-size:calc(17px*var(--ts))}
+.cs-acts{grid-column:3/-1;display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:-2px}.cs-now .cs-sl{align-self:start;padding-top:3px}.cs-now .cs-bar{grid-row:1/3;grid-column:2}
+.cs-acts .btn{display:inline-flex;gap:6px;align-items:center}.cs-acts .btn svg{width:14px;height:14px}.cs-acts .btn.on{background:var(--accent-soft);color:var(--accent)}
+.cs-why{font-size:calc(12.5px*var(--ts));font-weight:600;color:var(--accent);margin-right:4px}.cs-why.late{color:var(--danger)}
+.cs-unl{list-style:none;margin:0;padding:0}
+.cs-un{border:0!important;padding:0!important;margin:0!important;background:none!important;box-shadow:none!important;display:block!important;min-height:0!important}
+.cs-un.drop-before{box-shadow:inset 0 2px 0 var(--accent)!important}.cs-un.drop-after{box-shadow:inset 0 -2px 0 var(--accent)!important}.cs-un.dragging{opacity:.5}
+.cs .hm-more{padding:10px 0 2px}
+.cs .hm-side{padding-top:28px}
+.cs .hm-sh{font:700 calc(19px*var(--ts)) var(--display);text-transform:none;letter-spacing:0;color:var(--text);padding-bottom:8px;border-bottom:1px solid var(--line);margin:0}
+.cs .hm-sh em{color:var(--faint);font:500 calc(14px*var(--ts)) var(--body);margin-left:4px}
+.cs .hm-sh button{font:500 calc(13px*var(--ts)) var(--body)}
+.cs .ib-it{border-radius:0;padding:11px 0}
+.cs .hm-set{padding:3px 10px}
+@media (max-width:1100px){.cs .hm-side{padding-top:8px}}
+@media (max-width:820px){
+  .cs-top{flex-direction:column;align-items:flex-start;gap:14px}
+  .cs-hl h1{font-size:calc(46px*var(--ts));letter-spacing:-1px}
+  .cs-t{text-align:left}.cs-t b{font-size:calc(26px*var(--ts))}.cs-tally{gap:6px 20px}
+  .cs-sub{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:14px 16px 2px}.cs-sub::-webkit-scrollbar{display:none}.cs-new{display:none}.cs-sp{display:none}
+  .cs-r{grid-template-columns:4px minmax(0,1fr) auto;gap:3px 12px;padding:12px 0}
+  .cs-sl,.cs-tg{display:none}
+  .cs-bar{grid-row:1/3;grid-column:1}.cs-nm{grid-column:2;grid-row:1}.cs-st{grid-column:2;grid-row:2;font-size:calc(13px*var(--ts))}.cs-end{grid-column:3;grid-row:1}
+  .cs-nm b{font-size:calc(15px*var(--ts))}
+  .cs-now{padding:14px 10px;margin:0 -10px}
+  .cs-acts{grid-column:1/-1;margin-top:8px}.cs-acts .btn{flex:1;justify-content:center}.cs-why{flex-basis:100%}.cs-now .cs-bar{grid-row:1/3;grid-column:1}
+  .cs .hm-side{display:block!important}
+  .cs .hm-set{min-height:32px}
+}
+
+/* Sidebar, call sheet style: brand over a heavy rule, plain rows with a bar for the current page, job color bars,
+   and only the middle scrolls so the footer (Resume, Help, Settings) never drops off a short screen */
+.side-scroll{display:flex;flex-direction:column;gap:inherit;min-height:0}
+@media (min-width:821px){
+  .side{overflow:hidden}
+  .side-scroll{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;margin:0 -12px;padding:0 12px 4px;scrollbar-width:thin}
+  body.side-mini .side-scroll{margin:0 -8px;padding:0 8px;width:calc(100% + 16px);align-items:center}
+}
+.side .brand{padding-bottom:16px;margin-bottom:-4px;border-bottom:2px solid var(--text);margin-inline:0;padding-inline:8px}
+.side .brand b{font-weight:800;letter-spacing:-.02em}
+.side .nav-item.on{background:none;font-weight:700;box-shadow:inset 3px 0 0 var(--text);border-radius:2px 8px 8px 2px}
+.side .nav-item.on:hover{background:var(--surface-2)}
+.side .nav-item .count{font:600 calc(12px*var(--ts)) var(--display);font-variant-numeric:tabular-nums;color:var(--faint)}
+.side .nav-item.on .count{color:var(--text)}
+.side .jobs-toggle .name{font:700 calc(15px*var(--ts)) var(--display)}
+.side .nav-row .nav-item>.dot{width:4px;height:18px;border-radius:2px}
+.side .nav.jobs{border-left-color:transparent;margin-left:12px}
+.side .cork{margin-top:auto}
+.side .cork.with-cat{margin-bottom:8px}
+@media (min-width:821px){.side-scroll.more{-webkit-mask-image:linear-gradient(#000 calc(100% - 44px),transparent);mask-image:linear-gradient(#000 calc(100% - 44px),transparent)}}.side .photo-strip.with-cat{padding-bottom:16px}
+.side .side-foot .cat-sill{margin:0;align-self:stretch;padding-right:14px;box-shadow:inset 0 -1px 0 var(--line)}
+.side button.brand{border-radius:0}
+.side-foot{border-top:0}
+.foot-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;border-top:1px solid var(--line);padding-top:6px;margin-top:2px}
+.foot-links .nav-item{flex-direction:column;gap:3px;padding:7px 2px;justify-content:center;text-align:center;font-size:calc(12px*var(--ts));color:var(--muted)}
+.foot-links .nav-item .name{flex:none;max-width:100%}
+.foot-links .nav-item svg{width:18px;height:18px}
+.foot-links .nav-item.on{box-shadow:inset 0 3px 0 var(--text);border-radius:2px 2px 8px 8px;color:var(--text)}
+body.side-mini .foot-links{display:flex;flex-direction:column;border:0}
+body.side-mini .side .brand{border-bottom:0;padding-bottom:0;margin-bottom:0}
+@media (max-width:820px){.side .brand{padding-bottom:14px}.foot-links .nav-item{padding:10px 2px;font-size:calc(13px*var(--ts))}}
 /* Calendar page: job chips and the No date tray */
 .cal-jobs{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0 16px}
 .cj-chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:99px;padding:6px 14px;font-weight:500;font-size:calc(13.5px*var(--ts));cursor:pointer;white-space:nowrap}
@@ -4277,7 +4383,7 @@ function renderSide(){queueMicrotask(renderOffline);
   document.body.classList.toggle('side-mini',!!u.sideMini);
   const tt=n=>u.sideMini?` title="${n}"`:'';
   let html=`<button type="button" class="icon-btn side-toggle" data-act="side-mini" aria-label="${u.sideMini?'Expand sidebar':'Collapse sidebar'}" title="${u.sideMini?'Expand sidebar':'Collapse sidebar'}">${I.left}</button><button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Overview">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
-  <nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview"${tt('Home')}>${I.grid}<span class="name">Home</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='calendar'?'on':''}" data-act="nav" data-tab="calendar"${tt('Calendar')}>${I.cal}<span class="name">Calendar</span></button>
+  <div class="side-scroll"><nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview"${tt('Home')}>${I.grid}<span class="name">Home</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='calendar'?'on':''}" data-act="nav" data-tab="calendar"${tt('Calendar')}>${I.cal}<span class="name">Calendar</span></button>
   <button class="nav-item jobs-toggle ${jobsOpen?'open':''}"${tt('Jobs')} data-act="toggle-jobs" aria-expanded="${jobsOpen}" aria-controls="nav-jobs">${I.briefcase}<span class="name">Jobs</span><span class="count">${S.ready?jobsSorted().length:''}</span>${I.chev}</button></nav>
   <nav class="nav jobs" id="nav-jobs" aria-label="Jobs" ${jobsOpen?'':'hidden'}>`;
   for(const j of jobsSorted()){
@@ -4286,18 +4392,21 @@ function renderSide(){queueMicrotask(renderOffline);
   }
   html+=`<button class="nav-item nav-new" data-act="new-job"${tt('New job')}>${I.plus}<span class="name">New job</span></button></nav>
   <nav class="nav" aria-label="More"><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived"${tt('Archived')}>${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item ${u.tab==='activity'?'on':''}" data-act="nav" data-tab="activity"${tt('Activity')}>${I.clock}<span class="name">Activity</span></button><button class="nav-item ${u.tab==='trash'?'on':''}" data-act="nav" data-tab="trash"${tt('Trash')}>${I.trash}<span class="name">Trash</span><span class="count">${S.ready&&trashed().length?trashed().length:''}</span></button></nav>
-  ${u.sideMini?'':corkHtml()}
+  ${u.sideMini?'':corkHtml()}</div>
   <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='cloud'&&(B.offline||Object.keys(OUT).length)?`<span class="sync-dot local"></span>Offline · ${Object.keys(OUT).length?`${Object.keys(OUT).length} change${Object.keys(OUT).length===1?'':'s'} waiting to sync`:'changes will sync'}`:B.mode==='db'||B.mode==='cloud'?'<span class="sync-dot"></span>Saved to your account':B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
     ${B.mode==='cloud'&&B.syncedAt?`<small class="synced" title="Last time this device heard back from your account">Last synced ${syncedAgo()}</small>`:''}
     ${B.mode==='cloud'&&CU.connected&&cuJobs().length?`<button type="button" class="synced cu-synced" data-act="cu-sync" title="Check ClickUp now">${CU_IC}${cuRunning?'Checking ClickUp…':`ClickUp checked ${CU.lastSync?calAgo(CU.lastSync):'—'}`}</button>`:''}
-    <button class="nav-item foot-settings ${u.tab==='resume'?'on':''}" data-act="nav" data-tab="resume"${tt('Resume')}>${RS_IC}<span class="name">Resume</span></button>
+    <div class="foot-links"><button class="nav-item foot-settings ${u.tab==='resume'?'on':''}" data-act="nav" data-tab="resume"${tt('Resume')}>${RS_IC}<span class="name">Resume</span></button>
     <button class="nav-item foot-settings ${u.tab==='help'?'on':''}" data-act="nav" data-tab="help"${tt('Help & tips')}>${HELP_IC}<span class="name">Help &amp; tips</span></button>
-    <button class="nav-item foot-settings" data-act="open-settings"${tt('Settings')}>${I.gear}<span class="name">Settings</span></button></div>`;
+    <button class="nav-item foot-settings" data-act="open-settings"${tt('Settings')}>${I.gear}<span class="name">Settings</span></button></div></div>`;
   $('#side').innerHTML=html;
-  placeCat();
+  placeCat();sideFade();
   $('#mbrand').innerHTML=`${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b>`;
 }
 
+/* fade the bottom of the sidebar's scrolling middle while there's more below (short screens) */
+function sideFade(){const el=$('#side .side-scroll');if(!el)return;if(!el._fade){el._fade=1;el.addEventListener('scroll',sideFade,{passive:true})}el.classList.toggle('more',el.scrollHeight-el.scrollTop-el.clientHeight>4)}
+addEventListener('resize',()=>sideFade());
 function renderMain(){
   const u=S.ui;
   $('#subnav').innerHTML='';
@@ -4318,13 +4427,14 @@ function renderMain(){
   if(u.tab==='trash'){renderTrash();return}
   if(u.tab==='help'){renderHelp();return}
   if(u.tab==='resume'){renderResume();return}
-  if(u.tab==='upnext'){u.tab='overview';u.htab='upnext';saveUi()}
+  if(u.tab==='upnext'){u.tab='overview';u.htab='upnext';saveUi();requestAnimationFrame(()=>$('#csg-queue')?.scrollIntoView({block:'start'}))}
   if(u.view==='lanes')u.view='home';if(u.views?.overview==='lanes')u.views.overview='home';
   if(job&&u.view==='home')u.view='list';
   if(u.tab==='overview')u.view='home';if(u.tab==='calendar')u.view='calendar';
   const HOME=u.tab==='overview';
   const scope=tasksOfScope();
-  if(!job){
+  if(!job&&HOME){$('#head').innerHTML='<div class="head head-ov head-cs"></div>'}
+  else if(!job){
     $('#head').innerHTML=`<div class="head head-ov ${HOME?'head-home':''}"><div class="head-title">${HOME?`<div class="hm-hi">${esc(homeGreet().hi)}</div>`:''}<h1>${HOME?esc(homeGreet().h1):'Calendar'}</h1><div class="sub">${HOME?homeSummary():u.tab==='calendar'?'Due dates across every job':`${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients${(()=>{const h=jobsSorted().reduce((a,j)=>a+weeklyHours(workOf(j)),0);return h?` · ${fmtNum(h)} h/week scheduled`:''})()} <span class="sub-tail">· everything due across your work</span>`}</div></div>
       </div>`;
   }else{
@@ -4514,7 +4624,7 @@ function ctxDo(what,v){
   else if(what==='restore'){restoreTasks([id]);render()}
   else if(what==='del')deleteTasks([id]);
 }
-const CTX_SEL='.hm-row[data-id],.un-row[data-id],.row[data-id],.card[data-id],.wcard[data-id],.ev[data-id],.pin-card[data-id],.arow[data-id]';
+const CTX_SEL='.cs-r[data-id],.hm-row[data-id],.un-row[data-id],.row[data-id],.card[data-id],.wcard[data-id],.ev[data-id],.pin-card[data-id],.arow[data-id]';
 document.addEventListener('contextmenu',e=>{
   const r=e.target.closest?.(CTX_SEL);if(!r||e.target.closest('input,textarea,select,a'))return;
   e.preventDefault();openCtx(r.dataset.id,e.clientX,e.clientY);
@@ -4680,27 +4790,49 @@ function inboxHtml(){
   return `<div class="hm-sh">Inbox${L.length?` <em>${L.length}</em>`:''}${L.some(g=>!g.wait)?`<button type="button" class="linkish" data-act="hm-seen">Mark all seen</button>`:''}</div>
     ${L.length?show.map(inboxItem).join('')+(L.length>8?`<button type="button" class="hm-more" data-act="hm-inall">${INBOX_ALL?'Show fewer':`Show ${L.length-8} more`}</button>`:''):`<p class="hm-empty">You're caught up. ClickUp comments, replies, status changes and new tasks show up here.</p>`}`;
 }
+/* Home as a call sheet (user's pick, mockup A): a big date with counts, then every open task in one list by day —
+   Up next (drag to reorder), Late, Due today, Tomorrow, Next 7 days, Later, In progress with no date, No date —
+   with the Up now task highlighted in place (Focus / Mark done / Not now). Inbox stays on the right (below on phones). */
+let HM_OPEN=new Set();
+function csGroups(ts){
+  const t0=today(),t1=addDays(t0,1),w=addDays(t0,7),q=upNextList().filter(t=>ts.includes(t)),qs=new Set(q.map(t=>t.id)),r=ts.filter(t=>!qs.has(t.id));
+  const byDue=(a,b)=>a.due.localeCompare(b.due)||PRIO_RANK[a.priority||'normal']-PRIO_RANK[b.priority||'normal'],byAge=(a,b)=>(assignedOn(a)||'9').localeCompare(assignedOn(b)||'9');
+  return [['queue','Up next',q],['late','Late',r.filter(t=>t.due&&t.due<t0).sort(byDue)],['today','Due today',r.filter(t=>t.due===t0).sort(byDue)],['tom','Tomorrow',r.filter(t=>t.due===t1).sort(byDue)],
+    ['week','Next 7 days',r.filter(t=>t.due&&t.due>t1&&t.due<=w).sort(byDue)],['later','Later',r.filter(t=>t.due&&t.due>w).sort(byDue)],
+    ['active','In progress, no date',r.filter(t=>!t.due&&isActive(t)).sort(byAge)],['nodate','No date',r.filter(t=>!t.due&&!isActive(t)).sort(byAge)]];
+}
+function csRow(t,n,o={}){
+  const j=S.jobs[t.jobId],c=S.clients[t.clientId],st=stOf(t),nr=needsReply(t).length,nn=openNotes(t),cl=t.checklist||[],T=o.now?pomoState():null;
+  const where=[hmJob()==='all'?j.name:'',c?.name].filter(Boolean).join(' · ');
+  const chips=`${nr?`<span class="chip nr-chip" title="${nr} comment${nr===1?'':'s'} waiting for your reply">${rpIc}${nr}</span>`:''}${nn?`<span class="chip notes-chip" title="${nn} open update${nn===1?'':'s'}">${I.chat}${nn}</span>`:''}${(t.tags||[]).slice(0,2).map(x=>tagChip(x)).join('')}`;
+  const on=o.now&&T.taskId===t.id&&T.mode==='focus'&&T.run==='running';
+  const acts=o.now?`<span class="cs-acts"><span class="cs-why ${o.now.late?'late':''}">${/^Up next/.test(o.now.why)?'Up now':'Up now · '+esc(o.now.why)}</span><button type="button" class="btn sm ${on?'on':''}" data-act="hn-focus" data-id="${t.id}">${TOMATO_IC}${on?'Pause':'Focus'}</button><button type="button" class="btn sm primary" data-act="hn-done" data-id="${t.id}">Mark done</button><button type="button" class="btn sm ghost" data-act="hn-skip" data-id="${t.id}" title="Show the next one">Not now</button></span>`:'';
+  const a=o.nodate?ageDays(t):null;
+  const tags=o.nodate?(a!=null&&a>=AGE_SHOW?`<span class="hm-age ${a>=AGE_OLD?'old':''}" title="Assigned ${a} day${a===1?'':'s'} ago">${a}d</span>`:''):`${t.format?`<i>${esc(t.format)}</i>`:''}${t.revision?`<i title="Revision round">R${t.revision}</i>`:''}${cl.length?`<span>${cl.filter(x=>x.done).length}/${cl.length}</span>`:''}`;
+  const due=o.nodate?setDateBtn(t):`<span class="cs-due ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,true):'No date'}</span>`;
+  return `<div class="cs-r ${o.now?'cs-now':''}" data-act="open" data-id="${t.id}" tabindex="0" style="--jc:${esc(j.color||'var(--accent)')}">
+    <span class="cs-sl">${o.grip?`<span class="un-grip" data-stop aria-hidden="true" title="Drag to reorder">${GRIP_IC}</span>`:''}${o.now?'Now':n}</span><span class="cs-bar"></span>
+    <span class="cs-nm"><b>${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</b><small>${esc(where)}${chips?`<span class="cs-chips">${chips}</span>`:''}</small></span>
+    <span class="cs-st" style="--c:${esc(stColor(st))}"><i></i>${esc(stLabel(st))}</span><span class="cs-tg">${tags}</span>
+    <span class="cs-end">${due}${o.grip?`<button class="icon-btn" data-act="un-rm" data-id="${t.id}" data-stop title="Remove from Up next" aria-label="Remove from Up next">${I.x}</button>`:''}</span>${acts}</div>`;
+}
 function homeView(){
-  const ts=homeTasks(),p=homeParts(ts),un=upNow(ts),T=pomoState(),jf=hmJob(),all=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)),t0=today();
-  let tab=S.ui.htab||'today';if(!['today','upnext','active','nodate','week','inbox'].includes(tab))tab='today';
-  const UQ=upNextList().filter(t=>ts.includes(t));
-  const listOf={upnext:UQ,today:[...p.late,...p.today,...p.active],active:p.busy,nodate:p.idle,week:p.week,inbox:[...p.late,...p.today,...p.active]};
-  const L=tab==='upnext'?listOf.upnext:listOf[tab].filter(t=>t.id!==un?.t.id),show=HM_MORE||tab==='upnext'?L:L.slice(0,8),nIn=inboxGroups().length;
-  const tb=(k,label,n,extra='')=>`<button type="button" class="hm-tab ${tab===k?'on':''} ${k==='inbox'?'ht-inbox':''}" data-act="hm-tab" data-t="${k}" aria-pressed="${tab===k}">${label}<em>${extra}${n}</em></button>`;
-  let card='';
-  if(un){const t=un.t,j=S.jobs[t.jobId],c=S.clients[t.clientId],st=stOf(t),on=T.taskId===t.id&&T.mode==='focus'&&T.run==='running';
-    card=`<section class="hm-now" style="--jc:${esc(j.color||'var(--accent)')}"><div class="hn-main"><div class="hn-k ${un.late?'late':''}">Up now · ${esc(un.why)}</div>
-      <button type="button" class="hn-t" data-act="open" data-id="${t.id}">${esc(t.name||'Untitled task')}</button>
-      <div class="hn-m"><span class="hm-dot"></span>${esc([j.name,c?.name].filter(Boolean).join(' · '))}<span class="qst" style="--c:${esc(stColor(st))}"><i></i>${esc(stLabel(st))}</span>${needsReply(t).length?`<span class="ib-tag acc">${rpIc}Needs your reply</span>`:''}</div></div>
-      <div class="hn-b"><button type="button" class="btn" data-act="open" data-id="${t.id}">Open</button><button type="button" class="btn ${on?'on':''}" data-act="hn-focus" data-id="${t.id}">${TOMATO_IC}${on?'Pause':'Focus'}</button><button type="button" class="btn primary" data-act="hn-done" data-id="${t.id}">Mark done</button><button type="button" class="icon-btn" data-act="hn-skip" data-id="${t.id}" title="Not now: show the next one" aria-label="Not now">›</button></div></section>`}
-  else card=`<section class="hm-now calm"><div class="hn-main"><div class="hn-k">All clear</div><div class="hn-t">Nothing late, due today or in progress.</div><div class="hn-m">${ts.length?`${ts.length} open task${ts.length===1?'':'s'} later on.`:'No open tasks.'}</div></div></section>`;
-  const rows=tab==='upnext'?(show.length?`<ol class="un-list hm-unl">${show.map(t=>`<li class="un-row hm-un" draggable="true" data-un="${t.id}"><span class="un-grip" data-stop aria-hidden="true" title="Drag to reorder">${GRIP_IC}</span><span class="un-n">${upNextPos(t)}</span>${homeRow(t,`<span class="hm-x"><span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,true):'No date'}</span><button class="icon-btn" data-act="un-rm" data-id="${t.id}" data-stop title="Remove from Up next" aria-label="Remove from Up next">${I.x}</button></span>`)}</li>`).join('')}</ol>`:''):show.map(t=>{if(tab!=='nodate')return homeRow(t);const a=ageDays(t);return homeRow(t,`<span class="hm-x">${a!=null?`<span class="hm-age ${a>=AGE_OLD?'old':''}" title="Assigned ${a} day${a===1?'':'s'} ago">${a}d</span>`:''}${setDateBtn(t)}</span>`)}).join('');
-  const empty={upnext:'Nothing queued. Right-click a task (press and hold on a phone) and choose Up next, or use the queue icon at the top of a task, to line up what you\'ll work on next.',today:'Nothing else late, due today or in progress.',active:'Nothing in progress.',nodate:'Every task that isn\'t started has a due date.',week:'Nothing else due in the next 7 days.',inbox:''}[tab];
-  return `<div class="home ${tab==='inbox'?'tab-inbox':''}"><div class="hm-main">${card}
-    <div class="hm-bar"><div class="hm-tabs" role="tablist">${tb('today','Today',p.late.length+p.today.length+p.active.length,p.late.length?`<b>${p.late.length}</b> · `:'')}${tb('upnext','Up next',UQ.length)}${tb('inbox','Inbox',nIn)}${tb('active','In progress',p.busy.length)}${tb('nodate','No date',p.idle.length)}${tb('week','This week',p.week.length)}</div>
-      <select class="hm-jsel" id="hm-jsel" aria-label="Show one job"><option value="all">All jobs</option>${jobsSorted().map(j=>{const n=all.filter(t=>t.jobId===j.id),late=n.filter(t=>t.due&&t.due<t0).length;return `<option value="${j.id}" ${jf===j.id?'selected':''}>${esc(j.name)} · ${n.length}${late?` (${late} late)`:''}</option>`}).join('')}</select><button type="button" class="icon-btn hm-new" data-act="new-task" title="New task (N)" aria-label="New task">${I.plus}</button></div>
-    <div class="hm-list">${rows||`<p class="hm-empty">${empty}</p>`}${L.length>8?`<button type="button" class="hm-more" data-act="hm-more">${HM_MORE?'Show fewer':`Show ${L.length-8} more`}</button>`:''}</div></div>
-    <aside class="hm-side">${inboxHtml()}</aside></div>`;
+  const ts=homeTasks(),G=csGroups(ts),un=upNow(ts),jf=hmJob(),all=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)),t0=today(),gd=Object.fromEntries(G.map(g=>[g[0],g[2]]));
+  const gr=homeGreet(),wait=inboxGroups().filter(g=>g.wait).length,d=new Date();
+  const kick=[pref('greeting')?gr.h1:'',WEEKDAY_FULL[d.getDay()],pref('seasonal')?seasonNote():''].filter(Boolean).join(' · ');
+  const tl=(k,n,l,cls='')=>`<button type="button" class="cs-t ${cls}" data-act="cs-jump" data-g="${k}"><b>${n}</b><span>${l}</span></button>`;
+  const lateN=all.filter(t=>t.due&&t.due<t0&&(jf==='all'||t.jobId===jf)).length;
+  const head=`<header class="cs-top"><div class="cs-hl"><small>${esc(kick)}</small><h1>${esc(absDate(t0).replace(/ ’\d+$/,''))}</h1></div>
+    <div class="cs-tally">${tl('late',gd.late.length+gd.queue.filter(t=>t.due&&t.due<t0).length,'late',lateN?'late':'')}${tl('today',ts.filter(t=>t.due===t0).length,'due today')}${tl('tom',ts.filter(t=>t.due===addDays(t0,1)).length,'tomorrow')}${wait?tl('inbox',wait,'waiting on you','wait'):''}${tl('all',ts.length,'open')}</div></header>`;
+  const jobsRow=`<div class="cs-sub"><button type="button" class="${jf==='all'?'on':''}" data-act="hm-job" data-j="all">All jobs</button>${jobsSorted().map(j=>{const n=all.filter(t=>t.jobId===j.id).length;return `<button type="button" class="${jf===j.id?'on':''}" data-act="hm-job" data-j="${j.id}"><span class="hm-dot" style="--jc:${esc(j.color||'var(--accent)')}"></span>${esc(j.name)}<em>${n}</em></button>`}).join('')}<span class="cs-sp"></span><button type="button" class="btn sm primary cs-new" data-act="new-task" title="New task (N)">${I.plus}New task</button></div>`;
+  let n=0;const body=G.map(([k,label,list])=>{if(!list.length)return '';
+    const lim=['queue','late','today'].includes(k)||HM_OPEN.has(k)?list.length:8,show=list.slice(0,lim);
+    const rows=show.map(t=>{n++;const sl=k==='queue'?'#'+upNextPos(t):String(n).padStart(2,'0'),o={now:un?.t.id===t.id?un:null,nodate:k==='nodate',grip:k==='queue'};
+      return k==='queue'?`<li class="un-row cs-un" draggable="true" data-un="${t.id}">${csRow(t,sl,o)}</li>`:csRow(t,sl,o)}).join('');
+    return `<section class="cs-g" id="csg-${k}"><div class="cs-gh ${k==='late'?'late':''}"><b>${label}</b><span>${list.length}</span>${k==='queue'?'<em>Drag to reorder</em>':''}</div>
+      ${k==='queue'?`<ol class="un-list cs-unl">${rows}</ol>`:rows}${list.length>lim||HM_OPEN.has(k)&&list.length>8?`<button type="button" class="hm-more" data-act="cs-more" data-g="${k}">${HM_OPEN.has(k)?'Show fewer':`Show ${list.length-lim} more`}</button>`:''}</section>`}).join('');
+  const empty=`<p class="hm-empty">${ts.length?'':'No open tasks'+(jf==='all'?'':' in this job')+'. New tasks you add show up here, sorted by when they\'re due.'}</p>`;
+  return `<div class="cs">${head}${jobsRow}<div class="home cs-home"><div class="hm-main">${body||empty}</div><aside class="hm-side" id="csg-inbox">${inboxHtml()}</aside></div></div>`;
 }
 /* ================= Calendar page (tab 'calendar') =================
    Job chips on top (S.ui.cjob) instead of the filters, and a No date tray (S.ui.ctray) whose tasks drag onto a day
@@ -8378,6 +8510,9 @@ document.addEventListener('click',e=>{
     case 'hm-seen': lsSet('cutroom.homeseen',String(Date.now()));if(Object.values(S.tasks).some(t=>t.cuNew))cuReviewAll();INBOX_ALL=false;render();break;
     case 'hm-inall': INBOX_ALL=!INBOX_ALL;render();break;
     case 'hm-more': HM_MORE=!HM_MORE;render();break;
+    case 'cs-more': {const g=el.dataset.g;HM_OPEN.has(g)?HM_OPEN.delete(g):HM_OPEN.add(g);render();break}
+    case 'hm-job': S.ui.hjob=el.dataset.j;HM_OPEN.clear();saveUi();render();break;
+    case 'cs-jump': {const g=el.dataset.g,t=g==='all'?$('.cs-home'):$('#csg-'+g);if(t)t.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'start'});else toast(g==='late'?'Nothing late.':g==='today'?'Nothing due today.':g==='tom'?'Nothing due tomorrow.':'Nothing here.');break}
     case 'hn-done': setStatus(el.dataset.id,'done');render();break;
     case 'hn-focus': {const T=pomoState(),id=el.dataset.id;if(T.taskId===id&&T.mode==='focus'&&T.run!=='idle')pomoToggle();else pomoStart('focus',id);render();break}
     case 'hn-skip': UPNOW_SKIP.add(el.dataset.id);render();break;
