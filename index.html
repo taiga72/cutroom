@@ -1946,6 +1946,29 @@ button.hn-t:hover{text-decoration:underline;text-underline-offset:3px}
   .pg-job .pane-tabs{gap:0}.pg-job .pane-tabs button{padding:12px 0 10px}
   .pg-job .group-head .pill{font-size:calc(17px*var(--ts))}
 }
+
+.cs-jname{display:inline-flex;align-items:center;gap:12px;border:0;background:none;padding:0;margin:0;color:inherit;font:inherit;letter-spacing:inherit;text-align:left;cursor:pointer;min-width:0;border-radius:6px}
+.cs-jname .h1-name{overflow-wrap:anywhere}
+.cs-jname:hover .h1-name{text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:8px;text-decoration-color:var(--line-strong)}
+.cs-jname:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.pg-job .pane-tabs{align-items:center}
+.pt-views{margin-left:auto;display:inline-flex;gap:18px;border:0;background:none;padding:0}
+.pt-views button{border:0;background:none;padding:14px 0 12px;font:500 calc(14px*var(--ts)) var(--body);color:var(--muted);border-bottom:2px solid transparent!important;border-radius:0;box-shadow:none!important}
+.pt-views button:hover{color:var(--text)}.pt-views button.on{color:var(--text);font-weight:700;background:none}
+.tb-clients{display:none}
+@media (min-width:821px){
+  .pg-job .toolbar{position:relative;gap:10px}
+  .pg-job .toolbar>.seg{display:none}
+  .pg-job .tb-clients{display:flex;flex:1 1 auto;min-width:0;order:-1}
+  .pg-job .tb-clients .client-tabs{flex:1;min-width:0;border:0;margin:0;padding:0;gap:4px 20px;overflow-x:auto;scrollbar-width:none}
+  .pg-job .toolbar .spacer{display:none}
+  .pg-job .toolbar .filter-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px}
+  .pg-job .toolbar .filter-btn::after{content:"Filter";font-weight:600}
+  .pg-job .toolbar>.filters{display:none}
+  .pg-job .toolbar.f-open>.filters{display:flex;flex-direction:column;gap:8px;position:absolute;top:calc(100% + 6px);right:0;z-index:30;width:260px;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lg)}
+  .pg-job .toolbar.f-open>.filters .sel{width:100%!important;max-width:none!important}
+}
+.vopt .btn svg{width:14px;height:14px}
 /* Sidebar, call sheet style: brand over a heavy rule, plain rows with a bar for the current page, job color bars,
    and only the middle scrolls so the footer (Resume, Help, Settings) never drops off a short screen */
 .side-scroll{display:flex;flex-direction:column;gap:inherit;min-height:0}
@@ -2907,6 +2930,7 @@ select.rs-add{appearance:auto}
     <div id="stats"></div>
     <div id="jobcards"></div>
     <div class="toolbar" id="toolbar" hidden>
+      <div class="tb-clients" id="tb-clients"></div>
       <div class="seg" role="tablist" aria-label="View">
         
         <button type="button" data-act="view" data-view="list" id="v-list" aria-label="List view"><svg class="i" viewBox="0 0 16 16"><path d="M5.5 4h8M5.5 8h8M5.5 12h8M2.5 4h.01M2.5 8h.01M2.5 12h.01"/></svg><span class="vl">List</span></button>
@@ -4505,6 +4529,7 @@ function renderMain(){
   if(u.tab==='overview')u.view='home';if(u.tab==='calendar')u.view='calendar';
   const HOME=u.tab==='overview';
   const scope=tasksOfScope();document.body.classList.toggle('pg-job',!!job);
+  if(!job)$('#tb-clients').innerHTML='';
   if(!job&&HOME){$('#head').innerHTML='<div class="head head-ov head-cs"></div>'}
   else if(!job){
     $('#head').innerHTML=`<div class="head head-ov ${HOME?'head-home':''}"><div class="head-title">${HOME?`<div class="hm-hi">${esc(homeGreet().hi)}</div>`:''}<h1>${HOME?esc(homeGreet().h1):'Calendar'}</h1><div class="sub">${HOME?homeSummary():u.tab==='calendar'?'Due dates across every job':`${jobsSorted().length} jobs · ${Object.keys(S.clients).length} agency clients${(()=>{const h=jobsSorted().reduce((a,j)=>a+weeklyHours(workOf(j)),0);return h?` · ${fmtNum(h)} h/week scheduled`:''})()} <span class="sub-tail">· everything due across your work</span>`}</div></div>
@@ -4524,9 +4549,9 @@ function renderMain(){
     const jkeys=statKeys(),jlabels=Object.fromEntries(statDefs());
     const tally=TASKS&&Object.keys(S.jobs).length?`<div class="stats-wrap cs-tally-wrap"><div class="stats cs-tally">${jkeys.map(k=>statTile(k,jlabels[k],scope)).join('')}<button type="button" class="icon-btn stats-edit ${STATPOP?'on':''}" data-act="stat-edit" title="Choose which counts show" aria-label="Choose which counts show" aria-expanded="${STATPOP}">${I.pencil}</button></div>${statPopHtml()}</div>`:'';
     $('#head').innerHTML=`<nav class="crumbs" aria-label="Breadcrumb">${crumbs.join('<i aria-hidden="true">›</i>')}</nav>`;
-    const csHead=`<header class="cs-top cs-jtop"><div class="cs-hl"><small>${kick}</small><h1>${jobMark(job,40)}<span class="h1-name" data-act="job-name" data-id="${job.id}">${esc(job.name)}</span><button class="icon-btn h1-edit" data-act="edit-job" data-id="${job.id}" title="Edit job" aria-label="Edit job">${I.pencil}</button><button class="icon-btn h1-edit" data-act="export-csv" data-job="${job.id}" title="Export tasks as CSV" aria-label="Export tasks as CSV">${I.download}</button></h1></div>${tally}</header>`;
-    $('#subnav').innerHTML=csHead+`<div class="pane-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${['brand','details','invoices'].includes(u.pane)?'':'on'}" aria-selected="${!['brand','details','invoices'].includes(u.pane)}" data-act="pane" data-pane="tasks">${I.task}Tasks</button><button role="tab" class="${u.pane==='brand'?'on':''}" aria-selected="${u.pane==='brand'}" data-act="pane" data-pane="brand">${I.palette}Brand guide</button><button role="tab" class="${u.pane==='details'?'on':''}" aria-selected="${u.pane==='details'}" data-act="pane" data-pane="details">${I.info}Details</button><button role="tab" class="${u.pane==='invoices'?'on':''}" aria-selected="${u.pane==='invoices'}" data-act="pane" data-pane="invoices">${INV_IC}Invoices<span class="pt-long"> &amp; docs</span></button></div>
-      ${job.type==='agency'&&!['details','invoices'].includes(u.pane)?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}" draggable="true" data-ctab="${c.id}" title="Drag to reorder">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:''}`;
+    const csHead=`<header class="cs-top cs-jtop"><div class="cs-hl"><small>${kick}</small><h1><button type="button" class="cs-jname" data-act="edit-job" data-id="${job.id}" title="Edit job" aria-label="Edit ${esc(job.name)}">${jobMark(job,40)}<span class="h1-name">${esc(job.name)}</span></button></h1></div>${tally}</header>`;
+    $('#subnav').innerHTML=csHead+`<div class="pane-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${['brand','details','invoices'].includes(u.pane)?'':'on'}" aria-selected="${!['brand','details','invoices'].includes(u.pane)}" data-act="pane" data-pane="tasks">${I.task}Tasks</button><button role="tab" class="${u.pane==='brand'?'on':''}" aria-selected="${u.pane==='brand'}" data-act="pane" data-pane="brand">${I.palette}Brand guide</button><button role="tab" class="${u.pane==='details'?'on':''}" aria-selected="${u.pane==='details'}" data-act="pane" data-pane="details">${I.info}Details</button><button role="tab" class="${u.pane==='invoices'?'on':''}" aria-selected="${u.pane==='invoices'}" data-act="pane" data-pane="invoices">${INV_IC}Invoices<span class="pt-long"> &amp; docs</span></button>${TASKS?`<div class="seg pt-views" role="tablist" aria-label="View">${[['list','List'],['board','Board'],['calendar','Calendar']].map(([v,l])=>`<button type="button" data-act="view" data-view="${v}" class="${u.view===v?'on':''}" aria-selected="${u.view===v}">${l}</button>`).join('')}</div>`:''}</div>`;
+    {const ct=job.type==='agency'&&!['details','invoices'].includes(u.pane)?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}" draggable="true" data-ctab="${c.id}" title="Drag to reorder">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:'';$('#tb-clients').innerHTML=TASKS?ct:'';if(!TASKS)$('#subnav').insertAdjacentHTML('beforeend',ct)}
   }
 
   if(job&&(u.pane==='brand'||u.pane==='details'||u.pane==='invoices')){
@@ -4544,8 +4569,8 @@ function renderMain(){
   if(document.activeElement!==$('#q')) $('#q').value=u.q;
   $('#f-prio').value=u.prio;$('#f-due').value=u.due;$('#f-sort').value=u.sort;
   {const tg=allTags(),ft=$('#f-tag');if(u.tag&&u.tag!=='all'&&!tg.includes(u.tag))u.tag='all';ft.hidden=!tg.length;const k=tg.join('\n');if(ft._k!==k){ft._k=k;ft.innerHTML=`<option value="all">Any tag</option>${tg.map(x=>`<option value="${esc(x)}">#${esc(x)}</option>`).join('')}`}ft.value=u.tag||'all'}
-  $('#vopt-wrap').hidden=u.view!=='list';
-  $('#sel-btn').hidden=u.view==='calendar'||HOME;if(u.view==='calendar'&&(SELMODE||SEL.size)){SEL.clear();SELMODE=false}if(u.view!=='list')VOPT=false;renderVopt();
+  $('#vopt-wrap').hidden=!(u.view==='list'||job&&u.view==='board');
+  $('#sel-btn').hidden=u.view==='calendar'||HOME;if(u.view==='calendar'&&(SELMODE||SEL.size)){SEL.clear();SELMODE=false}if(u.view==='calendar'||!job&&u.view!=='list')VOPT=false;renderVopt();
 
   if(!Object.keys(S.jobs).length){
     $('#view').innerHTML=`<div class="empty"><h3>Add your first job</h3><p>A job is an agency you edit for (with its own clients) or a direct client. Each job keeps its own tools: where you talk, where tasks are assigned, where you upload, and where files live.</p><button class="btn primary" data-act="new-job">${I.plus}New job</button></div>`;
@@ -4635,10 +4660,11 @@ let VOPT=false;
 function renderVopt(){
   const b=$('#vopt-btn'),p=$('#vopt');if(!b||!p)return;
   b.setAttribute('aria-expanded',VOPT);b.classList.toggle('on',VOPT);p.hidden=!VOPT;if(!VOPT){p.innerHTML='';return}
-  const h=S.ui.hideCols||{};
+  const h=S.ui.hideCols||{},jb=S.jobs[S.ui.tab],csv=jb?`<b>Export</b><button type="button" class="btn sm" data-act="export-csv" data-job="${jb.id}">${I.download}Export tasks as CSV</button>`:'';
+  if(S.ui.view!=='list'){p.innerHTML=csv;return}
   p.innerHTML=`<b>Columns</b>${[['prio','Priority'],['start','Start date'],['links','Links']].map(([k,l])=>`<label><input type="checkbox" data-col="${k}" ${h[k]?'':'checked'}>${l}</label>`).join('')}
     <p class="hint">Status and due date always show. On narrow screens Priority and Start are hidden anyway.</p>
-    <b>Groups</b><div class="vopt-btns"><button type="button" class="btn sm" data-act="groups-all" data-open="1">Expand all</button><button type="button" class="btn sm" data-act="groups-all" data-open="0">Collapse all</button></div>`;
+    <b>Groups</b><div class="vopt-btns"><button type="button" class="btn sm" data-act="groups-all" data-open="1">Expand all</button><button type="button" class="btn sm" data-act="groups-all" data-open="0">Collapse all</button></div>${csv}`;
 }
 /* Phone tab bar (≤820px): Overview, Jobs (opens the sidebar's job list), New task, Calendar, Quick search */
 /* phones: the round + opens a small Slack-style menu: focus timer, new job, and a big New task button */
@@ -8323,7 +8349,7 @@ function placeTopRight(){
   if(!narrow.matches&&PLUS){PLUS=false;renderPlus()}
   if(!narrow.matches){closeSide();closeFilters()}
 }
-function openFilters(){$('#fs-slot').append($('#filters'));$('#filter-sheet').hidden=false}
+function openFilters(){if(!narrow.matches&&document.body.classList.contains('pg-job')){const t=$('#toolbar'),o=!t.classList.contains('f-open');t.classList.toggle('f-open',o);$('#filter-btn').setAttribute('aria-expanded',o);return}$('#fs-slot').append($('#filters'));$('#filter-sheet').hidden=false}
 function closeFilters(){const f=$('#filters'),tb=$('#toolbar');if(f.parentNode!==tb)tb.insertBefore(f,$('#filter-btn').nextSibling);$('#filter-sheet').hidden=true}
 function openSide(){$('#side').classList.add('open');$('#side-scrim').hidden=false;$('#menu-btn').setAttribute('aria-expanded','true')}
 /* phones: swipe right (from anywhere that isn't scrolling sideways) to open the sidebar, swipe left to close it.
@@ -9018,6 +9044,7 @@ let jobDrag=null;
 /* client tabs: drag to reorder (sets each client's order) */
 let ctabDrag=null;
 function ctabMark(e){document.querySelectorAll('.client-tabs .drop-before,.client-tabs .drop-after').forEach(x=>x.classList.remove('drop-before','drop-after'));const b=e.target.closest?.('[data-ctab]');if(!b||b.dataset.ctab===ctabDrag)return null;const r=b.getBoundingClientRect(),after=e.clientX>r.left+r.width/2;b.classList.add(after?'drop-after':'drop-before');return {id:b.dataset.ctab,after}}
+document.addEventListener('click',e=>{const t=$('#toolbar');if(t?.classList.contains('f-open')&&!e.target.closest?.('#filters,#filter-btn')){t.classList.remove('f-open');$('#filter-btn').setAttribute('aria-expanded','false')}});
 document.addEventListener('dragstart',e=>{const b=e.target.closest?.('[data-ctab]');if(!b)return;ctabDrag=b.dataset.ctab;b.classList.add('dragging');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',ctabDrag)}catch(x){}});
 document.addEventListener('dragover',e=>{if(!ctabDrag)return;if(e.target.closest?.('.client-tabs')){e.preventDefault();ctabMark(e)}});
 document.addEventListener('dragend',()=>{if(!ctabDrag)return;ctabDrag=null;document.querySelectorAll('.client-tabs [data-ctab]').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'))});
