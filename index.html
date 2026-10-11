@@ -1874,6 +1874,17 @@ button.hn-t:hover{text-decoration:underline;text-underline-offset:3px}
   .cs .hm-set{min-height:32px}
 }
 
+
+/* Up next in the side column: compact rows (number, bar, name over status, date) */
+.cs .hm-side .cs-q{margin-top:34px}
+.cs .hm-side .hm-empty{margin:12px 0}
+@media (min-width:821px){
+  .hm-side .cs-r{grid-template-columns:34px 4px minmax(0,1fr) auto;gap:2px 10px;padding-right:2px}
+  .hm-side .cs-tg{display:none}
+  .hm-side .cs-sl{grid-row:1/3}.hm-side .cs-bar{grid-row:1/3;grid-column:2}.hm-side .cs-nm{grid-column:3;grid-row:1}
+  .hm-side .cs-st{grid-column:3;grid-row:2;font-size:calc(12.5px*var(--ts))}.hm-side .cs-end{grid-column:4;grid-row:1/3}
+  .hm-side .cs-nm b{font-size:calc(14px*var(--ts))}.hm-side .cs-due{font-size:calc(13px*var(--ts))}
+}
 /* Sidebar, call sheet style: brand over a heavy rule, plain rows with a bar for the current page, job color bars,
    and only the middle scrolls so the footer (Resume, Help, Settings) never drops off a short screen */
 .side-scroll{display:flex;flex-direction:column;gap:inherit;min-height:0}
@@ -4795,7 +4806,7 @@ function inboxHtml(){
    with the Up now task highlighted in place (Focus / Mark done / Not now). Inbox stays on the right (below on phones). */
 let HM_OPEN=new Set();
 function csGroups(ts){
-  const t0=today(),t1=addDays(t0,1),w=addDays(t0,7),q=upNextList().filter(t=>ts.includes(t)),qs=new Set(q.map(t=>t.id)),r=ts.filter(t=>!qs.has(t.id));
+  const t0=today(),t1=addDays(t0,1),w=addDays(t0,7),q=upNextList().filter(t=>ts.includes(t)),r=ts;
   const byDue=(a,b)=>a.due.localeCompare(b.due)||PRIO_RANK[a.priority||'normal']-PRIO_RANK[b.priority||'normal'],byAge=(a,b)=>(assignedOn(a)||'9').localeCompare(assignedOn(b)||'9');
   return [['queue','Up next',q],['late','Late',r.filter(t=>t.due&&t.due<t0).sort(byDue)],['today','Due today',r.filter(t=>t.due===t0).sort(byDue)],['tom','Tomorrow',r.filter(t=>t.due===t1).sort(byDue)],
     ['week','Next 7 days',r.filter(t=>t.due&&t.due>t1&&t.due<=w).sort(byDue)],['later','Later',r.filter(t=>t.due&&t.due>w).sort(byDue)],
@@ -4816,6 +4827,11 @@ function csRow(t,n,o={}){
     <span class="cs-st" style="--c:${esc(stColor(st))}"><i></i>${esc(stLabel(st))}</span><span class="cs-tg">${tags}</span>
     <span class="cs-end">${due}${o.grip?`<button class="icon-btn" data-act="un-rm" data-id="${t.id}" data-stop title="Remove from Up next" aria-label="Remove from Up next">${I.x}</button>`:''}</span>${acts}</div>`;
 }
+/* Up next under the Inbox (user's ask): the queue in order, dragged to reorder (unDrag / unMove / UNT) */
+function csQueue(q){
+  return `<section class="cs-g cs-q" id="csg-queue"><div class="cs-gh"><b>Up next</b><span>${q.length}</span>${q.length>1?'<em>Drag to reorder</em>':''}</div>
+    ${q.length?`<ol class="un-list cs-unl">${q.map(t=>`<li class="un-row cs-un" draggable="true" data-un="${t.id}">${csRow(t,'#'+upNextPos(t),{grip:true})}</li>`).join('')}</ol>`:`<p class="hm-empty">Line up what you'll work on next: right-click a task (press and hold on a phone) and choose Add to Up next.</p>`}</section>`;
+}
 function homeView(){
   const ts=homeTasks(),G=csGroups(ts),un=upNow(ts),jf=hmJob(),all=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)),t0=today(),gd=Object.fromEntries(G.map(g=>[g[0],g[2]]));
   const gr=homeGreet(),wait=inboxGroups().filter(g=>g.wait).length,d=new Date();
@@ -4825,14 +4841,13 @@ function homeView(){
   const head=`<header class="cs-top"><div class="cs-hl"><small>${esc(kick)}</small><h1>${esc(absDate(t0).replace(/ ’\d+$/,''))}</h1></div>
     <div class="cs-tally">${tl('late',gd.late.length+gd.queue.filter(t=>t.due&&t.due<t0).length,'late',lateN?'late':'')}${tl('today',ts.filter(t=>t.due===t0).length,'due today')}${tl('tom',ts.filter(t=>t.due===addDays(t0,1)).length,'tomorrow')}${wait?tl('inbox',wait,'waiting on you','wait'):''}${tl('all',ts.length,'open')}</div></header>`;
   const jobsRow=`<div class="cs-sub"><button type="button" class="${jf==='all'?'on':''}" data-act="hm-job" data-j="all">All jobs</button>${jobsSorted().map(j=>{const n=all.filter(t=>t.jobId===j.id).length;return `<button type="button" class="${jf===j.id?'on':''}" data-act="hm-job" data-j="${j.id}"><span class="hm-dot" style="--jc:${esc(j.color||'var(--accent)')}"></span>${esc(j.name)}<em>${n}</em></button>`}).join('')}<span class="cs-sp"></span><button type="button" class="btn sm primary cs-new" data-act="new-task" title="New task (N)">${I.plus}New task</button></div>`;
-  let n=0;const body=G.map(([k,label,list])=>{if(!list.length)return '';
+  let n=0;const body=G.map(([k,label,list])=>{if(!list.length||k==='queue')return '';
     const lim=['queue','late','today'].includes(k)||HM_OPEN.has(k)?list.length:8,show=list.slice(0,lim);
-    const rows=show.map(t=>{n++;const sl=k==='queue'?'#'+upNextPos(t):String(n).padStart(2,'0'),o={now:un?.t.id===t.id?un:null,nodate:k==='nodate',grip:k==='queue'};
-      return k==='queue'?`<li class="un-row cs-un" draggable="true" data-un="${t.id}">${csRow(t,sl,o)}</li>`:csRow(t,sl,o)}).join('');
-    return `<section class="cs-g" id="csg-${k}"><div class="cs-gh ${k==='late'?'late':''}"><b>${label}</b><span>${list.length}</span>${k==='queue'?'<em>Drag to reorder</em>':''}</div>
-      ${k==='queue'?`<ol class="un-list cs-unl">${rows}</ol>`:rows}${list.length>lim||HM_OPEN.has(k)&&list.length>8?`<button type="button" class="hm-more" data-act="cs-more" data-g="${k}">${HM_OPEN.has(k)?'Show fewer':`Show ${list.length-lim} more`}</button>`:''}</section>`}).join('');
+    const rows=show.map(t=>{n++;return csRow(t,String(n).padStart(2,'0'),{now:un?.t.id===t.id?un:null,nodate:k==='nodate'})}).join('');
+    return `<section class="cs-g" id="csg-${k}"><div class="cs-gh ${k==='late'?'late':''}"><b>${label}</b><span>${list.length}</span></div>
+      ${rows}${list.length>lim||HM_OPEN.has(k)&&list.length>8?`<button type="button" class="hm-more" data-act="cs-more" data-g="${k}">${HM_OPEN.has(k)?'Show fewer':`Show ${list.length-lim} more`}</button>`:''}</section>`}).join('');
   const empty=`<p class="hm-empty">${ts.length?'':'No open tasks'+(jf==='all'?'':' in this job')+'. New tasks you add show up here, sorted by when they\'re due.'}</p>`;
-  return `<div class="cs">${head}${jobsRow}<div class="home cs-home"><div class="hm-main">${body||empty}</div><aside class="hm-side" id="csg-inbox">${inboxHtml()}</aside></div></div>`;
+  return `<div class="cs">${head}${jobsRow}<div class="home cs-home"><div class="hm-main">${body||empty}</div><aside class="hm-side"><div id="csg-inbox">${inboxHtml()}</div>${csQueue(gd.queue)}</aside></div></div>`;
 }
 /* ================= Calendar page (tab 'calendar') =================
    Job chips on top (S.ui.cjob) instead of the filters, and a No date tray (S.ui.ctray) whose tasks drag onto a day
