@@ -4487,6 +4487,8 @@ function applyLook(o){
   const pc=g('prioColors')||{};for(const p of ['urgent','high','low']){if(pc[p])r.style.setProperty('--pr-'+p,pc[p]);else r.style.removeProperty('--pr-'+p)}
 }
 function migrateStatuses(){
+  /* the Money page was removed at the user's request: drop its saved totals and the hide-amounts flag */
+  if(S.settings.finance)remove('settings','finance');try{localStorage.removeItem('cutroom.finhide')}catch(e){}
   pruneLog();purgeOldTrash();setTimeout(autoArchive,1500);setTimeout(invAutoDraft,2500);
   /* pins were folded into Up next: pinned tasks go to the top of the queue once */
   {const pins=Object.values(S.tasks).filter(t=>t.pinned&&!t._draft);if(pins.length){let k=Math.min(1000,...live().filter(x=>x.upNext).map(x=>x.upNext))-pins.length*10;
@@ -4569,6 +4571,7 @@ function renderMain(){
   {const cdp=job&&!hasExamples&&!$('#banner').innerHTML.trim()?clientDupe(job):null;
    if(cdp){const [a,b]=cdp,na=clientTaskN(a),nb=clientTaskN(b);$('#banner').innerHTML=`<div class="banner cdup-banner"><p>${I.users||''}<b>“${esc(b.name)}” looks like “${esc(a.name)}”.</b> Same client? ${nb?`Merging moves its ${nb===1?'task':`${nb} tasks`} over.`:'It has no tasks yet.'}</p><button class="btn sm primary" data-act="cdup-merge" data-keep="${a.id}" data-from="${b.id}">Merge into “${esc(a.name)}”</button><button class="btn sm" data-act="cdup-merge" data-keep="${b.id}" data-from="${a.id}">Merge into “${esc(b.name)}”</button><button class="btn sm ghost" data-act="cdup-keep" data-a="${a.id}" data-b="${b.id}">Keep both</button></div>`}}
 
+  document.body.classList.toggle('pg-job',!!job&&!['archived','activity','trash','help','resume'].includes(u.tab));document.body.classList.toggle('pg-cal',u.tab==='calendar');
   if(u.tab==='archived'){renderArchive();return}
   if(u.tab==='activity'){renderActivity();return}
   if(u.tab==='trash'){renderTrash();return}
@@ -4579,7 +4582,7 @@ function renderMain(){
   if(job&&u.view==='home')u.view='list';
   if(u.tab==='overview')u.view='home';if(u.tab==='calendar')u.view='calendar';
   const HOME=u.tab==='overview';
-  const scope=tasksOfScope();document.body.classList.toggle('pg-job',!!job);document.body.classList.toggle('pg-cal',u.tab==='calendar');
+  const scope=tasksOfScope();
   if(!job)$('#tb-clients').innerHTML='';
   if(!job&&HOME){$('#head').innerHTML='<div class="head head-ov head-cs"></div>'}
   else if(!job){
