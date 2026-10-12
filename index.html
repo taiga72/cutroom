@@ -2072,6 +2072,35 @@ body.pg-job .inv-yr{margin:22px 0 0;padding-bottom:8px;border-bottom:1px solid v
 body.pg-job .inv-yr:first-child{margin-top:4px}
 body.pg-job .docs-sec{margin-top:40px;padding-top:0;border-top:0}
 body.pg-job .inv-pane .empty,body.pg-job .brand-cards+.empty{border-radius:0}
+
+/* Activity / Archived controls: one row; on phones the pickers fold out under the Filter button */
+.al-fbtn{display:none}.al-fsel{display:contents}
+.al-ctl,.ar-ctl{padding-top:10px}
+@media (max-width:820px){
+  .al .al-ctl,.al .ar-ctl{flex-wrap:wrap!important;overflow:visible;margin:0;padding:12px 0 0;gap:8px}
+  .al-ctl .cs-sp,.ar-ctl .cs-sp{display:none}
+  .al-ctl .al-q,.ar-ctl .al-q{flex:1 1 0!important;min-width:0}
+  .al-fbtn{display:inline-flex;align-items:center;gap:5px;flex:none;height:44px;padding:0 13px}.al-fbtn .i{width:17px;height:17px}.al-fbtn.on{background:var(--accent-soft);color:var(--accent)}
+  .al-fbtn em{font-style:normal;font-weight:700;font-size:calc(12px*var(--ts));background:var(--accent);color:#fff;border-radius:99px;padding:0 6px;line-height:18px}
+  .ar-ctl>[data-act="asel-mode"]{flex:none;height:44px}
+  .al-fsel{display:none}
+  .f-open>.al-fsel{display:flex;flex-direction:column;gap:8px;flex:1 1 100%}
+  .al .al-fsel .sel{width:100%;flex:none}
+  .al .al-sub:not(.al-ctl):not(.ar-ctl){padding-bottom:0}
+}
+
+/* phones: Up next is its own page from the bottom bar, so Home leaves it out */
+@media (max-width:820px){
+  .hm-side .cs-q{display:none}
+  .upn-cs{padding:4px 16px 0}.upn-cs .cs-q{margin-top:0}.upn-cs .cs-gh{display:none}
+  .upn-cs .cs-r{grid-template-columns:30px 4px minmax(0,1fr) auto}
+  .upn-cs .cs-sl{display:flex!important;grid-column:1;grid-row:1/3;flex-direction:column;align-items:center;gap:2px;font-size:calc(12px*var(--ts));padding:0}
+  .upn-cs .cs-sl .un-grip{opacity:.8;width:30px;height:26px;touch-action:none}.upn-cs .cs-sl .un-grip svg{width:16px;height:16px}
+  .upn-cs .cs-bar{grid-column:2;grid-row:1/3}.upn-cs .cs-nm{grid-column:3;grid-row:1}.upn-cs .cs-st{grid-column:3;grid-row:2}.upn-cs .cs-end{grid-column:4;grid-row:1/3}
+  .upn-cs .cs-end .icon-btn{opacity:.7;width:36px;height:36px}
+  .ar-ctl>[data-act^="asel"]{order:1}.f-open>.al-fsel{order:2}
+  .tb-pill .tb-cnt{background:var(--accent)}
+}
 /* Archived, Trash and Help as call sheets (rows reuse .cs-r) */
 .ar-r{grid-template-columns:44px 4px minmax(0,1fr) 96px 96px auto}
 .ar-r.picked{background:var(--accent-soft)}
@@ -2131,6 +2160,8 @@ body.pg-job .inv-pane .empty,body.pg-job .brand-cards+.empty{border-radius:0}
 .side .nav.jobs{border-left-color:transparent;margin-left:12px}
 .side .cork{margin-top:auto}
 .side .cork.with-cat{margin-bottom:8px}
+/* phones: the slide-in sidebar scrolls as a whole, so nothing in it may shrink (the cork board used to collapse under the footer) */
+@media (max-width:820px){.side>*,.side .side-scroll>*{flex-shrink:0}}
 @media (min-width:821px){.side-scroll.more{-webkit-mask-image:linear-gradient(#000 calc(100% - 44px),transparent);mask-image:linear-gradient(#000 calc(100% - 44px),transparent)}}.side .photo-strip.with-cat{padding-bottom:16px}
 .side .side-foot .cat-sill{margin:0;align-self:stretch;padding-right:14px;box-shadow:inset 0 -1px 0 var(--line)}
 .side button.brand{border-radius:0}
@@ -4669,7 +4700,7 @@ function renderMain(){
   if(u.tab==='trash'){renderTrash();return}
   if(u.tab==='help'){renderHelp();return}
   if(u.tab==='resume'){renderResume();return}
-  if(u.tab==='upnext'){u.tab='overview';u.htab='upnext';saveUi();requestAnimationFrame(()=>$('#csg-queue')?.scrollIntoView({block:'start'}))}
+  if(u.tab==='upnext'){u.tab='overview';u.htab='upnext';saveUi();if(narrow.matches){UPN=true;notesOpen=false}else requestAnimationFrame(()=>$('#csg-queue')?.scrollIntoView({block:'start'}))}
   if(u.view==='lanes')u.view='home';if(u.views?.overview==='lanes')u.views.overview='home';
   if(job&&u.view==='home')u.view='list';
   if(u.tab==='overview')u.view='home';if(u.tab==='calendar')u.view='calendar';
@@ -4827,7 +4858,7 @@ function renderTabbar(){
   const e=$('#tabbar');if(!e)return;const u=S.ui,cal=u.view==='calendar'&&!['archived','activity','trash','help','resume','upnext'].includes(u.tab);
   const b=(act,label,icon,on,extra='',short=label)=>`<button type="button" data-act="${act}" class="${on?'on':''} ${extra} tb-${act.slice(3)}" aria-label="${label}" ${on?'aria-current="page"':''}>${icon}<span>${short}</span></button>`;
   const busy=notesOpen||UPN;
-  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Home',I.grid,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Alerts','<svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg>'+(()=>{const n=$('#bell-n');return n&&!n.hidden?`<i class="tb-badge">${esc(n.textContent)}</i>`:''})(),notesOpen,'','Alerts')+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-me','You',meAvatar(26),!!PRF)}</div>`
+  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Home',I.grid,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Alerts','<svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg>'+(()=>{const n=$('#bell-n');return n&&!n.hidden?`<i class="tb-badge">${esc(n.textContent)}</i>`:''})(),notesOpen,'','Alerts')+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-upnext','Up next',UP_IC+(()=>{const n=upNextList().length;return n?`<i class="tb-badge tb-cnt">${n}</i>`:''})(),UPN)+b('tb-me','You',meAvatar(26),!!PRF)}</div>`
     +`<button type="button" data-act="tb-search" class="tb-search" aria-label="Search" title="Search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 14 14"/></svg></button>`
     +`<button type="button" data-act="tb-plus" class="tb-fab ${PLUS?'on':''}" aria-label="New" aria-expanded="${PLUS}" title="New task, new job or focus timer">${I.plus}</button>`;
 }
@@ -4912,7 +4943,7 @@ function renderUpNextPage(){
   const on=UPN&&narrow.matches;e.hidden=!on;if(!on){e.innerHTML='';sheetLock();return}
   const n=upNextList().length;
   e.innerHTML=`<div class="na-head"><h2>Up next</h2>${n?`<span class="upn-n">${n} queued</span>`:''}</div>
-    ${n?upNextStrip():`<p class="na-empty">Nothing queued yet. Press and hold a task and choose Up next, or use the queue icon at the top of a task, to line up what you'll work on.</p>`}`;
+    ${n?`<div class="cs upn-cs">${csQueue(upNextList())}</div>`:`<p class="na-empty">Nothing queued yet. Press and hold a task and choose Add to Up next, or use the queue icon at the top of a task, to line up what you'll work on.</p>`}`;
   sheetLock();
 }
 function upNextStrip(){
@@ -5474,8 +5505,8 @@ function renderActivity(){
     .filter(e=>!q||[e.task,e.text,S.jobs[e.jobId]?.name].some(x=>String(x||'').toLowerCase().includes(q)));
   const shown=list.slice(0,u.lmore||200);
   const sub=`<div class="cs-sub al-sub"><span class="al-jobs"><button type="button" class="${jf==='all'?'on':''}" data-act="log-jobsel" data-j="all">All jobs</button>${jobsSorted().map(j=>{const n=all.filter(e=>e.jobId===j.id).length;return `<button type="button" class="${jf===j.id?'on':''}" data-act="log-jobsel" data-j="${j.id}"><span class="hm-dot" style="--jc:${esc(j.color||'var(--accent)')}"></span>${esc(j.name)}<em>${n}</em></button>`}).join('')}</span>
-    <span class="cs-sp"></span><label class="search al-q"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="log-q" data-fk="log-q" type="search" placeholder="Search activity" value="${esc(u.lq||'')}"></label>
-    <select class="sel" id="log-kind" aria-label="Filter by kind">${kinds.map(([k,l])=>`<option value="${k}" ${(u.lkind||'all')===k?'selected':''}>${l}</option>`).join('')}</select></div>`;
+    </div><div class="cs-sub al-sub al-ctl ${AL_FOPEN?'f-open':''}">${CS_Q('log-q','Search activity',u.lq)}${alFBtn((u.lkind||'all')!=='all'?1:0)}
+    <span class="al-fsel"><select class="sel" id="log-kind" aria-label="Filter by kind">${kinds.map(([k,l])=>`<option value="${k}" ${(u.lkind||'all')===k?'selected':''}>${l}</option>`).join('')}</select></span></div>`;
   const by=[];for(const e of shown){const h=dayHeading(e.at),g=by[by.length-1];if(g&&g.h===h)g.items.push(e);else by.push({h,items:[e]})}
   let body=by.map(g=>`<section class="cs-g"><div class="cs-gh"><b>${esc(g.h)}</b><span>${g.items.length}</span></div>${g.items.map(csLogRow).join('')}</section>`).join('');
   if(!list.length)body=`<div class="empty"><h3>Nothing matches</h3><p>No changes match this search or filter.</p><button class="btn" data-act="log-clear">Show everything</button></div>`;
@@ -5489,6 +5520,9 @@ function csJobs(act,sel,jobs,count,allLabel='All jobs'){
 }
 const CS_Q=(id,ph,v)=>`<label class="search al-q"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="${id}" data-fk="${id}" type="search" placeholder="${ph}" value="${esc(v||'')}" autocomplete="off"></label>`;
 let ASEL=new Set(),ASELMODE=false,aselDelArmed=false;
+/* phones: Activity and Archived keep search and a Filter button on one row; the pickers fold out under it */
+let AL_FOPEN=false;
+const alFBtn=n=>`<button type="button" class="btn al-fbtn ${AL_FOPEN?'on':''}" data-act="al-filters" aria-expanded="${AL_FOPEN}" aria-label="Filters" title="Filters"><svg class="i" viewBox="0 0 16 16"><path d="M2.5 3.5h11L9.2 8.6v4l-2.4 1.1V8.6z"/></svg>${n?`<em>${n}</em>`:''}</button>`;
 function renderArchive(){
   const u=S.ui,q=(u.aq||'').trim().toLowerCase();
   const all=archived();
@@ -5512,11 +5546,11 @@ function renderArchive(){
   for(const id of [...ASEL])if(!S.tasks[id]||!S.tasks[id].archived||S.tasks[id].deleted)ASEL.delete(id);
   const jobsWith=jobsSorted().filter(j=>all.some(t=>t.jobId===j.id));
   const mLabel=m=>`${MONTH_FULL[+m.slice(5,7)-1]} ${m.slice(0,4)}`;
-  let html=`<div class="cs al ar">${head}<div class="cs-sub al-sub">${csJobs('arch-jobsel',u.ajob||'all',jobsWith,j=>all.filter(t=>t.jobId===j.id).length)}</div><div class="cs-sub al-sub ar-ctl">
-    ${CS_Q('arch-q','Search archived tasks',u.aq)}
+  let html=`<div class="cs al ar">${head}<div class="cs-sub al-sub">${csJobs('arch-jobsel',u.ajob||'all',jobsWith,j=>all.filter(t=>t.jobId===j.id).length)}</div><div class="cs-sub al-sub ar-ctl ${AL_FOPEN?'f-open':''}">
+    ${CS_Q('arch-q','Search archived tasks',u.aq)}${alFBtn([(u.aclient||'all')!=='all',(u.amonth||'all')!=='all',(u.agroup||'job')!=='job'].filter(Boolean).length)}<span class="al-fsel">
     ${clientsWith.length?`<select class="sel" id="arch-client" aria-label="Filter by client"><option value="all">All clients</option>${clientsWith.map(c=>`<option value="${c.id}" ${u.aclient===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>`:''}
     <select class="sel" id="arch-month" aria-label="Filter by month archived"><option value="all">Any month</option>${months.map(m=>`<option value="${m}" ${u.amonth===m?'selected':''}>${mLabel(m)}</option>`).join('')}</select>
-    <select class="sel" id="arch-group" aria-label="Group by"><option value="job" ${(u.agroup||'job')==='job'?'selected':''}>Group by job</option><option value="month" ${u.agroup==='month'?'selected':''}>Group by month done</option></select>
+    <select class="sel" id="arch-group" aria-label="Group by"><option value="job" ${(u.agroup||'job')==='job'?'selected':''}>Group by job</option><option value="month" ${u.agroup==='month'?'selected':''}>Group by month done</option></select></span>
     <span class="cs-sp"></span><button type="button" class="btn sm ${ASELMODE?'on':''}" data-act="asel-mode" aria-pressed="${ASELMODE}">${ASELMODE?'Done selecting':'Select'}</button>
     ${ASELMODE?`<button type="button" class="btn sm ghost" data-act="asel-all" data-ids="${list.map(t=>t.id).join(',')}">${list.length&&list.every(t=>ASEL.has(t.id))?'Select none':`Select all ${list.length}`}</button>`:''}</div>
     ${sweepHtml}
@@ -8765,6 +8799,7 @@ document.addEventListener('click',e=>{
       u.view='list';u.collapsed[el.dataset.status]=false;u.due='all';saveUi();render();
       ($('#grp-'+CSS.escape(el.dataset.status))||$(`.group[data-stage="${el.dataset.status}"]`))?.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'start'});break}
     case 'log-jobsel': u.ljob=el.dataset.j;u.lmore=0;saveUi();render();break;
+    case 'al-filters': AL_FOPEN=!AL_FOPEN;render();break;
     case 'arch-jobsel': u.ajob=el.dataset.j;u.aclient='all';saveUi();render();break;
     case 'help-jump': {const g=$('#hp-g'+el.dataset.i);if(g)g.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'start'});break}
     case 'log-clear': u.lq='';u.ljob='all';u.lkind='all';saveUi();render();break;
