@@ -2020,6 +2020,36 @@ button.hn-t:hover{text-decoration:underline;text-underline-offset:3px}
 .pg-cal .cj-chip.on small{color:var(--faint)}
 .pg-cal .cj-chip:hover{color:var(--text)}
 @media (max-width:820px){.pg-cal .head h1{font-size:calc(38px*var(--ts))}}
+
+/* Activity page (call sheet style) */
+.fin-t{text-align:right}.fin-t b{display:block;font:700 calc(32px*var(--ts))/1 var(--display);font-variant-numeric:tabular-nums}.fin-t span{display:block;font:500 calc(13px*var(--ts)) var(--body);color:var(--muted);margin-top:6px}
+.fin-t.ok b{color:var(--st-done)}
+.al .cs-tally{gap:6px 26px}
+.al-sub{gap:4px 20px}
+.al-jobs{display:flex;flex-wrap:wrap;gap:4px 20px;align-items:center;min-width:0}
+.al-jobs>button{border:0;background:none;padding:4px 0;font:500 calc(14px*var(--ts)) var(--body);color:var(--muted);display:inline-flex;align-items:center;gap:7px;cursor:pointer;white-space:nowrap}
+.al-jobs>button:hover{color:var(--text)}.al-jobs>button.on{color:var(--text);font-weight:700}.al-jobs em{font-style:normal;color:var(--faint);font-weight:500}
+.al-sub .al-q{width:220px;flex:none}.al-sub .al-q input{width:100%}
+.al-sub .sel{width:auto;flex:none}
+.al-r{grid-template-columns:72px 4px minmax(0,1fr) minmax(110px,auto)}
+.al-r:not(.link){cursor:default}
+.al-r .cs-sl{font:600 calc(12.5px*var(--ts)) var(--display);white-space:nowrap}
+.al-k{display:inline-flex;align-items:center;justify-content:flex-end;gap:7px;color:var(--muted);font-size:calc(13px*var(--ts));white-space:nowrap}
+.al-k svg{width:14px;height:14px;flex:none}
+.al-k.k-status svg{color:var(--st-prog)}.al-k.k-check svg,.al-k.k-create svg{color:var(--st-done)}.al-k.k-date svg{color:var(--st-rev)}.al-k.k-note svg{color:var(--accent)}.al-k.k-delete svg{color:var(--danger)}.al-k.k-brand svg{color:var(--st-review)}
+.al .hm-more{padding:14px 0 2px}
+@media (max-width:820px){
+  .fin-t{text-align:left}.fin-t b{font-size:calc(24px*var(--ts))}
+  .al-sub{flex-wrap:wrap;overflow:visible;margin:0;padding:14px 0 2px}
+  .al-sub .cs-sp{display:none}
+  .al-jobs{flex:1 1 100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px 4px}.al-jobs::-webkit-scrollbar{display:none}
+  .al-sub .al-q{flex:1 1 100%;width:auto!important;max-width:none}.al-sub .sel{flex:1 1 100%}
+  .al .cs-tally{flex-wrap:nowrap;gap:18px;overflow-x:auto;scrollbar-width:none;width:100%}.al .fin-t{flex:none}.al .fin-t span{white-space:nowrap}
+  .al-r{grid-template-columns:4px minmax(0,1fr) auto;gap:3px 12px}
+  .al-r .cs-sl{display:block!important;grid-column:3;grid-row:1;text-align:right}
+  .al-r .cs-bar{grid-row:1/3;grid-column:1}.al-r .cs-nm{grid-column:2;grid-row:1/3}
+  .al-k{grid-column:3;grid-row:2;font-size:calc(12px*var(--ts))}
+}
 /* Sidebar, call sheet style: brand over a heavy rule, plain rows with a bar for the current page, job color bars,
    and only the middle scrolls so the footer (Resume, Help, Settings) never drops off a short screen */
 .side-scroll{display:flex;flex-direction:column;gap:inherit;min-height:0}
@@ -5358,24 +5388,37 @@ function logRow(e,showTask=true){
     <div class="l-main">${showTask&&e.task?`<b>${esc(e.task)}</b>`:''}<span>${esc(e.text)}</span>${showTask&&j?`<small>${jobMark(j,12)}${esc(j.name)}</small>`:''}</div>
     <time datetime="${esc(e.at)}">${fmtTime(e.at)}</time></div>`;
 }
+const LOG_KIND={note:'Update',status:'Status',create:'New task',date:'Date',check:'Checklist',archive:'Archived',restore:'Restored',delete:'Deleted',job:'Job',brand:'Brand guide',focus:'Focus',edit:'Edit',clickup:'ClickUp',priority:'Priority',move:'Moved'};
+/* Activity page, call sheet style: header with counts, job names as a text row, then each day as a group of rows (time · job bar · task over what changed · kind) */
+function csLogRow(e){
+  const t=e.taskId&&S.tasks[e.taskId],j=S.jobs[e.jobId],title=e.task||e.text,sub=[e.task?e.text:'',j?.name].filter(Boolean);
+  return `<div class="cs-r al-r ${t?'link':''}" ${t?`data-act="open" data-id="${t.id}" data-dtab="activity" tabindex="0"`:''} style="--jc:${esc(j?.color||'var(--line-strong)')}">
+    <time class="cs-sl" datetime="${esc(e.at)}">${fmtTime(e.at)}</time><span class="cs-bar"></span>
+    <span class="cs-nm"><b>${esc(title)}</b>${sub.length?`<small>${sub.map(esc).join(' · ')}</small>`:''}</span>
+    <span class="al-k k-${esc(e.kind)}">${LOG_ICON[e.kind]||I.info}${esc(LOG_KIND[e.kind]||'Change')}</span></div>`;
+}
 function renderActivity(){
   const u=S.ui,q=(u.lq||'').trim().toLowerCase(),all=logItems();
-  $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${I.clock.replace('class="i"','class="i" style="width:28px;height:28px"')}Activity</h1><div class="sub">What changed in your tracker, newest first. Kept for ${LOG_MONTHS} months.</div></div></div>`;
+  $('#head').innerHTML='<div class="head head-ov head-cs"></div>';
   $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
-  if(!all.length){$('#view').innerHTML=`<div class="empty"><h3>No activity yet</h3><p>Changes show up here as you work: new tasks, status moves, due dates, checklist steps, archiving and more.</p></div>`;return}
+  const t0=today(),w0=addDays(t0,-6),dOf=e=>ymd(new Date(e.at));
+  const nToday=all.filter(e=>dOf(e)===t0).length,wk=all.filter(e=>dOf(e)>=w0),nDone=wk.filter(e=>e.kind==='status'&&/\bdone\b/i.test(e.text)).length,nUpd=wk.filter(e=>e.kind==='note').length;
+  const tl=(n,l,c='')=>`<div class="fin-t al-t ${c}"><b>${n}</b><span>${l}</span></div>`;
+  const head=`<header class="cs-top"><div class="cs-hl"><small>What changed in your tracker · kept for ${LOG_MONTHS} months</small><h1>Activity</h1></div>
+    ${all.length?`<div class="cs-tally">${tl(nToday,'changes today')}${tl(wk.length,'this week')}${tl(nDone,'done this week',nDone?'ok':'')}${tl(nUpd,'updates posted')}</div>`:''}</header>`;
+  if(!all.length){$('#view').innerHTML=`<div class="cs al">${head}<div class="empty"><h3>No activity yet</h3><p>Changes show up here as you work: new tasks, status moves, due dates, checklist steps, archiving and more.</p></div></div>`;return}
   const kinds=[['all','Everything'],['note','Updates'],['status','Status'],['create','New tasks'],['date','Dates'],['check','Checklist'],['archive','Archive'],['delete','Deleted'],['job','Jobs & brand'],['focus','Focus sessions']];
-  const list=all.filter(e=>(u.ljob||'all')==='all'||e.jobId===u.ljob).filter(e=>{const k=u.lkind||'all';return k==='all'||e.kind===k||(k==='archive'&&e.kind==='restore')||(k==='job'&&e.kind==='brand')})
+  const jf=u.ljob||'all',list=all.filter(e=>jf==='all'||e.jobId===jf).filter(e=>{const k=u.lkind||'all';return k==='all'||e.kind===k||(k==='archive'&&e.kind==='restore')||(k==='job'&&e.kind==='brand')})
     .filter(e=>!q||[e.task,e.text,S.jobs[e.jobId]?.name].some(x=>String(x||'').toLowerCase().includes(q)));
   const shown=list.slice(0,u.lmore||200);
-  let html=`<div class="arch-bar"><label class="search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="log-q" data-fk="log-q" type="search" placeholder="Search activity" value="${esc(u.lq||'')}"></label>
-    <select class="sel" id="log-job" aria-label="Filter by job"><option value="all">All jobs</option>${jobsSorted().map(j=>`<option value="${j.id}" ${u.ljob===j.id?'selected':''}>${esc(j.name)}</option>`).join('')}</select>
+  const sub=`<div class="cs-sub al-sub"><span class="al-jobs"><button type="button" class="${jf==='all'?'on':''}" data-act="log-jobsel" data-j="all">All jobs</button>${jobsSorted().map(j=>{const n=all.filter(e=>e.jobId===j.id).length;return `<button type="button" class="${jf===j.id?'on':''}" data-act="log-jobsel" data-j="${j.id}"><span class="hm-dot" style="--jc:${esc(j.color||'var(--accent)')}"></span>${esc(j.name)}<em>${n}</em></button>`}).join('')}</span>
+    <span class="cs-sp"></span><label class="search al-q"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="log-q" data-fk="log-q" type="search" placeholder="Search activity" value="${esc(u.lq||'')}"></label>
     <select class="sel" id="log-kind" aria-label="Filter by kind">${kinds.map(([k,l])=>`<option value="${k}" ${(u.lkind||'all')===k?'selected':''}>${l}</option>`).join('')}</select></div>`;
-  let day='';
-  for(const e of shown){const h=dayHeading(e.at);if(h!==day){if(day)html+='</div></section>';day=h;html+=`<section class="arch-group"><h3>${esc(h)}</h3><div class="rows">`}html+=logRow(e)}
-  if(day)html+='</div></section>';
-  if(!list.length)html+=`<div class="empty"><h3>Nothing matches</h3><p>No changes match this search or filter.</p><button class="btn" data-act="log-clear">Show everything</button></div>`;
-  else if(list.length>shown.length)html+=`<div style="text-align:center;margin-top:14px"><button class="btn" data-act="log-more">Show more (${list.length-shown.length} older)</button></div>`;
-  $('#view').innerHTML=html;
+  const by=[];for(const e of shown){const h=dayHeading(e.at),g=by[by.length-1];if(g&&g.h===h)g.items.push(e);else by.push({h,items:[e]})}
+  let body=by.map(g=>`<section class="cs-g"><div class="cs-gh"><b>${esc(g.h)}</b><span>${g.items.length}</span></div>${g.items.map(csLogRow).join('')}</section>`).join('');
+  if(!list.length)body=`<div class="empty"><h3>Nothing matches</h3><p>No changes match this search or filter.</p><button class="btn" data-act="log-clear">Show everything</button></div>`;
+  else if(list.length>shown.length)body+=`<button type="button" class="hm-more" data-act="log-more">Show ${Math.min(200,list.length-shown.length)} older changes</button>`;
+  $('#view').innerHTML=`<div class="cs al">${head}${sub}${body}</div>`;
 }
 let ASEL=new Set(),ASELMODE=false,aselDelArmed=false;
 function renderArchive(){
@@ -8647,6 +8690,7 @@ document.addEventListener('click',e=>{
     case 'jump-status':{
       u.view='list';u.collapsed[el.dataset.status]=false;u.due='all';saveUi();render();
       ($('#grp-'+CSS.escape(el.dataset.status))||$(`.group[data-stage="${el.dataset.status}"]`))?.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'start'});break}
+    case 'log-jobsel': u.ljob=el.dataset.j;u.lmore=0;saveUi();render();break;
     case 'log-clear': u.lq='';u.ljob='all';u.lkind='all';saveUi();render();break;
     case 'arch-clear': u.aq='';u.ajob='all';u.aclient='all';u.amonth='all';saveUi();render();break;
     case 'reset-filters': u.q='';u.prio='all';u.due='all';u.tag='all';$('#q').value='';render();break;
