@@ -3073,7 +3073,7 @@ select.rs-add{appearance:auto}
 <div class="modal-wrap" id="modal" hidden></div>
 <div class="modal-wrap crop-wrap" id="crop" hidden></div>
 <div class="toast" id="toast" hidden role="status"></div>
-<input type="file" id="backup-in" accept="application/json,.json" hidden><input type="file" id="fin-in" accept="application/json,.json,text/plain,.txt" hidden>
+<input type="file" id="backup-in" accept="application/json,.json" hidden><input type="file" id="fin-in" accept="application/json,.json" hidden>
 <input type="file" id="import-in" accept=".csv,text/csv,.tsv,text/tab-separated-values,text/plain" hidden>
 <input type="file" id="pdf-in" accept="application/pdf,.pdf" hidden>
 <input type="file" id="logo-in" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
@@ -5072,8 +5072,8 @@ function finJob(desc){const d=finNorm(desc);if(!d)return null;
   for(const j of js){const n=finNorm(j.name);if(n.length>=3&&d.includes(n))return j.id}
   for(const j of js){const w=finNorm(String(j.name).split(/[\s\/·-]+/)[0]);if(w.length>=4&&d.includes(w))return j.id}
   return null}
-function finRead(f){if(!f)return;const r=new FileReader();r.onload=()=>{let d;try{const t=String(r.result).replace(/^\uFEFF/,'').trim();d=JSON.parse(t.slice(t.indexOf('{'),t.lastIndexOf('}')+1))}catch(e){d=null}
-  const D=d&&(d.data||d);if(!D||!Array.isArray(D.transactions)||!Array.isArray(D.accounts)){toast("That file isn't a KKBudget export. In KKBudget, export your data and pick the file it saves (.txt or .json).");return}
+function finRead(f){if(!f)return;const r=new FileReader();r.onload=()=>{let d;try{d=JSON.parse(r.result)}catch(e){d=null}
+  const D=d&&(d.data||d);if(!D||!Array.isArray(D.transactions)||!Array.isArray(D.accounts)){toast("That file isn't a KKBudget export. In KKBudget, export your data and pick the .json file.");return}
   finPlan(D)};r.readAsText(f)}
 function finPlan(D){
   const acc=Object.fromEntries(D.accounts.map(a=>[a.id,a])),cards=D.accounts.filter(a=>a.accountType==='credit-card').map(a=>a.accountName),saved=fin().answers||{};
@@ -5141,7 +5141,7 @@ function renderMoney(){
   const u=S.ui,F=fin(),M=F.months||{},keys=Object.keys(M).sort();
   $('#head').innerHTML='<div class="head head-ov head-cs"></div>';$('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
   if(!keys.length){$('#view').innerHTML=`<div class="cs fin"><header class="cs-top"><div class="cs-hl"><small>Money</small><h1>Money</h1></div></header>
-    <div class="empty fin-empty"><h3>See where your money goes</h3><p>Import the export file from KKBudget (.txt or .json). You'll get income per job, spending per category against your budgets, and a chart of each month. Only monthly totals are kept, never your transactions or balances.</p><button class="btn primary" data-act="fin-import">${I.download.replace('<svg','<svg style="transform:scaleY(-1)"')}Import KKBudget file</button></div></div>`;return}
+    <div class="empty fin-empty"><h3>See where your money goes</h3><p>Import the .json export from KKBudget. You'll get income per job, spending per category against your budgets, and a chart of each month. Only monthly totals are kept, never your transactions or balances.</p><button class="btn primary" data-act="fin-import">${I.download.replace('<svg','<svg style="transform:scaleY(-1)"')}Import KKBudget file</button></div></div>`;return}
   const mode=u.fmode==='year'?'year':'month',cur=u.fmonth&&keys.includes(u.fmonth)?u.fmonth:keys[keys.length-1],yr=cur.slice(0,4);
   const sel=mode==='year'?keys.filter(k=>k.startsWith(yr)):[cur],inc={},exp={};
   for(const k of sel){for(const [c,v] of Object.entries(M[k].inc||{}))inc[c]=(inc[c]||0)+v;for(const [c,v] of Object.entries(M[k].exp||{}))exp[c]=(exp[c]||0)+v}
@@ -7243,7 +7243,7 @@ function exportCSV(jobId){
    Searchable topics; "Open …" buttons jump to the matching Settings section or page. Keep this list in step with new features. */
 const HELP_IC='<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.6 1.6c-.6.3-.9.7-.9 1.3M8 11.3h.01"/></svg>';
 const HELP=[
- ['Your work','Money',`The Money page (sidebar) shows what came in and went out each month, from a KKBudget export (the .txt or .json file it saves): income per job (Salary and Freelance/Gig, matched to your jobs by name), the other income categories, spending per category against your budgets, a chart of where it went and income against expenses by month. Use Import KKBudget file whenever you like; months in the file are replaced and older months stay. Before saving it asks about anything it isn't sure of (pay that doesn't name a job, transfers into a credit card, loan repayments) and remembers your answers. Only monthly totals are kept, never your transactions or balances. Budgets edits each category's monthly budget, and the eye hides the amounts.`,null],
+ ['Your work','Money',`The Money page (sidebar) shows what came in and went out each month, from a KKBudget export: income per job (Salary and Freelance/Gig, matched to your jobs by name), the other income categories, spending per category against your budgets, a chart of where it went and income against expenses by month. Use Import KKBudget file whenever you like; months in the file are replaced and older months stay. Before saving it asks about anything it isn't sure of (pay that doesn't name a job, transfers into a credit card, loan repayments) and remembers your answers. Only monthly totals are kept, never your transactions or balances. Budgets edits each category's monthly budget, and the eye hides the amounts.`,null],
  ['Getting around','Pages and views',`The sidebar has the Overview, each job, Archived, Activity and Trash. On a job page, client tabs sit under the name, with Tasks, Details and Brand guide. Switch List, Board or Calendar in the toolbar; each job remembers its own view. The browser's Back button closes the task panel or goes to the previous page, and on a phone the tab bar at the bottom has Overview, Jobs, New task, Calendar and Search.`,null],
  ['Your work','Resume',`The Resume page (sidebar footer) is an A4 page laid out like your own resume. Tap any text to change it; Enter adds a new bullet and Backspace on an empty one removes it. Use + to add a job, school, skill or link, the arrows and × to reorder or remove, and "Add from my jobs" to start an entry from one of your jobs here. Download PDF saves just the page (choose "Save as PDF"). Import loads a resume file, and Save a copy downloads one. Prefer text boxes? Show form (on a phone it's the Edit tab) lists each part with plain fields; bullets and skills go one per line. Keep to one page tightens the spacing, then the text size a little, when it runs long; a red dashed line marks where page 2 would start, and a note says how many lines to trim if it still doesn't fit.`,null],
  ['Getting around','On your phone',`Swipe right anywhere to open the sidebar (from the very left edge when you're on the board or other things that scroll sideways), and swipe left to close it. The bar at the bottom has Overview, Alerts and Calendar (your jobs are in the sidebar); Alerts opens as a full-height sheet you can drag down to close (swipe an alert left to dismiss it), and Search opens full screen like Slack's, with the search bar at the bottom. The round + above the search button opens a menu with the focus timer, New job and New task.`,null],
