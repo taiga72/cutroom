@@ -2056,7 +2056,6 @@ button.hn-t:hover{text-decoration:underline;text-underline-offset:3px}
 .fb-base{stroke:var(--line)}.fb-m{font:500 12px var(--body);fill:var(--muted)}.fb-g{cursor:pointer}.fb-g:hover .fb-m,.fb-g.on .fb-m{fill:var(--text);font-weight:700}
 .fin-bars .hint,.fin-empty p{color:var(--muted);font-size:calc(13px*var(--ts))}
 .fin-empty{max-width:560px;margin:32px 0;text-align:left}.fin-empty .btn{display:inline-flex;gap:6px;align-items:center}
-.fin-data{margin-top:44px;max-width:720px}.fin-data p{color:var(--muted);font-size:calc(13.5px*var(--ts));margin:10px 0}.fin-del{display:flex;gap:8px;flex-wrap:wrap}.fin-del .btn{display:inline-flex;gap:6px;align-items:center}
 .fin-modal{max-width:720px}
 .fin-modal header small{display:block;color:var(--muted);font-weight:600;font-size:calc(13px*var(--ts))}
 .fin-modal header h2{font:800 calc(28px*var(--ts))/1.1 var(--display);letter-spacing:-.5px;margin:4px 0 0}
@@ -5061,14 +5060,12 @@ const EYE_OFF_FIN='<svg class="i" viewBox="0 0 16 16"><path d="M2 2l12 12M6.6 6.
 const FIN_COL={'Rent/Mortgage':1,'Debt':2,'Groceries':3,'Food & Dining':4,'Shopping':5,'Savings & Investment':6,'Bills & Utilities':7,'Other':8};
 const FIN_INC_SUB={'Bonus/Commission':'Interest and cashback','Other Income':'Loans, things sold, paid back','Gift/Inheritance':'Reimbursements','Refund':'Money back from a purchase'};
 const FIN_LOAN=/(g?loan|atome|maya ?black|\bmbe\b|maya credit)/i;
-let FIN_REV=null,FIN_EDIT=false,FIN_DEL=null;
+let FIN_REV=null,FIN_EDIT=false;
 const fin=()=>S.settings.finance||{};
 const finHidden=()=>lsGet('cutroom.finhide')===1;
 const peso=n=>finHidden()?'₱•••••':'₱'+Math.round(n||0).toLocaleString('en-US');
 const finMonthLbl=m=>`${MONTH_FULL[+m.slice(5)-1]} ${m.slice(0,4)}`;
 function finSave(p){if(S.settings.finance)patch('settings','finance',p);else create('settings',p,'finance')}
-/* patch() deep-merges, so removing a month or a budget rewrites the whole doc */
-function finPut(doc){const {id,...d}=doc;create('settings',{...d,updated:Date.now()},'finance')}
 const finNorm=x=>String(x||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 function finJob(desc){const d=finNorm(desc);if(!d)return null;
   const js=jobsSorted().filter(j=>!j.example).length?jobsSorted().filter(j=>!j.example):jobsSorted();
@@ -5123,15 +5120,6 @@ function finCommit(){
   finSave(p);FIN_REV=null;$('#modal').hidden=true;$('#modal').innerHTML='';
   S.ui.fmode='month';S.ui.fmonth=R.months[R.months.length-1];if(S.ui.tab!=='money')S.ui.tab='money';saveUi();render();
   toast(`Imported ${R.months.length===1?finMonthLbl(R.months[0]):`${finMonthLbl(R.months[0])} to ${finMonthLbl(R.months[R.months.length-1])}`}.`)}
-/* Delete this month or all Money data (click twice; Undo restores the doc as it was) */
-function finDelete(k){
-  if(FIN_DEL!==k){FIN_DEL=k;render();clearTimeout(finDelete.t);finDelete.t=setTimeout(()=>{if(FIN_DEL===k){FIN_DEL=null;render()}},4000);return}
-  FIN_DEL=null;const before=JSON.parse(JSON.stringify(fin()));
-  if(k==='all'){if(S.settings.finance)remove('settings','finance');S.ui.fmonth=null}
-  else{const months={...(before.months||{})};delete months[k];finPut({...before,months});const keys=Object.keys(months).sort();S.ui.fmonth=keys.filter(x=>x<k).pop()||keys[0]||null}
-  saveUi();render();
-  toast(k==='all'?'Deleted all money data.':`Deleted ${finMonthLbl(k)}.`,{label:'Undo',fn:()=>{finPut(before);S.ui.fmonth=k==='all'?null:k;saveUi();render()}});
-}
 function finStep(d){const keys=Object.keys(fin().months||{}).sort();if(!keys.length)return;const u=S.ui,cur=u.fmonth&&keys.includes(u.fmonth)?u.fmonth:keys[keys.length-1];
   if(u.fmode==='year'){const ys=[...new Set(keys.map(k=>k.slice(0,4)))],i=ys.indexOf(cur.slice(0,4))+d;if(ys[i])u.fmonth=keys.filter(k=>k.startsWith(ys[i])).pop()}
   else{const i=keys.indexOf(cur)+d;if(keys[i])u.fmonth=keys[i]}saveUi();render()}
@@ -5180,9 +5168,7 @@ function renderMoney(){
   $('#view').innerHTML=`<div class="cs fin ${finHidden()?'fin-hide':''}">${head}${sub}<div class="fin-cols">
     <div class="fin-main"><section class="cs-g"><div class="cs-gh"><b>Income</b><span>${Object.keys(inc).length} source${Object.keys(inc).length===1?'':'s'}</span><em class="fin-gt">${peso(ti)}</em></div>${ir||'<p class="hm-empty">No income in this period.</p>'}</section>
     <section class="cs-g"><div class="cs-gh"><b>${FIN_EDIT?'Monthly budgets':'Spending vs budget'}</b><span>${cats.length} categor${cats.length===1?'y':'ies'}</span><em class="fin-gt">${peso(te)}</em></div>${er||'<p class="hm-empty">No spending in this period.</p>'}</section></div>
-    <aside class="fin-side"><section class="cs-g"><div class="cs-gh"><b>Where it went</b></div>${finDonut(exp)}</section><section class="cs-g"><div class="cs-gh"><b>Income and expenses</b></div>${finBars(bl)}</section></aside></div>
-    <section class="cs-g fin-data"><div class="cs-gh"><b>Your money data</b></div><p>${keys.length} month${keys.length===1?'':'s'} saved, ${esc(finMonthLbl(keys[0]))}${keys.length>1?` to ${esc(finMonthLbl(keys[keys.length-1]))}`:''}. Only monthly totals and your import answers are kept.</p>
-      <div class="fin-del">${mode==='month'?`<button type="button" class="btn sm danger ${FIN_DEL===cur?'armed':''}" data-act="fin-del" data-k="${cur}">${I.trash}${FIN_DEL===cur?'Click again to delete '+esc(finMonthLbl(cur)):'Delete '+esc(finMonthLbl(cur))}</button>`:''}<button type="button" class="btn sm danger ${FIN_DEL==='all'?'armed':''}" data-act="fin-del" data-k="all">${I.trash}${FIN_DEL==='all'?'Click again to delete everything':'Delete all money data'}</button></div></section></div>`;
+    <aside class="fin-side"><section class="cs-g"><div class="cs-gh"><b>Where it went</b></div>${finDonut(exp)}</section><section class="cs-g"><div class="cs-gh"><b>Income and expenses</b></div>${finBars(bl)}</section></aside></div></div>`;
 }
 /* ================= Calendar page (tab 'calendar') =================
    Job chips on top (S.ui.cjob) instead of the filters, and a No date tray (S.ui.ctray) whose tasks drag onto a day
@@ -7257,7 +7243,7 @@ function exportCSV(jobId){
    Searchable topics; "Open …" buttons jump to the matching Settings section or page. Keep this list in step with new features. */
 const HELP_IC='<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.6 1.6c-.6.3-.9.7-.9 1.3M8 11.3h.01"/></svg>';
 const HELP=[
- ['Your work','Money',`The Money page (sidebar) shows what came in and went out each month, from a KKBudget export (the .txt or .json file it saves): income per job (Salary and Freelance/Gig, matched to your jobs by name), the other income categories, spending per category against your budgets, a chart of where it went and income against expenses by month. Use Import KKBudget file whenever you like; months in the file are replaced and older months stay. Before saving it asks about anything it isn't sure of (pay that doesn't name a job, transfers into a credit card, loan repayments) and remembers your answers. Only monthly totals are kept, never your transactions or balances. Budgets edits each category's monthly budget, and the eye hides the amounts. At the bottom, Your money data deletes the month you're looking at or all money data (click twice; Undo brings it back).`,null],
+ ['Your work','Money',`The Money page (sidebar) shows what came in and went out each month, from a KKBudget export (the .txt or .json file it saves): income per job (Salary and Freelance/Gig, matched to your jobs by name), the other income categories, spending per category against your budgets, a chart of where it went and income against expenses by month. Use Import KKBudget file whenever you like; months in the file are replaced and older months stay. Before saving it asks about anything it isn't sure of (pay that doesn't name a job, transfers into a credit card, loan repayments) and remembers your answers. Only monthly totals are kept, never your transactions or balances. Budgets edits each category's monthly budget, and the eye hides the amounts.`,null],
  ['Getting around','Pages and views',`The sidebar has the Overview, each job, Archived, Activity and Trash. On a job page, client tabs sit under the name, with Tasks, Details and Brand guide. Switch List, Board or Calendar in the toolbar; each job remembers its own view. The browser's Back button closes the task panel or goes to the previous page, and on a phone the tab bar at the bottom has Overview, Jobs, New task, Calendar and Search.`,null],
  ['Your work','Resume',`The Resume page (sidebar footer) is an A4 page laid out like your own resume. Tap any text to change it; Enter adds a new bullet and Backspace on an empty one removes it. Use + to add a job, school, skill or link, the arrows and × to reorder or remove, and "Add from my jobs" to start an entry from one of your jobs here. Download PDF saves just the page (choose "Save as PDF"). Import loads a resume file, and Save a copy downloads one. Prefer text boxes? Show form (on a phone it's the Edit tab) lists each part with plain fields; bullets and skills go one per line. Keep to one page tightens the spacing, then the text size a little, when it runs long; a red dashed line marks where page 2 would start, and a note says how many lines to trim if it still doesn't fit.`,null],
  ['Getting around','On your phone',`Swipe right anywhere to open the sidebar (from the very left edge when you're on the board or other things that scroll sideways), and swipe left to close it. The bar at the bottom has Overview, Alerts and Calendar (your jobs are in the sidebar); Alerts opens as a full-height sheet you can drag down to close (swipe an alert left to dismiss it), and Search opens full screen like Slack's, with the search bar at the bottom. The round + above the search button opens a menu with the focus timer, New job and New task.`,null],
@@ -8816,7 +8802,6 @@ document.addEventListener('click',e=>{
     case 'fin-cancel': FIN_REV=null;$('#modal').hidden=true;$('#modal').innerHTML='';break;
     case 'fin-save': finCommit();break;
     case 'fin-more': FIN_REV.more.add(el.dataset.k);renderFinReview();break;
-    case 'fin-del': finDelete(el.dataset.k);break;
     case 'backup-cancel': SM.restore=null;renderSettings();break;
     case 'backup-restore': runRestore();break;
     case 'rp-create': rpCreate();break;
@@ -9126,7 +9111,7 @@ document.addEventListener('change',e=>{
   if(el.id==='backup-in'){const f=el.files[0];el.value='';readBackup(f);return}
   if(el.id==='fin-in'){const f=el.files[0];el.value='';finRead(f);return}
   if(el.dataset.frev){FIN_REV.ans[el.dataset.frev]=el.type==='checkbox'?el.checked:el.value;return}
-  if(el.classList.contains('fin-bud')){const b={...(fin().budgets||{})},v=parseFloat(el.value);if(v>0)b[el.dataset.cat]=v;else delete b[el.dataset.cat];finPut({...fin(),budgets:b});render();return}
+  if(el.classList.contains('fin-bud')){const b={...(fin().budgets||{})},v=parseFloat(el.value);if(v>0)b[el.dataset.cat]=v;else delete b[el.dataset.cat];finSave({budgets:b});render();return}
   if(el.id==='import-in'){const f=el.files[0];el.value='';readImport(f);return}
   if(el.id==='photo-in'){const f=el.files[0];el.value='';addPhoto(f);return}
   if(el.id==='upd-pics-in'){const fs=[...el.files];el.value='';attAdd(fs,ATT_FOR);return}
