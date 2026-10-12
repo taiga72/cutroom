@@ -87,10 +87,11 @@ function eventFor(t, jobs, clients, appUrl, labels = {}) {
   };
 }
 
+// Money rows (settings ids starting with "$") aren't needed for the calendar
 async function loadDocs(uid) {
   const out = { jobs: {}, clients: {}, tasks: {}, settings: {} };
   for (let from = 0; ; from += 1000) {
-    const rows = await sb(`docs?user_id=eq.${uid}&col=in.(jobs,clients,tasks,settings)&select=col,id,data&order=col,id`, {
+    const rows = await sb(`docs?user_id=eq.${uid}&col=in.(jobs,clients,tasks,settings)&id=not.like.%24*&select=col,id,data&order=col,id`, {
       headers: { Range: `${from}-${from + 999}` }
     });
     rows.forEach(r => { out[r.col][r.id] = { ...r.data, id: r.id }; });

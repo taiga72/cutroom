@@ -28,10 +28,15 @@ async function list(uid) {
 
 async function create(uid) {
   await ensureBucket();
-  const data = { jobs: {}, clients: {}, tasks: {}, settings: {} };
+  const data = { jobs: {}, clients: {}, tasks: {}, settings: {}, accounts: {}, transactions: {}, budgets: {}, goals: {} };
   for (let from = 0; ; from += 1000) {
     const rows = await sb(`docs?user_id=eq.${uid}&select=col,id,data&order=col,id&limit=1000&offset=${from}`);
-    for (const r of rows || []) if (data[r.col]) data[r.col][r.id] = r.data;
+    for (const r of rows || []) {
+      // Money rows live in settings with ids like "$transactions:<id>"
+      let col = r.col, id = r.id;
+      if (col === 'settings' && id[0] === '$') { const i = id.indexOf(':'); col = id.slice(1, i); id = id.slice(i + 1); }
+      if (data[col]) data[col][id] = r.data;
+    }
     if (!rows || rows.length < 1000) break;
   }
   const date = new Date().toISOString().slice(0, 10);
