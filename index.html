@@ -3251,6 +3251,37 @@ body.side-mini .v2-jh,body.side-mini .v2-who .name,body.side-mini .v2-me>.icon-b
   .v2-facts .vf-st{grid-column:1/-1}.v2-facts .vf-st .st-ctl{flex:1}
   .v2-facts .vf{min-width:0}.v2-facts .vf :is(select,input){flex:1;min-width:0;width:100%}
 }
+
+/* Inbox page */
+.inb{max-width:900px}
+.inb .v2-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.inb .v2-head h1{margin:0;font:800 calc(54px*var(--ts))/1 var(--display);letter-spacing:-.035em}
+.inb-chips{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 6px}
+.inb-chips button{height:32px;padding:0 13px;border-radius:99px;border:1px solid var(--line-strong);background:var(--surface);font-size:calc(13px*var(--ts));font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.inb-chips button.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.inb-chips em{font-style:normal;font-weight:500;color:var(--faint)}.inb-chips button.on em{color:color-mix(in srgb,var(--bg) 70%,transparent)}
+.inb-it{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:14px;padding:16px 0;border-bottom:1px solid var(--line);align-items:start}
+.inb-it>.av,.inb-it>.me-av,.inb-it>img{width:34px;height:34px}
+.inb-ic{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);color:var(--muted)}
+.inb-ic svg{width:16px;height:16px}
+.inb-ic.k-danger{background:var(--danger-soft);color:var(--danger)}.inb-ic.k-warn{background:color-mix(in srgb,var(--warn) 14%,var(--surface));color:var(--warn)}
+.inb-main{border:0;background:none;padding:0;text-align:left;display:flex;flex-direction:column;gap:3px;min-width:0;color:var(--text);cursor:pointer}
+.inb-main b{font-weight:600;font-size:calc(15px*var(--ts))}
+.inb-it.unread .inb-main b::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:8px;vertical-align:2px}
+.inb-body{color:var(--muted);font-size:calc(14px*var(--ts));overflow-wrap:anywhere}
+.inb-ctx{display:flex;align-items:center;gap:7px;margin-top:3px;color:var(--faint);font-size:calc(12.5px*var(--ts))}
+.inb-ctx .v2-sq{width:8px;height:8px;border-radius:2px;margin:0}
+.inb-r{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.inb-r time{font-size:calc(12.5px*var(--ts));color:var(--faint);white-space:nowrap}
+.inb-acts{display:flex;align-items:center;gap:6px}
+.inb-acts .icon-btn{width:30px;height:30px;opacity:.55}.inb-it:hover .inb-acts .icon-btn{opacity:1}
+@media (max-width:820px){
+  .inb .v2-head h1{font-size:calc(40px*var(--ts))}.inb .inb-lede{display:none}.inb .v2-sum i{display:none}.inb .v2-head .btn{height:36px}
+  .inb-chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:16px -16px 4px;padding:0 16px}
+  .inb-chips button{flex:none}
+  .inb-it{grid-template-columns:34px minmax(0,1fr)}
+  .inb-r{grid-column:2;flex-direction:row;align-items:center;justify-content:space-between}
+}
 </style>
 
 <div class="app">
@@ -4794,7 +4825,7 @@ function render(){
   document.title=(a.name||'').trim()||APP_NAME;pomoTitle();
   const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
   withFocus(()=>{renderSide();renderMain()});
-  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();stickerSoon();renderMeBtn();renderUpNextPage();boardRestore();document.body.classList.toggle('cal-page',S.ui.view==='calendar'&&!['archived','activity','trash','help','resume','upnext'].includes(S.ui.tab));
+  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();stickerSoon();renderMeBtn();renderUpNextPage();boardRestore();document.body.classList.toggle('cal-page',S.ui.view==='calendar'&&!['inbox','archived','activity','trash','help','resume','upnext'].includes(S.ui.tab));
   if(S.ready&&!SEASON_RAN){SEASON_RAN=true;setTimeout(()=>seasonFx(),900)}
 }
 
@@ -4817,10 +4848,10 @@ function renderSide(){queueMicrotask(renderOffline);
   const app=appSettings();const appLogo=imgSrc(app.logo);
   document.body.classList.toggle('side-mini',!!u.sideMini);
   const tt=n=>u.sideMini?` title="${n}"`:'';
-  const inboxN=(()=>{try{return S.ready?notifications().filter(n=>!NS.read[n.key]).length:0}catch(e){return 0}})();
+  const inboxN=(()=>{try{return S.ready?inboxList().filter(n=>!NS.read[n.key]).length:0}catch(e){return 0}})();
   const nv=(tab,label,icon,count,act='nav')=>`<button class="nav-item ${u.tab===tab&&act==='nav'?'on':''}" data-act="${act}" data-tab="${tab}"${tt(label)}>${icon}<span class="name">${label}</span><span class="count">${count||''}</span></button>`;
   let html=`<button type="button" class="icon-btn side-toggle" data-act="side-mini" aria-label="${u.sideMini?'Expand sidebar':'Collapse sidebar'}" title="${u.sideMini?'Expand sidebar':'Collapse sidebar'}">${I.left}</button><button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Today">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
-  <div class="side-scroll"><nav class="nav" aria-label="Main">${nv('overview','Today',V2_IC.today,S.ready?allOpen:'')}${nv('calendar','Calendar',I.cal)}${nv('inbox','Inbox',V2_IC.inbox,inboxN,'bell')}${nv('archived','Done',V2_IC.done)}</nav>
+  <div class="side-scroll"><nav class="nav" aria-label="Main">${nv('overview','Today',V2_IC.today,S.ready?allOpen:'')}${nv('calendar','Calendar',I.cal)}${nv('inbox','Inbox',V2_IC.inbox,inboxN)}${nv('archived','Done',V2_IC.done)}</nav>
   <div class="v2-jh"><span>Jobs</span><button type="button" class="icon-btn" data-act="new-job" title="New job" aria-label="New job">${I.plus}</button></div>
   <nav class="nav jobs" id="nav-jobs" aria-label="Jobs">`;
   for(const j of jobsSorted()){
@@ -4855,6 +4886,7 @@ function renderMain(){
    if(cdp){const [a,b]=cdp,na=clientTaskN(a),nb=clientTaskN(b);$('#banner').innerHTML=`<div class="banner cdup-banner"><p>${I.users||''}<b>“${esc(b.name)}” looks like “${esc(a.name)}”.</b> Same client? ${nb?`Merging moves its ${nb===1?'task':`${nb} tasks`} over.`:'It has no tasks yet.'}</p><button class="btn sm primary" data-act="cdup-merge" data-keep="${a.id}" data-from="${b.id}">Merge into “${esc(a.name)}”</button><button class="btn sm" data-act="cdup-merge" data-keep="${b.id}" data-from="${a.id}">Merge into “${esc(b.name)}”</button><button class="btn sm ghost" data-act="cdup-keep" data-a="${a.id}" data-b="${b.id}">Keep both</button></div>`}}
 
   document.body.classList.toggle('pg-job',!!job&&!['archived','activity','trash','help','resume'].includes(u.tab));document.body.classList.toggle('pg-cal',u.tab==='calendar');
+  if(u.tab==='inbox'){renderInbox();return}
   if(u.tab==='archived'){renderArchive();return}
   if(u.tab==='activity'){renderActivity();return}
   if(u.tab==='trash'){renderTrash();return}
@@ -4925,7 +4957,7 @@ function renderMain(){
 /* ================= address bar: Back button and task links =================
    The page's place is kept in the URL hash (#/overview, #/job/<id>/client/<id>/pane/brand, …/task/<id>), so the
    browser's Back closes the task panel or returns to the previous page, and a task link opens that task. */
-const PAGES=['overview','calendar','upnext','archived','activity','trash','help','resume','upnext'];
+const PAGES=['overview','calendar','inbox','upnext','archived','activity','trash','help','resume','upnext'];
 let URL_READY=false,URL_LAST=null,URL_TASK_PUSHED=false,URL_APPLYING=false;
 const LINK_IC='<svg class="i" viewBox="0 0 16 16"><path d="M6.8 9.2a2.8 2.8 0 0 0 4 0l2.2-2.2a2.8 2.8 0 0 0-4-4l-.9.9"/><path d="M9.2 6.8a2.8 2.8 0 0 0-4 0L3 9a2.8 2.8 0 0 0 4 4l.9-.9"/></svg>';
 function urlOf(){
@@ -5020,10 +5052,10 @@ function renderPlus(){
     <button type="button" class="btn primary pm-task" data-act="new-task">${I.plus}New task</button>`;
 }
 function renderTabbar(){
-  const e=$('#tabbar');if(!e)return;const u=S.ui,cal=u.view==='calendar'&&!['archived','activity','trash','help','resume','upnext'].includes(u.tab);
+  const e=$('#tabbar');if(!e)return;const u=S.ui,cal=u.view==='calendar'&&!['inbox','archived','activity','trash','help','resume','upnext'].includes(u.tab);
   const b=(act,label,icon,on,extra='',short=label)=>`<button type="button" data-act="${act}" class="${on?'on':''} ${extra} tb-${act.slice(3)}" aria-label="${label}" ${on?'aria-current="page"':''}>${icon}<span>${short}</span></button>`;
   const busy=notesOpen||UPN;
-  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Today',V2_IC.today,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Inbox',V2_IC.inbox+(()=>{const n=$('#bell-n');return n&&!n.hidden?`<i class="tb-badge">${esc(n.textContent)}</i>`:''})(),notesOpen,'','Inbox')+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-upnext','Up next',UP_IC+(()=>{const n=upNextList().length;return n?`<i class="tb-badge tb-cnt">${n}</i>`:''})(),UPN)+b('tb-me','You',meAvatar(26),!!PRF)}</div>`
+  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Today',V2_IC.today,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Inbox',V2_IC.inbox+(()=>{const n=$('#bell-n');return n&&!n.hidden?`<i class="tb-badge">${esc(n.textContent)}</i>`:''})(),notesOpen||u.tab==='inbox','','Inbox')+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-upnext','Up next',UP_IC+(()=>{const n=upNextList().length;return n?`<i class="tb-badge tb-cnt">${n}</i>`:''})(),UPN)+b('tb-me','You',meAvatar(26),!!PRF)}</div>`
     +`<button type="button" data-act="tb-search" class="tb-search" aria-label="Search" title="Search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 14 14"/></svg></button>`
     +`<button type="button" data-act="tb-plus" class="tb-fab ${PLUS?'on':''}" aria-label="New" aria-expanded="${PLUS}" title="New task, new job or focus timer">${I.plus}</button>`;
 }
@@ -5545,10 +5577,10 @@ function notifications(all){
     }
     if((t.revision||0)>=3)out.push({key:`rev:${t.id}:${t.revision}`,rank:5,kind:'info',icon:'loop',task:t,title:`${nm} is on revision round ${t.revision}`,body:'Might be time to agree the remaining changes in one go.'});
     for(const f of (t.cu?.feed||[]).slice(-12)){if(f.k!=='comment'||f.me)continue;const mn=cuMention(f),age=Date.now()-new Date(f.at);if(age>(mn?7:3)*86400000)continue;
-      out.push({key:`${mn?'cum':'cu'}:${t.id}:${f.cid}`,rank:mn?0.5:1.5,kind:mn?'warn':'info',icon:'chat',task:t,tab:'activity',mention:mn,title:mn?`${f.who||'Someone'} mentioned you on ${nm}`:`${f.who||'Someone'} commented on ${nm}`,body:String(f.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}
+      out.push({who:f.who,key:`${mn?'cum':'cu'}:${t.id}:${f.cid}`,rank:mn?0.5:1.5,kind:mn?'warn':'info',icon:'chat',task:t,tab:'activity',mention:mn,title:mn?`${f.who||'Someone'} mentioned you on ${nm}`:`${f.who||'Someone'} commented on ${nm}`,body:String(f.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}
     for(const f of (t.cu?.feed||[]).slice(-12))for(const r of f.replies||[]){if(r.me)continue;const rr={...r,k:'reply'},mn=cuMention(rr),age=Date.now()-new Date(r.at);if(age>(mn?7:3)*86400000)continue;
-      out.push({key:`${mn?'cum':'cu'}:${t.id}:${r.cid}`,rank:mn?0.5:1.5,kind:mn?'warn':'info',icon:'chat',task:t,tab:'activity',mention:mn,title:mn?`${r.who||'Someone'} mentioned you on ${nm}`:`${r.who||'Someone'} replied on ${nm}`,body:String(r.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}
-    {const nr=needsReply(t);if(nr.length){const l=nr[nr.length-1];out.push({key:`nr:${t.id}:${l.key}`,rank:0.6,kind:'warn',icon:'chat',task:t,tab:'activity',reply:true,title:nr.length===1?`${l.who||'Someone'} is waiting for your reply on ${nm}`:`${nr.length} comments on ${nm} are waiting for your reply`,body:String(l.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}}
+      out.push({who:r.who,key:`${mn?'cum':'cu'}:${t.id}:${r.cid}`,rank:mn?0.5:1.5,kind:mn?'warn':'info',icon:'chat',task:t,tab:'activity',mention:mn,title:mn?`${r.who||'Someone'} mentioned you on ${nm}`:`${r.who||'Someone'} replied on ${nm}`,body:String(r.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}
+    {const nr=needsReply(t);if(nr.length){const l=nr[nr.length-1];out.push({who:l.who,key:`nr:${t.id}:${l.key}`,rank:0.6,kind:'warn',icon:'chat',task:t,tab:'activity',reply:true,title:nr.length===1?`${l.who||'Someone'} is waiting for your reply on ${nm}`:`${nr.length} comments on ${nm} are waiting for your reply`,body:String(l.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}}
     if(!t.due&&(t.priority==='urgent'||t.priority==='high'))out.push({key:`nodate:${t.id}`,rank:6,kind:'info',icon:'cal',task:t,title:`${nm} is ${t.priority==='urgent'?'urgent':'high priority'} but has no due date`,body:''});
   }
   const load=dueLoad();
@@ -5562,9 +5594,39 @@ function notifications(all){
   const list=out.sort((a,b)=>a.rank-b.rank||(a.task?.due||a.day||'').localeCompare(b.task?.due||b.day||''));
   return all?list:list.filter(n=>!NS.hidden[n.key]);
 }
+/* ================= Inbox page (tab 'inbox'): every alert in one list — comments waiting for you, deadlines, follow-ups ================= */
+/* alerts for the Inbox, without a comment that already shows as "waiting for your reply" */
+function inboxList(){const all=notifications(),nr=new Set(all.filter(n=>n.reply).map(n=>n.task?.id+'|'+n.body));return all.filter(n=>n.reply||!/^cum?:/.test(n.key)||!nr.has(n.task?.id+'|'+n.body))}
+function renderInbox(){
+  const u=S.ui;
+  $('#head').innerHTML='<div class="head head-ov head-cs"></div>';
+  $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
+  const list=inboxList(),f=naSets(list),shown=f[NF]||list,unread=f.unread.length,kindOf=n=>n.key.split(':')[0],t0=today();
+  const act=n=>{const k=kindOf(n),t=n.task;
+    if(k==='nr'&&t)return `<button type="button" class="btn sm" data-act="inb-handled" data-id="${t.id}" data-key="${esc(n.key)}">Mark handled</button>`;
+    if(k==='over'&&t)return `<button type="button" class="btn sm" data-act="inb-push" data-id="${t.id}" data-key="${esc(n.key)}">Move to today</button>`;
+    if(k==='busy')return `<button type="button" class="btn sm" data-act="note-open" data-key="${esc(n.key)}">See the week</button>`;
+    if(k==='cunew')return `<button type="button" class="btn sm" data-act="note-open" data-key="${esc(n.key)}">Review</button>`;
+    return '';};
+  const when=n=>{const t=n.task,k=kindOf(n);if(['cu','cum','nr'].includes(k)&&t){const f=(t.cu?.feed||[]).flatMap(x=>[x,...(x.replies||[])]).find(x=>n.key.endsWith(':'+x.cid));if(f?.at)return calAgo(f.at)}
+    return t?.due?fmtRel(t.due,k==='over'):n.day?fmtDate(n.day):''};
+  const row=n=>{const t=n.task,k=kindOf(n),j=t&&S.jobs[t.jobId];
+    const av=n.who?avOther(n.who,34):`<span class="inb-ic k-${n.kind}">${I[n.icon]||I.info}</span>`;
+    return `<div class="inb-it ${NS.read[n.key]?'':'unread'}" data-nkey="${esc(n.key)}">${av}
+      <button type="button" class="inb-main" data-act="note-open" data-key="${esc(n.key)}"><b>${esc(n.title.replace(/[“”]/g,''))}</b>${n.body?`<span class="inb-body">${esc(n.body)}</span>`:''}
+        <span class="inb-ctx">${j?`<i class="v2-sq" style="--jc:${esc(j.color||'var(--accent)')}"></i>`:''}${esc(NA_LBL[k]||'')}${n.sub?` · ${esc(n.sub)}`:''}</span></button>
+      <div class="inb-r"><time>${esc(when(n))}</time><div class="inb-acts">${act(n)}<button type="button" class="icon-btn" data-act="note-hide" data-key="${esc(n.key)}" title="Dismiss" aria-label="Dismiss">${I.x}</button></div></div></div>`};
+  const chips=[['all','All'],['unread','Unread'],...(f.replies.length?[['replies','Needs reply']]:[]),...(f.mentions.length?[['mentions','Mentions']]:[]),['deadlines','Deadlines'],['followups','Follow-ups']]
+    .map(([k,l])=>`<button type="button" class="${NF===k?'on':''}" data-act="na-filter" data-f="${k}">${l}<em>${f[k].length||''}</em></button>`).join('');
+  $('#view').innerHTML=`<div class="inb">
+    <header class="v2-head"><div><h1>Inbox</h1><p class="v2-sum">${list.length?`${unread?`<b>${unread} unread</b><i>·</i>`:''}<span class="inb-lede">Comments that need you, deadlines and follow-ups. Dismiss one and it leaves.</span>`:'Nothing needs you right now.'}</p></div>${unread?'<button type="button" class="btn" data-act="notes-read">Mark all read</button>':''}</header>
+    <div class="inb-chips">${chips}</div>
+    ${shown.length?`<div class="inb-list">${shown.map(row).join('')}</div>`:`<div class="empty"><h3>${list.length?'Nothing in this filter':"You're all caught up"}</h3><p>${list.length?'Try All to see everything.':'Comments from ClickUp, late tasks, busy days and tasks that need a nudge show up here.'}</p>${list.length?'<button class="btn" data-act="na-filter" data-f="all">Show all</button>':''}</div>`}
+  </div>`;
+}
 function renderBell(){
   const b=$('#bell');if(!b)return;
-  let list=S.ready?notifications():[];const unread=list.filter(n=>!NS.read[n.key]).length;
+  let list=S.ready?inboxList():[];const unread=list.filter(n=>!NS.read[n.key]).length;
   const c=$('#bell-n');c.hidden=!unread;c.textContent=unread>9?'9+':unread;
   b.classList.toggle('has',!!unread);b.setAttribute('aria-expanded',notesOpen);
   b.setAttribute('aria-label',unread?`Alerts, ${unread} unread`:'Alerts');
@@ -8885,7 +8947,7 @@ document.addEventListener('click',e=>{
   if(a!=='cal-disconnect'&&CAL.disArmed){CAL.disArmed=false;if(SM)renderSettings()}
   if(SM&&SM.stArm&&!/^st-(del|del-go)$/.test(a)&&!el.closest('.st-del-box')){SM.stArm=null;renderSettings()}
   switch(a){
-    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','calendar','archived','activity','trash','help','resume','upnext'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';{let v=u.views?.[u.tab]||(['home','calendar'].includes(u.view)&&S.jobs[u.tab]?'list':u.view);if(narrow.matches&&v==='calendar')v=u.lastLB||'list';u.view=v}saveUi();render();window.scrollTo({top:0});break;
+    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','calendar','inbox','archived','activity','trash','help','resume','upnext'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';{let v=u.views?.[u.tab]||(['home','calendar'].includes(u.view)&&S.jobs[u.tab]?'list':u.view);if(narrow.matches&&v==='calendar')v=u.lastLB||'list';u.view=v}saveUi();render();window.scrollTo({top:0});break;
     case 'view': u.view=el.dataset.view;(u.views=u.views||{})[u.tab]=u.view;if(u.view!=='calendar')u.lastLB=u.view;saveUi();render();break;
     case 'vopt': VOPT=!VOPT;renderVopt();break;
     case 'cx': ctxDo(el.dataset.do,el.dataset.v);break;
@@ -8901,7 +8963,7 @@ document.addEventListener('click',e=>{
     case 'pm-job': PLUS=false;renderPlus();openJobModal();break;
     case 'tb-me': PLUS=false;renderPlus();if(UPN){UPN=false;renderUpNextPage()}if(notesOpen){notesOpen=false;renderBell()}closeSide();PRF?closeProfile():openProfile();renderTabbar();break;
     case 'tb-upnext': UPN=!UPN;if(UPN){notesOpen=false;renderBell();closeSide()}renderUpNextPage();renderTabbar();if(UPN)gestSheet($('#upnext-page'));break;
-    case 'tb-notes': UPN=false;renderUpNextPage();notesOpen=!notesOpen;if(notesOpen){saveNotes();POMO_OPEN=false;renderPomo();closeSide()}renderBell();if(notesOpen&&narrow.matches)gestSheet($('#notes'));break;
+    case 'tb-notes': UPN=false;renderUpNextPage();notesOpen=false;PLUS=false;closeSide();if(u.tab!=='inbox')u.from=u.tab;u.tab='inbox';saveUi();render();window.scrollTo({top:0});break;
     case 'groups-all': {const open=el.dataset.open==='1';u.collapsed=u.collapsed||{};(S.jobs[u.tab]?statusesFor(u.tab):STATUSES).forEach(x=>{u.collapsed[x.id]=!open});saveUi();render();break}
     case 'rs-print': rsPrint();break;
     case 'rs-mode': u.rsMode=el.dataset.m;saveUi();render();break;
@@ -8923,10 +8985,12 @@ document.addEventListener('click',e=>{
     case 'log-more': u.lmore=(u.lmore||200)+200;render();break;
     case 'bell': notesOpen=!notesOpen;if(notesOpen)saveNotes();renderBell();break;
     case 'notes-close': notesOpen=false;renderBell();break;
-    case 'na-filter': NF=el.dataset.f;renderBell();break;
-    case 'notes-read': notifications().forEach(n=>NS.read[n.key]=1);saveNotes();renderBell();break;
+    case 'na-filter': NF=el.dataset.f;renderBell();if(u.tab==='inbox')render();break;
+    case 'inb-handled': {const t=S.tasks[el.dataset.id];if(t){nrDone(t,null);NS.read[el.dataset.key]=1;notifications().forEach(n=>{if(/^cum?:/.test(n.key)&&n.task?.id===t.id){NS.hidden[n.key]=1;NS.read[n.key]=1}});saveNotes();toast('Marked as handled')}render();break}
+    case 'inb-push': {const t=S.tasks[el.dataset.id];if(t){const was=t.due;patch('tasks',t.id,{due:today()});logAct('date',`Due date set to ${fmtDate(today())}`,{task:t});toast('Moved to today',{label:'Undo',fn:()=>{patch('tasks',t.id,{due:was});render()}})}render();break}
+    case 'notes-read': notifications().forEach(n=>NS.read[n.key]=1);saveNotes();renderBell();if(u.tab==='inbox')render();break;
     case 'note-open': openNote(el.dataset.key);break;
-    case 'note-hide': NS.hidden[el.dataset.key]=1;NS.read[el.dataset.key]=1;saveNotes();renderBell();break;
+    case 'note-hide': NS.hidden[el.dataset.key]=1;NS.read[el.dataset.key]=1;saveNotes();renderBell();if(u.tab==='inbox')render();break;
     case 'brand-edit': openBrand(el.dataset.col,el.dataset.id);break;
     case 'brand-cancel': if(!guardClose())closeBrand();break;
     case 'brand-save': saveBrand();break;
