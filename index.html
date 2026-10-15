@@ -8030,7 +8030,25 @@ function renderSettings(){
     {id:'import',label:'Import CSV',icon:I.upload,html:importSettingsHtml()},
     {id:'dupes',label:'Duplicate tasks',icon:'<svg class="i" viewBox="0 0 16 16"><rect x="5" y="5" width="8.5" height="8.5" rx="1.5"/><path d="M10.5 3V2.5A1 1 0 0 0 9.5 1.5h-7a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1H3"/></svg>',html:dupesHtml()},
     {id:'backup',label:'Backup',icon:I.download,html:backupSettingsHtml()}];
-  const META={appearance:['Look & feel','Theme, colors, surfaces'],tasks:['Look & feel','Task rows, due dates, the Calendar'],fun:['Look & feel','Greeting, the office cat, cork board'],a11y:['Look & feel','Text size, motion, contrast'],statuses:['Your work','Rename, recolor and reorder'],workload:['Your work','When a day counts as busy'],holidays:['Your work','Public holidays on the Calendar'],pomo:['Your work','Focus and break lengths, sounds'],safezones:['Your work','TikTok, Reels and Shorts overlays'],branding:['App','Your own name and logo'],finder:['App','Mac folders and Chrome profiles'],account:['App','Google Calendar and sign out'],clickup:['App','Bring in tasks assigned to you'],keys:['App','Shortcuts on a keyboard'],import:['Your data','Bring in a tracker sheet'],dupes:['Your data','Find and merge tasks with the same name'],backup:['Your data','Download, restore, trash']};
+  /* revamp: one General section replaces Appearance, Tasks & calendar, Accessibility and Workload; the fun extras and overlays are gone */
+  {const pick=id=>secs.find(x=>x.id===id),a11=pick('a11y').html,ts=a11.slice(0,a11.indexOf('<div class="field"><span class="lbl" id="s-dens-lbl">'));
+   const gen={id:'general',label:'General',icon:I.gear,html:`<p class="pref-group" style="margin-top:0">Dates</p>
+      ${prefRow('dateRel','Dates in lists',[[false,absDate(addDays(today(),3))],[true,'in 3 days']],'The date itself, or how far away it is')}
+      ${prefRow('dateFmt','Date format',[['md','Oct 1'],['dm','1 Oct']])}
+      ${prefRow('weekStart','Week starts on',[['mon','Monday'],['sun','Sunday']])}
+      ${prefRow('hideWeekends','Weekends on the Calendar',[[false,'Full width'],[true,'Narrow']])}
+      <p class="pref-group">Tasks</p>
+      ${prefRow('autoArchive','Archive finished tasks',[[0,'Off'],[3,'3 days'],[7,'7 days'],[14,'14 days']],'Done tasks move to Done → Archived on their own this long after they were finished')}
+      ${pick('workload').html}
+      <p class="pref-group">Reading</p>
+      ${ts}
+      ${prefRow('motion','Motion',[['system','Match device'],['reduce','Reduce']])}
+      ${prefRow('tips','Hover labels',[[true,'On'],[false,'Off']],'A short label when you hover over an icon button')}`};
+   const drop=new Set(['appearance','tasks','fun','a11y','workload','keys','safezones']),order=['general','statuses','pomo','clickup','account','holidays','finder','branding','import','dupes','backup'];
+   const pool=[gen,...secs.filter(x=>!drop.has(x.id))],kept=[...order.map(id=>pool.find(x=>x.id===id)).filter(Boolean),...pool.filter(x=>!order.includes(x.id))];
+   secs.length=0;secs.push(...kept);
+   if(!secs.some(x=>x.id===SM.sec))SM.sec='general';}
+  const META={general:['Your work','Dates, busy days, text size'],pomo:['Your work','Focus and break lengths, sounds'],appearance:['Look & feel','Theme, colors, surfaces'],tasks:['Look & feel','Task rows, due dates, the Calendar'],fun:['Look & feel','Greeting, the office cat, cork board'],a11y:['Look & feel','Text size, motion, contrast'],statuses:['Your work','Rename, recolor and reorder'],workload:['Your work','When a day counts as busy'],holidays:['Your work','Public holidays on the Calendar'],pomo:['Your work','Focus and break lengths, sounds'],safezones:['Your work','TikTok, Reels and Shorts overlays'],branding:['App','Your own name and logo'],finder:['App','Mac folders and Chrome profiles'],account:['App','Google Calendar and sign out'],clickup:['App','Bring in tasks assigned to you'],keys:['App','Shortcuts on a keyboard'],import:['Your data','Bring in a tracker sheet'],dupes:['Your data','Find and merge tasks with the same name'],backup:['Your data','Download, restore, trash']};
   secs.forEach(x=>{const m=META[x.id];if(m){x.group=m[0];x.sub=m[1]}
     /* the Help tips for a section live inside it (Help lists them only when you search) */
     const tips=HELP.filter(h=>h[3]&&h[3][0]===x.id);if(tips.length)x.html=`<details class="pref-tip"><summary>${HELP_IC}Tips for ${esc(x.label)}</summary>${tips.map(h=>`<p><b>${esc(h[1])}.</b> ${esc(h[2])}</p>`).join('')}</details>`+x.html});
