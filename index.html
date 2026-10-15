@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="v2" data-theme="light">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Splice &amp; Co.</title>
@@ -10,20 +10,20 @@
 <meta name="application-name" content="Splice &amp; Co.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#f3f4f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0e1015" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f7f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#f7f7f5" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
 <style>
 :root{
-  --bg:#f3f4f7; --surface:#ffffff; --surface-2:#eceef3; --surface-3:#e2e5ec;
-  --line:#dadee6; --line-strong:#c4c9d4;
-  --text:#161a22; --muted:#5b6272; --faint:#8a91a0;
-  --accent:#0b7f93; --accent-ink:#ffffff; --accent-soft:#dff2f5;
-  --side-bg:var(--surface);
+  --bg:#f7f7f5; --surface:#ffffff; --surface-2:#efefec; --surface-3:#e6e5e1;
+  --line:#e4e3df; --line-strong:#d2d1cc;
+  --text:#17181a; --muted:#5d6066; --faint:#8b8e94;
+  --accent:#2f5bea; --accent-ink:#ffffff; --accent-soft:#e7ecfd;
+  --side-bg:var(--bg);
   --st-not:#7d8596; --st-prog:#2f73e8; --st-review:#8b5cf6; --st-rev:#e07b00; --st-done:#2b9348; --st-client:#0b7f93; --st-wait:#c2417a; --st-drop:#9aa0a8;
-  --danger:#d9362b; --danger-soft:#fde8e6; --warn:#b86b00;
+  --danger:#d93a3a; --danger-soft:#fbe9e8; --warn:#b9700a;
   --shadow:0 1px 2px rgba(22,26,34,.06),0 4px 16px rgba(22,26,34,.06);
   --shadow-lg:0 12px 40px rgba(22,26,34,.18);
   --display:"Bricolage Grotesque","Figtree",system-ui,sans-serif;
@@ -3090,6 +3090,69 @@ select.rs-add{appearance:auto}
 }
 .upn-tab .upnext h3{display:none}
 .upn-tab .upnext{max-width:900px}
+
+/* ================= Revamp (v2): Daylight look, plain sidebar, Today with the week strip ================= */
+.v2 .side{background:var(--bg);border-right:1px solid var(--line);box-shadow:none}
+.v2 .side .brand{border-bottom:0;padding-bottom:14px;margin-bottom:6px}
+.v2 .side .brand b{font:800 calc(18px*var(--ts)) var(--display);letter-spacing:-.02em}
+.v2 .side .nav-item{border-radius:9px;color:var(--muted);font-weight:600;padding:8px 10px}
+.v2 .side .nav-item:hover{background:var(--surface-2);color:var(--text)}
+.v2 .side .nav-item.on{background:var(--surface-3);color:var(--text);box-shadow:none;font-weight:700;border-radius:9px}
+.v2 .side .nav-item .count{font:600 calc(12px*var(--ts)) var(--body);color:var(--faint)}
+.v2 .side .nav-item.on .count{color:var(--accent)}
+.v2 .side .nav.jobs{margin-left:0;border-left:0;padding-left:0}
+.v2-jh{display:flex;align-items:center;justify-content:space-between;padding:18px 4px 4px 10px;font:600 calc(12.5px*var(--ts)) var(--body);color:var(--faint)}
+.v2-jh .icon-btn{width:26px;height:26px;opacity:.7}.v2-jh .icon-btn:hover{opacity:1}
+.v2-sq{width:10px;height:10px;border-radius:3px;background:var(--jc);flex:none;margin:0 2px}
+.v2 .side .nav.jobs .nav-item{font-weight:500}
+.v2 .side .nav.jobs .nav-item.on{font-weight:700}
+.v2 .side-foot{border-top:1px solid var(--line);padding-top:8px;gap:2px}
+.v2 .side-foot .save-state{padding:4px 10px;font-size:calc(12px*var(--ts));color:var(--faint)}
+.v2-me{display:flex;align-items:center;gap:2px;padding:6px 0 2px}
+.v2-who{flex:1;min-width:0;display:flex;align-items:center;gap:9px;border:0;background:none;padding:6px 8px;border-radius:9px;color:var(--text);font-weight:600;text-align:left}
+.v2-who:hover{background:var(--surface-2)}
+.v2-who .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v2-me .icon-btn{width:34px;height:34px;color:var(--muted)}
+body.side-mini .v2-jh,body.side-mini .v2-who .name,body.side-mini .v2-me>.icon-btn{display:none}
+.v2 #bell,.v2 #me-btn{display:none}
+.v2-find{flex:none;white-space:nowrap;display:flex;align-items:center;gap:8px;width:280px;height:38px;border:1px solid var(--line-strong);border-radius:10px;padding:0 10px 0 12px;background:var(--surface);color:var(--faint);font-size:calc(14px*var(--ts));text-align:left}
+.v2-find:hover{border-color:var(--faint)}
+.v2-find kbd{margin-left:auto;font:600 calc(11px*var(--ts)) var(--body);border:1px solid var(--line-strong);border-radius:5px;padding:1px 6px;color:var(--muted)}
+.v2-find svg{width:15px;height:15px}
+/* Today */
+.v2-home .v2-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.v2-home .v2-head h1{margin:0;font:800 calc(54px*var(--ts))/1 var(--display);letter-spacing:-.035em;color:var(--text)}
+.v2-sum{margin:8px 0 0;color:var(--muted);font-size:calc(15px*var(--ts))}
+.v2-sum b{color:var(--text);font-weight:600}.v2-sum b.late{color:var(--danger)}.v2-sum i{font-style:normal;color:var(--faint);margin:0 7px}
+.v2-new{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 16px;border-radius:10px;font-weight:700}
+.ws{margin-top:24px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:10px 6px 12px}
+.ws-d{display:flex;flex-direction:column;gap:6px;padding:4px 4px 6px;border-radius:10px;min-width:0;min-height:120px}
+.ws-d.today{background:var(--accent-soft);box-shadow:inset 0 2px 0 var(--accent)}
+.ws-d.cal-drop{outline:2px dashed var(--accent);outline-offset:-2px}
+.ws-h{display:flex;justify-content:space-between;align-items:baseline;padding:2px 4px 4px;font-size:calc(12.5px*var(--ts));color:var(--faint);font-weight:600}
+.ws-h b{font-weight:600}.ws-d.today .ws-h b{color:var(--text);font-weight:700}
+.ws-d.busy .ws-h,.ws-d.busy .ws-h b{color:var(--warn)}
+.ws-c{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--jc);border-radius:7px;background:color-mix(in srgb,var(--jc) 16%,var(--surface));padding:6px 8px;font:600 calc(12.5px*var(--ts)) var(--body);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.ws-c:hover{background:color-mix(in srgb,var(--jc) 26%,var(--surface))}
+.ws-c.late{border-left-color:var(--danger);background:color-mix(in srgb,var(--danger) 11%,var(--surface))}
+.ws-more{border:0;background:none;color:var(--muted);font-size:calc(12px*var(--ts));text-align:left;padding:2px 6px}
+.v2-home .cs-home{margin-top:30px}
+.v2-home .hm-main .cs-r{grid-template-columns:4px minmax(0,1fr) minmax(110px,150px) minmax(84px,auto)}
+.v2-home .hm-main .cs-sl,.v2-home .hm-main .cs-tg{display:none}
+.v2-home .hm-main .cs-acts{grid-column:2/-1}.v2-home .hm-main .cs-now .cs-bar{grid-column:1;grid-row:1/3}
+.v2-home .cs-now{background:var(--accent-soft);border-radius:12px;padding:16px 14px 16px 0;margin:2px 0 8px;border-bottom:0}
+.v2-home .cs-now .cs-why{color:var(--accent)}
+.v2-home .cs-g:first-child{margin-top:0}
+@media (max-width:820px){
+  .v2-find{display:none}
+  .v2-home .v2-head h1{font-size:calc(40px*var(--ts))}
+  .v2-new{display:none}
+  .ws{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin:18px -16px 0;border-radius:0;border-left:0;border-right:0;padding:10px 12px}
+  .ws::-webkit-scrollbar{display:none}
+  .ws-d{flex:0 0 42%;scroll-snap-align:start;min-height:0}
+  .v2-home .hm-main .cs-r{grid-template-columns:4px minmax(0,1fr) auto}
+  .v2-home .cs-now{padding:14px 12px;margin:2px -4px 8px}
+}
 </style>
 
 <div class="app">
@@ -3099,7 +3162,7 @@ select.rs-add{appearance:auto}
   <div class="side-resize" id="side-resize" title="Drag to resize the sidebar · double-click to reset" aria-hidden="true"></div>
   <main class="main" id="main">
     <div id="banner"></div>
-    <div class="head-row"><div id="head"></div><div class="top-right"><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search tasks  ( / )" autocomplete="off"></label><div class="pomo-wrap"><button type="button" class="pomo-btn" id="pomo" data-act="pomo" aria-haspopup="true" aria-expanded="false" aria-controls="pomo-pop" title="Focus timer (P to start or pause)"></button><div class="notes-pop pomo-pop" id="pomo-pop" hidden role="dialog" aria-label="Focus timer"></div></div><div class="bell-wrap"><button type="button" class="icon-btn bell" id="bell" data-act="bell" aria-haspopup="true" aria-expanded="false" aria-controls="notes" title="Alerts"><svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bell-n" id="bell-n" hidden></span></button><div class="notes-pop" id="notes" hidden role="dialog" aria-label="Alerts"></div></div><button type="button" class="me-btn" id="me-btn" data-act="profile" title="Your profile" aria-label="Your profile"></button></div></div>
+    <div class="head-row"><div id="head"></div><div class="top-right"><button type="button" class="v2-find" data-act="jump" title="Quick search (⌘K)"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg>Search tasks, jobs, clients<kbd>⌘K</kbd></button><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search tasks  ( / )" autocomplete="off"></label><div class="pomo-wrap"><button type="button" class="pomo-btn" id="pomo" data-act="pomo" aria-haspopup="true" aria-expanded="false" aria-controls="pomo-pop" title="Focus timer (P to start or pause)"></button><div class="notes-pop pomo-pop" id="pomo-pop" hidden role="dialog" aria-label="Focus timer"></div></div><div class="bell-wrap"><button type="button" class="icon-btn bell" id="bell" data-act="bell" aria-haspopup="true" aria-expanded="false" aria-controls="notes" title="Alerts"><svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bell-n" id="bell-n" hidden></span></button><div class="notes-pop" id="notes" hidden role="dialog" aria-label="Alerts"></div></div><button type="button" class="me-btn" id="me-btn" data-act="profile" title="Your profile" aria-label="Your profile"></button></div></div>
     <div id="subnav"></div>
     <div id="stats"></div>
     <div id="jobcards"></div>
@@ -3326,7 +3389,9 @@ const PREF_DEF={dateRel:false,dateFmt:'md',weekStart:'mon',hideWeekends:false,co
   iconWeight:'regular',depth:'soft',sideStyle:'colored',thinScroll:false,toastPos:'bottom',nameWrap:false,doneStyle:'struck',overdueTint:false,statusIcons:false,prioColors:{},logoShape:'rounded',numFont:'mono',readSpacing:'normal',sideCounts:true,sideCompact:false,
   compactHeader:false,greeting:true,greetName:'',drawerBand:true,boardTint:false,dueStyle:'text',jobProgress:'bar',calGrid:'lines',todayMark:'dot',
   pomoFocus:25,pomoShort:5,pomoLong:15,pomoEvery:4,pomoAutoBreak:false,pomoAutoFocus:false,pomoSound:'chime',pomoPopup:false,allClear:true,seasonal:true,officeCat:true,catSky:true,catPlant:true,plantGoal:20,catVisitors:true,catNaps:true,catTreats:true,catPeek:true,sillPet:'none',corkBoard:true,catName:'',catFur:'orange',meShow:false,meHair:'short',meHairCol:'#3b2a20',meSkin:'#f1c27d',meTop:'#4c8dff',deskMug:true,deskLamp:true,deskCam:false,deskVinyl:false,stickerShow:true,autoArchive:0};
-const pref=k=>{let o=null;try{o=SM}catch(e){/* Settings state not set up yet */}o=o||S.settings?.app||{};return o[k]!==undefined&&o[k]!==null?o[k]:PREF_DEF[k]};
+/* the revamp keeps the app plain: these extras stay off whatever was saved */
+const FUN_OFF={allClear:false,seasonal:false,officeCat:false,catSky:false,catPlant:false,catVisitors:false,catNaps:false,catTreats:false,catPeek:false,sillPet:'none',corkBoard:false,meShow:false,deskMug:false,deskLamp:false,deskCam:false,deskVinyl:false,stickerShow:false,confetti:false,greeting:false};
+const pref=k=>{if(k in FUN_OFF)return FUN_OFF[k];let o=null;try{o=SM}catch(e){/* Settings state not set up yet */}o=o||S.settings?.app||{};return o[k]!==undefined&&o[k]!==null?o[k]:PREF_DEF[k]};
 const reducedMotion=()=>pref('motion')==='reduce'||matchMedia('(prefers-reduced-motion:reduce)').matches;
 function absDate(s){
   const d=parseD(s);
@@ -4578,8 +4643,7 @@ function applyTheme(t){
 }
 function applyLook(o){
   const r=document.documentElement;
-  applyTheme(o.theme);
-  if(o.scheme&&o.scheme!=='splice'&&SCHEMES.some(x=>x[0]===o.scheme)) r.setAttribute('data-scheme',o.scheme); else r.removeAttribute('data-scheme');
+  applyTheme('light');r.removeAttribute('data-scheme');r.classList.add('v2');
   const ts=TEXT_SIZES.some(x=>x[0]===+o.textSize)?+o.textSize:1;
   if(ts===1) r.style.removeProperty('--tsu'); else r.style.setProperty('--tsu',ts);
   if(o.density==='compact') r.setAttribute('data-density','compact'); else r.removeAttribute('data-density');
@@ -4647,6 +4711,7 @@ function renderOffline(){
     :`<svg viewBox="0 0 16 16"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3"/></svg><span>Syncing ${n} change${n===1?'':'s'}…</span>`;
 }
 window.addEventListener('online',()=>renderOffline());window.addEventListener('offline',()=>renderOffline());
+const V2_IC={today:'<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 4.8V8l2.4 1.6"/></svg>',inbox:'<svg class="i" viewBox="0 0 16 16"><path d="M2.5 9.5 4 3.5h8l1.5 6v3h-11zM2.5 9.5h3.2l.8 1.5h3l.8-1.5h3.2"/></svg>',done:'<svg class="i" viewBox="0 0 16 16"><path d="m3 8.5 3 3 7-7"/></svg>'};
 function renderSide(){queueMicrotask(renderOffline);
   const u=S.ui,jobsOpen=u.jobsOpen!==false;
   const openCount=jid=>live().filter(t=>t.jobId===jid&&!isClosed(t)).length;
@@ -4654,23 +4719,20 @@ function renderSide(){queueMicrotask(renderOffline);
   const app=appSettings();const appLogo=imgSrc(app.logo);
   document.body.classList.toggle('side-mini',!!u.sideMini);
   const tt=n=>u.sideMini?` title="${n}"`:'';
-  let html=`<button type="button" class="icon-btn side-toggle" data-act="side-mini" aria-label="${u.sideMini?'Expand sidebar':'Collapse sidebar'}" title="${u.sideMini?'Expand sidebar':'Collapse sidebar'}">${I.left}</button><button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Overview">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
-  <div class="side-scroll"><nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview"${tt('Home')}>${I.grid}<span class="name">Home</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='calendar'?'on':''}" data-act="nav" data-tab="calendar"${tt('Calendar')}>${I.cal}<span class="name">Calendar</span></button>
-  <button class="nav-item jobs-toggle ${jobsOpen?'open':''}"${tt('Jobs')} data-act="toggle-jobs" aria-expanded="${jobsOpen}" aria-controls="nav-jobs">${I.briefcase}<span class="name">Jobs</span><span class="count">${S.ready?jobsSorted().length:''}</span>${I.chev}</button></nav>
-  <nav class="nav jobs" id="nav-jobs" aria-label="Jobs" ${jobsOpen?'':'hidden'}>`;
+  const inboxN=(()=>{try{return S.ready?notifications().filter(n=>!NS.read[n.key]).length:0}catch(e){return 0}})();
+  const nv=(tab,label,icon,count,act='nav')=>`<button class="nav-item ${u.tab===tab&&act==='nav'?'on':''}" data-act="${act}" data-tab="${tab}"${tt(label)}>${icon}<span class="name">${label}</span><span class="count">${count||''}</span></button>`;
+  let html=`<button type="button" class="icon-btn side-toggle" data-act="side-mini" aria-label="${u.sideMini?'Expand sidebar':'Collapse sidebar'}" title="${u.sideMini?'Expand sidebar':'Collapse sidebar'}">${I.left}</button><button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Today">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
+  <div class="side-scroll"><nav class="nav" aria-label="Main">${nv('overview','Today',V2_IC.today,S.ready?allOpen:'')}${nv('calendar','Calendar',I.cal)}${nv('inbox','Inbox',V2_IC.inbox,inboxN,'bell')}${nv('archived','Done',V2_IC.done)}</nav>
+  <div class="v2-jh"><span>Jobs</span><button type="button" class="icon-btn" data-act="new-job" title="New job" aria-label="New job">${I.plus}</button></div>
+  <nav class="nav jobs" id="nav-jobs" aria-label="Jobs">`;
   for(const j of jobsSorted()){
     const on=u.tab===j.id;
-    html+=`<div class="nav-row" draggable="true" data-job="${j.id}"><button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}" ${u.sideMini?`title="${esc(j.name)}"`:''}>${jobMark(j,18)}${jobEmoji(j)}<span class="name">${esc(j.name)}</span>${shiftDot(j)}<span class="count">${openCount(j.id)}</span></button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.pencil}</button></div>`;
+    html+=`<div class="nav-row" draggable="true" data-job="${j.id}"><button class="nav-item ${on?'on':''}" data-act="nav" data-tab="${j.id}" ${u.sideMini?`title="${esc(j.name)}"`:''}><span class="v2-sq" style="--jc:${esc(j.color||'var(--accent)')}"></span><span class="name">${esc(j.name)}</span>${shiftDot(j)}<span class="count">${openCount(j.id)}</span></button></div>`;
   }
-  html+=`<button class="nav-item nav-new" data-act="new-job"${tt('New job')}>${I.plus}<span class="name">New job</span></button></nav>
-  <nav class="nav" aria-label="More"><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived"${tt('Archived')}>${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item ${u.tab==='activity'?'on':''}" data-act="nav" data-tab="activity"${tt('Activity')}>${I.clock}<span class="name">Activity</span></button><button class="nav-item ${u.tab==='trash'?'on':''}" data-act="nav" data-tab="trash"${tt('Trash')}>${I.trash}<span class="name">Trash</span><span class="count">${S.ready&&trashed().length?trashed().length:''}</span></button></nav>
-  ${u.sideMini?'':corkHtml()}</div>
-  <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='cloud'&&(B.offline||Object.keys(OUT).length)?`<span class="sync-dot local"></span>Offline · ${Object.keys(OUT).length?`${Object.keys(OUT).length} change${Object.keys(OUT).length===1?'':'s'} waiting to sync`:'changes will sync'}`:B.mode==='db'||B.mode==='cloud'?'<span class="sync-dot"></span>Saved to your account':B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
-    ${B.mode==='cloud'&&B.syncedAt?`<small class="synced" title="Last time this device heard back from your account">Last synced ${syncedAgo()}</small>`:''}
+  html+=`</nav></div>
+  <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='cloud'&&(B.offline||Object.keys(OUT).length)?`<span class="sync-dot local"></span>Offline · ${Object.keys(OUT).length?`${Object.keys(OUT).length} change${Object.keys(OUT).length===1?'':'s'} waiting to sync`:'changes will sync'}`:B.mode==='db'||B.mode==='cloud'?`<span class="sync-dot"></span>${B.syncedAt?`Synced ${syncedAgo()}`:'Saved to your account'}`:B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
     ${B.mode==='cloud'&&CU.connected&&cuJobs().length?`<button type="button" class="synced cu-synced" data-act="cu-sync" title="Check ClickUp now">${CU_IC}${cuRunning?'Checking ClickUp…':`ClickUp checked ${CU.lastSync?calAgo(CU.lastSync):'—'}`}</button>`:''}
-    <div class="foot-links"><button class="nav-item foot-settings ${u.tab==='resume'?'on':''}" data-act="nav" data-tab="resume"${tt('Resume')}>${RS_IC}<span class="name">Resume</span></button>
-    <button class="nav-item foot-settings ${u.tab==='help'?'on':''}" data-act="nav" data-tab="help"${tt('Help & tips')}>${HELP_IC}<span class="name">Help &amp; tips</span></button>
-    <button class="nav-item foot-settings" data-act="open-settings"${tt('Settings')}>${I.gear}<span class="name">Settings</span></button></div></div>`;
+    <div class="v2-me"><button type="button" class="v2-who" data-act="profile" title="Your profile">${meAvatar(28)}<span class="name">${esc(meName()||'You')}</span></button><button type="button" class="icon-btn" data-act="nav" data-tab="help" title="Help &amp; tips" aria-label="Help &amp; tips">${HELP_IC}</button><button type="button" class="icon-btn" data-act="open-settings" title="Settings" aria-label="Settings">${I.gear}</button></div></div>`;
   $('#side').innerHTML=html;
   placeCat();sideFade();
   $('#mbrand').innerHTML=`${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b>`;
@@ -4741,7 +4803,7 @@ function renderMain(){
   $('#jobcards').innerHTML=!job?'':(!job?allClearHtml():'')+(!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')+`<button type="button" class="job-card job-add" data-act="new-job" title="New job">${I.plus}<span>New job</span></button>`}</div>`:'');
 
   const tb=$('#toolbar');tb.hidden=!Object.keys(S.jobs).length;tb.classList.toggle('tb-home',HOME||u.tab==='calendar');
-  $('#top-search').hidden=tb.hidden;$('#fdot').hidden=u.prio==='all'&&u.due==='all'&&(u.tag||'all')==='all';
+  $('#top-search').hidden=tb.hidden||HOME||u.tab==='calendar';$('#fdot').hidden=u.prio==='all'&&u.due==='all'&&(u.tag||'all')==='all';
   ['list','board','calendar'].forEach(v=>{const b=$('#v-'+v);b.classList.toggle('on',u.view===v);b.setAttribute('aria-selected',u.view===v)});tb.querySelector('.seg').hidden=!job;
   if(document.activeElement!==$('#q')) $('#q').value=u.q;
   $('#f-prio').value=u.prio;$('#f-due').value=u.due;$('#f-sort').value=u.sort;
@@ -4858,7 +4920,7 @@ function renderTabbar(){
   const e=$('#tabbar');if(!e)return;const u=S.ui,cal=u.view==='calendar'&&!['archived','activity','trash','help','resume','upnext'].includes(u.tab);
   const b=(act,label,icon,on,extra='',short=label)=>`<button type="button" data-act="${act}" class="${on?'on':''} ${extra} tb-${act.slice(3)}" aria-label="${label}" ${on?'aria-current="page"':''}>${icon}<span>${short}</span></button>`;
   const busy=notesOpen||UPN;
-  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Home',I.grid,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Alerts','<svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg>'+(()=>{const n=$('#bell-n');return n&&!n.hidden?`<i class="tb-badge">${esc(n.textContent)}</i>`:''})(),notesOpen,'','Alerts')+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-upnext','Up next',UP_IC+(()=>{const n=upNextList().length;return n?`<i class="tb-badge tb-cnt">${n}</i>`:''})(),UPN)+b('tb-me','You',meAvatar(26),!!PRF)}</div>`
+  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Today',V2_IC.today,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Inbox',V2_IC.inbox+(()=>{const n=$('#bell-n');return n&&!n.hidden?`<i class="tb-badge">${esc(n.textContent)}</i>`:''})(),notesOpen,'','Inbox')+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-upnext','Up next',UP_IC+(()=>{const n=upNextList().length;return n?`<i class="tb-badge tb-cnt">${n}</i>`:''})(),UPN)+b('tb-me','You',meAvatar(26),!!PRF)}</div>`
     +`<button type="button" data-act="tb-search" class="tb-search" aria-label="Search" title="Search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 14 14"/></svg></button>`
     +`<button type="button" data-act="tb-plus" class="tb-fab ${PLUS?'on':''}" aria-label="New" aria-expanded="${PLUS}" title="New task, new job or focus timer">${I.plus}</button>`;
 }
@@ -5100,22 +5162,35 @@ function csQueue(q){
   return `<section class="cs-g cs-q" id="csg-queue"><div class="cs-gh"><b>Up next</b><span>${q.length}</span>${q.length>1?'<em>Drag to reorder</em>':''}</div>
     ${q.length?`<ol class="un-list cs-unl">${q.map(t=>`<li class="un-row cs-un" draggable="true" data-un="${t.id}">${csRow(t,'#'+upNextPos(t),{grip:true})}</li>`).join('')}</ol>`:`<p class="hm-empty">Line up what you'll work on next: right-click a task (press and hold on a phone) and choose Add to Up next.</p>`}</section>`;
 }
+/* Today: this week as a timeline strip, one column per day with each due task as a clip in its job's color */
+function weekStrip(){
+  const t0=today(),load=dueLoad(),lim=dayLimit(),open=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)&&t.due);
+  const days=[...Array(7)].map((_,i)=>addDays(t0,i));
+  const col=d=>{const ts=open.filter(t=>d===t0?t.due<=t0:t.due===d).sort((a,b)=>(a.due<b.due?-1:a.due>b.due?1:0)||(a.upNext||9e9)-(b.upNext||9e9)),dt=parseD(d),busy=(load[d]||0)>=lim;
+    const show=ts.slice(0,4);
+    return `<div class="ws-d ${d===t0?'today':''} ${busy?'busy':''}" data-calday="${d}"><div class="ws-h"><b>${WEEKDAY[dt.getDay()]} ${dt.getDate()}</b><span>${ts.length?ts.length+(busy?' · busy':''):''}</span></div>
+      ${show.map(t=>`<button type="button" class="ws-c ${t.due<t0?'late':''}" data-act="open" data-id="${t.id}" data-caldrag="${t.id}" draggable="true" style="--jc:${esc(S.jobs[t.jobId]?.color||'var(--accent)')}" title="${esc(t.name||'Untitled task')} · ${esc(S.jobs[t.jobId]?.name||'')}">${esc(t.name||'Untitled task')}</button>`).join('')}
+      ${ts.length>4?`<button type="button" class="ws-more" data-act="nav" data-tab="calendar">+${ts.length-4} more</button>`:''}</div>`};
+  return `<section class="ws" aria-label="This week">${days.map(col).join('')}</section>`;
+}
 function homeView(){
+  S.ui.hjob='all';
   const ts=homeTasks(),G=csGroups(ts),un=upNow(ts),jf=hmJob(),all=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)),t0=today(),gd=Object.fromEntries(G.map(g=>[g[0],g[2]]));
   const gr=homeGreet(),wait=inboxGroups().filter(g=>g.wait).length,d=new Date();
   const kick=[pref('greeting')?gr.h1:'',WEEKDAY_FULL[d.getDay()],pref('seasonal')?seasonNote():''].filter(Boolean).join(' · ');
   const tl=(k,n,l,cls='')=>`<button type="button" class="cs-t ${cls}" data-act="cs-jump" data-g="${k}"><b>${n}</b><span>${l}</span></button>`;
   const lateN=all.filter(t=>t.due&&t.due<t0&&(jf==='all'||t.jobId===jf)).length;
-  const head=`<header class="cs-top"><div class="cs-hl"><small>${esc(kick)}</small><h1>${esc(absDate(t0).replace(/ ’\d+$/,''))}</h1></div>
-    <div class="cs-tally">${tl('late',gd.late.length+gd.queue.filter(t=>t.due&&t.due<t0).length,'late',lateN?'late':'')}${tl('today',ts.filter(t=>t.due===t0).length,'due today')}${tl('tom',ts.filter(t=>t.due===addDays(t0,1)).length,'tomorrow')}${wait?tl('inbox',wait,'waiting on you','wait'):''}${tl('all',ts.length,'open')}</div></header>`;
-  const jobsRow=`<div class="cs-sub"><button type="button" class="${jf==='all'?'on':''}" data-act="hm-job" data-j="all">All jobs</button>${jobsSorted().map(j=>{const n=all.filter(t=>t.jobId===j.id).length;return `<button type="button" class="${jf===j.id?'on':''}" data-act="hm-job" data-j="${j.id}"><span class="hm-dot" style="--jc:${esc(j.color||'var(--accent)')}"></span>${esc(j.name)}<em>${n}</em></button>`}).join('')}<span class="cs-sp"></span><button type="button" class="btn sm primary cs-new" data-act="new-task" title="New task (N)">${I.plus}New task</button></div>`;
+  const lateAll=ts.filter(t=>t.due&&t.due<t0).length,todayN=ts.filter(t=>t.due===t0).length;
+  const sum=[lateAll?`<b class="late">${lateAll} late</b>`:'',`<b>${todayN} due today</b>`,`${ts.length} open across ${new Set(ts.map(t=>t.jobId)).size} job${new Set(ts.map(t=>t.jobId)).size===1?'':'s'}`].filter(Boolean).join('<i>·</i>');
+  const head=`<header class="v2-head"><div><h1>${esc(WEEKDAY_FULL[d.getDay()])}</h1><p class="v2-sum">${sum}</p></div><button type="button" class="btn primary v2-new" data-act="new-task" title="New task (N)">${I.plus}New task</button></header>`;
+  const jobsRow=weekStrip();
   let n=0;const body=G.map(([k,label,list])=>{if(!list.length||k==='queue')return '';
     const lim=['queue','late','today'].includes(k)||HM_OPEN.has(k)?list.length:8,show=list.slice(0,lim);
     const rows=show.map(t=>{n++;return csRow(t,String(n).padStart(2,'0'),{now:un?.t.id===t.id?un:null,nodate:k==='nodate'})}).join('');
     return `<section class="cs-g" id="csg-${k}"><div class="cs-gh ${k==='late'?'late':''}"><b>${label}</b><span>${list.length}</span></div>
       ${rows}${list.length>lim||HM_OPEN.has(k)&&list.length>8?`<button type="button" class="hm-more" data-act="cs-more" data-g="${k}">${HM_OPEN.has(k)?'Show fewer':`Show ${list.length-lim} more`}</button>`:''}</section>`}).join('');
   const empty=`<p class="hm-empty">${ts.length?'':'No open tasks'+(jf==='all'?'':' in this job')+'. New tasks you add show up here, sorted by when they\'re due.'}</p>`;
-  return `<div class="cs">${head}${jobsRow}<div class="home cs-home"><div class="hm-main">${body||empty}</div><aside class="hm-side"><div id="csg-inbox">${inboxHtml()}</div>${csQueue(gd.queue)}</aside></div></div>`;
+  return `<div class="cs v2-home">${head}${jobsRow}<div class="home cs-home"><div class="hm-main">${body||empty}</div><aside class="hm-side"><div id="csg-inbox">${inboxHtml()}</div>${csQueue(gd.queue)}</aside></div></div>`;
 }
 /* ================= Calendar page (tab 'calendar') =================
    Job chips on top (S.ui.cjob) instead of the filters, and a No date tray (S.ui.ctray) whose tasks drag onto a day
@@ -6940,7 +7015,7 @@ function stickerScan(){
   return out;
 }
 let STK_T=0;
-function stickerSoon(){if(STK_T||!S.ready)return;STK_T=setTimeout(()=>{STK_T=0;stickerCheck()},2000)}
+function stickerSoon(){if(!pref('stickerShow'))return;if(STK_T||!S.ready)return;STK_T=setTimeout(()=>{STK_T=0;stickerCheck()},2000)}
 function stickerCheck(extra){
   if(!S.ready)return;
   const a=appSettings(),have=a.stickers||null,t0=today(),found={...stickerScan(),...(extra||{})},p={};
@@ -6983,6 +7058,7 @@ let STICKY_EDIT=null,STICKY_DRAFT=null;
 const stickies=()=>(appSettings().stickies||[]).slice(0,6);
 function saveStickies(list){saveApp({stickies:list});renderSide()}
 function corkHtml(){
+  return '';
   if(pref('sideCompact'))return '';
   if(!pref('corkBoard'))return photoStripHtml();
   const ps=photos(),st=stickies();
