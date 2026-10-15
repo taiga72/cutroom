@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="v2" data-theme="light">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Splice &amp; Co.</title>
@@ -10,20 +10,20 @@
 <meta name="application-name" content="Splice &amp; Co.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#f3f4f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0e1015" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f7f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#f7f7f5" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
 <style>
 :root{
-  --bg:#f3f4f7; --surface:#ffffff; --surface-2:#eceef3; --surface-3:#e2e5ec;
-  --line:#dadee6; --line-strong:#c4c9d4;
-  --text:#161a22; --muted:#5b6272; --faint:#8a91a0;
-  --accent:#0b7f93; --accent-ink:#ffffff; --accent-soft:#dff2f5;
-  --side-bg:var(--surface);
+  --bg:#f7f7f5; --surface:#ffffff; --surface-2:#efefec; --surface-3:#e6e5e1;
+  --line:#e4e3df; --line-strong:#d2d1cc;
+  --text:#17181a; --muted:#5d6066; --faint:#8b8e94;
+  --accent:#2f5bea; --accent-ink:#ffffff; --accent-soft:#e7ecfd;
+  --side-bg:var(--bg);
   --st-not:#7d8596; --st-prog:#2f73e8; --st-review:#8b5cf6; --st-rev:#e07b00; --st-done:#2b9348; --st-client:#0b7f93; --st-wait:#c2417a; --st-drop:#9aa0a8;
-  --danger:#d9362b; --danger-soft:#fde8e6; --warn:#b86b00;
+  --danger:#d93a3a; --danger-soft:#fbe9e8; --warn:#b9700a;
   --shadow:0 1px 2px rgba(22,26,34,.06),0 4px 16px rgba(22,26,34,.06);
   --shadow-lg:0 12px 40px rgba(22,26,34,.18);
   --display:"Bricolage Grotesque","Figtree",system-ui,sans-serif;
@@ -3090,6 +3090,219 @@ select.rs-add{appearance:auto}
 }
 .upn-tab .upnext h3{display:none}
 .upn-tab .upnext{max-width:900px}
+
+/* ================= Revamp (v2): Daylight look, plain sidebar, Today with the week strip ================= */
+.v2 .side{background:var(--bg);border-right:1px solid var(--line);box-shadow:none}
+.v2 .side .brand{border-bottom:0;padding-bottom:14px;margin-bottom:6px}
+.v2 .side .brand b{font:800 calc(18px*var(--ts)) var(--display);letter-spacing:-.02em}
+.v2 .side .nav-item{border-radius:9px;color:var(--muted);font-weight:600;padding:8px 10px}
+.v2 .side .nav-item:hover{background:var(--surface-2);color:var(--text)}
+.v2 .side .nav-item.on{background:var(--surface-3);color:var(--text);box-shadow:none;font-weight:700;border-radius:9px}
+.v2 .side .nav-item .count{font:600 calc(12px*var(--ts)) var(--body);color:var(--faint)}
+.v2 .side .nav-item.on .count{color:var(--accent)}
+.v2 .side .nav.jobs{margin-left:0;border-left:0;padding-left:0}
+.v2-jh{display:flex;align-items:center;justify-content:space-between;padding:18px 4px 4px 10px;font:600 calc(12.5px*var(--ts)) var(--body);color:var(--faint)}
+.v2-jh .icon-btn{width:26px;height:26px;opacity:.7}.v2-jh .icon-btn:hover{opacity:1}
+.v2-sq{width:10px;height:10px;border-radius:3px;background:var(--jc);flex:none;margin:0 2px}
+.v2 .side .nav.jobs .nav-item{font-weight:500}
+.v2 .side .nav.jobs .nav-item.on{font-weight:700}
+.v2 .side-foot{border-top:1px solid var(--line);padding-top:8px;gap:2px}
+.v2 .side-foot .save-state{padding:4px 10px;font-size:calc(12px*var(--ts));color:var(--faint)}
+.v2-me{display:flex;align-items:center;gap:2px;padding:6px 0 2px}
+.v2-who{flex:1;min-width:0;display:flex;align-items:center;gap:9px;border:0;background:none;padding:6px 8px;border-radius:9px;color:var(--text);font-weight:600;text-align:left}
+.v2-who:hover{background:var(--surface-2)}
+.v2-who .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v2-me .icon-btn{width:34px;height:34px;color:var(--muted)}
+body.side-mini .v2-jh,body.side-mini .v2-who .name,body.side-mini .v2-me>.icon-btn{display:none}
+.v2 #bell,.v2 #me-btn{display:none}
+.v2-find{flex:none;white-space:nowrap;display:flex;align-items:center;gap:8px;width:280px;height:38px;border:1px solid var(--line-strong);border-radius:10px;padding:0 10px 0 12px;background:var(--surface);color:var(--faint);font-size:calc(14px*var(--ts));text-align:left}
+.v2-find:hover{border-color:var(--faint)}
+.v2-find kbd{margin-left:auto;font:600 calc(11px*var(--ts)) var(--body);border:1px solid var(--line-strong);border-radius:5px;padding:1px 6px;color:var(--muted)}
+.v2-find svg{width:15px;height:15px}
+/* Today */
+.v2-home .v2-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.v2-home .v2-head h1{margin:0;font:800 calc(54px*var(--ts))/1 var(--display);letter-spacing:-.035em;color:var(--text)}
+.v2-sum{margin:8px 0 0;color:var(--muted);font-size:calc(15px*var(--ts))}
+.v2-sum b{color:var(--text);font-weight:600}.v2-sum b.late{color:var(--danger)}.v2-sum i{font-style:normal;color:var(--faint);margin:0 7px}
+.v2-new{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 16px;border-radius:10px;font-weight:700}
+.ws{margin-top:24px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:10px 6px 12px}
+.ws-d{display:flex;flex-direction:column;gap:6px;padding:4px 4px 6px;border-radius:10px;min-width:0;min-height:120px}
+.ws-d.today{background:var(--accent-soft);box-shadow:inset 0 2px 0 var(--accent)}
+.ws-d.cal-drop{outline:2px dashed var(--accent);outline-offset:-2px}
+.ws-h{display:flex;justify-content:space-between;align-items:baseline;padding:2px 4px 4px;font-size:calc(12.5px*var(--ts));color:var(--faint);font-weight:600}
+.ws-h b{font-weight:600}.ws-d.today .ws-h b{color:var(--text);font-weight:700}
+.ws-d.busy .ws-h,.ws-d.busy .ws-h b{color:var(--warn)}
+.ws-c{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--jc);border-radius:7px;background:color-mix(in srgb,var(--jc) 16%,var(--surface));padding:6px 8px;font:600 calc(12.5px*var(--ts)) var(--body);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.ws-c:hover{background:color-mix(in srgb,var(--jc) 26%,var(--surface))}
+.ws-c.late{border-left-color:var(--danger);background:color-mix(in srgb,var(--danger) 11%,var(--surface))}
+.ws-more{border:0;background:none;color:var(--muted);font-size:calc(12px*var(--ts));text-align:left;padding:2px 6px}
+.v2-home .cs-home{margin-top:30px}
+.v2-home .hm-main .cs-r{grid-template-columns:4px minmax(0,1fr) minmax(110px,150px) minmax(84px,auto)}
+.v2-home .hm-main .cs-sl,.v2-home .hm-main .cs-tg{display:none}
+.v2-home .hm-main .cs-acts{grid-column:2/-1}.v2-home .hm-main .cs-now .cs-bar{grid-column:1;grid-row:1/3}
+.v2-home .cs-now{background:var(--accent-soft);border-radius:12px;padding:16px 14px 16px 0;margin:2px 0 8px;border-bottom:0}
+.v2-home .cs-now .cs-why{color:var(--accent)}
+.v2-home .cs-g:first-child{margin-top:0}
+@media (max-width:820px){
+  .v2-find{display:none}
+  .v2-home .v2-head h1{font-size:calc(40px*var(--ts))}
+  .v2-new{display:none}
+  .ws{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin:18px -16px 0;border-radius:0;border-left:0;border-right:0;padding:10px 12px}
+  .ws::-webkit-scrollbar{display:none}
+  .ws-d{flex:0 0 42%;scroll-snap-align:start;min-height:0}
+  .v2-home .hm-main .cs-r{grid-template-columns:4px minmax(0,1fr) auto}
+  .v2-home .cs-now{padding:14px 12px;margin:2px -4px 8px}
+}
+
+/* Job page (v2): mark + name, Tasks | About, client chips */
+.v2 body.pg-job #head .crumbs,.v2 body.pg-job #head{display:none}
+.v2 body.pg-job .head-row{justify-content:flex-end}
+.v2-jhead{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-top:4px}
+.v2-jname{display:flex;align-items:center;gap:16px;border:0;background:none;padding:0;text-align:left;color:var(--text);min-width:0;cursor:pointer}
+.v2-jname .jmark,.v2-jname img,.v2-jname .dot{width:52px!important;height:52px!important;border-radius:14px!important;flex:none}
+.v2-jname b{display:block;font:800 calc(48px*var(--ts))/1 var(--display);letter-spacing:-.035em;overflow-wrap:anywhere}
+.v2-jname small{display:block;margin-top:7px;color:var(--muted);font-size:calc(14.5px*var(--ts))}
+.v2-jname small i,.v2-jcount i{font-style:normal;color:var(--faint);margin:0 7px}
+.v2-jname:hover b{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px}
+.v2-jcount{margin:0;color:var(--muted);font-weight:600;white-space:nowrap}.v2-jcount b.late{color:var(--danger)}
+.v2 #subnav .v2-tabs{display:flex;align-items:center;gap:26px;margin-top:22px;border-bottom:1px solid var(--line)}
+.v2 #subnav .v2-tabs>button{padding:10px 0;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:none;color:var(--muted);font-weight:600;font-size:calc(15px*var(--ts));border-radius:0}
+.v2 #subnav .v2-tabs>button.on{color:var(--text);border-bottom-color:var(--text)}
+.v2 #subnav .v2-tabs .pt-views{margin-left:auto;display:flex;border:1px solid var(--line-strong);border-radius:9px;padding:2px;background:var(--surface);gap:0}
+.v2 #subnav .v2-tabs .pt-views button{padding:5px 12px;border-radius:7px;border:0;font-size:calc(13px*var(--ts));color:var(--muted);font-weight:600;background:none;text-decoration:none}
+.v2 #subnav .v2-tabs .pt-views button.on{background:var(--surface-3);color:var(--text)}
+.v2 :is(#tb-clients,.ab-cl).client-tabs,.v2 #tb-clients .client-tabs,.v2 .ab-cl{display:flex;flex-wrap:wrap;gap:8px;border:0;padding:0;margin:0}
+.v2 :is(#tb-clients,.ab-cl) .client-tabs button,.v2 .ab-cl button,.v2 #tb-clients .client-tabs button{height:32px;padding:0 13px;border-radius:99px;border:1px solid var(--line-strong);background:var(--surface);font-size:calc(13px*var(--ts));font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:6px;box-shadow:none}
+.v2 #tb-clients .client-tabs button.on,.v2 .ab-cl button.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.v2 #tb-clients .client-tabs button em{font-style:normal;color:var(--faint);font-weight:500}
+.v2 #tb-clients .client-tabs button.on em{color:color-mix(in srgb,var(--bg) 70%,transparent)}
+.v2 #tb-clients .client-tabs .add{border-style:dashed;color:var(--faint)}
+.v2 body.pg-job .row-head{display:none}
+.v2 body.pg-job .group.g-empty:not(.drop-on){display:none}
+:root.v2{--mono:var(--body)}
+.v2 body.pg-job .group h3,.v2 body.pg-job .group-head{border-bottom:1px solid var(--line)}
+/* About */
+.ab{max-width:1000px}
+.ab-jump{position:sticky;top:0;z-index:3;display:flex;gap:22px;padding:14px 0 10px;background:var(--bg);border-bottom:1px solid var(--line)}
+.ab-jump a{color:var(--muted);font-weight:600;text-decoration:none;font-size:calc(14px*var(--ts))}.ab-jump a:hover{color:var(--text)}
+.ab-sec{padding-top:30px;scroll-margin-top:50px}
+.ab-sec>h2{margin:0 0 14px;font:800 calc(26px*var(--ts)) var(--display);letter-spacing:-.02em}
+.ab-sec .details-head{margin-top:-46px}
+.ab .ab-cl{margin-bottom:16px}
+@media (max-width:820px){
+  .v2-jname b{font-size:calc(34px*var(--ts))}.v2-jname .jmark,.v2-jname img,.v2-jname .dot{width:40px!important;height:40px!important;border-radius:11px!important}
+  .v2-jhead{flex-direction:column;align-items:flex-start;gap:8px}
+  .v2 #subnav .v2-tabs{gap:0}.v2 #subnav .v2-tabs .pt-views{display:none}.v2-jcount{display:none}
+  .ab-jump{overflow-x:auto;white-space:nowrap;scrollbar-width:none;top:0}
+}
+
+/* Task panel (v2): facts row on top, then links, checklist, notes; the rest under More details */
+.v2-facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.vf{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 6px 0 12px;border-radius:10px;background:var(--surface-2);font-weight:600;font-size:calc(13.5px*var(--ts));color:var(--text)}
+.vf>span{color:var(--faint);font-weight:500;font-size:calc(12.5px*var(--ts))}
+.vf :is(select,input){border:0;background:transparent;font:600 calc(13.5px*var(--ts)) var(--body);color:var(--text);height:34px;padding:0 4px;border-radius:7px;min-width:0}
+.vf :is(select,input):hover{background:var(--surface-3)}
+.vf input[type=date]{width:auto}
+.vf input.over{color:var(--danger)}.vf input.today,.vf input.soon{color:var(--warn)}
+.vf.vf-st{padding:0;background:none;gap:6px}
+.vf-st .st-ctl{height:38px;border-radius:10px}
+.v2-done{display:inline-flex!important;align-items:center;gap:6px;width:auto!important;height:38px!important;padding:0 14px!important;border-radius:10px!important;background:var(--accent)!important;color:var(--accent-ink)!important;border:0!important;font-weight:700;font-size:calc(13.5px*var(--ts))}
+.v2-done .i{width:15px;height:15px;stroke-width:2.2}
+.vf .stepper{display:inline-flex;align-items:center;gap:2px;border:0;background:none}
+.vf .stepper button{width:26px;height:26px;border-radius:7px;border:0;background:transparent;color:var(--muted);font-weight:700}
+.vf .stepper button:hover{background:var(--surface-3);color:var(--text)}
+.vf .stepper output{min-width:18px;text-align:center}
+.v2-age{margin-top:8px;color:var(--faint);font-size:calc(12.5px*var(--ts))}
+.v2-age:empty{display:none}
+.v2 #drawer .load-warn{margin-top:8px}
+.v2 #drawer .d-body>div>.section-title,.v2 #drawer .section-title{margin-top:26px}
+.v2-more{margin-top:28px;border-top:1px solid var(--line);padding-top:4px}
+.v2-more>summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:10px;padding:12px 0;font:700 calc(15px*var(--ts)) var(--display);color:var(--text)}
+.v2-more>summary::-webkit-details-marker{display:none}
+.v2-more>summary::before{content:'›';display:inline-block;transition:transform .15s;color:var(--muted);font-weight:700}
+.v2-more[open]>summary::before{transform:rotate(90deg)}
+.v2-more>summary span{font:500 calc(12.5px*var(--ts)) var(--body);color:var(--faint)}
+.v2-more>.props2{margin-top:4px}
+
+.lk-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.lk-grid>.link-row{grid-column:1/-1}
+.lk-card{position:relative;display:flex;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--surface);min-width:0}
+.lk-card:hover{border-color:var(--line-strong)}
+.lk-open{flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:10px 12px;text-decoration:none;color:var(--text);border:0;background:none;text-align:left;border-radius:12px}
+.lk-ic{width:30px;height:30px;border-radius:8px;background:var(--surface-2);display:grid;place-items:center;flex:none}
+.lk-ic svg,.lk-ic img{width:18px;height:18px}
+.lk-t{min-width:0;display:flex;flex-direction:column}
+.lk-t b{font-weight:600;font-size:calc(13.5px*var(--ts));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lk-t small{color:var(--faint);font-size:calc(12px*var(--ts));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lk-edit{opacity:0;width:30px;height:30px;margin-right:6px}
+.lk-card:hover .lk-edit,.lk-edit:focus-visible{opacity:.8}
+@media (hover:none){.lk-edit{opacity:.6}}
+@media (max-width:560px){.lk-grid{grid-template-columns:1fr}}
+.v2 #drawer .d-rule{height:1px;background:var(--line);margin:12px 0 0}
+
+.v2 #drawer .notes-head{padding:0;border-bottom:1px solid var(--line);position:static;background:none;margin:26px 0 10px}
+.v2 #drawer .notes-head .section-title{margin:0!important;border:0;padding-bottom:8px}
+.v2 #drawer .v2-facts{margin-top:2px}
+.v2 #drawer .d-rule{margin:8px 0 12px}
+.v2 #drawer .v2-age{margin:8px 0 0}
+
+@media (max-width:820px){
+  .v2-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .v2-facts .vf-st{grid-column:1/-1}.v2-facts .vf-st .st-ctl{flex:1}
+  .v2-facts .vf{min-width:0}.v2-facts .vf :is(select,input){flex:1;min-width:0;width:100%}
+}
+
+/* Inbox page */
+.inb{max-width:900px}
+.inb .v2-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.inb .v2-head h1{margin:0;font:800 calc(54px*var(--ts))/1 var(--display);letter-spacing:-.035em}
+.inb-chips{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 6px}
+.inb-chips button{height:32px;padding:0 13px;border-radius:99px;border:1px solid var(--line-strong);background:var(--surface);font-size:calc(13px*var(--ts));font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.inb-chips button.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.inb-chips em{font-style:normal;font-weight:500;color:var(--faint)}.inb-chips button.on em{color:color-mix(in srgb,var(--bg) 70%,transparent)}
+.inb-it{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:14px;padding:16px 0;border-bottom:1px solid var(--line);align-items:start}
+.inb-it>.av,.inb-it>.me-av,.inb-it>img{width:34px;height:34px}
+.inb-ic{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);color:var(--muted)}
+.inb-ic svg{width:16px;height:16px}
+.inb-ic.k-danger{background:var(--danger-soft);color:var(--danger)}.inb-ic.k-warn{background:color-mix(in srgb,var(--warn) 14%,var(--surface));color:var(--warn)}
+.inb-main{border:0;background:none;padding:0;text-align:left;display:flex;flex-direction:column;gap:3px;min-width:0;color:var(--text);cursor:pointer}
+.inb-main b{font-weight:600;font-size:calc(15px*var(--ts))}
+.inb-it.unread .inb-main b::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:8px;vertical-align:2px}
+.inb-body{color:var(--muted);font-size:calc(14px*var(--ts));overflow-wrap:anywhere}
+.inb-ctx{display:flex;align-items:center;gap:7px;margin-top:3px;color:var(--faint);font-size:calc(12.5px*var(--ts))}
+.inb-ctx .v2-sq{width:8px;height:8px;border-radius:2px;margin:0}
+.inb-r{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.inb-r time{font-size:calc(12.5px*var(--ts));color:var(--faint);white-space:nowrap}
+.inb-acts{display:flex;align-items:center;gap:6px}
+.inb-acts .icon-btn{width:30px;height:30px;opacity:.55}.inb-it:hover .inb-acts .icon-btn{opacity:1}
+@media (max-width:820px){
+  .inb .v2-head h1{font-size:calc(40px*var(--ts))}.inb .inb-lede{display:none}.inb .v2-sum i{display:none}.inb .v2-head .btn{height:36px}
+  .inb-chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:16px -16px 4px;padding:0 16px}
+  .inb-chips button{flex:none}
+  .inb-it{grid-template-columns:34px minmax(0,1fr)}
+  .inb-r{grid-column:2;flex-direction:row;align-items:center;justify-content:space-between}
+}
+
+/* Done page header + tabs (Archived, Activity, Trash) */
+.dn-head h1{margin:0;font:800 calc(54px*var(--ts))/1 var(--display);letter-spacing:-.035em}
+.dn-tabs{display:flex;gap:26px;margin-top:20px;border-bottom:1px solid var(--line)}
+.dn-tabs button{padding:10px 0;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:none;color:var(--muted);font-weight:600;font-size:calc(15px*var(--ts));display:inline-flex;gap:7px;align-items:baseline}
+.dn-tabs button.on{color:var(--text);border-bottom-color:var(--text)}
+.dn-tabs em{font-style:normal;font-weight:500;color:var(--faint);font-size:calc(13px*var(--ts))}
+.v2 .al .cs-sub.al-sub{padding-top:14px}
+.v2 .al .cs-gh b{font-size:calc(17px*var(--ts))}
+@media (max-width:820px){.dn-head h1{font-size:calc(40px*var(--ts))}.dn-tabs{gap:0}.dn-tabs button{flex:1;justify-content:center}}
+
+/* Profile (v2): You, Pay, My week only; flat numbers instead of boxed tiles */
+.v2 .pf-tiles{display:flex;flex-wrap:wrap;gap:6px 32px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 0;margin-top:18px}
+.v2 .pf-tile{background:none;border:0;padding:0;border-radius:0;min-width:0}
+.v2 .pf-tile b{font:800 calc(28px*var(--ts))/1 var(--display);letter-spacing:-.02em}
+.v2 .pf-tile small{display:block;margin-top:5px;color:var(--muted)}
+.v2 .pf-tiles.wide .pf-tile b{font-size:calc(26px*var(--ts))}
+.v2 .pf-acct-v2{margin-top:18px}
+.v2 .pf-day{background:var(--surface);border-color:var(--line)}
+.v2 .pf-day.today{border-color:var(--accent);box-shadow:none}
+.v2 .pf-day.off{background:transparent}
 </style>
 
 <div class="app">
@@ -3099,7 +3312,7 @@ select.rs-add{appearance:auto}
   <div class="side-resize" id="side-resize" title="Drag to resize the sidebar · double-click to reset" aria-hidden="true"></div>
   <main class="main" id="main">
     <div id="banner"></div>
-    <div class="head-row"><div id="head"></div><div class="top-right"><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search tasks  ( / )" autocomplete="off"></label><div class="pomo-wrap"><button type="button" class="pomo-btn" id="pomo" data-act="pomo" aria-haspopup="true" aria-expanded="false" aria-controls="pomo-pop" title="Focus timer (P to start or pause)"></button><div class="notes-pop pomo-pop" id="pomo-pop" hidden role="dialog" aria-label="Focus timer"></div></div><div class="bell-wrap"><button type="button" class="icon-btn bell" id="bell" data-act="bell" aria-haspopup="true" aria-expanded="false" aria-controls="notes" title="Alerts"><svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bell-n" id="bell-n" hidden></span></button><div class="notes-pop" id="notes" hidden role="dialog" aria-label="Alerts"></div></div><button type="button" class="me-btn" id="me-btn" data-act="profile" title="Your profile" aria-label="Your profile"></button></div></div>
+    <div class="head-row"><div id="head"></div><div class="top-right"><button type="button" class="v2-find" data-act="jump" title="Quick search (⌘K)"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg>Search tasks, jobs, clients<kbd>⌘K</kbd></button><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search tasks  ( / )" autocomplete="off"></label><div class="pomo-wrap"><button type="button" class="pomo-btn" id="pomo" data-act="pomo" aria-haspopup="true" aria-expanded="false" aria-controls="pomo-pop" title="Focus timer (P to start or pause)"></button><div class="notes-pop pomo-pop" id="pomo-pop" hidden role="dialog" aria-label="Focus timer"></div></div><div class="bell-wrap"><button type="button" class="icon-btn bell" id="bell" data-act="bell" aria-haspopup="true" aria-expanded="false" aria-controls="notes" title="Alerts"><svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bell-n" id="bell-n" hidden></span></button><div class="notes-pop" id="notes" hidden role="dialog" aria-label="Alerts"></div></div><button type="button" class="me-btn" id="me-btn" data-act="profile" title="Your profile" aria-label="Your profile"></button></div></div>
     <div id="subnav"></div>
     <div id="stats"></div>
     <div id="jobcards"></div>
@@ -3326,7 +3539,9 @@ const PREF_DEF={dateRel:false,dateFmt:'md',weekStart:'mon',hideWeekends:false,co
   iconWeight:'regular',depth:'soft',sideStyle:'colored',thinScroll:false,toastPos:'bottom',nameWrap:false,doneStyle:'struck',overdueTint:false,statusIcons:false,prioColors:{},logoShape:'rounded',numFont:'mono',readSpacing:'normal',sideCounts:true,sideCompact:false,
   compactHeader:false,greeting:true,greetName:'',drawerBand:true,boardTint:false,dueStyle:'text',jobProgress:'bar',calGrid:'lines',todayMark:'dot',
   pomoFocus:25,pomoShort:5,pomoLong:15,pomoEvery:4,pomoAutoBreak:false,pomoAutoFocus:false,pomoSound:'chime',pomoPopup:false,allClear:true,seasonal:true,officeCat:true,catSky:true,catPlant:true,plantGoal:20,catVisitors:true,catNaps:true,catTreats:true,catPeek:true,sillPet:'none',corkBoard:true,catName:'',catFur:'orange',meShow:false,meHair:'short',meHairCol:'#3b2a20',meSkin:'#f1c27d',meTop:'#4c8dff',deskMug:true,deskLamp:true,deskCam:false,deskVinyl:false,stickerShow:true,autoArchive:0};
-const pref=k=>{let o=null;try{o=SM}catch(e){/* Settings state not set up yet */}o=o||S.settings?.app||{};return o[k]!==undefined&&o[k]!==null?o[k]:PREF_DEF[k]};
+/* the revamp keeps the app plain: these extras stay off whatever was saved */
+const FUN_OFF={allClear:false,seasonal:false,officeCat:false,catSky:false,catPlant:false,catVisitors:false,catNaps:false,catTreats:false,catPeek:false,sillPet:'none',corkBoard:false,meShow:false,deskMug:false,deskLamp:false,deskCam:false,deskVinyl:false,stickerShow:false,confetti:false,greeting:false};
+const pref=k=>{if(k in FUN_OFF)return FUN_OFF[k];let o=null;try{o=SM}catch(e){/* Settings state not set up yet */}o=o||S.settings?.app||{};return o[k]!==undefined&&o[k]!==null?o[k]:PREF_DEF[k]};
 const reducedMotion=()=>pref('motion')==='reduce'||matchMedia('(prefers-reduced-motion:reduce)').matches;
 function absDate(s){
   const d=parseD(s);
@@ -4578,8 +4793,7 @@ function applyTheme(t){
 }
 function applyLook(o){
   const r=document.documentElement;
-  applyTheme(o.theme);
-  if(o.scheme&&o.scheme!=='splice'&&SCHEMES.some(x=>x[0]===o.scheme)) r.setAttribute('data-scheme',o.scheme); else r.removeAttribute('data-scheme');
+  applyTheme('light');r.removeAttribute('data-scheme');r.classList.add('v2');
   const ts=TEXT_SIZES.some(x=>x[0]===+o.textSize)?+o.textSize:1;
   if(ts===1) r.style.removeProperty('--tsu'); else r.style.setProperty('--tsu',ts);
   if(o.density==='compact') r.setAttribute('data-density','compact'); else r.removeAttribute('data-density');
@@ -4632,7 +4846,7 @@ function render(){
   document.title=(a.name||'').trim()||APP_NAME;pomoTitle();
   const fav=$('#favicon'),want=imgSrc(a.logo)||APP_LOGO;if(fav&&fav.getAttribute('href')!==want){fav.setAttribute('href',want);fav.removeAttribute('type')}
   withFocus(()=>{renderSide();renderMain()});
-  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();stickerSoon();renderMeBtn();renderUpNextPage();boardRestore();document.body.classList.toggle('cal-page',S.ui.view==='calendar'&&!['archived','activity','trash','help','resume','upnext'].includes(S.ui.tab));
+  renderBell();renderBulk();applyDrawerW();applySideW();renderTabbar();syncUrl();renderPip();renderPomo();appBadge();napPlace();stickerSoon();renderMeBtn();renderUpNextPage();boardRestore();document.body.classList.toggle('cal-page',S.ui.view==='calendar'&&!['inbox','archived','activity','trash','help','resume','upnext'].includes(S.ui.tab));
   if(S.ready&&!SEASON_RAN){SEASON_RAN=true;setTimeout(()=>seasonFx(),900)}
 }
 
@@ -4647,6 +4861,7 @@ function renderOffline(){
     :`<svg viewBox="0 0 16 16"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3"/></svg><span>Syncing ${n} change${n===1?'':'s'}…</span>`;
 }
 window.addEventListener('online',()=>renderOffline());window.addEventListener('offline',()=>renderOffline());
+const V2_IC={today:'<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 4.8V8l2.4 1.6"/></svg>',inbox:'<svg class="i" viewBox="0 0 16 16"><path d="M2.5 9.5 4 3.5h8l1.5 6v3h-11zM2.5 9.5h3.2l.8 1.5h3l.8-1.5h3.2"/></svg>',done:'<svg class="i" viewBox="0 0 16 16"><path d="m3 8.5 3 3 7-7"/></svg>'};
 function renderSide(){queueMicrotask(renderOffline);
   const u=S.ui,jobsOpen=u.jobsOpen!==false;
   const openCount=jid=>live().filter(t=>t.jobId===jid&&!isClosed(t)).length;
@@ -4654,23 +4869,20 @@ function renderSide(){queueMicrotask(renderOffline);
   const app=appSettings();const appLogo=imgSrc(app.logo);
   document.body.classList.toggle('side-mini',!!u.sideMini);
   const tt=n=>u.sideMini?` title="${n}"`:'';
-  let html=`<button type="button" class="icon-btn side-toggle" data-act="side-mini" aria-label="${u.sideMini?'Expand sidebar':'Collapse sidebar'}" title="${u.sideMini?'Expand sidebar':'Collapse sidebar'}">${I.left}</button><button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Overview">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
-  <div class="side-scroll"><nav class="nav" aria-label="Main"><button class="nav-item ${u.tab==='overview'?'on':''}" data-act="nav" data-tab="overview"${tt('Home')}>${I.grid}<span class="name">Home</span><span class="count">${S.ready?allOpen:''}</span></button><button class="nav-item ${u.tab==='calendar'?'on':''}" data-act="nav" data-tab="calendar"${tt('Calendar')}>${I.cal}<span class="name">Calendar</span></button>
-  <button class="nav-item jobs-toggle ${jobsOpen?'open':''}"${tt('Jobs')} data-act="toggle-jobs" aria-expanded="${jobsOpen}" aria-controls="nav-jobs">${I.briefcase}<span class="name">Jobs</span><span class="count">${S.ready?jobsSorted().length:''}</span>${I.chev}</button></nav>
-  <nav class="nav jobs" id="nav-jobs" aria-label="Jobs" ${jobsOpen?'':'hidden'}>`;
+  const inboxN=(()=>{try{return S.ready?inboxList().filter(n=>!NS.read[n.key]).length:0}catch(e){return 0}})();
+  const nv=(tab,label,icon,count,act='nav')=>`<button class="nav-item ${(u.tab===tab||tab==='archived'&&['activity','trash'].includes(u.tab))&&act==='nav'?'on':''}" data-act="${act}" data-tab="${tab}"${tt(label)}>${icon}<span class="name">${label}</span><span class="count">${count||''}</span></button>`;
+  let html=`<button type="button" class="icon-btn side-toggle" data-act="side-mini" aria-label="${u.sideMini?'Expand sidebar':'Collapse sidebar'}" title="${u.sideMini?'Expand sidebar':'Collapse sidebar'}">${I.left}</button><button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Today">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
+  <div class="side-scroll"><nav class="nav" aria-label="Main">${nv('overview','Today',V2_IC.today,S.ready?allOpen:'')}${nv('calendar','Calendar',I.cal)}${nv('inbox','Inbox',V2_IC.inbox,inboxN)}${nv('archived','Done',V2_IC.done)}</nav>
+  <div class="v2-jh"><span>Jobs</span><button type="button" class="icon-btn" data-act="new-job" title="New job" aria-label="New job">${I.plus}</button></div>
+  <nav class="nav jobs" id="nav-jobs" aria-label="Jobs">`;
   for(const j of jobsSorted()){
     const on=u.tab===j.id;
-    html+=`<div class="nav-row" draggable="true" data-job="${j.id}"><button class="nav-item ${on&&u.client==='all'?'on':''}" data-act="nav" data-tab="${j.id}" ${u.sideMini?`title="${esc(j.name)}"`:''}>${jobMark(j,18)}${jobEmoji(j)}<span class="name">${esc(j.name)}</span>${shiftDot(j)}<span class="count">${openCount(j.id)}</span></button><button class="icon-btn edit" data-act="edit-job" data-id="${j.id}" title="Edit ${esc(j.name)}" aria-label="Edit ${esc(j.name)}">${I.pencil}</button></div>`;
+    html+=`<div class="nav-row" draggable="true" data-job="${j.id}"><button class="nav-item ${on?'on':''}" data-act="nav" data-tab="${j.id}" ${u.sideMini?`title="${esc(j.name)}"`:''}><span class="v2-sq" style="--jc:${esc(j.color||'var(--accent)')}"></span><span class="name">${esc(j.name)}</span>${shiftDot(j)}<span class="count">${openCount(j.id)}</span></button></div>`;
   }
-  html+=`<button class="nav-item nav-new" data-act="new-job"${tt('New job')}>${I.plus}<span class="name">New job</span></button></nav>
-  <nav class="nav" aria-label="More"><button class="nav-item ${u.tab==='archived'?'on':''}" data-act="nav" data-tab="archived"${tt('Archived')}>${I.archive}<span class="name">Archived</span><span class="count">${S.ready?archived().length:''}</span></button><button class="nav-item ${u.tab==='activity'?'on':''}" data-act="nav" data-tab="activity"${tt('Activity')}>${I.clock}<span class="name">Activity</span></button><button class="nav-item ${u.tab==='trash'?'on':''}" data-act="nav" data-tab="trash"${tt('Trash')}>${I.trash}<span class="name">Trash</span><span class="count">${S.ready&&trashed().length?trashed().length:''}</span></button></nav>
-  ${u.sideMini?'':corkHtml()}</div>
-  <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='cloud'&&(B.offline||Object.keys(OUT).length)?`<span class="sync-dot local"></span>Offline · ${Object.keys(OUT).length?`${Object.keys(OUT).length} change${Object.keys(OUT).length===1?'':'s'} waiting to sync`:'changes will sync'}`:B.mode==='db'||B.mode==='cloud'?'<span class="sync-dot"></span>Saved to your account':B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
-    ${B.mode==='cloud'&&B.syncedAt?`<small class="synced" title="Last time this device heard back from your account">Last synced ${syncedAgo()}</small>`:''}
+  html+=`</nav></div>
+  <div class="side-foot"><span class="save-state" title="${B.mode==='local'?'Saved in this browser only':'Saved to your account'}">${B.mode==='cloud'&&(B.offline||Object.keys(OUT).length)?`<span class="sync-dot local"></span>Offline · ${Object.keys(OUT).length?`${Object.keys(OUT).length} change${Object.keys(OUT).length===1?'':'s'} waiting to sync`:'changes will sync'}`:B.mode==='db'||B.mode==='cloud'?`<span class="sync-dot"></span>${B.syncedAt?`Synced ${syncedAgo()}`:'Saved to your account'}`:B.mode==='local'?'<span class="sync-dot local"></span>Saved in this browser only':'Loading…'}</span>
     ${B.mode==='cloud'&&CU.connected&&cuJobs().length?`<button type="button" class="synced cu-synced" data-act="cu-sync" title="Check ClickUp now">${CU_IC}${cuRunning?'Checking ClickUp…':`ClickUp checked ${CU.lastSync?calAgo(CU.lastSync):'—'}`}</button>`:''}
-    <div class="foot-links"><button class="nav-item foot-settings ${u.tab==='resume'?'on':''}" data-act="nav" data-tab="resume"${tt('Resume')}>${RS_IC}<span class="name">Resume</span></button>
-    <button class="nav-item foot-settings ${u.tab==='help'?'on':''}" data-act="nav" data-tab="help"${tt('Help & tips')}>${HELP_IC}<span class="name">Help &amp; tips</span></button>
-    <button class="nav-item foot-settings" data-act="open-settings"${tt('Settings')}>${I.gear}<span class="name">Settings</span></button></div></div>`;
+    <div class="v2-me"><button type="button" class="v2-who" data-act="profile" title="Your profile">${meAvatar(28)}<span class="name">${esc(meName()||'You')}</span></button><button type="button" class="icon-btn" data-act="nav" data-tab="help" title="Help &amp; tips" aria-label="Help &amp; tips">${HELP_IC}</button><button type="button" class="icon-btn" data-act="open-settings" title="Settings" aria-label="Settings">${I.gear}</button></div></div>`;
   $('#side').innerHTML=html;
   placeCat();sideFade();
   $('#mbrand').innerHTML=`${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b>`;
@@ -4695,6 +4907,7 @@ function renderMain(){
    if(cdp){const [a,b]=cdp,na=clientTaskN(a),nb=clientTaskN(b);$('#banner').innerHTML=`<div class="banner cdup-banner"><p>${I.users||''}<b>“${esc(b.name)}” looks like “${esc(a.name)}”.</b> Same client? ${nb?`Merging moves its ${nb===1?'task':`${nb} tasks`} over.`:'It has no tasks yet.'}</p><button class="btn sm primary" data-act="cdup-merge" data-keep="${a.id}" data-from="${b.id}">Merge into “${esc(a.name)}”</button><button class="btn sm" data-act="cdup-merge" data-keep="${b.id}" data-from="${a.id}">Merge into “${esc(b.name)}”</button><button class="btn sm ghost" data-act="cdup-keep" data-a="${a.id}" data-b="${b.id}">Keep both</button></div>`}}
 
   document.body.classList.toggle('pg-job',!!job&&!['archived','activity','trash','help','resume'].includes(u.tab));document.body.classList.toggle('pg-cal',u.tab==='calendar');
+  if(u.tab==='inbox'){renderInbox();return}
   if(u.tab==='archived'){renderArchive();return}
   if(u.tab==='activity'){renderActivity();return}
   if(u.tab==='trash'){renderTrash();return}
@@ -4721,19 +4934,24 @@ function renderMain(){
       (cur||paneName)?`<button type="button" data-act="nav" data-tab="${job.id}" data-pane="tasks">${jobMark(job,14)}${esc(job.name)}</button>`:`<span aria-current="page">${jobMark(job,14)}${esc(job.name)}</span>`];
     if(cur)crumbs.push(paneName?`<button type="button" data-act="nav" data-tab="${job.id}" data-client="${cur.id}" data-pane="tasks">${esc(cur.name)}</button>`:`<span aria-current="page">${esc(cur.name)}</span>`);
     if(paneName)crumbs.push(`<span aria-current="page">${paneName}</span>`);
-    const TASKS=!['brand','details','invoices'].includes(u.pane),tools=[job.tools?.comms,job.tools?.tracker,job.tools?.upload].filter(x=>x&&x!=='None');
+    const TASKS=!['brand','details','invoices','about'].includes(u.pane),tools=[job.tools?.comms,job.tools?.tracker,job.tools?.upload].filter(x=>x&&x!=='None');
     const kick=[job.type==='agency'?'Agency':'Direct client',job.type==='agency'?`${cl.length} client${cl.length===1?'':'s'}`:'',...tools].filter(Boolean).map(esc).join(' · ');
     const jkeys=statKeys(),jlabels=Object.fromEntries(statDefs());
     const tally=TASKS&&Object.keys(S.jobs).length?`<div class="stats-wrap cs-tally-wrap"><div class="stats cs-tally">${jkeys.map(k=>statTile(k,jlabels[k],scope)).join('')}<button type="button" class="icon-btn stats-edit ${STATPOP?'on':''}" data-act="stat-edit" title="Choose which counts show" aria-label="Choose which counts show" aria-expanded="${STATPOP}">${I.pencil}</button></div>${statPopHtml()}</div>`:'';
     $('#head').innerHTML=`<nav class="crumbs" aria-label="Breadcrumb">${crumbs.join('<i aria-hidden="true">›</i>')}</nav>`;
-    const csHead=`<header class="cs-top cs-jtop"><div class="cs-hl"><small>${kick}</small><h1><button type="button" class="cs-jname" data-act="edit-job" data-id="${job.id}" title="Edit job" aria-label="Edit ${esc(job.name)}">${jobMark(job,40)}<span class="h1-name">${esc(job.name)}</span></button></h1></div>${tally}</header>`;
-    $('#subnav').innerHTML=csHead+`<div class="pane-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${['brand','details','invoices'].includes(u.pane)?'':'on'}" aria-selected="${!['brand','details','invoices'].includes(u.pane)}" data-act="pane" data-pane="tasks">${I.task}Tasks</button><button role="tab" class="${u.pane==='brand'?'on':''}" aria-selected="${u.pane==='brand'}" data-act="pane" data-pane="brand">${I.palette}Brand guide</button><button role="tab" class="${u.pane==='details'?'on':''}" aria-selected="${u.pane==='details'}" data-act="pane" data-pane="details">${I.info}Details</button><button role="tab" class="${u.pane==='invoices'?'on':''}" aria-selected="${u.pane==='invoices'}" data-act="pane" data-pane="invoices">${INV_IC}Invoices<span class="pt-long"> &amp; docs</span></button>${TASKS?`<div class="seg pt-views" role="tablist" aria-label="View">${[['list','List'],['board','Board'],['calendar','Calendar']].map(([v,l])=>`<button type="button" data-act="view" data-view="${v}" class="${u.view===v?'on':''}" aria-selected="${u.view===v}">${l}</button>`).join('')}</div>`:''}</div>`;
-    {const ct=job.type==='agency'&&!['details','invoices'].includes(u.pane)?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All clients</button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}" draggable="true" data-ctab="${c.id}" title="Drag to reorder">${clientMark(c,18)}${esc(c.name)}</button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:'';$('#tb-clients').innerHTML=TASKS?ct:'';if(!TASKS)$('#subnav').insertAdjacentHTML('beforeend',ct)}
+    const w=workOf(job),when=[daysLabel(w.days),w.shiftStart&&w.shiftEnd?`${fmtClock(w.shiftStart)}–${fmtClock(w.shiftEnd)}`:''].filter(Boolean).join(', ');
+    const jsub=[job.type==='agency'?'Agency':'Direct client',job.type==='agency'?`${cl.length} client${cl.length===1?'':'s'}`:'',when].filter(Boolean).map(esc).join('<i>·</i>');
+    const openN=live().filter(t=>t.jobId===job.id&&!isClosed(t)).length,lateN=live().filter(t=>t.jobId===job.id&&!isClosed(t)&&t.due&&t.due<today()).length;
+    const csHead=`<header class="v2-jhead"><button type="button" class="v2-jname" data-act="edit-job" data-id="${job.id}" title="Edit job" aria-label="Edit ${esc(job.name)}">${jobMark(job,48)}<span><b class="h1-name">${esc(job.name)}</b><small>${jsub}</small></span></button><p class="v2-jcount">${lateN?`<b class="late">${lateN} late</b><i>·</i>`:''}${openN} open</p></header>`;
+    $('#subnav').innerHTML=csHead+`<div class="pane-tabs v2-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${TASKS?'on':''}" aria-selected="${TASKS}" data-act="pane" data-pane="tasks">Tasks</button><button role="tab" class="${TASKS?'':'on'}" aria-selected="${!TASKS}" data-act="pane" data-pane="about">About</button>${TASKS?`<div class="seg pt-views" role="tablist" aria-label="View">${[['list','List'],['board','Board'],['calendar','Calendar']].map(([v,l])=>`<button type="button" data-act="view" data-view="${v}" class="${u.view===v?'on':''}" aria-selected="${u.view===v}">${l}</button>`).join('')}</div>`:''}</div>`;
+    {const ct=job.type==='agency'&&TASKS?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All<em>${TASKS?openN:''}</em></button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}" draggable="true" data-ctab="${c.id}" title="Drag to reorder">${esc(c.name)}<em>${TASKS?live().filter(t=>t.clientId===c.id&&!isClosed(t)).length||'':''}</em></button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:'';$('#tb-clients').innerHTML=TASKS?ct:'';if(!TASKS)$('#subnav').insertAdjacentHTML('beforeend',ct)}
   }
 
-  if(job&&(u.pane==='brand'||u.pane==='details'||u.pane==='invoices')){
+  if(job&&['brand','details','invoices','about'].includes(u.pane)){
     $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
-    $('#view').innerHTML=u.pane==='brand'?brandPane(job):u.pane==='invoices'?invoicesPane(job):detailsPane(job);return;
+    $('#view').innerHTML=aboutPane(job);
+    if(u.pane!=='about'){const go=u.pane;u.pane='about';requestAnimationFrame(()=>$('#ab-'+go)?.scrollIntoView({block:'start'}))}
+    return;
   }
   const keys=statKeys(),labels=Object.fromEntries(statDefs());
   $('#stats').innerHTML=!job||true?'':Object.keys(S.jobs).length?`<div class="stats-wrap"><div class="stats" style="grid-template-columns:repeat(${keys.length},minmax(0,1fr))">${keys.map(k=>statTile(k,labels[k],scope)).join('')}<button type="button" class="icon-btn stats-edit ${STATPOP?'on':''}" data-act="stat-edit" title="Choose tiles" aria-label="Choose which tiles show" aria-expanded="${STATPOP}">${I.pencil}</button></div>${statPopHtml()}</div>`:'';
@@ -4741,7 +4959,7 @@ function renderMain(){
   $('#jobcards').innerHTML=!job?'':(!job?allClearHtml():'')+(!job&&jobsSorted().length?`<div class="jobs-grid">${jobsSorted().map(jobCard).join('')+`<button type="button" class="job-card job-add" data-act="new-job" title="New job">${I.plus}<span>New job</span></button>`}</div>`:'');
 
   const tb=$('#toolbar');tb.hidden=!Object.keys(S.jobs).length;tb.classList.toggle('tb-home',HOME||u.tab==='calendar');
-  $('#top-search').hidden=tb.hidden;$('#fdot').hidden=u.prio==='all'&&u.due==='all'&&(u.tag||'all')==='all';
+  $('#top-search').hidden=tb.hidden||HOME||u.tab==='calendar';$('#fdot').hidden=u.prio==='all'&&u.due==='all'&&(u.tag||'all')==='all';
   ['list','board','calendar'].forEach(v=>{const b=$('#v-'+v);b.classList.toggle('on',u.view===v);b.setAttribute('aria-selected',u.view===v)});tb.querySelector('.seg').hidden=!job;
   if(document.activeElement!==$('#q')) $('#q').value=u.q;
   $('#f-prio').value=u.prio;$('#f-due').value=u.due;$('#f-sort').value=u.sort;
@@ -4760,7 +4978,7 @@ function renderMain(){
 /* ================= address bar: Back button and task links =================
    The page's place is kept in the URL hash (#/overview, #/job/<id>/client/<id>/pane/brand, …/task/<id>), so the
    browser's Back closes the task panel or returns to the previous page, and a task link opens that task. */
-const PAGES=['overview','calendar','upnext','archived','activity','trash','help','resume','upnext'];
+const PAGES=['overview','calendar','inbox','upnext','archived','activity','trash','help','resume','upnext'];
 let URL_READY=false,URL_LAST=null,URL_TASK_PUSHED=false,URL_APPLYING=false;
 const LINK_IC='<svg class="i" viewBox="0 0 16 16"><path d="M6.8 9.2a2.8 2.8 0 0 0 4 0l2.2-2.2a2.8 2.8 0 0 0-4-4l-.9.9"/><path d="M9.2 6.8a2.8 2.8 0 0 0-4 0L3 9a2.8 2.8 0 0 0 4 4l.9-.9"/></svg>';
 function urlOf(){
@@ -4855,10 +5073,10 @@ function renderPlus(){
     <button type="button" class="btn primary pm-task" data-act="new-task">${I.plus}New task</button>`;
 }
 function renderTabbar(){
-  const e=$('#tabbar');if(!e)return;const u=S.ui,cal=u.view==='calendar'&&!['archived','activity','trash','help','resume','upnext'].includes(u.tab);
+  const e=$('#tabbar');if(!e)return;const u=S.ui,cal=u.view==='calendar'&&!['inbox','archived','activity','trash','help','resume','upnext'].includes(u.tab);
   const b=(act,label,icon,on,extra='',short=label)=>`<button type="button" data-act="${act}" class="${on?'on':''} ${extra} tb-${act.slice(3)}" aria-label="${label}" ${on?'aria-current="page"':''}>${icon}<span>${short}</span></button>`;
   const busy=notesOpen||UPN;
-  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Home',I.grid,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Alerts','<svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg>'+(()=>{const n=$('#bell-n');return n&&!n.hidden?`<i class="tb-badge">${esc(n.textContent)}</i>`:''})(),notesOpen,'','Alerts')+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-upnext','Up next',UP_IC+(()=>{const n=upNextList().length;return n?`<i class="tb-badge tb-cnt">${n}</i>`:''})(),UPN)+b('tb-me','You',meAvatar(26),!!PRF)}</div>`
+  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Today',V2_IC.today,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Inbox',V2_IC.inbox+(()=>{const n=$('#bell-n');return n&&!n.hidden?`<i class="tb-badge">${esc(n.textContent)}</i>`:''})(),notesOpen||u.tab==='inbox','','Inbox')+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-upnext','Up next',UP_IC+(()=>{const n=upNextList().length;return n?`<i class="tb-badge tb-cnt">${n}</i>`:''})(),UPN)+b('tb-me','You',meAvatar(26),!!PRF)}</div>`
     +`<button type="button" data-act="tb-search" class="tb-search" aria-label="Search" title="Search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 14 14"/></svg></button>`
     +`<button type="button" data-act="tb-plus" class="tb-fab ${PLUS?'on':''}" aria-label="New" aria-expanded="${PLUS}" title="New task, new job or focus timer">${I.plus}</button>`;
 }
@@ -5100,22 +5318,35 @@ function csQueue(q){
   return `<section class="cs-g cs-q" id="csg-queue"><div class="cs-gh"><b>Up next</b><span>${q.length}</span>${q.length>1?'<em>Drag to reorder</em>':''}</div>
     ${q.length?`<ol class="un-list cs-unl">${q.map(t=>`<li class="un-row cs-un" draggable="true" data-un="${t.id}">${csRow(t,'#'+upNextPos(t),{grip:true})}</li>`).join('')}</ol>`:`<p class="hm-empty">Line up what you'll work on next: right-click a task (press and hold on a phone) and choose Add to Up next.</p>`}</section>`;
 }
+/* Today: this week as a timeline strip, one column per day with each due task as a clip in its job's color */
+function weekStrip(){
+  const t0=today(),load=dueLoad(),lim=dayLimit(),open=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)&&t.due);
+  const days=[...Array(7)].map((_,i)=>addDays(t0,i));
+  const col=d=>{const ts=open.filter(t=>d===t0?t.due<=t0:t.due===d).sort((a,b)=>(a.due<b.due?-1:a.due>b.due?1:0)||(a.upNext||9e9)-(b.upNext||9e9)),dt=parseD(d),busy=(load[d]||0)>=lim;
+    const show=ts.slice(0,4);
+    return `<div class="ws-d ${d===t0?'today':''} ${busy?'busy':''}" data-calday="${d}"><div class="ws-h"><b>${WEEKDAY[dt.getDay()]} ${dt.getDate()}</b><span>${ts.length?ts.length+(busy?' · busy':''):''}</span></div>
+      ${show.map(t=>`<button type="button" class="ws-c ${t.due<t0?'late':''}" data-act="open" data-id="${t.id}" data-caldrag="${t.id}" draggable="true" style="--jc:${esc(S.jobs[t.jobId]?.color||'var(--accent)')}" title="${esc(t.name||'Untitled task')} · ${esc(S.jobs[t.jobId]?.name||'')}">${esc(t.name||'Untitled task')}</button>`).join('')}
+      ${ts.length>4?`<button type="button" class="ws-more" data-act="nav" data-tab="calendar">+${ts.length-4} more</button>`:''}</div>`};
+  return `<section class="ws" aria-label="This week">${days.map(col).join('')}</section>`;
+}
 function homeView(){
+  S.ui.hjob='all';
   const ts=homeTasks(),G=csGroups(ts),un=upNow(ts),jf=hmJob(),all=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)),t0=today(),gd=Object.fromEntries(G.map(g=>[g[0],g[2]]));
   const gr=homeGreet(),wait=inboxGroups().filter(g=>g.wait).length,d=new Date();
   const kick=[pref('greeting')?gr.h1:'',WEEKDAY_FULL[d.getDay()],pref('seasonal')?seasonNote():''].filter(Boolean).join(' · ');
   const tl=(k,n,l,cls='')=>`<button type="button" class="cs-t ${cls}" data-act="cs-jump" data-g="${k}"><b>${n}</b><span>${l}</span></button>`;
   const lateN=all.filter(t=>t.due&&t.due<t0&&(jf==='all'||t.jobId===jf)).length;
-  const head=`<header class="cs-top"><div class="cs-hl"><small>${esc(kick)}</small><h1>${esc(absDate(t0).replace(/ ’\d+$/,''))}</h1></div>
-    <div class="cs-tally">${tl('late',gd.late.length+gd.queue.filter(t=>t.due&&t.due<t0).length,'late',lateN?'late':'')}${tl('today',ts.filter(t=>t.due===t0).length,'due today')}${tl('tom',ts.filter(t=>t.due===addDays(t0,1)).length,'tomorrow')}${wait?tl('inbox',wait,'waiting on you','wait'):''}${tl('all',ts.length,'open')}</div></header>`;
-  const jobsRow=`<div class="cs-sub"><button type="button" class="${jf==='all'?'on':''}" data-act="hm-job" data-j="all">All jobs</button>${jobsSorted().map(j=>{const n=all.filter(t=>t.jobId===j.id).length;return `<button type="button" class="${jf===j.id?'on':''}" data-act="hm-job" data-j="${j.id}"><span class="hm-dot" style="--jc:${esc(j.color||'var(--accent)')}"></span>${esc(j.name)}<em>${n}</em></button>`}).join('')}<span class="cs-sp"></span><button type="button" class="btn sm primary cs-new" data-act="new-task" title="New task (N)">${I.plus}New task</button></div>`;
+  const lateAll=ts.filter(t=>t.due&&t.due<t0).length,todayN=ts.filter(t=>t.due===t0).length;
+  const sum=[lateAll?`<b class="late">${lateAll} late</b>`:'',`<b>${todayN} due today</b>`,`${ts.length} open across ${new Set(ts.map(t=>t.jobId)).size} job${new Set(ts.map(t=>t.jobId)).size===1?'':'s'}`].filter(Boolean).join('<i>·</i>');
+  const head=`<header class="v2-head"><div><h1>${esc(WEEKDAY_FULL[d.getDay()])}</h1><p class="v2-sum">${sum}</p></div><button type="button" class="btn primary v2-new" data-act="new-task" title="New task (N)">${I.plus}New task</button></header>`;
+  const jobsRow=weekStrip();
   let n=0;const body=G.map(([k,label,list])=>{if(!list.length||k==='queue')return '';
     const lim=['queue','late','today'].includes(k)||HM_OPEN.has(k)?list.length:8,show=list.slice(0,lim);
     const rows=show.map(t=>{n++;return csRow(t,String(n).padStart(2,'0'),{now:un?.t.id===t.id?un:null,nodate:k==='nodate'})}).join('');
     return `<section class="cs-g" id="csg-${k}"><div class="cs-gh ${k==='late'?'late':''}"><b>${label}</b><span>${list.length}</span></div>
       ${rows}${list.length>lim||HM_OPEN.has(k)&&list.length>8?`<button type="button" class="hm-more" data-act="cs-more" data-g="${k}">${HM_OPEN.has(k)?'Show fewer':`Show ${list.length-lim} more`}</button>`:''}</section>`}).join('');
   const empty=`<p class="hm-empty">${ts.length?'':'No open tasks'+(jf==='all'?'':' in this job')+'. New tasks you add show up here, sorted by when they\'re due.'}</p>`;
-  return `<div class="cs">${head}${jobsRow}<div class="home cs-home"><div class="hm-main">${body||empty}</div><aside class="hm-side"><div id="csg-inbox">${inboxHtml()}</div>${csQueue(gd.queue)}</aside></div></div>`;
+  return `<div class="cs v2-home">${head}${jobsRow}<div class="home cs-home"><div class="hm-main">${body||empty}</div><aside class="hm-side"><div id="csg-inbox">${inboxHtml()}</div>${csQueue(gd.queue)}</aside></div></div>`;
 }
 /* ================= Calendar page (tab 'calendar') =================
    Job chips on top (S.ui.cjob) instead of the filters, and a No date tray (S.ui.ctray) whose tasks drag onto a day
@@ -5205,7 +5436,7 @@ const statusSelect=(t,act)=>`<select class="pill" ${pillStyle(stOf(t))} data-act
 const ROW_HEAD=`<div class="row-head"><span></span><span>Task</span><span>Status</span><span class="c-prio">Priority</span><span class="c-start">Start</span><span>Due</span><span class="c-links">Links</span></div>`;
 /* List columns the user hid (View options), per device: S.ui.hideCols {prio,start,links} */
 function rowsAttrs(){
-  const h=S.ui.hideCols||{},on=k=>!h[k];
+  const h={...(S.ui.hideCols||{}),prio:true,start:true},on=k=>!h[k];
   const wide=['var(--w0)','minmax(0,1fr)','180px',on('prio')&&'84px',on('start')&&'84px','84px',on('links')&&'120px'].filter(Boolean).join(' ');
   const mid=['var(--w0)','minmax(0,1fr)','180px','84px',on('links')&&'120px'].filter(Boolean).join(' ');
   return `class="rows ${['prio','start','links'].filter(k=>h[k]).map(k=>'h-'+k).join(' ')}" style="--cols:${wide};--cols-mid:${mid}"`;
@@ -5225,7 +5456,7 @@ function listView(list,job){
   for(const s of sts){
     const rows=list.filter(t=>gk(t)===s.id);
     const open=!S.ui.collapsed[s.id];
-    html+=`<section class="group" id="grp-${s.id}" data-stage="${esc(s.stage||s.id)}" data-drop="${s.id}"><div class="group-bar"><button class="group-head ${open?'open':''}" data-act="group" data-status="${s.id}" aria-expanded="${open}">${I.chev}<span class="pill" ${pillStyle(s.id)}><span class="pl">${esc(s.label)}</span></span><span class="count">${rows.length}</span></button>${(s.stage||s.id)==='done'&&rows.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}">${I.archive}Archive all ${rows.length} done</button>`:''}</div>`;
+    html+=`<section class="group ${rows.length?'':'g-empty'}" id="grp-${s.id}" data-stage="${esc(s.stage||s.id)}" data-drop="${s.id}"><div class="group-bar"><button class="group-head ${open?'open':''}" data-act="group" data-status="${s.id}" aria-expanded="${open}">${I.chev}<span class="pill" ${pillStyle(s.id)}><span class="pl">${esc(s.label)}</span></span><span class="count">${rows.length}</span></button>${(s.stage||s.id)==='done'&&rows.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}">${I.archive}Archive all ${rows.length} done</button>`:''}</div>`;
     if(open&&rows.length){
       html+=`<div ${rowsAttrs()}>${rows.length?ROW_HEAD:''}`;
       html+=rows.map(t=>rowHtml(t,job,showJob)).join('');
@@ -5367,10 +5598,10 @@ function notifications(all){
     }
     if((t.revision||0)>=3)out.push({key:`rev:${t.id}:${t.revision}`,rank:5,kind:'info',icon:'loop',task:t,title:`${nm} is on revision round ${t.revision}`,body:'Might be time to agree the remaining changes in one go.'});
     for(const f of (t.cu?.feed||[]).slice(-12)){if(f.k!=='comment'||f.me)continue;const mn=cuMention(f),age=Date.now()-new Date(f.at);if(age>(mn?7:3)*86400000)continue;
-      out.push({key:`${mn?'cum':'cu'}:${t.id}:${f.cid}`,rank:mn?0.5:1.5,kind:mn?'warn':'info',icon:'chat',task:t,tab:'activity',mention:mn,title:mn?`${f.who||'Someone'} mentioned you on ${nm}`:`${f.who||'Someone'} commented on ${nm}`,body:String(f.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}
+      out.push({who:f.who,key:`${mn?'cum':'cu'}:${t.id}:${f.cid}`,rank:mn?0.5:1.5,kind:mn?'warn':'info',icon:'chat',task:t,tab:'activity',mention:mn,title:mn?`${f.who||'Someone'} mentioned you on ${nm}`:`${f.who||'Someone'} commented on ${nm}`,body:String(f.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}
     for(const f of (t.cu?.feed||[]).slice(-12))for(const r of f.replies||[]){if(r.me)continue;const rr={...r,k:'reply'},mn=cuMention(rr),age=Date.now()-new Date(r.at);if(age>(mn?7:3)*86400000)continue;
-      out.push({key:`${mn?'cum':'cu'}:${t.id}:${r.cid}`,rank:mn?0.5:1.5,kind:mn?'warn':'info',icon:'chat',task:t,tab:'activity',mention:mn,title:mn?`${r.who||'Someone'} mentioned you on ${nm}`:`${r.who||'Someone'} replied on ${nm}`,body:String(r.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}
-    {const nr=needsReply(t);if(nr.length){const l=nr[nr.length-1];out.push({key:`nr:${t.id}:${l.key}`,rank:0.6,kind:'warn',icon:'chat',task:t,tab:'activity',reply:true,title:nr.length===1?`${l.who||'Someone'} is waiting for your reply on ${nm}`:`${nr.length} comments on ${nm} are waiting for your reply`,body:String(l.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}}
+      out.push({who:r.who,key:`${mn?'cum':'cu'}:${t.id}:${r.cid}`,rank:mn?0.5:1.5,kind:mn?'warn':'info',icon:'chat',task:t,tab:'activity',mention:mn,title:mn?`${r.who||'Someone'} mentioned you on ${nm}`:`${r.who||'Someone'} replied on ${nm}`,body:String(r.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}
+    {const nr=needsReply(t);if(nr.length){const l=nr[nr.length-1];out.push({who:l.who,key:`nr:${t.id}:${l.key}`,rank:0.6,kind:'warn',icon:'chat',task:t,tab:'activity',reply:true,title:nr.length===1?`${l.who||'Someone'} is waiting for your reply on ${nm}`:`${nr.length} comments on ${nm} are waiting for your reply`,body:String(l.text||'').replace(/\*\*|__/g,'').replace(/\s+/g,' ').slice(0,140)})}}
     if(!t.due&&(t.priority==='urgent'||t.priority==='high'))out.push({key:`nodate:${t.id}`,rank:6,kind:'info',icon:'cal',task:t,title:`${nm} is ${t.priority==='urgent'?'urgent':'high priority'} but has no due date`,body:''});
   }
   const load=dueLoad();
@@ -5384,9 +5615,39 @@ function notifications(all){
   const list=out.sort((a,b)=>a.rank-b.rank||(a.task?.due||a.day||'').localeCompare(b.task?.due||b.day||''));
   return all?list:list.filter(n=>!NS.hidden[n.key]);
 }
+/* ================= Inbox page (tab 'inbox'): every alert in one list — comments waiting for you, deadlines, follow-ups ================= */
+/* alerts for the Inbox, without a comment that already shows as "waiting for your reply" */
+function inboxList(){const all=notifications(),nr=new Set(all.filter(n=>n.reply).map(n=>n.task?.id+'|'+n.body));return all.filter(n=>n.reply||!/^cum?:/.test(n.key)||!nr.has(n.task?.id+'|'+n.body))}
+function renderInbox(){
+  const u=S.ui;
+  $('#head').innerHTML='<div class="head head-ov head-cs"></div>';
+  $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
+  const list=inboxList(),f=naSets(list),shown=f[NF]||list,unread=f.unread.length,kindOf=n=>n.key.split(':')[0],t0=today();
+  const act=n=>{const k=kindOf(n),t=n.task;
+    if(k==='nr'&&t)return `<button type="button" class="btn sm" data-act="inb-handled" data-id="${t.id}" data-key="${esc(n.key)}">Mark handled</button>`;
+    if(k==='over'&&t)return `<button type="button" class="btn sm" data-act="inb-push" data-id="${t.id}" data-key="${esc(n.key)}">Move to today</button>`;
+    if(k==='busy')return `<button type="button" class="btn sm" data-act="note-open" data-key="${esc(n.key)}">See the week</button>`;
+    if(k==='cunew')return `<button type="button" class="btn sm" data-act="note-open" data-key="${esc(n.key)}">Review</button>`;
+    return '';};
+  const when=n=>{const t=n.task,k=kindOf(n);if(['cu','cum','nr'].includes(k)&&t){const f=(t.cu?.feed||[]).flatMap(x=>[x,...(x.replies||[])]).find(x=>n.key.endsWith(':'+x.cid));if(f?.at)return calAgo(f.at)}
+    return t?.due?fmtRel(t.due,k==='over'):n.day?fmtDate(n.day):''};
+  const row=n=>{const t=n.task,k=kindOf(n),j=t&&S.jobs[t.jobId];
+    const av=n.who?avOther(n.who,34):`<span class="inb-ic k-${n.kind}">${I[n.icon]||I.info}</span>`;
+    return `<div class="inb-it ${NS.read[n.key]?'':'unread'}" data-nkey="${esc(n.key)}">${av}
+      <button type="button" class="inb-main" data-act="note-open" data-key="${esc(n.key)}"><b>${esc(n.title.replace(/[“”]/g,''))}</b>${n.body?`<span class="inb-body">${esc(n.body)}</span>`:''}
+        <span class="inb-ctx">${j?`<i class="v2-sq" style="--jc:${esc(j.color||'var(--accent)')}"></i>`:''}${esc(NA_LBL[k]||'')}${n.sub?` · ${esc(n.sub)}`:''}</span></button>
+      <div class="inb-r"><time>${esc(when(n))}</time><div class="inb-acts">${act(n)}<button type="button" class="icon-btn" data-act="note-hide" data-key="${esc(n.key)}" title="Dismiss" aria-label="Dismiss">${I.x}</button></div></div></div>`};
+  const chips=[['all','All'],['unread','Unread'],...(f.replies.length?[['replies','Needs reply']]:[]),...(f.mentions.length?[['mentions','Mentions']]:[]),['deadlines','Deadlines'],['followups','Follow-ups']]
+    .map(([k,l])=>`<button type="button" class="${NF===k?'on':''}" data-act="na-filter" data-f="${k}">${l}<em>${f[k].length||''}</em></button>`).join('');
+  $('#view').innerHTML=`<div class="inb">
+    <header class="v2-head"><div><h1>Inbox</h1><p class="v2-sum">${list.length?`${unread?`<b>${unread} unread</b><i>·</i>`:''}<span class="inb-lede">Comments that need you, deadlines and follow-ups. Dismiss one and it leaves.</span>`:'Nothing needs you right now.'}</p></div>${unread?'<button type="button" class="btn" data-act="notes-read">Mark all read</button>':''}</header>
+    <div class="inb-chips">${chips}</div>
+    ${shown.length?`<div class="inb-list">${shown.map(row).join('')}</div>`:`<div class="empty"><h3>${list.length?'Nothing in this filter':"You're all caught up"}</h3><p>${list.length?'Try All to see everything.':'Comments from ClickUp, late tasks, busy days and tasks that need a nudge show up here.'}</p>${list.length?'<button class="btn" data-act="na-filter" data-f="all">Show all</button>':''}</div>`}
+  </div>`;
+}
 function renderBell(){
   const b=$('#bell');if(!b)return;
-  let list=S.ready?notifications():[];const unread=list.filter(n=>!NS.read[n.key]).length;
+  let list=S.ready?inboxList():[];const unread=list.filter(n=>!NS.read[n.key]).length;
   const c=$('#bell-n');c.hidden=!unread;c.textContent=unread>9?'9+':unread;
   b.classList.toggle('has',!!unread);b.setAttribute('aria-expanded',notesOpen);
   b.setAttribute('aria-label',unread?`Alerts, ${unread} unread`:'Alerts');
@@ -5497,8 +5758,7 @@ function renderActivity(){
   const t0=today(),w0=addDays(t0,-6),dOf=e=>ymd(new Date(e.at));
   const nToday=all.filter(e=>dOf(e)===t0).length,wk=all.filter(e=>dOf(e)>=w0),nDone=wk.filter(e=>e.kind==='status'&&/\bdone\b/i.test(e.text)).length,nUpd=wk.filter(e=>e.kind==='note').length;
   const tl=(n,l,c='')=>`<div class="fin-t al-t ${c}"><b>${n}</b><span>${l}</span></div>`;
-  const head=`<header class="cs-top"><div class="cs-hl"><small>What changed in your tracker · kept for ${LOG_MONTHS} months</small><h1>Activity</h1></div>
-    ${all.length?`<div class="cs-tally">${tl(nToday,'changes today')}${tl(wk.length,'this week')}${tl(nDone,'done this week',nDone?'ok':'')}${tl(nUpd,'updates posted')}</div>`:''}</header>`;
+  const head=doneHead('activity');
   if(!all.length){$('#view').innerHTML=`<div class="cs al">${head}<div class="empty"><h3>No activity yet</h3><p>Changes show up here as you work: new tasks, status moves, due dates, checklist steps, archiving and more.</p></div></div>`;return}
   const kinds=[['all','Everything'],['note','Updates'],['status','Status'],['create','New tasks'],['date','Dates'],['check','Checklist'],['archive','Archive'],['delete','Deleted'],['job','Jobs & brand'],['focus','Focus sessions']];
   const jf=u.ljob||'all',list=all.filter(e=>jf==='all'||e.jobId===jf).filter(e=>{const k=u.lkind||'all';return k==='all'||e.kind===k||(k==='archive'&&e.kind==='restore')||(k==='job'&&e.kind==='brand')})
@@ -5520,6 +5780,12 @@ function csJobs(act,sel,jobs,count,allLabel='All jobs'){
 }
 const CS_Q=(id,ph,v)=>`<label class="search al-q"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="${id}" data-fk="${id}" type="search" placeholder="${ph}" value="${esc(v||'')}" autocomplete="off"></label>`;
 let ASEL=new Set(),ASELMODE=false,aselDelArmed=false;
+/* Done: Archived, Activity and Trash share one page header with three tabs */
+function doneHead(cur){
+  const tabs=[['archived','Archived',archived().length],['activity','Activity',''],['trash','Trash',trashed().length]];
+  return `<header class="v2-head dn-head"><div><h1>Done</h1><p class="v2-sum">${cur==='archived'?'Finished tasks you put away. Restore one to bring it back.':cur==='activity'?`Everything that changed, kept for ${LOG_MONTHS} months.`:`Deleted tasks stay here for ${trashDays()} days, then they're gone for good.`}</p></div></header>
+    <nav class="dn-tabs" aria-label="Done">${tabs.map(([k,l,n])=>`<button type="button" class="${cur===k?'on':''}" data-act="nav" data-tab="${k}" aria-current="${cur===k?'page':'false'}">${l}${n?`<em>${n}</em>`:''}</button>`).join('')}</nav>`;
+}
 /* phones: Activity and Archived keep search and a Filter button on one row; the pickers fold out under it */
 let AL_FOPEN=false;
 const alFBtn=n=>`<button type="button" class="btn al-fbtn ${AL_FOPEN?'on':''}" data-act="al-filters" aria-expanded="${AL_FOPEN}" aria-label="Filters" title="Filters"><svg class="i" viewBox="0 0 16 16"><path d="M2.5 3.5h11L9.2 8.6v4l-2.4 1.1V8.6z"/></svg>${n?`<em>${n}</em>`:''}</button>`;
@@ -5531,8 +5797,7 @@ function renderArchive(){
   const ym0=today().slice(0,7),sweep=autoArchiveDays()?[]:live().filter(t=>isClosed(t)&&!t.archived&&t.doneAt&&t.doneAt.slice(0,7)<ym0).map(t=>t.id);
   const sweepHtml=sweep.length?`<div class="arch-sweep">${I.archive}<span><b>${sweep.length} finished task${sweep.length===1?'':'s'}</b> from before ${MONTH_FULL[+ym0.slice(5,7)-1]} ${sweep.length===1?'is':'are'} still in your lists.</span><button type="button" class="btn sm primary" data-act="arch-sweep" data-ids="${sweep.join(',')}">Archive ${sweep.length===1?'it':'them'}</button></div>`:'';
   const nMonth=all.filter(t=>(t.archivedAt||'').slice(0,7)===ym0).length;
-  const head=`<header class="cs-top"><div class="cs-hl"><small>Finished work, put away · hidden from Home, job pages and counts</small><h1>Archived</h1></div>
-    ${all.length?`<div class="cs-tally">${csTl(all.length,all.length===1?'task':'tasks')}${csTl(nMonth,'archived this month')}${csTl(new Set(all.map(t=>t.jobId)).size,'jobs')}</div>`:''}</header>`;
+  const head=doneHead('archived');
   if(!all.length){$('#view').innerHTML=`<div class="cs al">${head}${sweepHtml}<div class="empty"><h3>Nothing archived yet</h3><p>When a task is Done, click <b>Archive</b> on it to move it here and keep your lists clean.</p></div></div>`;return}
   if(u.ajob&&u.ajob!=='all'&&!S.jobs[u.ajob])u.ajob='all';
   const aj=S.jobs[u.ajob],clientsWith=aj&&aj.type==='agency'?clientsOf(aj.id).filter(c=>all.some(t=>t.clientId===c.id)):[];
@@ -5574,7 +5839,7 @@ function renderArchive(){
 let deleteArmed=false, clearArmed=false;
 function openTask(id,tab){seenTask(id);cuSeen(id);if(NAP&&NAP.id===id)napEnd('wake');if(NOTES_EDIT!==id)NOTES_EDIT=null;if(S.tasks[id]&&!S.tasks[id]._draft){S.ui.recent=[id,...(S.ui.recent||[]).filter(x=>x!==id)].slice(0,8);saveUi()}if(S.ui.openTask!==id)TPL={open:false,naming:false,del:null};if(DRAFT&&DRAFT.id!==id)discardDraft();if(S.ui.openTask!==id||tab)S.ui.dtab=tab||'details';if(S.ui.openTask!==id){NEWCL=null;REACT_AT=null;REPLY_AT=null;replyDelArmed=null;EDIT_AT=null;SPLIT=null;if(ATT.task&&ATT.task!==id)attReset()}const wasHidden=$('#drawer').hidden;S.ui.openTask=id;noteDelArmed=null;deleteArmed=false;renderDrawer();$('#drawer').hidden=false;if(wasHidden&&narrow.matches)setTimeout(()=>{const d=$('#drawer');if(d.hidden)return;if(!gestHint('down',d,18)&&!S.tasks[id]?._draft){const tb=d.querySelector('.d-tabs');if(tb)gestHint('dtab',tb,52)}},420);$('#scrim').hidden=false;autosize($('.d-name'));scheduleRender();syncUrl()}
 function closeDrawer(){TOPT=false;renderTopt();flushAll();discardDraft();S.ui.openTask=null;$('#drawer').hidden=true;$('#scrim').hidden=true;scheduleRender();syncUrl()}
-let LSHOW=new Set();
+let LSHOW=new Set(),LEDIT=new Set();
 /* Task activity: the task's log entries plus your own posted updates (kind 'note'), newest first */
 function taskActivity(t){
   const h=logItems().filter(e=>e.taskId===t.id);
@@ -6171,6 +6436,8 @@ function renderTopt(){
     </div></div>`;
 }
 let DRAW_ID='';
+let V2_MORE=false;
+document.addEventListener('toggle',e=>{if(e.target.matches?.('details.v2-more'))V2_MORE=e.target.open},true);
 function renderDrawer(){
   const t=S.tasks[S.ui.openTask];
   if(!t){if(S.ui.openTask)closeDrawer();return}
@@ -6197,31 +6464,41 @@ function renderDrawer(){
       const job=f(I.briefcase,'Job',`<select id="d-job" data-field="jobId">${jobsSorted().map(x=>`<option value="${x.id}" ${x.id===t.jobId?'selected':''}>${esc(x.name)}</option>`).join('')}</select>`,'d-job');
       const client=j?.type==='agency'?f(I.user,'Client',NEWCL===t.id?`<form class="newcl" data-act="newcl-add"><input id="newcl-in" data-fk="newcl-in" placeholder="New client name" maxlength="60" aria-label="New client name" autocomplete="off"><button type="submit" class="btn sm primary">Add</button><button type="button" class="btn sm ghost" data-act="newcl-cancel">Cancel</button></form>`:`<select id="d-client" data-field="clientId"><option value="">No client</option>${cl.map(c=>`<option value="${c.id}" ${c.id===t.clientId?'selected':''}>${esc(c.name)}</option>`).join('')}<option value="__new">+ New client…</option></select>`,'d-client'):'';
       const busy=(()=>{if(!t.due||isClosed(t)||t.archived)return'';const n=dueLoad(t.id)[t.due]||0;return n+1>=dayLimit()?`<p class="load-warn pf-wide">${I.warn}Busy day: ${n} other task${n===1?' is':'s are'} due ${(d=>/^(Today|Tomorrow|Yesterday)$/.test(d)?d.toLowerCase():'on '+d)(fmtDate(t.due))}.</p>`:''})();
-      return `<div class="props2">
-      ${f(I.status,'Status',`<div class="st-ctl" ${pillStyle(cur)} data-notip>${statusSelect(t,'d-status')}${nxt?`<button type="button" class="st-next" data-act="d-next" data-notip aria-label="Move to ${esc(nxt.label)}"><svg class="i" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" fill="currentColor"/></svg></button>`:''}</div>${cur!=='done'?`<button type="button" class="st-done" data-act="d-done" data-notip aria-label="Mark ${esc(stLabel('done'))}"><svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg></button>`:''}`)}
-      ${f(I.flag,'Priority',`<div class="prio-ctl p-${prio}">${I.flag.replace('class="i"','class="i" style="width:14px;height:14px"')}<select id="d-prio" data-field="priority">${PRIORITIES.map(p=>`<option value="${p.id}" ${prio===p.id?'selected':''}>${p.label}</option>`).join('')}</select></div>`,'d-prio')}
-      ${f(I.cal,'Dates',`<div class="date-ctl"><input type="date" id="d-start" data-field="start" value="${esc(t.start||'')}" aria-label="Start date" title="Start date"><span class="arrow">→</span><input type="date" id="d-due" data-field="due" class="${t.due?dueClass(t):''}" value="${esc(t.due||'')}" aria-label="Due date" title="Due date"></div>${ageNote(t)}`,'',true)}
-      ${job}
-      ${busy}
-      ${f(I.clock,'Length',`<input type="text" id="d-len" data-field="length" data-fk="d-len" value="${esc(t.length||'')}" placeholder="e.g. 0:30 or 3 × 0:15">`,'d-len')}
-      ${client||f(I.ratio,'Format',`<div class="fmt-pick">${FORMATS.map(x=>`<button data-act="fmt" data-fmt="${x}" class="${t.format===x?'on':''}" aria-pressed="${t.format===x}">${x}</button>`).join('')}${t.format==='9:16'?`<button type="button" class="fmt-sz" data-act="help-go" data-sec="safezones" title="Download safe-zone overlays for TikTok, Reels and Shorts">Safe zones</button>`:''}</div>`)}
-      ${f(I.loop,'Revision',`<div class="stepper"><button data-act="rev" data-step="-1" aria-label="Decrease revision round">−</button><output>R${t.revision||0}</output><button data-act="rev" data-step="1" aria-label="Increase revision round">+</button></div>`)}
-      ${client?f(I.ratio,'Format',`<div class="fmt-pick">${FORMATS.map(x=>`<button data-act="fmt" data-fmt="${x}" class="${t.format===x?'on':''}" aria-pressed="${t.format===x}">${x}</button>`).join('')}${t.format==='9:16'?`<button type="button" class="fmt-sz" data-act="help-go" data-sec="safezones" title="Download safe-zone overlays for TikTok, Reels and Shorts">Safe zones</button>`:''}</div>`):''}
-      ${f(TAG_IC,'Tags',tagsCtl(t),'',true)}
-      ${specsRow(t,f)}
-    </div>`})()}
-    ${brandForTask(t)}
+      const fmtSel=`<select data-field="format" aria-label="Format">${FORMATS.map(x=>`<option ${t.format===x?'selected':''}>${x}</option>`).join('')}</select>`;
+      const clientSel=j?.type==='agency'?(NEWCL===t.id?`<form class="newcl" data-act="newcl-add"><input id="newcl-in" data-fk="newcl-in" placeholder="New client name" maxlength="60" aria-label="New client name" autocomplete="off"><button type="submit" class="btn sm primary">Add</button><button type="button" class="btn sm ghost" data-act="newcl-cancel">Cancel</button></form>`:`<select id="d-client" data-field="clientId" aria-label="Client"><option value="">No client</option>${cl.map(c=>`<option value="${c.id}" ${c.id===t.clientId?'selected':''}>${esc(c.name)}</option>`).join('')}<option value="__new">+ New client…</option></select>`):'';
+      return `<div class="v2-facts">
+        <div class="vf vf-st"><div class="st-ctl" ${pillStyle(cur)} data-notip>${statusSelect(t,'d-status')}${nxt?`<button type="button" class="st-next" data-act="d-next" data-notip aria-label="Move to ${esc(nxt.label)}" title="Move to ${esc(nxt.label)}"><svg class="i" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" fill="currentColor"/></svg></button>`:''}</div>${cur!=='done'?`<button type="button" class="st-done v2-done" data-act="d-done" data-notip aria-label="Mark ${esc(stLabel('done'))}"><svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg>Done</button>`:''}</div>
+        <label class="vf"><span>Due</span><input type="date" id="d-due" data-field="due" class="${t.due?dueClass(t):''}" value="${esc(t.due||'')}" aria-label="Due date"></label>
+        ${clientSel?`<label class="vf vf-cl"><span>Client</span>${clientSel}</label>`:''}
+        <div class="vf"><span>Round</span><div class="stepper"><button data-act="rev" data-step="-1" aria-label="Decrease revision round">−</button><output>${t.revision||0}</output><button data-act="rev" data-step="1" aria-label="Increase revision round">+</button></div></div>
+        <label class="vf"><span>Format</span>${fmtSel}</label>
+      </div>${busy}${ageNote(t)?`<div class="v2-age">${ageNote(t)}</div>`:''}`})()}
     ${(()=>{const kinds=[['task',I.task],['upload',I.film],['file',I.folder],['project',I.mac]];
       const shown=kinds.filter(([k])=>String(t.links?.[k]||'').trim()||LSHOW.has(t.id+':'+k)),empty=kinds.filter(x=>!shown.includes(x));
-      return `<div><h4 class="section-title">Links<span class="sec-hint">Paste a link here (${IS_MAC?'⌘':'Ctrl+'}V) to add it</span></h4>${shown.map(([k,ic])=>linkRow(k,ic)).join('')}${empty.length?`<div class="link-add">${empty.map(([k,ic])=>`<button type="button" class="btn sm ghost" data-act="link-add" data-kind="${k}">${I.plus}${esc(linkLabel(j,k))}</button>`).join('')}</div>`:''}${briefLinksHtml(t,j)}</div>`})()}
-    ${t._draft?'':commentFilesHtml(t,j)}
-    ${exportNameHtml(t)}
+      const host=v=>{const lp=localPath(v);if(lp)return pathName(lp);try{return new URL(v).hostname.replace(/^www\./,'')}catch(e){return ''}};
+      const card=(k,ic)=>{const v=String(t.links?.[k]||'').trim();if(!v||LEDIT.has(t.id+':'+k))return linkRow(k,ic);const u=linkHref(v,j),lp=localPath(v);
+        return `<div class="lk-card">${u?`<a class="lk-open" href="${esc(u)}"${linkTarget(v,j)} title="${lp?'Open in Finder':'Open'}">`:`<button type="button" class="lk-open" data-act="copy-path" data-path="${esc(lp||v)}" title="Copy path">`}<span class="lk-ic">${svcIcon(v)||ic}</span><span class="lk-t"><b>${esc(linkLabel(j,k))}</b><small>${esc(host(v))}</small></span>${u?'</a>':'</button>'}<button type="button" class="icon-btn lk-edit" data-act="link-edit" data-kind="${k}" title="Change link" aria-label="Change ${esc(linkLabel(j,k))}">${I.pencil}</button></div>`};
+      return `<div><h4 class="section-title">Links<span class="sec-hint">Paste a link here (${IS_MAC?'⌘':'Ctrl+'}V) to add it</span></h4><div class="lk-grid">${shown.map(([k,ic])=>card(k,ic)).join('')}</div>${empty.length?`<div class="link-add">${empty.map(([k,ic])=>`<button type="button" class="btn sm ghost" data-act="link-add" data-kind="${k}">${I.plus}${esc(linkLabel(j,k))}</button>`).join('')}</div>`:''}${briefLinksHtml(t,j)}</div>`})()}
     <div><h4 class="section-title">Checklist<span class="mono">${checklist.length?`${doneN}/${checklist.length}`:''}</span>${!tplHome(t)?'':`<button type="button" class="tpl-btn ${TPL.open?'on':''}" data-act="tpl-toggle" aria-expanded="${TPL.open}">${I.task}Templates</button>`}</h4>
       ${TPL.open?tplMenu(t):''}
       ${checklist.length?`<div class="progress"><i style="width:${doneN/checklist.length*100}%"></i></div>`:''}
       <div class="checklist">${checklist.map(c=>`<div class="check ${c.done?'done':''}" data-cid="${esc(c.id)}"><span class="ck-grip" data-grip="${esc(c.id)}" title="Drag to reorder" aria-hidden="true"><svg viewBox="0 0 12 12" fill="currentColor"><circle cx="4" cy="2.5" r="1.1"/><circle cx="8" cy="2.5" r="1.1"/><circle cx="4" cy="6" r="1.1"/><circle cx="8" cy="6" r="1.1"/><circle cx="4" cy="9.5" r="1.1"/><circle cx="8" cy="9.5" r="1.1"/></svg></span><input type="checkbox" data-act="check" data-cid="${esc(c.id)}" ${c.done?'checked':''} aria-label="Done"><input class="txt" data-act="check-text" data-cid="${esc(c.id)}" data-fk="ck-${esc(c.id)}" value="${esc(c.text)}" aria-label="Checklist item"><button class="icon-btn" data-act="check-del" data-cid="${esc(c.id)}" aria-label="Remove item">${I.x}</button></div>`).join('')}
       <form class="check-add" data-act="check-add">${I.plus}<input data-fk="ck-new" placeholder="Add a step (rough cut, captions, color…)" aria-label="Add checklist item"></form></div></div>
     ${notesBlock(t)}
+    <details class="v2-more" data-more ${V2_MORE?'open':''}><summary>More details<span>Job, priority, start date, length, tags${j?.type==='agency'||brandHome(t)?', brand guide':''}, export name</span></summary>
+      ${(()=>{const f=(icon,label,body,forId,wide)=>`<div class="pf${wide?' pf-wide':''}">${forId?`<label for="${forId}">`:'<span class="pf-l">'}${icon}${label}${forId?'</label>':'</span>'}<div class="pf-v">${body}</div></div>`,prio=t.priority||'normal';
+        return `<div class="props2">
+        ${f(I.briefcase,'Job',`<select id="d-job" data-field="jobId">${jobsSorted().map(x=>`<option value="${x.id}" ${x.id===t.jobId?'selected':''}>${esc(x.name)}</option>`).join('')}</select>`,'d-job')}
+        ${f(I.flag,'Priority',`<div class="prio-ctl p-${prio}">${I.flag.replace('class="i"','class="i" style="width:14px;height:14px"')}<select id="d-prio" data-field="priority">${PRIORITIES.map(p=>`<option value="${p.id}" ${prio===p.id?'selected':''}>${p.label}</option>`).join('')}</select></div>`,'d-prio')}
+        ${f(I.cal,'Start',`<input type="date" id="d-start" data-field="start" value="${esc(t.start||'')}" aria-label="Start date">`,'d-start')}
+        ${f(I.clock,'Length',`<input type="text" id="d-len" data-field="length" data-fk="d-len" value="${esc(t.length||'')}" placeholder="e.g. 0:30 or 3 × 0:15">`,'d-len')}
+        ${f(TAG_IC,'Tags',tagsCtl(t),'',true)}
+        ${specsRow(t,f)}
+      </div>`})()}
+      ${brandForTask(t)}
+      ${t._draft?'':commentFilesHtml(t,j)}
+      ${exportNameHtml(t)}
+    </details>
     ${t._draft?`<div class="d-foot d-save"><button class="btn" data-act="drawer-close">Cancel</button><button class="btn" data-act="save-draft-again" title="Save this task and start another for the same job and client">Save &amp; add another</button><button class="btn primary" data-act="save-draft">${I.plus}Save task</button></div>`:`<div class="d-foot"><span class="d-created">${t.created?'Created '+fmtDate(ymd(new Date(t.created))):''}${t.doneAt?' · Done '+fmtDate(t.doneAt):''}</span>
       <span class="d-foot-btns" style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" data-act="d-duplicate">${I.copy}Duplicate</button><button class="btn sm" data-act="split-open">${SPLIT_IC}Split into tasks</button>${isClosed(t)&&!t.archived?`<button class="btn sm" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}<button class="btn sm danger ${deleteArmed?'armed':''}" data-act="delete-task">${I.trash}${deleteArmed?'Click again to move to Trash':'Delete task'}</button></span></div>`}
   </div>`}${FULL?`</div><div class="d-split-r">${activityPane(t)}</div></div>`:''}`});
@@ -6868,8 +7145,12 @@ function renderProfile(){
   const acctRow=(icon,name,line,sec,btn)=>`<div class="pf-acct">${icon}<div><b>${name}</b><small>${line}</small></div>${sec?`<button type="button" class="btn sm" data-act="help-go" data-sec="${sec}">${btn||'Manage'}</button>`:''}</div>`;
   const secs=[
     {id:'me',label:'You',icon:PERSON_IC,html:`${meCard}
-      <div class="pf-tiles">${tile(jobs.length,jobs.length===1?'job':'jobs')}${tile(ncl,ncl===1?'client':'clients')}${tile(doneM,'done this month')}${tile(doneY,`done in ${yr}`)}${tile(pom,'focus sessions')}${tile(`${stk}/${STICKERS.length}`,'stickers')}${tile(wkTot?fmtNum(wkTot)+' h':'—','scheduled a week')}</div>
-      <div class="pf-btns"><button type="button" class="btn sm" data-act="stk-open">Sticker book</button></div>`},
+      <div class="pf-tiles">${tile(open,'open tasks')}${tile(doneM,'done this month')}${tile(doneY,`done in ${yr}`)}${tile(wkTot?fmtNum(wkTot)+' h':'—','scheduled a week')}</div>
+      <div class="pf-acct-list pf-acct-v2">
+      ${acctRow(PERSON_IC,B.mode==='cloud'?'Signed in':'This browser',B.mode==='cloud'?esc(B.email||''):'Your work is saved in this browser only',null)}
+      ${B.mode==='cloud'&&CAL.error==='reconnect'?acctRow(I.cal,'Google Calendar','<b class="acct-warn">Needs reconnecting</b>','account','Fix'):''}
+      ${B.mode==='cloud'&&CU.connected&&CU.error?acctRow(CU_IC,'ClickUp','<b class="acct-warn">Has a problem</b>','clickup','Fix'):''}
+      </div><div class="pf-btns"><button type="button" class="btn sm" data-act="open-settings">Settings</button>${B.mode==='cloud'?'<button type="button" class="btn sm" data-act="sign-out">Sign out</button>':''}</div>`},
     {id:'jobs',label:'My jobs',icon:I.briefcase,html:jobs.length?jobs.map(j=>{const w=workOf(j),r=rows.find(x=>x.j===j),nOpen=ts.filter(t=>t.jobId===j.id&&!isClosed(t)&&!t.archived).length;
       return `<div class="pf-job" style="--jc:${esc(j.color||'var(--accent)')}"><div class="pf-job-h">${jobMark(j,26)}${jobEmoji(j)}<div class="pf-jn"><b>${esc(j.name)}</b><small>${j.type==='agency'?`Agency · ${shownClients(j.id).length} client${shownClients(j.id).length===1?'':'s'}`:'Direct client'} · ${nOpen} open${r.ph!=null?` · about ${esc(money(r.ph,r.cur))} an hour`:''}</small>${ctr(w)}</div><button type="button" class="btn sm" data-act="prf-job" data-id="${j.id}">Open details</button></div>${(()=>{const pd=invPaydayText(j)||w.pay?.payday,wh=weeklyHours(w),bits=[[payLabel(w.pay),'Pay'],[pd?`Paid ${pd}`:'','Payday'],[wh?`${fmtNum(wh)} h a week`:'','Hours'],[w.location||(w.tz?tzCity(w.tz):''),'Where']].filter(x=>x[0]);return bits.length?`<div class="pf-jsum">${bits.map(([v,l])=>`<span><small>${l}</small>${esc(v)}</span>`).join('')}</div>`:''})()}</div>`}).join(''):'<p class="hint">No jobs yet.</p>'},
     {id:'pay',label:'Pay',icon:'<svg class="i" viewBox="0 0 16 16"><rect x="1.8" y="4" width="12.4" height="8.5" rx="1.5"/><circle cx="8" cy="8.2" r="1.8"/></svg>',html:`<div class="pf-pay-top">${curSel}</div>
@@ -6890,6 +7171,8 @@ function renderProfile(){
       ${B.mode==='cloud'&&CU.connected&&CU.error?acctRow(CU_IC,'ClickUp','<b class="acct-warn">Has a problem</b>','clickup','Fix'):''}
       </div><div class="pf-btns"><button type="button" class="btn sm" data-act="help-go" data-sec="appearance">Open Settings</button>${B.mode==='cloud'?'<button type="button" class="btn sm" data-act="sign-out">Sign out</button>':''}</div><p class="hint">Calendar, ClickUp and backups live in Settings.</p>`}
   ];
+  for(let i=secs.length-1;i>=0;i--)if(secs[i].id==='jobs'||secs[i].id==='account')secs.splice(i,1);
+  if(!secs.some(x=>x.id===PRF.sec))PRF.sec='me';
   keepScroll('#modal',()=>withFocus(()=>{$('#modal').innerHTML=`<div class="modal pref-modal pf-modal" role="dialog" aria-modal="true" aria-labelledby="pf-title">
     <header><h2 id="pf-title">Profile</h2><button class="icon-btn" data-act="prf-close" aria-label="Close" title="Close">${I.x}</button></header>
     ${prefLayout('p',PRF.sec,secs)}
@@ -6940,7 +7223,7 @@ function stickerScan(){
   return out;
 }
 let STK_T=0;
-function stickerSoon(){if(STK_T||!S.ready)return;STK_T=setTimeout(()=>{STK_T=0;stickerCheck()},2000)}
+function stickerSoon(){if(!pref('stickerShow'))return;if(STK_T||!S.ready)return;STK_T=setTimeout(()=>{STK_T=0;stickerCheck()},2000)}
 function stickerCheck(extra){
   if(!S.ready)return;
   const a=appSettings(),have=a.stickers||null,t0=today(),found={...stickerScan(),...(extra||{})},p={};
@@ -6983,6 +7266,7 @@ let STICKY_EDIT=null,STICKY_DRAFT=null;
 const stickies=()=>(appSettings().stickies||[]).slice(0,6);
 function saveStickies(list){saveApp({stickies:list});renderSide()}
 function corkHtml(){
+  return '';
   if(pref('sideCompact'))return '';
   if(!pref('corkBoard'))return photoStripHtml();
   const ps=photos(),st=stickies();
@@ -7431,8 +7715,7 @@ function renderTrash(){
   $('#head').innerHTML='<div class="head head-ov head-cs"></div>';
   $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
   const daysLeft=t=>trashDays()-diffDays(today(),(t.deletedAt||today()).slice(0,10)),soon=all.filter(t=>daysLeft(t)<=3).length;
-  const head=`<header class="cs-top"><div class="cs-hl"><small>Deleted tasks stay here for ${trashDays()} days, then they're gone for good</small><h1>Trash</h1></div>
-    ${all.length?`<div class="cs-tally">${csTl(all.length,all.length===1?'task':'tasks')}${csTl(soon,'gone within 3 days',soon?'late':'')}</div>`:''}</header>`;
+  const head=doneHead('trash');
   if(!all.length){$('#view').innerHTML=`<div class="cs al">${head}<div class="empty"><h3>Trash is empty</h3><p>Deleted tasks land here, so you can bring them back for ${trashDays()} days.</p></div></div>`;return}
   const left=t=>{const d=daysLeft(t);return d<=0?'today':d===1?'in 1 day':`in ${d} days`};
   const by=[];for(const t of all){const h=t.deletedAt?dayHeading(t.deletedAt):'Earlier',g=by[by.length-1];if(g&&g.h===h)g.items.push(t);else by.push({h,items:[t]})}
@@ -7764,7 +8047,25 @@ function renderSettings(){
     {id:'import',label:'Import CSV',icon:I.upload,html:importSettingsHtml()},
     {id:'dupes',label:'Duplicate tasks',icon:'<svg class="i" viewBox="0 0 16 16"><rect x="5" y="5" width="8.5" height="8.5" rx="1.5"/><path d="M10.5 3V2.5A1 1 0 0 0 9.5 1.5h-7a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1H3"/></svg>',html:dupesHtml()},
     {id:'backup',label:'Backup',icon:I.download,html:backupSettingsHtml()}];
-  const META={appearance:['Look & feel','Theme, colors, surfaces'],tasks:['Look & feel','Task rows, due dates, the Calendar'],fun:['Look & feel','Greeting, the office cat, cork board'],a11y:['Look & feel','Text size, motion, contrast'],statuses:['Your work','Rename, recolor and reorder'],workload:['Your work','When a day counts as busy'],holidays:['Your work','Public holidays on the Calendar'],pomo:['Your work','Focus and break lengths, sounds'],safezones:['Your work','TikTok, Reels and Shorts overlays'],branding:['App','Your own name and logo'],finder:['App','Mac folders and Chrome profiles'],account:['App','Google Calendar and sign out'],clickup:['App','Bring in tasks assigned to you'],keys:['App','Shortcuts on a keyboard'],import:['Your data','Bring in a tracker sheet'],dupes:['Your data','Find and merge tasks with the same name'],backup:['Your data','Download, restore, trash']};
+  /* revamp: one General section replaces Appearance, Tasks & calendar, Accessibility and Workload; the fun extras and overlays are gone */
+  {const pick=id=>secs.find(x=>x.id===id),a11=pick('a11y').html,ts=a11.slice(0,a11.indexOf('<div class="field"><span class="lbl" id="s-dens-lbl">'));
+   const gen={id:'general',label:'General',icon:I.gear,html:`<p class="pref-group" style="margin-top:0">Dates</p>
+      ${prefRow('dateRel','Dates in lists',[[false,absDate(addDays(today(),3))],[true,'in 3 days']],'The date itself, or how far away it is')}
+      ${prefRow('dateFmt','Date format',[['md','Oct 1'],['dm','1 Oct']])}
+      ${prefRow('weekStart','Week starts on',[['mon','Monday'],['sun','Sunday']])}
+      ${prefRow('hideWeekends','Weekends on the Calendar',[[false,'Full width'],[true,'Narrow']])}
+      <p class="pref-group">Tasks</p>
+      ${prefRow('autoArchive','Archive finished tasks',[[0,'Off'],[3,'3 days'],[7,'7 days'],[14,'14 days']],'Done tasks move to Done → Archived on their own this long after they were finished')}
+      ${pick('workload').html}
+      <p class="pref-group">Reading</p>
+      ${ts}
+      ${prefRow('motion','Motion',[['system','Match device'],['reduce','Reduce']])}
+      ${prefRow('tips','Hover labels',[[true,'On'],[false,'Off']],'A short label when you hover over an icon button')}`};
+   const drop=new Set(['appearance','tasks','fun','a11y','workload','keys','safezones']),order=['general','statuses','pomo','clickup','account','holidays','finder','branding','import','dupes','backup'];
+   const pool=[gen,...secs.filter(x=>!drop.has(x.id))],kept=[...order.map(id=>pool.find(x=>x.id===id)).filter(Boolean),...pool.filter(x=>!order.includes(x.id))];
+   secs.length=0;secs.push(...kept);
+   if(!secs.some(x=>x.id===SM.sec))SM.sec='general';}
+  const META={general:['Your work','Dates, busy days, text size'],pomo:['Your work','Focus and break lengths, sounds'],appearance:['Look & feel','Theme, colors, surfaces'],tasks:['Look & feel','Task rows, due dates, the Calendar'],fun:['Look & feel','Greeting, the office cat, cork board'],a11y:['Look & feel','Text size, motion, contrast'],statuses:['Your work','Rename, recolor and reorder'],workload:['Your work','When a day counts as busy'],holidays:['Your work','Public holidays on the Calendar'],pomo:['Your work','Focus and break lengths, sounds'],safezones:['Your work','TikTok, Reels and Shorts overlays'],branding:['App','Your own name and logo'],finder:['App','Mac folders and Chrome profiles'],account:['App','Google Calendar and sign out'],clickup:['App','Bring in tasks assigned to you'],keys:['App','Shortcuts on a keyboard'],import:['Your data','Bring in a tracker sheet'],dupes:['Your data','Find and merge tasks with the same name'],backup:['Your data','Download, restore, trash']};
   secs.forEach(x=>{const m=META[x.id];if(m){x.group=m[0];x.sub=m[1]}
     /* the Help tips for a section live inside it (Help lists them only when you search) */
     const tips=HELP.filter(h=>h[3]&&h[3][0]===x.id);if(tips.length)x.html=`<details class="pref-tip"><summary>${HELP_IC}Tips for ${esc(x.label)}</summary>${tips.map(h=>`<p><b>${esc(h[1])}.</b> ${esc(h[2])}</p>`).join('')}</details>`+x.html});
@@ -8501,6 +8802,14 @@ function toolsHtml(job){
     return url?box('a',`href="${esc(url)}"${linkTarget(v,job)} title="${lp?`Open “${esc(pathName(lp))}” in Finder`:`Open ${esc(name)}`}"`,r.id,name,r.label,esc(name),I.ext):box('div','',r.id,name,r.label,esc(name),'');
   }).join('')+folder;
 }
+/* a job's About tab: work details and tools, brand guide, invoices & docs, one under the other */
+function aboutPane(job){
+  const cl=shownClients(job.id),bc=job.type==='agency'&&cl.length?`<div class="client-tabs ab-cl">${[`<button class="${S.ui.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}" data-pane="about">All clients</button>`,...cl.map(c=>`<button class="${S.ui.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}" data-pane="about">${esc(c.name)}</button>`)].join('')}</div>`:'';
+  return `<div class="ab"><nav class="ab-jump"><a href="#ab-details" data-act="ab-go" data-to="details">Details</a><a href="#ab-brand" data-act="ab-go" data-to="brand">Brand guide</a><a href="#ab-invoices" data-act="ab-go" data-to="invoices">Invoices &amp; docs</a></nav>
+    <section class="ab-sec" id="ab-details"><h2>Details</h2>${detailsPane(job)}</section>
+    <section class="ab-sec" id="ab-brand"><h2>Brand guide</h2>${bc}${brandPane(job)}</section>
+    <section class="ab-sec" id="ab-invoices">${invoicesPane(job)}</section></div>`;
+}
 function detailsPane(job){
   const tools=`<h3 class="d-h">Tools</h3><div class="tools">${toolsHtml(job)}</div>`;
   const w=workCard(job);
@@ -8686,7 +8995,7 @@ document.addEventListener('click',e=>{
   if(a!=='cal-disconnect'&&CAL.disArmed){CAL.disArmed=false;if(SM)renderSettings()}
   if(SM&&SM.stArm&&!/^st-(del|del-go)$/.test(a)&&!el.closest('.st-del-box')){SM.stArm=null;renderSettings()}
   switch(a){
-    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','calendar','archived','activity','trash','help','resume','upnext'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';{let v=u.views?.[u.tab]||(['home','calendar'].includes(u.view)&&S.jobs[u.tab]?'list':u.view);if(narrow.matches&&v==='calendar')v=u.lastLB||'list';u.view=v}saveUi();render();window.scrollTo({top:0});break;
+    case 'nav': if(el.dataset.tab!==u.tab){u.pane='tasks';if(['overview','calendar','inbox','archived','activity','trash','help','resume','upnext'].includes(u.tab))u.from=u.tab}if(el.dataset.pane)u.pane=el.dataset.pane;u.tab=el.dataset.tab;u.client=el.dataset.client||'all';{let v=u.views?.[u.tab]||(['home','calendar'].includes(u.view)&&S.jobs[u.tab]?'list':u.view);if(narrow.matches&&v==='calendar')v=u.lastLB||'list';u.view=v}saveUi();render();window.scrollTo({top:0});break;
     case 'view': u.view=el.dataset.view;(u.views=u.views||{})[u.tab]=u.view;if(u.view!=='calendar')u.lastLB=u.view;saveUi();render();break;
     case 'vopt': VOPT=!VOPT;renderVopt();break;
     case 'cx': ctxDo(el.dataset.do,el.dataset.v);break;
@@ -8702,7 +9011,7 @@ document.addEventListener('click',e=>{
     case 'pm-job': PLUS=false;renderPlus();openJobModal();break;
     case 'tb-me': PLUS=false;renderPlus();if(UPN){UPN=false;renderUpNextPage()}if(notesOpen){notesOpen=false;renderBell()}closeSide();PRF?closeProfile():openProfile();renderTabbar();break;
     case 'tb-upnext': UPN=!UPN;if(UPN){notesOpen=false;renderBell();closeSide()}renderUpNextPage();renderTabbar();if(UPN)gestSheet($('#upnext-page'));break;
-    case 'tb-notes': UPN=false;renderUpNextPage();notesOpen=!notesOpen;if(notesOpen){saveNotes();POMO_OPEN=false;renderPomo();closeSide()}renderBell();if(notesOpen&&narrow.matches)gestSheet($('#notes'));break;
+    case 'tb-notes': UPN=false;renderUpNextPage();notesOpen=false;PLUS=false;closeSide();if(u.tab!=='inbox')u.from=u.tab;u.tab='inbox';saveUi();render();window.scrollTo({top:0});break;
     case 'groups-all': {const open=el.dataset.open==='1';u.collapsed=u.collapsed||{};(S.jobs[u.tab]?statusesFor(u.tab):STATUSES).forEach(x=>{u.collapsed[x.id]=!open});saveUi();render();break}
     case 'rs-print': rsPrint();break;
     case 'rs-mode': u.rsMode=el.dataset.m;saveUi();render();break;
@@ -8719,18 +9028,22 @@ document.addEventListener('click',e=>{
     case 'd-more': TOPT=!TOPT;deleteArmed=false;renderTopt();break;
     case 'topt-close': TOPT=false;renderTopt();break;
     case 'd-link': copyTaskLink(u.openTask);break;
+    case 'link-edit': LEDIT.add(u.openTask+':'+el.dataset.kind);renderDrawer();{const i=$(`#drawer [data-field="links.${el.dataset.kind}"]`);i?.focus();i?.select()}break;
     case 'link-add': LSHOW.add(u.openTask+':'+el.dataset.kind);renderDrawer();$(`#drawer [data-field="links.${el.dataset.kind}"]`)?.focus();break;
     case 'log-more': u.lmore=(u.lmore||200)+200;render();break;
     case 'bell': notesOpen=!notesOpen;if(notesOpen)saveNotes();renderBell();break;
     case 'notes-close': notesOpen=false;renderBell();break;
-    case 'na-filter': NF=el.dataset.f;renderBell();break;
-    case 'notes-read': notifications().forEach(n=>NS.read[n.key]=1);saveNotes();renderBell();break;
+    case 'na-filter': NF=el.dataset.f;renderBell();if(u.tab==='inbox')render();break;
+    case 'inb-handled': {const t=S.tasks[el.dataset.id];if(t){nrDone(t,null);NS.read[el.dataset.key]=1;notifications().forEach(n=>{if(/^cum?:/.test(n.key)&&n.task?.id===t.id){NS.hidden[n.key]=1;NS.read[n.key]=1}});saveNotes();toast('Marked as handled')}render();break}
+    case 'inb-push': {const t=S.tasks[el.dataset.id];if(t){const was=t.due;patch('tasks',t.id,{due:today()});logAct('date',`Due date set to ${fmtDate(today())}`,{task:t});toast('Moved to today',{label:'Undo',fn:()=>{patch('tasks',t.id,{due:was});render()}})}render();break}
+    case 'notes-read': notifications().forEach(n=>NS.read[n.key]=1);saveNotes();renderBell();if(u.tab==='inbox')render();break;
     case 'note-open': openNote(el.dataset.key);break;
-    case 'note-hide': NS.hidden[el.dataset.key]=1;NS.read[el.dataset.key]=1;saveNotes();renderBell();break;
+    case 'note-hide': NS.hidden[el.dataset.key]=1;NS.read[el.dataset.key]=1;saveNotes();renderBell();if(u.tab==='inbox')render();break;
     case 'brand-edit': openBrand(el.dataset.col,el.dataset.id);break;
     case 'brand-cancel': if(!guardClose())closeBrand();break;
     case 'brand-save': saveBrand();break;
     case 'pane': u.pane=el.dataset.pane;saveUi();render();break;
+    case 'ab-go': e.preventDefault();$('#ab-'+el.dataset.to)?.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'start'});break;
     case 'inv-new': openInv(u.tab);break;
     case 'inv-defaults': openInvDefaults(u.tab);break;
     case 'ivd-close': closeInvDefaults();break;
@@ -9163,6 +9476,7 @@ document.addEventListener('input',e=>{
   }
 });
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.classList?.contains('d-name')){e.preventDefault();e.target.blur()}});
+document.addEventListener('focusout',e=>{const f=e.target.dataset?.field;if(!f||!f.startsWith('links.')||!S.ui.openTask)return;const k=S.ui.openTask+':'+f.slice(6);if(!LEDIT.has(k)&&!LSHOW.has(k))return;setTimeout(()=>{if(document.activeElement===e.target||$('#drawer')?.contains(document.activeElement)&&document.activeElement.closest?.('.link-row')===e.target.closest('.link-row'))return;LEDIT.delete(k);LSHOW.delete(k);flush?.();renderDrawer()},150)});
 /* notes: ⌘B / ⌘I, and Enter continues a list (Enter on an empty item ends it) */
 document.addEventListener('keydown',e=>{
   const ta=e.target;if(!ta.matches?.('#drawer textarea.notes,#note-in,#reply-in,#edit-in'))return;
