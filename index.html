@@ -3587,13 +3587,13 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 
 /* About tab (Apple): one readable column of grouped lists, like iOS Settings */
 .ap .ab{max-width:860px}
-.ap .ab-jump{border-bottom:0;gap:8px;padding:10px 0 12px}
-.ap .ab-jump a{background:rgba(118,118,128,.12);color:var(--text);font-weight:500;border-radius:999px;padding:6px 14px;font-size:calc(14px*var(--ts))}
-.ap .ab-jump a:hover{background:rgba(118,118,128,.2)}
+.ap .ab-jump.seg{position:static;display:inline-flex;gap:0;border:0;padding:2px;margin:12px 0 4px;background:rgba(118,118,128,.12);border-radius:9px}
+.ap .ab-jump.seg button{padding:6px 16px;font-size:calc(14px*var(--ts))}
 .ap .ab-sec{padding-top:26px}
 .ap .ab-sec>h2,.ap .ab .inv-head h2{font:700 calc(22px*var(--ts)) var(--display);letter-spacing:-.02em;margin:0 0 10px}
 .ap .ab .inv-head h2 svg{display:none}
-.ap .ab-sec .details-head{margin-top:-40px;display:flex;justify-content:flex-end}
+.ap .ab-sec{position:relative;padding-top:14px}
+.ap .ab-sec .details-head{position:absolute;right:0;top:22px;margin:0;z-index:1}
 .ap .ab-sec .details-head .btn{background:none;padding:4px 0}
 .ap body.pg-job .d-h,.ap .ab .d-h{border:0!important;font:600 calc(13px*var(--ts)) var(--body)!important;text-transform:uppercase;letter-spacing:.02em!important;color:var(--muted)!important;margin:18px 0 6px!important;padding:0 14px!important}
 .ap .ab :is(.tools,.work-grid,.brand-cards,.inv-list,.docs-list){display:block!important;background:var(--grp);border-radius:14px;padding:0 0 0 14px!important;overflow:hidden}
@@ -3641,9 +3641,8 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap .ab .doc-row{border:0!important;border-bottom:.5px solid var(--line-strong)!important;border-radius:0!important;background:none!important;padding:12px 14px 12px 0!important}
 .ap .ab .doc-row:last-child{border-bottom:0!important}
 @media (max-width:820px){
-  .ap .ab-jump{overflow-x:auto}
-  .ap .ab-jump a{flex:none}
-  .ap .ab-sec .details-head{margin-top:-38px}
+  .ap .ab-jump.seg{display:flex;width:100%}
+  .ap .ab-jump.seg button{flex:1;justify-content:center;padding:7px 4px;font-size:calc(13.5px*var(--ts))}
   .ap body.pg-job .ab .work-item{grid-template-columns:1fr}
   .ap body.pg-job .ab .work-item small{grid-row:auto;font-size:calc(13px*var(--ts))!important;color:var(--muted)!important}
   .ap body.pg-job .ab .work-item :is(b,span){text-align:left}
@@ -5338,8 +5337,8 @@ function renderMain(){
 
   if(job&&['brand','details','invoices','about'].includes(u.pane)){
     $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
+    if(u.pane!=='about'){u.abSec=u.pane;u.pane='about';saveUi()}
     $('#view').innerHTML=aboutPane(job);
-    if(u.pane!=='about'){const go=u.pane;u.pane='about';requestAnimationFrame(()=>$('#ab-'+go)?.scrollIntoView({block:'start'}))}
     return;
   }
   const keys=statKeys(),labels=Object.fromEntries(statDefs());
@@ -9195,10 +9194,10 @@ function toolsHtml(job){
 /* a job's About tab: work details and tools, brand guide, invoices & docs, one under the other */
 function aboutPane(job){
   const cl=shownClients(job.id),bc=job.type==='agency'&&cl.length?`<div class="client-tabs ab-cl">${[`<button class="${S.ui.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}" data-pane="about">All clients</button>`,...cl.map(c=>`<button class="${S.ui.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}" data-pane="about">${esc(c.name)}</button>`)].join('')}</div>`:'';
-  return `<div class="ab"><nav class="ab-jump"><a href="#ab-details" data-act="ab-go" data-to="details">Details</a><a href="#ab-brand" data-act="ab-go" data-to="brand">Brand guide</a><a href="#ab-invoices" data-act="ab-go" data-to="invoices">Invoices &amp; docs</a></nav>
-    <section class="ab-sec" id="ab-details"><h2>Details</h2>${detailsPane(job)}</section>
-    <section class="ab-sec" id="ab-brand"><h2>Brand guide</h2>${bc}${brandPane(job)}</section>
-    <section class="ab-sec" id="ab-invoices">${invoicesPane(job)}</section></div>`;
+  /* one section at a time (user's ask: not one long page), picked with the segmented control; S.ui.abSec remembers it */
+  const sec=['details','brand','invoices'].includes(S.ui.abSec)?S.ui.abSec:'details';
+  return `<div class="ab"><nav class="ab-jump seg" role="tablist" aria-label="About sections">${[['details','Details'],['brand','Brand guide'],['invoices','Invoices &amp; docs']].map(([k,l])=>`<button type="button" role="tab" class="${sec===k?'on':''}" aria-selected="${sec===k}" data-act="ab-go" data-to="${k}">${l}</button>`).join('')}</nav>
+    ${sec==='details'?`<section class="ab-sec" id="ab-details">${detailsPane(job)}</section>`:sec==='brand'?`<section class="ab-sec" id="ab-brand">${bc}${brandPane(job)}</section>`:`<section class="ab-sec" id="ab-invoices">${invoicesPane(job)}</section>`}</div>`;
 }
 function detailsPane(job){
   const tools=`<h3 class="d-h">Tools</h3><div class="tools">${toolsHtml(job)}</div>`;
@@ -9433,7 +9432,7 @@ document.addEventListener('click',e=>{
     case 'brand-cancel': if(!guardClose())closeBrand();break;
     case 'brand-save': saveBrand();break;
     case 'pane': u.pane=el.dataset.pane;saveUi();render();break;
-    case 'ab-go': e.preventDefault();$('#ab-'+el.dataset.to)?.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'start'});break;
+    case 'ab-go': e.preventDefault();u.abSec=el.dataset.to;saveUi();render();window.scrollTo({top:0});break;
     case 'inv-new': openInv(u.tab);break;
     case 'inv-defaults': openInvDefaults(u.tab);break;
     case 'ivd-close': closeInvDefaults();break;
