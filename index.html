@@ -3821,6 +3821,47 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
   .ap #drawer .d-tabs button{font-size:calc(15px*var(--ts));padding:8px}
   .ap .d-activity .composer{background:transparent;box-shadow:none;border-radius:0}
 }
+
+/* Profile (Apple, like the Apple Account page): centered you, numbers in one card, every list a white grouped card */
+.ap .pf-me{position:relative;flex-direction:column;text-align:center;gap:8px;margin:4px 0 18px}
+.ap .pf-me .me-av{--s:88px!important;width:88px;height:88px;font-size:calc(30px*var(--ts))}
+.ap .pf-me-t h4{font:700 calc(24px*var(--ts)) var(--display);letter-spacing:-.02em;margin:0}
+.ap .pf-me-t .pf-title{font-weight:500;color:var(--text)}
+.ap .pf-me-t .hint{color:var(--muted)}
+.ap .pf-links{justify-content:center}
+.ap .pf-links .btn{background:var(--card)}
+.ap .pf-me>.icon-btn{position:absolute;top:0;right:0;background:var(--card);border-radius:50%}
+.ap #modal .pf-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:0;background:var(--card);border:0;border-radius:14px;padding:0;margin:0 0 18px;overflow:hidden}
+.ap #modal .pf-tile{border:0;border-radius:0;background:none;padding:14px 12px;text-align:center;box-shadow:inset -.5px 0 0 var(--line-strong)}
+.ap #modal .pf-tile:last-child{box-shadow:none}
+.ap #modal .pf-tile b{font:700 calc(24px*var(--ts))/1.1 var(--display);letter-spacing:-.02em}
+.ap #modal .pf-tile small{color:var(--muted);font-size:calc(12.5px*var(--ts))}
+.ap .pf-acct-list,.ap .pf-list,.ap .pf-table,.ap .pf-week{background:var(--card);border:0!important;border-radius:14px;overflow:hidden;gap:0}
+.ap .pf-acct,.ap .pf-li{border-top:.5px solid var(--line-strong)}
+.ap .pf-acct:first-child,.ap .pf-li:first-child{border-top:0}
+.ap .pf-acct>svg{color:var(--accent)}
+.ap .pf-btns{margin-top:14px}
+.ap .pf-btns .btn{flex:1;justify-content:center;background:var(--card);border-radius:12px;min-height:44px;font-size:calc(15px*var(--ts));font-weight:500}
+.ap .pf-btns .btn.danger{color:var(--red)}
+.ap .pf-h5{font:600 calc(13px*var(--ts)) var(--body);letter-spacing:.02em;color:var(--muted);margin:18px 0 6px 14px}
+.ap .pf-chart{background:var(--card);border:0;border-radius:14px}
+.ap .pf-chart .pf-ch-h h4{font:600 calc(17px*var(--ts)) var(--display)}
+.ap .pf-stack b,.ap .pf-split i{border-radius:4px}
+.ap .pf-col{border-radius:6px}
+.ap .pf-split{background:var(--grp)}
+.ap .pf-day{border:0!important;border-radius:0;background:none;border-top:.5px solid var(--line-strong)!important;padding:12px 14px}
+.ap .pf-day:first-child{border-top:0!important}
+.ap .pf-day.off{background:none;opacity:.6}
+.ap .pf-day.today .pf-dh b{color:var(--accent)}
+.ap .pf-day.today{box-shadow:inset 3px 0 0 var(--accent)}
+.ap .pf-pay-top .sel{background-color:var(--card)!important;border:0!important}
+.ap .pref-s.m-list .pref-nav button.on>svg{background:color-mix(in srgb,var(--tc) 17%,transparent)!important;color:var(--tc)!important}
+@media (max-width:820px){
+  .ap #modal .pf-tiles{grid-template-columns:1fr 1fr}
+  .ap #modal .pf-tile:nth-child(2n){box-shadow:none}
+  .ap #modal .pf-tile:nth-child(n+3){border-top:.5px solid var(--line-strong)}
+  .ap .pf-day{grid-template-columns:96px minmax(0,1fr)}
+}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
