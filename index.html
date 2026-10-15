@@ -3862,6 +3862,34 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
   .ap #modal .pf-tile:nth-child(n+3){border-top:.5px solid var(--line-strong)}
   .ap .pf-day{grid-template-columns:96px minmax(0,1fr)}
 }
+
+/* Edit job dialog (Apple): colored section icons, every field a white rounded card on grey, grey inputs, pill choices */
+.ap #m-form .pref-nav [data-sec="general"]{--tc:var(--grey)}.ap #m-form .pref-nav [data-sec="clients"]{--tc:var(--purple)}.ap #m-form .pref-nav [data-sec="tools"]{--tc:var(--orange)}
+.ap #m-form .pref-nav [data-sec="accounts"]{--tc:var(--teal)}.ap #m-form .pref-nav [data-sec="work"]{--tc:var(--green)}.ap #m-form .pref-nav [data-sec="statuses"]{--tc:var(--indigo)}
+.ap #m-form .pref-sec{gap:14px}
+.ap #m-form .pref-h{font:700 calc(22px*var(--ts)) var(--display);letter-spacing:-.02em;margin:0}
+.ap #m-form .pref-sec>.field{background:var(--card);border:0!important;border-radius:14px;padding:14px!important;margin:0}
+.ap #m-form .pref-sec>.field>label,.ap #m-form .pref-sec>.field>.lbl,.ap #m-form .wf-lbl{font:600 calc(13px*var(--ts)) var(--body);text-transform:uppercase;letter-spacing:.02em;color:var(--muted)}
+.ap #m-form .pref-sec>.field>label .hint{text-transform:none;letter-spacing:0}
+.ap #modal #m-form :where(input:not([type=checkbox]):not([type=radio]):not([type=color]),select:not(.pill),textarea){background-color:var(--grp)!important;border:0!important;border-radius:10px}
+.ap #m-form .emo{border:0;background:var(--grp);border-radius:10px}
+.ap #m-form .emo[aria-pressed="true"],.ap #m-form .emo.on{background:var(--accent-soft);box-shadow:0 0 0 2px var(--accent)}
+.ap #m-form .type-pick button{border:0;background:var(--grp);border-radius:12px}
+.ap #m-form .type-pick button.on{background:var(--accent-soft);box-shadow:0 0 0 2px var(--accent) inset}
+.ap #m-form .swatches button{width:30px;height:30px;border-radius:50%;border:0}
+.ap #m-form .swatches button.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--c)}
+.ap #m-form .tool-grid{gap:10px}
+.ap #m-form .tool-cell{border:0;background:var(--grp);border-radius:12px;padding:10px}
+.ap #modal #m-form.pref .tool-cell :is(input,select){background-color:var(--card)!important}
+.ap #m-form .client-list{gap:0}
+.ap #m-form .client-list .cl{padding:6px 0;border-bottom:.5px solid var(--line-strong)}
+.ap #m-form .client-list .cl:last-child{border-bottom:0}
+.ap #modal #m-form.pref .client-list input{background-color:transparent!important;padding-left:4px;font-size:calc(15px*var(--ts))}
+.ap #m-form .logo-box.sm{border:0;background:var(--grp);border-radius:50%}
+.ap #m-form .work-form{border:0;padding:0;background:none}
+.ap #m-form .day-pick button{border:0;background:var(--grp);border-radius:999px;padding:6px 12px}
+.ap #m-form .day-pick button.on{background:var(--accent);color:#fff}
+.ap #m-form .logo-field .logo-box{border-radius:16px}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
