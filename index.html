@@ -3778,6 +3778,49 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap .hp .hp-it{border:0!important;padding:12px 0;border-bottom:.5px solid var(--line-strong)!important}
 .ap .hp .hp-it h4{font:600 calc(15px*var(--ts)) var(--body)}
 .ap .hp .hp-it p{color:var(--muted)}
+
+/* task panel Activity tab (Apple): segmented Details / Activity, Messages-style day labels, soft cards, tidy replies, rounded composer */
+.ap #drawer .d-tabs{display:flex;gap:0;margin:4px 18px 6px;padding:2px;border:0;border-radius:9px;background:rgba(118,118,128,.12)}
+.ap #drawer .d-tabs button{flex:1;justify-content:center;border:0;border-radius:7px;margin:0;padding:6px 10px;color:var(--text);font-weight:500;font-size:calc(14px*var(--ts));box-shadow:none}
+.ap #drawer .d-tabs button .i{display:none}
+.ap #drawer .d-tabs button.on{background:var(--seg-on);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.ap #drawer .d-tabs button .mono{font-family:var(--body);color:var(--muted);font-weight:400}
+.ap .d-activity .act-head h3{font:700 calc(20px*var(--ts)) var(--display);letter-spacing:-.02em}
+.ap .d-activity .notes-sum{color:var(--muted)}
+.ap .d-activity .tl-day{display:block;text-align:center;font:600 calc(12px*var(--ts)) var(--body);letter-spacing:0;text-transform:none;color:var(--muted);margin:16px 0 8px}
+.ap .d-activity .tl-day::before,.ap .d-activity .tl-day::after{display:none}
+.ap .d-activity .act-line{color:var(--muted);font-size:calc(13px*var(--ts));padding:4px 2px}
+.ap .d-activity .cmt{background:var(--card);border:0;border-radius:16px;padding:12px 14px;margin:8px 0;box-shadow:0 .5px 1.5px rgba(0,0,0,.1)}
+.ap .d-activity .cmt-who b{font-weight:600}
+.ap .d-activity .cmt-who time{color:var(--muted)}
+.ap .d-activity .cmt-h>.icon-btn:not(.note-done){opacity:0;transition:opacity .15s}
+.ap .d-activity .cmt:hover .cmt-h>.icon-btn,.ap .d-activity .cmt-h>.icon-btn:focus-visible{opacity:.8}
+@media (hover:none){.ap .d-activity .cmt-h>.icon-btn:not(.note-done){opacity:.55}}
+.ap .d-activity .note-done{width:26px!important;height:26px!important;min-width:0!important;min-height:0!important;flex:none;border:1.6px solid var(--ring)!important;opacity:1!important;color:var(--faint)}
+.ap .d-activity .note-done:hover{border-color:var(--green)!important;color:var(--green)}
+.ap .d-activity .note-done.on,.ap .d-activity .note-done[aria-pressed="true"]{background:var(--green)!important;border-color:var(--green)!important;color:#fff}
+.ap .d-activity .note-body{font-size:calc(15px*var(--ts));line-height:1.45}
+.ap .d-activity .react.add{border:0!important;background:rgba(118,118,128,.12);border-radius:999px;color:var(--muted)}
+.ap .d-activity .react:not(.add){border:0;background:color-mix(in srgb,var(--accent) 12%,transparent);border-radius:999px}
+.ap .d-activity .cmt-rn{text-decoration:none!important;color:var(--accent);font-weight:500}
+.ap .d-activity .note-reply-btn{color:var(--accent);font-weight:500}
+.ap .d-activity .cmt-replies{border:0!important;background:var(--grp);border-radius:12px;padding:4px 12px;margin:10px 0 0}
+.ap .d-activity .cmt-reply{display:block;border:0;padding:8px 0;border-bottom:.5px solid var(--line-strong)}
+.ap .d-activity .cmt-reply:last-child{border-bottom:0}
+.ap .d-activity .cmt-reply .cmt-h{display:flex;align-items:center;gap:8px}
+.ap .d-activity .cmt-reply .cmt-who{flex:1;min-width:0}
+.ap .d-activity .cmt-reply .cmt-body{margin:4px 0 0 32px}
+.ap .d-activity .cu-body,.ap .d-activity .cmt.cu{background:var(--card)}
+.ap .d-activity .composer{border:0;background:var(--card);border-radius:18px;box-shadow:0 .5px 2px rgba(0,0,0,.12),0 6px 20px rgba(0,0,0,.06)}
+.ap .d-activity .composer textarea{background:transparent!important;font-size:calc(15px*var(--ts))}
+.ap .d-activity .composer .fmt-bar{border:0;opacity:.75}
+.ap .d-activity .composer-foot{border:0}
+.ap .d-activity .composer-foot .btn.primary{border-radius:999px}
+@media (max-width:820px){
+  .ap #drawer .d-tabs{margin:4px 14px 6px}
+  .ap #drawer .d-tabs button{font-size:calc(15px*var(--ts));padding:8px}
+  .ap .d-activity .composer{background:transparent;box-shadow:none;border-radius:0}
+}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
