@@ -3292,6 +3292,17 @@ body.side-mini .v2-jh,body.side-mini .v2-who .name,body.side-mini .v2-me>.icon-b
 .v2 .al .cs-sub.al-sub{padding-top:14px}
 .v2 .al .cs-gh b{font-size:calc(17px*var(--ts))}
 @media (max-width:820px){.dn-head h1{font-size:calc(40px*var(--ts))}.dn-tabs{gap:0}.dn-tabs button{flex:1;justify-content:center}}
+
+/* Profile (v2): You, Pay, My week only; flat numbers instead of boxed tiles */
+.v2 .pf-tiles{display:flex;flex-wrap:wrap;gap:6px 32px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 0;margin-top:18px}
+.v2 .pf-tile{background:none;border:0;padding:0;border-radius:0;min-width:0}
+.v2 .pf-tile b{font:800 calc(28px*var(--ts))/1 var(--display);letter-spacing:-.02em}
+.v2 .pf-tile small{display:block;margin-top:5px;color:var(--muted)}
+.v2 .pf-tiles.wide .pf-tile b{font-size:calc(26px*var(--ts))}
+.v2 .pf-acct-v2{margin-top:18px}
+.v2 .pf-day{background:var(--surface);border-color:var(--line)}
+.v2 .pf-day.today{border-color:var(--accent);box-shadow:none}
+.v2 .pf-day.off{background:transparent}
 </style>
 
 <div class="app">
@@ -7134,8 +7145,12 @@ function renderProfile(){
   const acctRow=(icon,name,line,sec,btn)=>`<div class="pf-acct">${icon}<div><b>${name}</b><small>${line}</small></div>${sec?`<button type="button" class="btn sm" data-act="help-go" data-sec="${sec}">${btn||'Manage'}</button>`:''}</div>`;
   const secs=[
     {id:'me',label:'You',icon:PERSON_IC,html:`${meCard}
-      <div class="pf-tiles">${tile(jobs.length,jobs.length===1?'job':'jobs')}${tile(ncl,ncl===1?'client':'clients')}${tile(doneM,'done this month')}${tile(doneY,`done in ${yr}`)}${tile(pom,'focus sessions')}${tile(`${stk}/${STICKERS.length}`,'stickers')}${tile(wkTot?fmtNum(wkTot)+' h':'—','scheduled a week')}</div>
-      <div class="pf-btns"><button type="button" class="btn sm" data-act="stk-open">Sticker book</button></div>`},
+      <div class="pf-tiles">${tile(open,'open tasks')}${tile(doneM,'done this month')}${tile(doneY,`done in ${yr}`)}${tile(wkTot?fmtNum(wkTot)+' h':'—','scheduled a week')}</div>
+      <div class="pf-acct-list pf-acct-v2">
+      ${acctRow(PERSON_IC,B.mode==='cloud'?'Signed in':'This browser',B.mode==='cloud'?esc(B.email||''):'Your work is saved in this browser only',null)}
+      ${B.mode==='cloud'&&CAL.error==='reconnect'?acctRow(I.cal,'Google Calendar','<b class="acct-warn">Needs reconnecting</b>','account','Fix'):''}
+      ${B.mode==='cloud'&&CU.connected&&CU.error?acctRow(CU_IC,'ClickUp','<b class="acct-warn">Has a problem</b>','clickup','Fix'):''}
+      </div><div class="pf-btns"><button type="button" class="btn sm" data-act="open-settings">Settings</button>${B.mode==='cloud'?'<button type="button" class="btn sm" data-act="sign-out">Sign out</button>':''}</div>`},
     {id:'jobs',label:'My jobs',icon:I.briefcase,html:jobs.length?jobs.map(j=>{const w=workOf(j),r=rows.find(x=>x.j===j),nOpen=ts.filter(t=>t.jobId===j.id&&!isClosed(t)&&!t.archived).length;
       return `<div class="pf-job" style="--jc:${esc(j.color||'var(--accent)')}"><div class="pf-job-h">${jobMark(j,26)}${jobEmoji(j)}<div class="pf-jn"><b>${esc(j.name)}</b><small>${j.type==='agency'?`Agency · ${shownClients(j.id).length} client${shownClients(j.id).length===1?'':'s'}`:'Direct client'} · ${nOpen} open${r.ph!=null?` · about ${esc(money(r.ph,r.cur))} an hour`:''}</small>${ctr(w)}</div><button type="button" class="btn sm" data-act="prf-job" data-id="${j.id}">Open details</button></div>${(()=>{const pd=invPaydayText(j)||w.pay?.payday,wh=weeklyHours(w),bits=[[payLabel(w.pay),'Pay'],[pd?`Paid ${pd}`:'','Payday'],[wh?`${fmtNum(wh)} h a week`:'','Hours'],[w.location||(w.tz?tzCity(w.tz):''),'Where']].filter(x=>x[0]);return bits.length?`<div class="pf-jsum">${bits.map(([v,l])=>`<span><small>${l}</small>${esc(v)}</span>`).join('')}</div>`:''})()}</div>`}).join(''):'<p class="hint">No jobs yet.</p>'},
     {id:'pay',label:'Pay',icon:'<svg class="i" viewBox="0 0 16 16"><rect x="1.8" y="4" width="12.4" height="8.5" rx="1.5"/><circle cx="8" cy="8.2" r="1.8"/></svg>',html:`<div class="pf-pay-top">${curSel}</div>
@@ -7156,6 +7171,8 @@ function renderProfile(){
       ${B.mode==='cloud'&&CU.connected&&CU.error?acctRow(CU_IC,'ClickUp','<b class="acct-warn">Has a problem</b>','clickup','Fix'):''}
       </div><div class="pf-btns"><button type="button" class="btn sm" data-act="help-go" data-sec="appearance">Open Settings</button>${B.mode==='cloud'?'<button type="button" class="btn sm" data-act="sign-out">Sign out</button>':''}</div><p class="hint">Calendar, ClickUp and backups live in Settings.</p>`}
   ];
+  for(let i=secs.length-1;i>=0;i--)if(secs[i].id==='jobs'||secs[i].id==='account')secs.splice(i,1);
+  if(!secs.some(x=>x.id===PRF.sec))PRF.sec='me';
   keepScroll('#modal',()=>withFocus(()=>{$('#modal').innerHTML=`<div class="modal pref-modal pf-modal" role="dialog" aria-modal="true" aria-labelledby="pf-title">
     <header><h2 id="pf-title">Profile</h2><button class="icon-btn" data-act="prf-close" aria-label="Close" title="Close">${I.x}</button></header>
     ${prefLayout('p',PRF.sec,secs)}
