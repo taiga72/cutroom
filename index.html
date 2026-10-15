@@ -6103,6 +6103,18 @@ function openJump(){JUMP={q:'',i:0};renderJump();sheetLock();jumpVV();if(narrow.
 let SHEET_Y=null;
 /* anything that covers the page (task panel, dialogs, the sidebar, the lightbox) pins it too, so a swipe inside them can't scroll what's behind */
 {const mo=new MutationObserver(()=>sheetLock());for(const id of ['modal','drawer','lightbox','side']){const el=document.getElementById(id);if(el)mo.observe(el,{attributes:true,attributeFilter:['hidden','class']})}}
+/* Scroll guard: a wheel or finger scroll over an open window, panel or pop-up never moves the page behind it.
+   It only goes through when something inside the overlay can still scroll that way. */
+const OVL_SEL='#modal,#drawer,#jump,#lightbox,#crop,#ctx,#notes,#pomo-pop,#plus-menu,#topt,#filter-sheet,#upnext-page,#vopt,[role=dialog],[role=menu]';
+function ovlCanScroll(el,dy,root){for(let n=el;n&&n!==root.parentElement;n=n.parentElement){if(n.nodeType!==1)continue;const oy=getComputedStyle(n).overflowY;
+  if((oy==='auto'||oy==='scroll')&&n.scrollHeight>n.clientHeight+1&&(dy<0?n.scrollTop>0:n.scrollTop+n.clientHeight<n.scrollHeight-1))return true}return false}
+document.addEventListener('wheel',e=>{if(e.ctrlKey||!e.deltaY||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;const o=e.target.closest?.(OVL_SEL);if(!o||o.hidden)return;
+  if(!ovlCanScroll(e.target,e.deltaY,o))e.preventDefault()},{passive:false});
+let OVT=null;
+document.addEventListener('touchstart',e=>{const o=e.touches.length===1&&e.target.closest?.(OVL_SEL);OVT=o&&!o.hidden&&!e.target.closest('input[type=range]')?{o,x:e.touches[0].clientX,y:e.touches[0].clientY}:null},{passive:true});
+document.addEventListener('touchmove',e=>{if(!OVT||!e.cancelable)return;const t=e.touches[0],dx=t.clientX-OVT.x,dy=OVT.y-t.clientY;if(Math.abs(dx)>Math.abs(dy)||!dy)return;
+  if(!ovlCanScroll(e.target,dy,OVT.o))e.preventDefault()},{passive:false});
+document.addEventListener('touchend',()=>{OVT=null},{passive:true});
 function sheetLock(){
   const sideOpen=$('#side')?.classList.contains('open'),covered=!$('#modal')?.hidden||!$('#drawer')?.hidden||!$('#lightbox')?.hidden||!!sideOpen;
   const on=narrow.matches&&(!!JUMP||notesOpen||UPN||covered),b=document.body;b.classList.toggle('sheet-open',narrow.matches&&(!!JUMP||notesOpen));b.classList.toggle('page-locked',on);
