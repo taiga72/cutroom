@@ -4079,6 +4079,56 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap .pip-brand :is(.pip-copy,.pb-sw){border:0;background:var(--grp);border-radius:10px}
 .ap .pip-brand .pb-sw i{border-radius:50%}
 .ap .pip-brand .pb-l{font-weight:500;letter-spacing:.03em;color:var(--muted)}
+/* calmer rows, cards and task panel */
+@media (hover:hover){.ap .row .c-links .links{opacity:0;transition:opacity .15s}.ap .row:is(:hover,:focus-within) .c-links .links{opacity:1}}
+@media (hover:none){.ap .row .c-links .links{display:none}}
+.ap .card .card-foot .links{display:none}
+@media (hover:hover){.ap .card:is(:hover,:focus-within) .card-foot .links{display:flex}}
+.ap .card .t-meta :is(.chip.fmt,.ck-n,.chip.age:not(.old),.chip.rev:not(.rev-hi)){display:none}
+.ap .card .card-foot .prio.low{display:none}
+.ap .vf-st .st-ctl{margin-left:auto}
+.ap .vf-st .st-done{width:auto;margin-left:6px;flex:none;display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 12px;border:0;border-radius:999px;background:color-mix(in srgb,var(--green) 14%,transparent);color:var(--green);font-weight:600;font-size:calc(13px*var(--ts));cursor:pointer}
+.ap .vf-st .st-done .i{width:14px;height:14px;stroke-width:2.2}
+.ap .vf-st .st-done:hover{background:color-mix(in srgb,var(--green) 22%,transparent)}
+.ap .link-addm{position:relative;margin-top:8px}
+.ap .link-addm>summary{list-style:none;display:inline-flex;color:var(--accent);cursor:pointer}
+.ap .link-addm>summary::-webkit-details-marker{display:none}
+.ap .link-addm .lam-menu{position:absolute;z-index:6;top:calc(100% + 4px);left:0;min-width:220px;background:var(--card);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.16),0 0 0 .5px var(--line-strong);padding:4px;display:flex;flex-direction:column}
+.ap .link-addm .lam-menu button{display:flex;align-items:center;gap:10px;border:0;background:none;text-align:left;padding:9px 10px;border-radius:8px;color:var(--text);font-size:calc(14px*var(--ts));cursor:pointer}
+.ap .link-addm .lam-menu button:hover{background:var(--card-hover)}
+.ap .link-addm .lam-menu .i{width:16px;height:16px;color:var(--muted)}
+.ap .hm-empty{padding:4px 2px;margin:0;font-size:calc(13.5px*var(--ts));color:var(--faint)}
+/* dark mode: grey pill buttons on cards get a lighter fill so they don't sink into the card */
+:root.ap[data-theme="dark"] :is(#s-form .pick-row button,#s-form .hol-chip,#m-form .type-pick button,#m-form .day-pick button,.crop header .icon-btn,.crop .crop-quick .btn,.crop footer>div:last-child .btn:not(.primary),.pip-v .btn,.pip-timer .btn,.vf-st .st-next){background:color-mix(in srgb,var(--text) 13%,var(--card))}
+/* Today: move every late task to today; list rows: move to the next status */
+.ap .cs-gh .cs-gh-act{margin-left:auto;border:0;background:none;color:var(--blue);font-size:calc(13px*var(--ts));font-weight:500;cursor:pointer;padding:2px 4px}
+.ap .row-next{display:none;margin-left:8px;vertical-align:1px;border:0;border-radius:999px;padding:2px 9px;font-size:calc(11.5px*var(--ts));font-weight:600;background:color-mix(in srgb,var(--sc) 14%,transparent);color:var(--sc);cursor:pointer;white-space:nowrap}
+.ap .row-next:hover{background:color-mix(in srgb,var(--sc) 24%,transparent)}
+@media (hover:hover){.ap .row:is(:hover,:focus-within) .row-next{display:inline-block}}
+/* new task: start from a template */
+.ap .tpl-start{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:6px 0 2px;font-size:calc(13px*var(--ts));color:var(--muted)}
+.ap .tpl-chip{border:0;border-radius:999px;padding:4px 11px;background:color-mix(in srgb,var(--blue) 12%,transparent);color:var(--blue);font-weight:500;font-size:calc(13px*var(--ts));cursor:pointer}
+.ap .tpl-chip:hover{background:color-mix(in srgb,var(--blue) 20%,transparent)}
+/* phone calendar: a day's tasks in a bottom sheet */
+.daysheet{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.32);display:flex;align-items:flex-end}
+.daysheet[hidden]{display:none}
+.ap .ds-card{width:100%;max-height:72vh;overflow:auto;overscroll-behavior:contain;background:var(--grp);border-radius:16px 16px 0 0;padding:10px 14px calc(20px + env(safe-area-inset-bottom,0px));animation:sheetUp .25s ease-out}
+.ap .ds-head{display:flex;align-items:baseline;gap:8px;padding:6px 2px 12px}
+.ap .ds-head b{font:700 calc(20px*var(--ts)) var(--display)}
+.ap .ds-head span{color:var(--muted);font-size:calc(13.5px*var(--ts))}
+.ap .ds-head .icon-btn{margin-left:auto;background:color-mix(in srgb,var(--text) 10%,transparent);border-radius:50%}
+.ap .ds-list{background:var(--card);border-radius:12px;overflow:hidden}
+.ap .ds-row{display:flex;align-items:center;gap:8px;padding:8px 12px;position:relative}
+.ap .ds-row+.ds-row::before{content:"";position:absolute;left:12px;right:0;top:0;border-top:.5px solid var(--line-strong)}
+.ap .ds-open{flex:1;min-width:0;display:flex;align-items:center;gap:10px;border:0;background:none;text-align:left;padding:4px 0;color:var(--text)}
+.ap .ds-open i{width:4px;align-self:stretch;border-radius:2px;background:var(--jc)}
+.ap .ds-open span{display:flex;flex-direction:column;min-width:0}
+.ap .ds-open b{font-weight:500;font-size:calc(15px*var(--ts));overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ap .ds-open small{color:var(--muted);font-size:calc(12.5px*var(--ts))}
+.ap .ds-row.is-done b{text-decoration:line-through;color:var(--faint)}
+.ap .ds-move{position:relative;flex:none;border-radius:999px;padding:6px 12px;background:color-mix(in srgb,var(--blue) 12%,transparent);color:var(--blue);font-weight:600;font-size:calc(13px*var(--ts));overflow:hidden}
+.ap .ds-move input{position:absolute;inset:0;opacity:0;width:100%;height:100%}
+.ap .ds-none{margin:4px 2px}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
@@ -5909,6 +5959,7 @@ function renderCtx(){
     <button type="button" class="ctx-item" data-act="cx" data-do="dup">${I.copy}Duplicate</button>
     <button type="button" class="ctx-item" data-act="cx" data-do="split">${SPLIT_IC}Split into tasks</button>
     <button type="button" class="ctx-item" data-act="cx" data-do="link">${LINK_IC}Copy link</button>
+    ${t.name?`<button type="button" class="ctx-item" data-act="cx" data-do="xname">${I.copy}Copy file name</button>`:''}
     ${t.archived?`<button type="button" class="ctx-item" data-act="cx" data-do="restore">${I.archive}Restore from Archived</button>`:`<button type="button" class="ctx-item" data-act="cx" data-do="archive">${I.archive}Archive</button>`}
     <button type="button" class="ctx-item danger ${CTX.del?'armed':''}" data-act="cx" data-do="del">${I.trash}${CTX.del?'Click again to move to Trash':'Delete'}</button>`;
 }
@@ -5923,6 +5974,7 @@ function ctxDo(what,v){
   else if(what==='dup')duplicateTask(id);
   else if(what==='split'){openTask(id);openSplit()}
   else if(what==='link')copyTaskLink(id);
+  else if(what==='xname'){const n=exportName(t);copyVal(n,`Copied ${n}`)}
   else if(what==='archive'){archiveTasks([id]);render()}
   else if(what==='restore'){restoreTasks([id]);render()}
   else if(what==='del')deleteTasks([id]);
@@ -6091,7 +6143,7 @@ function inboxItem(g){
 function inboxHtml(){
   const L=inboxGroups(),show=INBOX_ALL?L:L.slice(0,8);
   return `<div class="hm-sh">Inbox${L.length?` <em>${L.length}</em>`:''}${L.some(g=>!g.wait)?`<button type="button" class="linkish" data-act="hm-seen">Mark all seen</button>`:''}</div>
-    ${L.length?show.map(inboxItem).join('')+(L.length>8?`<button type="button" class="hm-more" data-act="hm-inall">${INBOX_ALL?'Show fewer':`Show ${L.length-8} more`}</button>`:''):`<p class="hm-empty">You're caught up. ClickUp comments, replies, status changes and new tasks show up here.</p>`}`;
+    ${L.length?show.map(inboxItem).join('')+(L.length>8?`<button type="button" class="hm-more" data-act="hm-inall">${INBOX_ALL?'Show fewer':`Show ${L.length-8} more`}</button>`:''):`<p class="hm-empty">Nothing new.</p>`}`;
 }
 /* Home as a call sheet (user's pick, mockup A): a big date with counts, then every open task in one list by day —
    Up next (drag to reorder), Late, Due today, Tomorrow, Next 7 days, Later, In progress with no date, No date —
@@ -6122,7 +6174,7 @@ function csRow(t,n,o={}){
 /* Up next under the Inbox (user's ask): the queue in order, dragged to reorder (unDrag / unMove / UNT) */
 function csQueue(q){
   return `<section class="cs-g cs-q" id="csg-queue"><div class="cs-gh"><b>Up next</b><span>${q.length}</span>${q.length>1?'<em>Drag to reorder</em>':''}</div>
-    ${q.length?`<ol class="un-list cs-unl">${q.map(t=>`<li class="un-row cs-un" draggable="true" data-un="${t.id}">${csRow(t,'#'+upNextPos(t),{grip:true})}</li>`).join('')}</ol>`:`<p class="hm-empty">Line up what you'll work on next: right-click a task (press and hold on a phone) and choose Add to Up next.</p>`}</section>`;
+    ${q.length?`<ol class="un-list cs-unl">${q.map(t=>`<li class="un-row cs-un" draggable="true" data-un="${t.id}">${csRow(t,'#'+upNextPos(t),{grip:true})}</li>`).join('')}</ol>`:`<p class="hm-empty" title="Right-click a task (press and hold on a phone) and choose Add to Up next">Nothing queued. Right-click a task to add it.</p>`}</section>`;
 }
 function homeView(){
   S.ui.hjob='all';
@@ -6138,7 +6190,7 @@ function homeView(){
   let n=0;const body=G.map(([k,label,list])=>{if(!list.length||k==='queue')return '';
     const lim=['queue','late','today'].includes(k)||HM_OPEN.has(k)?list.length:8,show=list.slice(0,lim);
     const rows=show.map(t=>{n++;return csRow(t,String(n).padStart(2,'0'),{now:un?.t.id===t.id?un:null,nodate:k==='nodate'})}).join('');
-    return `<section class="cs-g" id="csg-${k}"><div class="cs-gh ${k==='late'?'late':''}"><b>${label}</b><span>${list.length}</span></div>
+    return `<section class="cs-g" id="csg-${k}"><div class="cs-gh ${k==='late'?'late':''}"><b>${label}</b><span>${list.length}</span>${k==='late'?`<button type="button" class="cs-gh-act" data-act="late-today">${list.length>1?'Move all to today':'Move to today'}</button>`:''}</div>
       ${rows}${list.length>lim||HM_OPEN.has(k)&&list.length>8?`<button type="button" class="hm-more" data-act="cs-more" data-g="${k}">${HM_OPEN.has(k)?'Show fewer':`Show ${list.length-lim} more`}</button>`:''}</section>`}).join('');
   const empty=`<p class="hm-empty">${ts.length?'':'No open tasks'+(jf==='all'?'':' in this job')+'. New tasks you add show up here, sorted by when they\'re due.'}</p>`;
   return `<div class="cs v2-home">${head}${jobsRow}<div class="home cs-home"><div class="hm-main">${body||empty}<button type="button" class="ap-addrow" data-act="new-task">${AP_PLUS}New Task</button></div><aside class="hm-side"><div id="csg-inbox">${inboxHtml()}</div>${csQueue(gd.queue)}</aside></div></div>`;
@@ -6185,9 +6237,9 @@ function metaLine(t,job,showJob){
   const bits=[];
   if(showJob){const j=S.jobs[t.jobId];bits.push(`<span class="jobtag">${jobMark(j,14)}${esc(j?.name)}</span>`)}
   const c=S.clients[t.clientId]; if(c&&!(S.ui.client===c.id&&!showJob)) bits.push(`<span class="jobtag">${clientMark(c,14)}${esc(c.name)}</span>`);
-  if(t.format) bits.push(`<span class="chip">${esc(t.format)}</span>`);
-  if(t.revision) bits.push(`<span class="chip rev" title="Revision round">R${t.revision}</span>`);
-  const cl=t.checklist||[]; if(cl.length) bits.push(`<span class="mono">${cl.filter(x=>x.done).length}/${cl.length}</span>`);
+  if(t.format) bits.push(`<span class="chip fmt">${esc(t.format)}</span>`);
+  if(t.revision) bits.push(`<span class="chip rev ${t.revision>=3?'rev-hi':''}" title="Revision round">R${t.revision}</span>`);
+  const cl=t.checklist||[]; if(cl.length) bits.push(`<span class="mono ck-n">${cl.filter(x=>x.done).length}/${cl.length}</span>`);
   if(t.pomos)bits.push(`<span class="chip pomo-chip" title="${t.pomos} focus session${t.pomos===1?'':'s'}">${TOMATO_IC}${t.pomos}</span>`);
   {const q=t.upNext&&!isClosed(t)&&!t.archived?upNextPos(t):0;if(q)bits.push(`<span class="chip un-chip" title="Up next #${q}">${UP_IC}${q}</span>`)}
   {const n=openNotes(t);if(n)bits.push(`<span class="chip notes-chip" title="${n} open update${n===1?'':'s'} to work through">${I.chat}${n}</span>`)}
@@ -6236,9 +6288,10 @@ function rowsAttrs(){
   const mid=['var(--w0)','minmax(0,1fr)','180px','84px',on('links')&&'120px'].filter(Boolean).join(' ');
   return `class="rows ${['prio','start','links'].filter(k=>h[k]).map(k=>'h-'+k).join(' ')}" style="--cols:${wide};--cols-mid:${mid}"`;
 }
+const nextStatus=t=>{if(isClosed(t))return null;const SL=statusesFor(t.jobId),i=SL.findIndex(x=>x.id===stOf(t));return SL[i+1]||null};
 const rowHtml=(t,job,showJob)=>`<div class="row ${isClosed(t)?'done-row':''} ${dueClass(t)==='over'?'is-over':''} ${S.ui.openTask===t.id?'focus':''} ${SEL.has(t.id)?'picked':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="mark-wrap">${SEL.size||SELMODE?'':apCk(t)}${selBox(t)}</div>
-        <div class="t-main"><div class="t-name" title="Double-click to rename">${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</div>${metaLine(t,job,showJob)}${searchHit(t)}</div>
+        <div class="t-main"><div class="t-name" title="Double-click to rename">${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}${(n=>n?`<button type="button" class="row-next" data-act="row-next" data-id="${t.id}" data-stop data-notip title="Move to ${esc(n.label)}" style="--sc:${esc(stColor(n.id))}">${esc(n.label)} ›</button>`:'')(nextStatus(t))}</div>${metaLine(t,job,showJob)}${searchHit(t)}</div>
         <div class="c-status" data-stop>${statusSelect(t,'row-status')}${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
         <div class="c-prio pedit" title="Change priority">${prioHtml(t.priority)}<select class="cell-sel" data-act="row-prio" data-id="${t.id}" aria-label="Priority">${PRIORITIES.map(p=>`<option value="${p.id}" ${(t.priority||'normal')===p.id?'selected':''}>${p.label}</option>`).join('')}</select></div>
         <div class="c-start date ${t.start?'':'none'}"${relTitle(t.start)}>${t.start?fmtRel(t.start):'—'}</div>
@@ -6369,11 +6422,13 @@ const holHtml=hs=>hs.map(h=>`<div class="hol" title="${esc(ccName(h.cc))}: ${esc
    Read / dismissed state is kept per device (localStorage). Keys include the
    date they refer to, so a task that moves to a new due date notifies again. */
 const LS_NOTES='cutroom.notes.v1';
-const NS=Object.assign({read:{},hidden:{}},lsGet(LS_NOTES)||{});
+const NS=Object.assign({read:{},hidden:{},snooze:{}},lsGet(LS_NOTES)||{});NS.snooze=NS.snooze||{};
+const snoozed=k=>(NS.snooze[k]||'')>today();  /* "Remind me tomorrow" hides an alert until that day */
 let notesOpen=false;
 function saveNotes(){
   const keep=new Set(notifications(true).map(n=>n.key));  // forget keys that no longer apply
   for(const m of [NS.read,NS.hidden])for(const k in m)if(!keep.has(k))delete m[k];
+  for(const k in NS.snooze)if(!keep.has(k)||!snoozed(k))delete NS.snooze[k];
   lsSet(LS_NOTES,NS);
 }
 function notifications(all){
@@ -6408,7 +6463,7 @@ function notifications(all){
   {const b=backupDue();if(b)out.push({key:`backup:${b.last||'never'}:${Math.floor(b.days/30)}`,rank:7,kind:'info',icon:'download',backup:true,sub:'Settings → Backup',title:b.last?`Your last backup was ${b.days} days ago`:"You haven't downloaded a backup yet",body:'A backup file keeps a copy of every job and task on your computer. It takes a second.'})}
   out.forEach(n=>{n.sub=n.sub||(n.task?who(n.task):'All jobs')});
   const list=out.sort((a,b)=>a.rank-b.rank||(a.task?.due||a.day||'').localeCompare(b.task?.due||b.day||''));
-  return all?list:list.filter(n=>!NS.hidden[n.key]);
+  return all?list:list.filter(n=>!NS.hidden[n.key]&&!snoozed(n.key));
 }
 /* ================= Inbox page (tab 'inbox'): every alert in one list — comments waiting for you, deadlines, follow-ups ================= */
 /* alerts for the Inbox, without a comment that already shows as "waiting for your reply" */
@@ -6431,7 +6486,7 @@ function renderInbox(){
     return `<div class="inb-it ${NS.read[n.key]?'':'unread'}" data-nkey="${esc(n.key)}">${av}
       <button type="button" class="inb-main" data-act="note-open" data-key="${esc(n.key)}"><b>${esc(n.title.replace(/[“”]/g,''))}</b>${n.body?`<span class="inb-body">${esc(n.body)}</span>`:''}
         <span class="inb-ctx">${j?`<i class="v2-sq" style="--jc:${esc(j.color||'var(--accent)')}"></i>`:''}${esc(NA_LBL[k]||'')}${n.sub?` · ${esc(n.sub)}`:''}</span></button>
-      <div class="inb-r"><time>${esc(when(n))}</time><div class="inb-acts">${act(n)}<button type="button" class="icon-btn" data-act="note-hide" data-key="${esc(n.key)}" title="Dismiss" aria-label="Dismiss">${I.x}</button></div></div></div>`};
+      <div class="inb-r"><time>${esc(when(n))}</time><div class="inb-acts">${act(n)}<button type="button" class="icon-btn" data-act="note-snooze" data-key="${esc(n.key)}" title="Remind me tomorrow" aria-label="Remind me tomorrow"><svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="9" r="5.5"/><path d="M8 6.2V9l1.8 1.3M3 2.8 1.6 4.2M13 2.8l1.4 1.4"/></svg></button><button type="button" class="icon-btn" data-act="note-hide" data-key="${esc(n.key)}" title="Dismiss" aria-label="Dismiss">${I.x}</button></div></div></div>`};
   const chips=[['all','All'],['unread','Unread'],...(f.replies.length?[['replies','Needs reply']]:[]),...(f.mentions.length?[['mentions','Mentions']]:[]),['deadlines','Deadlines'],['followups','Follow-ups']]
     .map(([k,l])=>`<button type="button" class="${NF===k?'on':''}" data-act="na-filter" data-f="${k}">${l}<em>${f[k].length||''}</em></button>`).join('');
   $('#view').innerHTML=`<div class="inb">
@@ -6796,6 +6851,9 @@ function deleteNote(at){
    as templates:[{id,name,steps:[text]}]. Applying adds the steps that aren't on the checklist yet. */
 let TPL={open:false,naming:false,del:null};
 function tplHome(t){const c=t&&S.clients[t.clientId];if(c)return {col:'clients',id:c.id,name:c.name,doc:c};const j=t&&S.jobs[t.jobId];return j?{col:'jobs',id:j.id,name:j.name,doc:j}:null}
+/* a new task can start from one of its client's (or job's) templates: steps, plus the format and length saved with it */
+function tplStartHtml(t){const h=tplHome(t),tp=h?.doc.templates||[];if(!tp.length)return '';
+  return `<div class="tpl-start"><span>Start from</span>${tp.map(x=>`<button type="button" class="tpl-chip" data-act="tpl-start" data-tid="${x.id}" title="${esc([x.format,x.length,`${x.steps.length} step${x.steps.length===1?'':'s'}`].filter(Boolean).join(' · '))}">${esc(x.name)}</button>`).join('')}</div>`}
 function tplMenu(t){
   const h=tplHome(t);if(!h)return '';const tpls=h.doc.templates||[],steps=(t.checklist||[]).length;
   return `<div class="tpl-menu">
@@ -6900,7 +6958,7 @@ let SHEET_Y=null;
 {const mo=new MutationObserver(()=>sheetLock());for(const id of ['modal','drawer','lightbox','side']){const el=document.getElementById(id);if(el)mo.observe(el,{attributes:true,attributeFilter:['hidden','class']})}}
 /* Scroll guard: a wheel or finger scroll over an open window, panel or pop-up never moves the page behind it.
    It only goes through when something inside the overlay can still scroll that way. */
-const OVL_SEL='#modal,#drawer,#jump,#lightbox,#crop,#ctx,#notes,#pomo-pop,#plus-menu,#topt,#filter-sheet,#upnext-page,#vopt,[role=dialog],[role=menu]';
+const OVL_SEL='#modal,#drawer,#daysheet,#jump,#lightbox,#crop,#ctx,#notes,#pomo-pop,#plus-menu,#topt,#filter-sheet,#upnext-page,#vopt,[role=dialog],[role=menu]';
 function ovlCanScroll(el,dy,root){for(let n=el;n&&n!==root.parentElement;n=n.parentElement){if(n.nodeType!==1)continue;const oy=getComputedStyle(n).overflowY;
   if((oy==='auto'||oy==='scroll')&&n.scrollHeight>n.clientHeight+1&&(dy<0?n.scrollTop>0:n.scrollTop+n.clientHeight<n.scrollHeight-1))return true}return false}
 document.addEventListener('wheel',e=>{if(e.ctrlKey||!e.deltaY||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;const o=e.target.closest?.(OVL_SEL);if(!o||o.hidden)return;
@@ -7245,6 +7303,7 @@ function renderTopt(){
 let DRAW_ID='';
 let V2_MORE=false;
 document.addEventListener('toggle',e=>{if(e.target.matches?.('details.v2-more'))V2_MORE=e.target.open},true);
+document.addEventListener('click',e=>{document.querySelectorAll('details.link-addm[open]').forEach(d=>{if(!d.contains(e.target))d.open=false})});
 function renderDrawer(){
   const t=S.tasks[S.ui.openTask];
   if(!t){if(S.ui.openTask)closeDrawer();return}
@@ -7264,7 +7323,7 @@ function renderDrawer(){
     ${SPLIT&&SPLIT.id===t.id?splitHtml(t):''}
     ${t.deleted?`<div class="d-archived">${I.trash}<span><b>In Trash</b> since ${fmtDate(t.deletedAt)}. It's deleted for good after ${trashDays()} days.</span><button class="btn sm" data-act="trash-restore" data-id="${t.id}">Restore</button></div>`:''}
     ${t.archived?`<div class="d-archived">${I.archive}<span><b>Archived</b>${t.archivedAt?' '+fmtDate(t.archivedAt):''}. Hidden from Overview and job tabs.</span><button class="btn sm" data-act="restore" data-id="${t.id}">Restore</button></div>`:''}
-    <textarea class="d-name" rows="1" data-field="name" data-fk="d-name" aria-label="Task name" placeholder="Task name">${esc(t.name)}</textarea>${t._draft?`<div class="smart-hint" id="smart-hint">${smartHintHtml(t)}</div><div id="dup-slot">${dupWarnHtml(t)}</div>`:''}<div class="d-rule" aria-hidden="true"></div>
+    <textarea class="d-name" rows="1" data-field="name" data-fk="d-name" aria-label="Task name" placeholder="Task name">${esc(t.name)}</textarea>${t._draft?`<div class="smart-hint" id="smart-hint">${smartHintHtml(t)}</div><div id="dup-slot">${dupWarnHtml(t)}</div>${tplStartHtml(t)}`:''}<div class="d-rule" aria-hidden="true"></div>
     ${(()=>{
       const cur=stOf(t),SL=statusesFor(t.jobId),idx=SL.findIndex(x=>x.id===cur),nxt=SL[idx+1],prio=t.priority||'normal';
       const f=(icon,label,body,forId,wide)=>`<div class="pf${wide?' pf-wide':''}">${forId?`<label for="${forId}">`:'<span class="pf-l">'}${icon}${label}${forId?'</label>':'</span>'}<div class="pf-v">${body}</div></div>`;
@@ -7274,18 +7333,18 @@ function renderDrawer(){
       const fmtSel=`<select data-field="format" aria-label="Format">${FORMATS.map(x=>`<option ${t.format===x?'selected':''}>${x}</option>`).join('')}</select>`;
       const clientSel=j?.type==='agency'?(NEWCL===t.id?`<form class="newcl" data-act="newcl-add"><input id="newcl-in" data-fk="newcl-in" placeholder="New client name" maxlength="60" aria-label="New client name" autocomplete="off"><button type="submit" class="btn sm primary">Add</button><button type="button" class="btn sm ghost" data-act="newcl-cancel">Cancel</button></form>`:`<select id="d-client" data-field="clientId" aria-label="Client"><option value="">No client</option>${cl.map(c=>`<option value="${c.id}" ${c.id===t.clientId?'selected':''}>${esc(c.name)}</option>`).join('')}<option value="__new">+ New client…</option></select>`):'';
       return `<div class="v2-facts">
-        <div class="vf vf-st"><span>Status</span><div class="st-ctl" ${pillStyle(cur)} data-notip>${statusSelect(t,'d-status')}${nxt?`<button type="button" class="st-next" data-act="d-next" data-notip aria-label="Move to ${esc(nxt.label)}" title="Move to ${esc(nxt.label)}"><svg class="i" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" fill="currentColor"/></svg></button>`:''}</div></div>
+        <div class="vf vf-st"><span>Status</span><div class="st-ctl" ${pillStyle(cur)} data-notip>${statusSelect(t,'d-status')}${nxt?`<button type="button" class="st-next" data-act="d-next" data-notip aria-label="Move to ${esc(nxt.label)}" title="Move to ${esc(nxt.label)}"><svg class="i" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" fill="currentColor"/></svg></button>`:''}</div>${!isClosed(t)&&!t._draft?`<button type="button" class="st-done" data-act="d-done" data-notip title="Mark as done"><svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg>Done</button>`:''}</div>
         <label class="vf"><span>Due</span><input type="date" id="d-due" data-field="due" class="${t.due?dueClass(t):''}" value="${esc(t.due||'')}" aria-label="Due date"></label>
         ${clientSel?`<label class="vf vf-cl"><span>Client</span>${clientSel}</label>`:''}
         <div class="vf"><span>Round</span><div class="stepper"><button data-act="rev" data-step="-1" aria-label="Decrease revision round">−</button><output>${t.revision||0}</output><button data-act="rev" data-step="1" aria-label="Increase revision round">+</button></div></div>
         <label class="vf"><span>Format</span>${fmtSel}</label>
-      </div>${busy}${!isClosed(t)&&!t._draft?`<button type="button" class="ap-donerow" data-act="d-done" data-notip><svg class="i" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg>Mark as Done</button>`:''}${ageNote(t)?`<div class="v2-age">${ageNote(t)}</div>`:''}`})()}
+      </div>${busy}${ageNote(t)?`<div class="v2-age">${ageNote(t)}</div>`:''}`})()}
     ${(()=>{const kinds=[['task',I.task],['upload',I.film],['file',I.folder],['project',I.mac]];
       const shown=kinds.filter(([k])=>String(t.links?.[k]||'').trim()||LSHOW.has(t.id+':'+k)),empty=kinds.filter(x=>!shown.includes(x));
       const host=v=>{const lp=localPath(v);if(lp)return pathName(lp);try{return new URL(v).hostname.replace(/^www\./,'')}catch(e){return ''}};
       const card=(k,ic)=>{const v=String(t.links?.[k]||'').trim();if(!v||LEDIT.has(t.id+':'+k))return linkRow(k,ic);const u=linkHref(v,j),lp=localPath(v);
         return `<div class="lk-card">${u?`<a class="lk-open" href="${esc(u)}"${linkTarget(v,j)} title="${lp?'Open in Finder':'Open'}">`:`<button type="button" class="lk-open" data-act="copy-path" data-path="${esc(lp||v)}" title="Copy path">`}<span class="lk-ic">${svcIcon(v)||ic}</span><span class="lk-t"><b>${esc(linkLabel(j,k))}</b><small>${esc(host(v))}</small></span>${u?'</a>':'</button>'}<button type="button" class="icon-btn lk-edit" data-act="link-edit" data-kind="${k}" title="Change link" aria-label="Change ${esc(linkLabel(j,k))}">${I.pencil}</button></div>`};
-      return `<div><h4 class="section-title">Links<span class="sec-hint">Paste a link here (${IS_MAC?'⌘':'Ctrl+'}V) to add it</span></h4><div class="lk-grid">${shown.map(([k,ic])=>card(k,ic)).join('')}</div>${empty.length?`<div class="link-add">${empty.map(([k,ic])=>`<button type="button" class="btn sm ghost" data-act="link-add" data-kind="${k}">${I.plus}${esc(linkLabel(j,k))}</button>`).join('')}</div>`:''}${briefLinksHtml(t,j)}</div>`})()}
+      return `<div><h4 class="section-title">Links<span class="sec-hint">Paste a link here (${IS_MAC?'⌘':'Ctrl+'}V) to add it</span></h4><div class="lk-grid">${shown.map(([k,ic])=>card(k,ic)).join('')}</div>${empty.length?`<details class="link-add link-addm"><summary class="btn sm ghost">${I.plus}Add link</summary><div class="lam-menu" role="menu">${empty.map(([k,ic])=>`<button type="button" role="menuitem" data-act="link-add" data-kind="${k}">${ic}${esc(linkLabel(j,k))}</button>`).join('')}</div></details>`:''}${briefLinksHtml(t,j)}</div>`})()}
     <div><h4 class="section-title">Checklist<span class="mono">${checklist.length?`${doneN}/${checklist.length}`:''}</span>${!tplHome(t)?'':`<button type="button" class="tpl-btn ${TPL.open?'on':''}" data-act="tpl-toggle" aria-expanded="${TPL.open}">${I.task}Templates</button>`}</h4>
       ${TPL.open?tplMenu(t):''}
       ${checklist.length?`<div class="progress"><i style="width:${doneN/checklist.length*100}%"></i></div>`:''}
@@ -8304,6 +8363,12 @@ function exportCSV(jobId){
    Searchable topics; "Open …" buttons jump to the matching Settings section or page. Keep this list in step with new features. */
 const HELP_IC='<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.6 1.6c-.6.3-.9.7-.9 1.3M8 11.3h.01"/></svg>';
 const HELP=[
+ ['Tasks','Move late work to today',`On Today, the Late group has a "Move all to today" button that sets every late task's due date to today in one go. Undo puts the old dates back.`,null],
+ ['Tasks','Next status from the list',`Hover a task in a job's list and a small pill with the next status appears after its name (for example "Internal review ›"). Click it to move the task along without opening it.`,null],
+ ['Tasks','Copy the export file name',`Right-click a task (press and hold on a phone) and choose Copy file name to copy its export name, built from the client's file name pattern.`,null],
+ ['Tasks','Start a task from a template',`Save a task's checklist as a template (Templates on the checklist); its format and length are saved with it. When you add a new task for that client, "Start from" chips under the name fill in the steps, format and length.`,null],
+ ['Calendar','A day on your phone',`On a phone, tap a day in the Calendar to see what's due that day. Tap a task to open it, or Move to pick another day for it.`,null],
+ ['Getting work done','Snooze an Inbox item',`In the Inbox, the clock button on an item hides it until tomorrow, when it comes back unread. The × dismisses it for good.`,null],
  ['Getting around','Pages and views',`The sidebar has the Overview, each job, Archived, Activity and Trash. On a job page, client tabs sit under the name, with Tasks, Details and Brand guide. Switch List, Board or Calendar in the toolbar; each job remembers its own view. The browser's Back button closes the task panel or goes to the previous page, and on a phone the tab bar at the bottom has Overview, Jobs, New task, Calendar and Search.`,null],
  ['Your work','Resume',`The Resume page (sidebar footer) is an A4 page laid out like your own resume. Tap any text to change it; Enter adds a new bullet and Backspace on an empty one removes it. Use + to add a job, school, skill or link, the arrows and × to reorder or remove, and "Add from my jobs" to start an entry from one of your jobs here. Download PDF saves just the page (choose "Save as PDF"). Import loads a resume file, and Save a copy downloads one. Prefer text boxes? Show form (on a phone it's the Edit tab) lists each part with plain fields; bullets and skills go one per line. Keep to one page tightens the spacing, then the text size a little, when it runs long; a red dashed line marks where page 2 would start, and a note says how many lines to trim if it still doesn't fit.`,null],
  ['Getting around','On your phone',`Swipe right anywhere to open the sidebar (from the very left edge when you're on the board or other things that scroll sideways), and swipe left to close it. The bar at the bottom has Overview, Alerts and Calendar (your jobs are in the sidebar); Alerts opens as a full-height sheet you can drag down to close (swipe an alert left to dismiss it), and Search opens full screen like Slack's, with the search bar at the bottom. The round + above the search button opens a menu with the focus timer, New job and New task.`,null],
@@ -9848,9 +9913,14 @@ document.addEventListener('click',e=>{
     case 'notes-close': notesOpen=false;renderBell();break;
     case 'na-filter': NF=el.dataset.f;renderBell();if(u.tab==='inbox')render();break;
     case 'inb-handled': {const t=S.tasks[el.dataset.id];if(t){nrDone(t,null);NS.read[el.dataset.key]=1;notifications().forEach(n=>{if(/^cum?:/.test(n.key)&&n.task?.id===t.id){NS.hidden[n.key]=1;NS.read[n.key]=1}});saveNotes();toast('Marked as handled')}render();break}
+    case 'late-today': {const t0=today(),ts=homeTasks().filter(t=>t.due&&t.due<t0),was=ts.map(t=>[t.id,t.due]);
+      ts.forEach(t=>{patch('tasks',t.id,{due:t0});logAct('date',`Due date set to ${fmtDate(t0)}`,{task:t})});
+      toast(`Moved ${ts.length} late task${ts.length===1?'':'s'} to today`,{label:'Undo',fn:()=>{was.forEach(([id,d])=>patch('tasks',id,{due:d}));render()}});render();break}
+    case 'row-next': {const t=S.tasks[el.dataset.id],n=t&&nextStatus(t);if(n){setStatus(t.id,n.id);render();if(S.ui.openTask===t.id)renderDrawer()}break}
     case 'inb-push': {const t=S.tasks[el.dataset.id];if(t){const was=t.due;patch('tasks',t.id,{due:today()});logAct('date',`Due date set to ${fmtDate(today())}`,{task:t});toast('Moved to today',{label:'Undo',fn:()=>{patch('tasks',t.id,{due:was});render()}})}render();break}
     case 'notes-read': notifications().forEach(n=>NS.read[n.key]=1);saveNotes();renderBell();if(u.tab==='inbox')render();break;
     case 'note-open': openNote(el.dataset.key);break;
+    case 'note-snooze': {const k=el.dataset.key;NS.snooze[k]=addDays(today(),1);delete NS.read[k];saveNotes();renderBell();if(u.tab==='inbox')render();toast('Snoozed until tomorrow',{label:'Undo',fn:()=>{delete NS.snooze[k];saveNotes();renderBell();render()}});break}
     case 'note-hide': NS.hidden[el.dataset.key]=1;NS.read[el.dataset.key]=1;saveNotes();renderBell();if(u.tab==='inbox')render();break;
     case 'brand-edit': openBrand(el.dataset.col,el.dataset.id);break;
     case 'brand-cancel': if(!guardClose())closeBrand();break;
@@ -10004,6 +10074,10 @@ document.addEventListener('click',e=>{
       const have=new Set((t.checklist||[]).map(c=>c.text.trim().toLowerCase())),add=x.steps.filter(st=>!have.has(st.trim().toLowerCase())).map(text=>({id:uid().slice(0,12),text,done:false}));
       if(!add.length){toast('Those steps are already on the checklist');break}
       patch('tasks',t.id,{checklist:[...(t.checklist||[]),...add]});logAct('check',`Added ${add.length} step${add.length===1?'':'s'} from “${x.name}”`,{task:t});TPL.open=false;renderDrawer();toast(`Added ${add.length} step${add.length===1?'':'s'}`);break}
+    case 'tpl-start':{const t=S.tasks[u.openTask],h=tplHome(t),x=(h?.doc.templates||[]).find(y=>y.id===el.dataset.tid);if(!x||!t)break;
+      const have=new Set((t.checklist||[]).map(c=>c.text.trim().toLowerCase())),add=x.steps.filter(st=>!have.has(st.trim().toLowerCase())).map(text=>({id:uid().slice(0,12),text,done:false}));
+      const p={checklist:[...(t.checklist||[]),...add]};if(x.format)p.format=x.format;if(x.length)p.length=x.length;
+      patch('tasks',t.id,p);renderDrawer();toast(`Filled in from “${x.name}”`);break}
     case 'tpl-del':{const t=S.tasks[u.openTask],h=tplHome(t);if(!h)break;if(TPL.del!==el.dataset.tid){TPL.del=el.dataset.tid;renderDrawer();break}
       patch(h.col,h.id,{templates:(h.doc.templates||[]).filter(y=>y.id!==el.dataset.tid)});TPL.del=null;renderDrawer();toast('Template deleted');break}
     case 'd-upnext':toggleUpNext(u.openTask);break;
@@ -10345,7 +10419,7 @@ document.addEventListener('submit',e=>{
   if(a==='newcl-add'){addClientFromPanel();return}
   if(a==='tpl-save'){const t=S.tasks[S.ui.openTask],h=tplHome(t),name=($('#tpl-name')?.value||'').trim();if(!h)return;if(!name){$('#tpl-name')?.focus();return}
     const steps=(t.checklist||[]).map(c=>c.text.trim()).filter(Boolean);const others=(h.doc.templates||[]).filter(y=>y.name.toLowerCase()!==name.toLowerCase());
-    patch(h.col,h.id,{templates:[...others,{id:uid().slice(0,10),name,steps}]});TPL={open:true,naming:false,del:null};renderDrawer();toast(`Saved “${name}” for ${h.name}`);return}
+    patch(h.col,h.id,{templates:[...others,{id:uid().slice(0,10),name,steps,format:t.format||'',length:t.length||''}]});TPL={open:true,naming:false,del:null};renderDrawer();toast(`Saved “${name}” for ${h.name}`);return}
   if(a==='tag-add'){const inp=f.querySelector('input'),t=S.tasks[S.ui.openTask];if(t&&inp.value.trim()){addTag(t,inp.value);renderDrawer();setTimeout(()=>$('#tag-in')?.focus(),0)}return}
   if(a==='check-add'){const inp=f.querySelector('input');const text=inp.value.trim();if(!text)return;const t=S.tasks[S.ui.openTask];patch('tasks',t.id,{checklist:[...(t.checklist||[]),{id:uid().slice(0,12),text,done:false}]});inp.value='';renderDrawer();$('[data-fk="ck-new"]')?.focus()}
   else if(a==='modal-save'){saveModal()}
@@ -10434,6 +10508,21 @@ document.addEventListener('drop',e=>{
 
 /* Calendar: drag a task (month entry or week card) onto another day to move its due date; logged, with Undo */
 let calDrag=null;
+/* phones: tapping a calendar day opens that day's tasks in a sheet, each with a date box to move it (drag doesn't work with a finger) */
+let DAYS=null;
+function renderDaySheet(){
+  let e=$('#daysheet');if(!e){e=document.createElement('div');e.id='daysheet';e.className='daysheet';e.setAttribute('role','dialog');e.setAttribute('aria-label','Tasks on this day');document.body.appendChild(e)}
+  if(!DAYS){e.hidden=true;e.innerHTML='';return}
+  const cj=S.ui.tab==='calendar'?calJob():'all',ts=tasksOfScope().filter(t=>t.due===DAYS&&!t.archived&&(cj==='all'||t.jobId===cj)).sort((a,b)=>isClosed(a)-isClosed(b));
+  e.hidden=false;
+  e.innerHTML=`<div class="ds-card"><div class="ds-head"><b>${esc(fmtDate(DAYS))}</b><span>${ts.length} task${ts.length===1?'':'s'} due</span><button type="button" class="icon-btn" data-act="ds-close" aria-label="Close" title="Close">${I.x}</button></div>
+    ${ts.length?`<div class="ds-list">${ts.map(t=>`<div class="ds-row ${isClosed(t)?'is-done':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'var(--accent)')}"><button type="button" class="ds-open" data-act="ds-open" data-id="${t.id}"><i></i><span><b>${esc(t.name||'Untitled task')}</b><small>${esc([S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '))}</small></span></button><label class="ds-move" title="Move to another day">Move<input type="date" data-act="ds-move" data-id="${t.id}" value="${esc(t.due)}" aria-label="Move ${esc(t.name||'task')} to another day"></label></div>`).join('')}</div>`:'<p class="hint ds-none">Nothing due this day.</p>'}</div>`;
+}
+document.addEventListener('click',e=>{if(!narrow.matches||DAYS)return;const d=e.target.closest?.('.cal [data-calday].day');if(!d)return;e.preventDefault();e.stopPropagation();DAYS=d.dataset.calday;renderDaySheet()},true);
+document.addEventListener('click',e=>{if(!DAYS)return;const a=e.target.closest?.('[data-act]')?.dataset.act;
+  if(a==='ds-close'||(e.target.id==='daysheet')){DAYS=null;renderDaySheet()}
+  else if(a==='ds-open'){const id=e.target.closest('[data-id]').dataset.id;DAYS=null;renderDaySheet();openTask(id)}});
+document.addEventListener('change',e=>{const i=e.target.closest?.('[data-act="ds-move"]');if(!i||!i.value)return;moveDue(i.dataset.id,i.value);renderDaySheet()});
 function moveDue(id,day){
   const t=S.tasks[id];if(!t||!day||t.due===day)return;const old=t.due||'';
   patch('tasks',id,{due:day});logAct('date',`Due date moved to ${fmtDate(day)}`,{task:t});render();
