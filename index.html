@@ -4079,6 +4079,8 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap .pip-brand :is(.pip-copy,.pb-sw){border:0;background:var(--grp);border-radius:10px}
 .ap .pip-brand .pb-sw i{border-radius:50%}
 .ap .pip-brand .pb-l{font-weight:500;letter-spacing:.03em;color:var(--muted)}
+/* board: columns with no tasks hide; they come back while a card is dragged so it can be dropped there */
+body:not(.card-dragging) .board>.col.col-empty{display:none!important}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
@@ -6265,9 +6267,10 @@ function listView(list,job){
 
 function boardView(list,job){
   const sts=job?statusesFor(job.id):STATUSES,gk=job?stOf:gkey;
+  const anyCards=list.some(t=>sts.some(s=>gk(t)===s.id));  /* empty columns hide (shown again while dragging a card), unless every column is empty */
   return `<div class="board-wrap"><div class="board">${sts.map(s=>{
     const cards=list.filter(t=>gk(t)===s.id);
-    return `<div class="col" data-drop="${s.id}" style="--sc:${stColor(s.id)}"><div class="col-head"><span class="pill" ${pillStyle(s.id)}><span class="pl">${esc(s.label)}</span></span>${(s.stage||s.id)==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
+    return `<div class="col ${anyCards&&!cards.length?'col-empty':''}" data-drop="${s.id}" style="--sc:${stColor(s.id)}"><div class="col-head"><span class="pill" ${pillStyle(s.id)}><span class="pl">${esc(s.label)}</span></span>${(s.stage||s.id)==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
       ${cards.map(t=>`<div class="card ${SEL.has(t.id)?'picked':''} ${isClosed(t)?'is-done':''} ${dueClass(t)==='over'?'is-over':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="card-top"><div class="mark-wrap">${SEL.size||SELMODE?'':apCk(t)}${selBox(t)}</div><div class="t-name" title="Double-click to rename">${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</div></div>${metaLine(t,job,!job)}${searchHit(t)}
         <div class="card-foot"><span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,!isClosed(t)):'No date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
@@ -10398,8 +10401,8 @@ document.addEventListener('dragover',e=>{if(jobDrag&&e.target.closest?.('#nav-jo
 document.addEventListener('drop',e=>{if(!jobDrag)return;const m=jobDropMark(e);document.querySelectorAll('.nav-row').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'));const id=jobDrag;jobDrag=null;if(!m)return;e.preventDefault();
   const ids=jobsSorted().map(j=>j.id).filter(x=>x!==id);ids.splice(ids.indexOf(m.id)+(m.after?1:0),0,id);ids.forEach((x,i)=>{if(S.jobs[x].order!==i)patch('jobs',x,{order:i})});render()});
 document.addEventListener('dragend',()=>{if(jobDrag){jobDrag=null;document.querySelectorAll('.nav-row').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'))}});
-document.addEventListener('dragstart',e=>{if(jobDrag)return;const c=e.target.closest?.('.card,.row[draggable]');if(!c)return;dragId=c.dataset.id;c.classList.add('dragging');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',dragId)}catch(x){}});
-document.addEventListener('dragend',e=>{e.target.classList?.remove('dragging');document.querySelectorAll('.col.drag,.group.drag').forEach(c=>c.classList.remove('drag'));clearDropMark();dragId=null});
+document.addEventListener('dragstart',e=>{if(jobDrag)return;const c=e.target.closest?.('.card,.row[draggable]');if(!c)return;dragId=c.dataset.id;c.classList.add('dragging');if(c.classList.contains('card'))document.body.classList.add('card-dragging');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',dragId)}catch(x){}});
+document.addEventListener('dragend',e=>{e.target.classList?.remove('dragging');document.body.classList.remove('card-dragging');document.querySelectorAll('.col.drag,.group.drag').forEach(c=>c.classList.remove('drag'));clearDropMark();dragId=null});
 document.addEventListener('dragover',e=>{
   const col=e.target.closest?.('[data-drop]');
   if(col&&dragId){e.preventDefault();document.querySelectorAll('.col.drag,.group.drag').forEach(c=>c!==col&&c.classList.remove('drag'));col.classList.add('drag');
@@ -10425,6 +10428,7 @@ document.addEventListener('dragleave',e=>{const z=e.target.closest?.('[data-drop
 document.addEventListener('drop',e=>{const z=e.target.closest?.('[data-drop-pics]');if(!z||!e.dataTransfer?.files?.length)return;e.preventDefault();z.classList.remove('drop-on');attAdd(e.dataTransfer.files,z.dataset.dropPics)});
 document.addEventListener('keydown',e=>{if(e.target.id==='reply-in'&&e.key==='Enter'&&(e.metaKey||e.ctrlKey)&&REPLY_AT){e.preventDefault();postReply(REPLY_AT)}else if(e.target.id==='reply-in'&&e.key==='Escape'){e.preventDefault();e.stopPropagation();REPLY_AT=null;renderDrawer()}},true);
 document.addEventListener('drop',e=>{
+  document.body.classList.remove('card-dragging');  /* the redraw can detach the card before its dragend */
   const col=e.target.closest?.('[data-drop]');
   if(col&&dragId){e.preventDefault();const id=dragId,it=dropMark,after=it?.classList.contains('drop-after');clearDropMark();dragId=null;
     if(stOf(S.tasks[id])!==col.dataset.drop)setStatus(id,col.dataset.drop);
