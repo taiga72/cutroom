@@ -5773,7 +5773,8 @@ function renderMain(){
   $('#sel-btn').hidden=u.view==='calendar'||HOME;if(u.view==='calendar'&&(SELMODE||SEL.size)){SEL.clear();SELMODE=false}if(u.view==='calendar'||!job&&u.view!=='list')VOPT=false;renderVopt();
 
   if(!Object.keys(S.jobs).length){
-    $('#view').innerHTML=`<div class="empty"><h3>Add your first job</h3><p>A job is an agency you edit for (with its own clients) or a direct client. Each job keeps its own tools: where you talk, where tasks are assigned, where you upload, and where files live.</p><button class="btn primary" data-act="new-job">${I.plus}New job</button></div>`;
+    const nd=new Date(),todayHead=HOME?`<header class="v2-head ap-lt"><div><h1>Today</h1><p class="v2-sum">${esc(WEEKDAY_FULL[nd.getDay()])}, ${esc(nd.toLocaleDateString(pref('dateFmt')==='dm'?'en-GB':'en-US',{month:'long',day:'numeric'}))}</p></div></header>`:'';  /* a new account keeps the Today title */
+    $('#view').innerHTML=todayHead+`<div class="empty"><h3>Add your first job</h3><p>A job is an agency you edit for (with its own clients) or a direct client. Each job keeps its own tools: where you talk, where tasks are assigned, where you upload, and where files live.</p><button class="btn primary" data-act="new-job">${I.plus}New job</button></div>`;
     return;
   }
   const list=filtered();
@@ -6948,7 +6949,7 @@ function renderJump(){
   const items=jumpItems(JUMP.q);JUMP.items=items;JUMP.i=Math.min(JUMP.i,Math.max(0,items.length-1));
   e.hidden=false;
   let lastG='';
-  const list=items.map((x,k)=>`${!JUMP.q.trim()&&x.grp&&x.grp!==lastG?`<h3 class="jump-g">${esc(lastG=x.grp)}</h3>`:''}<button type="button" class="jump-item ${k===JUMP.i?'on':''}" data-act="jump-go" data-k="${k}"><span class="jic">${x.icon}</span><span class="jl">${esc(x.label)}</span><span class="js">${esc(x.sub)}</span></button>`).join('')||`<p class="hint" style="padding:14px">Nothing matches “${esc(JUMP.q)}”.</p>`;
+  const list=items.map((x,k)=>`${!JUMP.q.trim()&&x.grp&&x.grp!==lastG?`<h3 class="jump-g">${esc(lastG=x.grp)}</h3>`:''}<button type="button" class="jump-item ${k===JUMP.i?'on':''}" data-act="jump-go" data-k="${k}"><span class="jic">${x.icon}</span><span class="jl">${esc(x.label)}</span>${!JUMP.q.trim()&&x.grp==='Pages'?'':`<span class="js">${esc(x.sub)}</span>`}</button>`).join('')||`<p class="hint" style="padding:14px">Nothing matches “${esc(JUMP.q)}”.</p>`;
   if(!$('#jump-q')){e.innerHTML=`<div class="jump" role="dialog" aria-modal="true" aria-label="Quick search"><div class="jump-top"><h2>Search</h2></div><div class="jump-bar"><label class="jump-in"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="jump-q" placeholder="Search tasks, jobs, clients…" autocomplete="off" spellcheck="false"><kbd>Esc</kbd></label><button type="button" class="jump-x" data-act="jump-close" aria-label="Close search" title="Close">${I.x}</button></div><div class="jump-list" id="jump-list">${list}</div><div class="jump-foot"><span>↑↓ to move</span><span>Enter to open</span></div></div>`}
   else $('#jump-list').innerHTML=list;
   $('#jump-list .on')?.scrollIntoView({block:'nearest'});
