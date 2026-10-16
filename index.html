@@ -4000,6 +4000,19 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap .lightbox .icon-btn{background:rgba(120,120,128,.36);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 .ap .lb-open{background:rgba(120,120,128,.36);color:#fff;border:0;border-radius:999px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 .ap .lb-count{font-family:inherit;background:rgba(120,120,128,.36);padding:3px 10px;border-radius:999px}
+/* audit fixes: one search per page, plain banner, Help header like the other pages, phone Calendar title */
+.ap body.pg-job .v2-find{display:none}
+.ap .top-search{width:280px;height:38px;border:0;background:rgba(118,118,128,.12);border-radius:10px;padding:0 12px;gap:8px}
+.ap .top-search input{background:transparent;border:0;font-size:calc(14px*var(--ts))}
+.ap .top-search input::placeholder{color:var(--muted)}
+.ap .banner{border:0;background:var(--grp);border-radius:14px;padding:12px 16px}
+.ap .hp .cs-hl small,.ap .hp .cs-tally{display:none}
+@media (max-width:820px){
+  .ap body.pg-cal.cal-page #head{display:block}
+  .ap body.pg-cal .head-ov{display:flex}
+  .ap body.pg-cal .head-ov .head-title,.ap body.pg-cal .head-ov .sub{display:block}
+  .ap body.pg-cal .head-ov h1{font:700 calc(34px*var(--ts))/1.1 var(--display);letter-spacing:-.025em}
+}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
@@ -4027,7 +4040,7 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
   <div class="side-resize" id="side-resize" title="Drag to resize the sidebar · double-click to reset" aria-hidden="true"></div>
   <main class="main" id="main">
     <div id="banner"></div>
-    <div class="head-row"><div id="head"></div><div class="top-right"><button type="button" class="v2-find" data-act="jump" title="Quick search (⌘K)"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg>Search tasks, jobs, clients<kbd>⌘K</kbd></button><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search tasks  ( / )" autocomplete="off"></label><div class="pomo-wrap"><button type="button" class="pomo-btn" id="pomo" data-act="pomo" aria-haspopup="true" aria-expanded="false" aria-controls="pomo-pop" title="Focus timer (P to start or pause)"></button><div class="notes-pop pomo-pop" id="pomo-pop" hidden role="dialog" aria-label="Focus timer"></div></div><div class="bell-wrap"><button type="button" class="icon-btn bell" id="bell" data-act="bell" aria-haspopup="true" aria-expanded="false" aria-controls="notes" title="Alerts"><svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bell-n" id="bell-n" hidden></span></button><div class="notes-pop" id="notes" hidden role="dialog" aria-label="Alerts"></div></div><button type="button" class="me-btn" id="me-btn" data-act="profile" title="Your profile" aria-label="Your profile"></button></div></div>
+    <div class="head-row"><div id="head"></div><div class="top-right"><button type="button" class="v2-find" data-act="jump" title="Quick search (⌘K)"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg>Search tasks, jobs, clients<kbd>⌘K</kbd></button><label class="search top-search" id="top-search" hidden><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><input id="q" type="search" placeholder="Search this job" autocomplete="off"></label><div class="pomo-wrap"><button type="button" class="pomo-btn" id="pomo" data-act="pomo" aria-haspopup="true" aria-expanded="false" aria-controls="pomo-pop" title="Focus timer (P to start or pause)"></button><div class="notes-pop pomo-pop" id="pomo-pop" hidden role="dialog" aria-label="Focus timer"></div></div><div class="bell-wrap"><button type="button" class="icon-btn bell" id="bell" data-act="bell" aria-haspopup="true" aria-expanded="false" aria-controls="notes" title="Alerts"><svg class="i" viewBox="0 0 16 16"><path d="M4 11.5V7.2a4 4 0 0 1 8 0v4.3l1.2 1.3H2.8zM6.6 14.2a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bell-n" id="bell-n" hidden></span></button><div class="notes-pop" id="notes" hidden role="dialog" aria-label="Alerts"></div></div><button type="button" class="me-btn" id="me-btn" data-act="profile" title="Your profile" aria-label="Your profile"></button></div></div>
     <div id="subnav"></div>
     <div id="stats"></div>
     <div id="jobcards"></div>
@@ -8428,7 +8441,7 @@ function renderHelp(){
   $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
   const inSet=HELP.filter(h=>h[3]).length,hits=HELP.filter(([g,t,b,go])=>q?(g+' '+t+' '+b).toLowerCase().includes(q):!go);
   const groups=[];for(const h of hits){let g=groups.find(x=>x.g===h[0]);if(!g)groups.push(g={g:h[0],items:[]});g.items.push(h)}
-  const jump=groups.length>1?`<div class="cs-sub al-sub hp-sub"><span class="al-jobs">${groups.map((g,i)=>`<button type="button" data-act="help-jump" data-i="${i}">${esc(g.g)}<em>${g.items.length}</em></button>`).join('')}</span><span class="cs-sp"></span>${CS_Q('help-q','Search help (e.g. Finder, backup, holidays)',u.hq)}</div>`
+  const jump=groups.length>1?`<div class="cs-sub al-sub hp-sub"><span class="al-jobs">${groups.map((g,i)=>`<button type="button" data-act="help-jump" data-i="${i}">${esc(g.g)}<em>${g.items.length}</em></button>`).join('')}</span><span class="cs-sp"></span>${CS_Q('help-q','Search help',u.hq)}</div>`
     :`<div class="cs-sub al-sub hp-sub"><span class="cs-sp"></span>${CS_Q('help-q','Search help (e.g. Finder, backup, holidays)',u.hq)}</div>`;
   let html=`<div class="cs al hp"><header class="cs-top"><div class="cs-hl"><small>How everything in ${esc((appSettings().name||'').trim()||APP_NAME)} works</small><h1>Help &amp; tips</h1></div>
     <div class="cs-tally">${csTl(HELP.length,'topics')}${csTl(inSet,'inside Settings')}</div></header>${jump}`;
