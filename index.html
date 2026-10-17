@@ -4201,7 +4201,8 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap :is(.search,.jump-in) input{border-radius:999px!important}
 .ap .btn:not(.icon-btn){border-radius:999px!important}
 .ap .icon-btn{border-radius:50%!important}
-.ap :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="search"]):not([type="file"]),select:not(.pill)){border-radius:12px!important}
+.ap :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="search"]):not([type="file"]),select:not(.pill)){border-radius:999px!important}
+.ap textarea{border-radius:12px}
 .ap .seg,.ap .seg>button{border-radius:999px!important}
 .ap .pomo-btn:not(.run):not(.paused){border-radius:50%!important}
 .ap .pomo-btn{border-radius:999px!important}
@@ -6184,6 +6185,7 @@ const GRIP_IC='<svg viewBox="0 0 12 12" fill="currentColor"><circle cx="4" cy="2
 let PS=null;
 function psDrop(kind,id,m){
   if(kind==='upnext')unMove(id,m);
+  else if(kind==='checklist'){const t=S.tasks[S.ui.openTask];if(!t)return;const arr=[...(t.checklist||[])],from=arr.findIndex(c=>c.id===id);if(from<0)return;const [item]=arr.splice(from,1);let at=arr.findIndex(c=>c.id===m.id);if(at<0)return;if(m.after)at++;arr.splice(at,0,item);patch('tasks',t.id,{checklist:arr});renderDrawer()}
   else if(kind==='statuses'){const a=SM.statuses,from=+id;let to=+m.id;const [x]=a.splice(from,1);if(to>from)to--;if(m.after)to++;a.splice(to,0,x);SM.stPick=null;renderSettings()}
 }
 function psScroller(el){for(let e=el.parentElement;e;e=e.parentElement){const cs=getComputedStyle(e);if(/(auto|scroll)/.test(cs.overflowY)&&e.scrollHeight>e.clientHeight)return e}return null}
@@ -7532,7 +7534,7 @@ function renderDrawer(){
     <div><h4 class="section-title">Checklist<span class="mono">${checklist.length?`${doneN}/${checklist.length}`:''}</span>${!tplHome(t)?'':`<button type="button" class="tpl-btn ${TPL.open?'on':''}" data-act="tpl-toggle" aria-expanded="${TPL.open}">${I.task}Templates</button>`}</h4>
       ${TPL.open?tplMenu(t):''}
       ${checklist.length?`<div class="progress"><i style="width:${doneN/checklist.length*100}%"></i></div>`:''}
-      <div class="checklist">${checklist.map(c=>`<div class="check ${c.done?'done':''}" data-cid="${esc(c.id)}"><span class="ck-grip" data-grip="${esc(c.id)}" title="Drag to reorder" aria-hidden="true"><svg viewBox="0 0 12 12" fill="currentColor"><circle cx="4" cy="2.5" r="1.1"/><circle cx="8" cy="2.5" r="1.1"/><circle cx="4" cy="6" r="1.1"/><circle cx="8" cy="6" r="1.1"/><circle cx="4" cy="9.5" r="1.1"/><circle cx="8" cy="9.5" r="1.1"/></svg></span><input type="checkbox" data-act="check" data-cid="${esc(c.id)}" ${c.done?'checked':''} aria-label="Done"><input class="txt" data-act="check-text" data-cid="${esc(c.id)}" data-fk="ck-${esc(c.id)}" value="${esc(c.text)}" aria-label="Checklist item"><button class="icon-btn" data-act="check-del" data-cid="${esc(c.id)}" aria-label="Remove item">${I.x}</button></div>`).join('')}
+      <div class="checklist" data-sort="checklist">${checklist.map(c=>`<div class="check ${c.done?'done':''}" data-cid="${esc(c.id)}" data-sort-item="${esc(c.id)}"><input type="checkbox" data-act="check" data-cid="${esc(c.id)}" ${c.done?'checked':''} aria-label="Done"><input class="txt" data-act="check-text" data-cid="${esc(c.id)}" data-fk="ck-${esc(c.id)}" value="${esc(c.text)}" aria-label="Checklist item"><button type="button" class="ps-grip" data-sort-grip title="Drag to reorder" aria-label="Drag to reorder this step (arrow keys move it)">${GRIP_IC}</button><button class="icon-btn" data-act="check-del" data-cid="${esc(c.id)}" aria-label="Remove item">${I.x}</button></div>`).join('')}
       <form class="check-add" data-act="check-add">${I.plus}<input data-fk="ck-new" placeholder="Add a step (rough cut, captions, color…)" aria-label="Add checklist item"></form></div></div>
     ${notesBlock(t)}
     <details class="v2-more" data-more ${V2_MORE?'open':''}><summary>More details<span>Job, priority, start date, length, tags${j?.type==='agency'||brandHome(t)?', brand guide':''}, export name</span></summary>
