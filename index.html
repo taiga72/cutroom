@@ -4455,11 +4455,16 @@ const weekStartOf=d=>{d=new Date(d);d.setDate(d.getDate()-((d.getDay()-WS()+7)%7
 const isWeekend=d=>d.getDay()===0||d.getDay()===6;
 /* grid columns for a 7-day row; weekends narrow when "hide weekends" is on */
 const weekCols=()=>Array.from({length:7},(_,i)=>pref('hideWeekends')&&((WS()+i)%7===0||(WS()+i)%7===6)?'var(--wk)':'var(--wd)').join(' ');
+/* Late = past due AND still on you: not started, in progress or revisions (user's ask). A past-due task that's out
+   for review or waiting on the client isn't late; it shows as "past due" instead. */
+const LATE_STAGES=new Set(['not_started','in_progress','revisions']);
+const pastDue=(t,t0=today())=>!!t.due&&t.due<t0&&!isClosed(t);
+const isLate=(t,t0=today())=>pastDue(t,t0)&&LATE_STAGES.has(stageOf(stOf(t)));
 function dueClass(t){
   if(!t.due) return 'none';
   if(isClosed(t)) return '';
   const dd=diffDays(t.due,today());
-  if(dd<0) return 'over'; if(dd<=2) return 'soon'; return '';
+  if(dd<0) return isLate(t)?'over':'past'; if(dd<=2) return 'soon'; return '';
 }
 const uid=()=>(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)).replace(/[^a-zA-Z0-9-]/g,'');
 const isObj=v=>v&&typeof v==='object'&&!Array.isArray(v);
@@ -5499,7 +5504,7 @@ function filtered(){
   const u=S.ui,t0=today(),q=u.q.trim().toLowerCase();
   let list=tasksOfScope();
   if(u.prio!=='all') list=list.filter(t=>(t.priority||'normal')===u.prio);
-  if(u.due==='overdue') list=list.filter(t=>t.due&&t.due<t0&&!isClosed(t));
+  if(u.due==='overdue') list=list.filter(t=>isLate(t,t0));
   if(u.due==='week') list=list.filter(t=>t.due&&!isClosed(t)&&diffDays(t.due,t0)>=0&&diffDays(t.due,t0)<=7);
   if(u.due==='nodate') list=list.filter(t=>!t.due);
   if(u.due==='today') list=list.filter(t=>t.due===t0&&!isClosed(t));
@@ -5534,7 +5539,7 @@ function statTile(key,label,list){
   const t0=today(),open=list.filter(t=>!isClosed(t)),u=S.ui;
   if(key.startsWith('st:')){const id=key.slice(3),n=open.filter(t=>gkey(t)===id).length;
     return `<button class="stat ${id==='revisions'&&n?'warn':''}" data-act="jump-status" data-status="${id}"><small>${esc(label)}</small><b>${n}</b></button>`}
-  const n={open:open.length,overdue:open.filter(t=>t.due&&t.due<t0).length,today:open.filter(t=>t.due===t0).length,
+  const n={open:open.length,overdue:open.filter(t=>isLate(t,t0)).length,today:open.filter(t=>t.due===t0).length,
     week:open.filter(t=>t.due&&diffDays(t.due,t0)>=0&&diffDays(t.due,t0)<=7).length,nodate:open.filter(t=>!t.due).length}[key];
   const f=key==='open'?'all':key,cls=key==='overdue'&&n?'alert':key==='today'&&n?'warn':'';
   return `<button class="stat ${cls} ${u.due===f?'on':''}" data-act="stat" data-due="${f}"><small>${esc(label)}</small><b>${n}</b></button>`;
@@ -5550,7 +5555,7 @@ function statsFor(list){
   const open=list.filter(t=>!isClosed(t));
   return {
     open:open.length,
-    overdue:open.filter(t=>t.due&&t.due<t0).length,
+    overdue:open.filter(t=>isLate(t,t0)).length,
     week:open.filter(t=>t.due&&diffDays(t.due,t0)>=0&&diffDays(t.due,t0)<=7).length,
     review:open.filter(t=>stageOf(t.status)==='internal_review').length,
     revisions:open.filter(t=>stageOf(t.status)==='revisions').length
@@ -5772,7 +5777,7 @@ function renderSide(){queueMicrotask(renderOffline);
   let html=`<button type="button" class="icon-btn side-toggle" data-act="side-mini" aria-label="${u.sideMini?'Expand sidebar':'Collapse sidebar'}" title="${u.sideMini?'Expand sidebar':'Collapse sidebar'}">${I.left}</button><button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Today">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
   <div class="side-scroll">${(()=>{if(!S.ready)return '';const t0=today(),op=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)),onT=['archived','activity','trash'].includes(u.tab)?'archived':u.tab;
     const tile=(tab,label,icon,n,col)=>`<button type="button" class="ap-tile ${onT===tab?'on':''}" data-act="nav" data-tab="${tab}" style="--tc:${col}"><span class="ap-ti">${icon}</span><b>${n}</b><span class="ap-tl">${label}</span></button>`;
-    return `<div class="ap-tiles">${tile('overview','Today',AP_IC.today,op.filter(t=>t.due&&t.due<=t0).length,'var(--accent)')}${tile('calendar','Calendar',AP_IC.cal,op.filter(t=>t.due).length,'var(--red)')}${tile('inbox','Inbox',AP_IC.inbox,inboxN,'var(--indigo)')}${tile('archived','Done',AP_IC.done,archived().length,'var(--grey)')}</div>`})()}<nav class="nav ap-mini-nav" aria-label="Main">${nv('overview','Today',V2_IC.today,S.ready?allOpen:'')}${nv('calendar','Calendar',I.cal)}${nv('inbox','Inbox',V2_IC.inbox,inboxN)}${nv('archived','Done',V2_IC.done)}</nav>
+    return `<div class="ap-tiles">${tile('overview','Today',AP_IC.today,op.filter(t=>t.due===t0||isLate(t,t0)).length,'var(--accent)')}${tile('calendar','Calendar',AP_IC.cal,op.filter(t=>t.due).length,'var(--red)')}${tile('inbox','Inbox',AP_IC.inbox,inboxN,'var(--indigo)')}${tile('archived','Done',AP_IC.done,archived().length,'var(--grey)')}</div>`})()}<nav class="nav ap-mini-nav" aria-label="Main">${nv('overview','Today',V2_IC.today,S.ready?allOpen:'')}${nv('calendar','Calendar',I.cal)}${nv('inbox','Inbox',V2_IC.inbox,inboxN)}${nv('archived','Done',V2_IC.done)}</nav>
   <div class="v2-jh"><span>My Jobs</span><button type="button" class="icon-btn" data-act="new-job" title="New job" aria-label="New job">${I.plus}</button></div>
   <nav class="nav jobs" id="nav-jobs" aria-label="Jobs">`;
   for(const j of jobsSorted()){
@@ -5841,7 +5846,7 @@ function renderMain(){
     $('#head').innerHTML=`<nav class="crumbs" aria-label="Breadcrumb">${crumbs.join('<i aria-hidden="true">›</i>')}</nav>`;
     const w=workOf(job),when=[daysLabel(w.days),w.shiftStart&&w.shiftEnd?`${fmtClock(w.shiftStart)}–${fmtClock(w.shiftEnd)}`:''].filter(Boolean).join(', ');
     const jsub=[job.type==='agency'?'Agency':'Direct client',job.type==='agency'?`${cl.length} client${cl.length===1?'':'s'}`:'',when].filter(Boolean).map(esc).join('<i>·</i>');
-    const openN=live().filter(t=>t.jobId===job.id&&!isClosed(t)).length,lateN=live().filter(t=>t.jobId===job.id&&!isClosed(t)&&t.due&&t.due<today()).length;
+    const openN=live().filter(t=>t.jobId===job.id&&!isClosed(t)).length,lateN=live().filter(t=>t.jobId===job.id&&isLate(t)).length;
     const csHead=`<header class="v2-jhead"><button type="button" class="v2-jname" data-act="edit-job" data-id="${job.id}" title="Edit job" aria-label="Edit ${esc(job.name)}">${apJob(job,'ap-big')}<span><b class="h1-name">${esc(job.name)}</b><small>${jsub}</small></span></button><p class="v2-jcount">${lateN?`<b class="late">${lateN} late</b><i>·</i>`:''}${openN} open</p></header>`;
     $('#subnav').innerHTML=csHead+`<div class="pane-tabs v2-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${TASKS?'on':''}" aria-selected="${TASKS}" data-act="pane" data-pane="tasks">Tasks</button><button role="tab" class="${TASKS?'':'on'}" aria-selected="${!TASKS}" data-act="pane" data-pane="about">About</button>${TASKS?`<div class="seg pt-views" role="tablist" aria-label="View">${[['list','List'],['board','Board'],['calendar','Calendar']].map(([v,l])=>`<button type="button" data-act="view" data-view="${v}" class="${u.view===v?'on':''}" aria-selected="${u.view===v}">${l}</button>`).join('')}</div>`:''}</div>`;
     {const ct=job.type==='agency'&&TASKS?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All<em>${TASKS?openN:''}</em></button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}" draggable="true" data-ctab="${c.id}" title="Drag to reorder">${esc(c.name)}<em>${TASKS?live().filter(t=>t.clientId===c.id&&!isClosed(t)).length||'':''}</em></button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:'';$('#tb-clients').innerHTML=TASKS?ct:'';if(!TASKS)$('#subnav').insertAdjacentHTML('beforeend',ct)}
@@ -5903,7 +5908,7 @@ if('launchQueue' in window)window.launchQueue.setConsumer(p=>{if(!p.targetURL||!
 let BADGE_N=-1;
 function appBadge(){
   if(!('setAppBadge' in navigator)||!S.ready)return;
-  const t0=today(),n=live().filter(t=>!isClosed(t)&&t.due&&t.due<=t0).length;
+  const t0=today(),n=live().filter(t=>!isClosed(t)&&(t.due===t0||isLate(t,t0))).length;
   if(n===BADGE_N)return;BADGE_N=n;
   (n?navigator.setAppBadge(n):navigator.clearAppBadge()).catch(()=>{});
 }
@@ -6090,7 +6095,7 @@ function allClearHtml(){
   if(!pref('allClear')||!jobsSorted().length)return '';
   const t0=today(),open=live().filter(t=>!isClosed(t));
   if(!open.length&&!live().length)return '';
-  if(open.some(t=>t.due&&t.due<=t0))return '';
+  if(open.some(t=>t.due===t0||isLate(t,t0)))return '';
   if(lsGet('cutroom.clear')===t0)return '';
   const next=open.filter(t=>t.due).sort((a,b)=>a.due.localeCompare(b.due))[0];
   return `<section class="all-clear" aria-label="All clear"><svg class="ac-art" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="56" rx="20" ry="4" fill="currentColor" opacity=".12"/><path d="M22 56h20l-3 -14H25z" fill="var(--st-rev)" opacity=".85"/><path d="M32 42c0-10 0-16 0-22" stroke="var(--st-done)" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M32 30c-8-1-12-6-12-12 7 0 12 4 12 12zM32 24c7-1 11-6 11-12-7 0-11 5-11 12zM32 36c6 0 10-3 11-8-6 0-10 3-11 8z" fill="var(--st-done)"/></svg>
@@ -6120,13 +6125,13 @@ function homeTasks(){const jf=hmJob(),q=(S.ui.q||'').trim().toLowerCase();
   return live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)&&(jf==='all'||t.jobId===jf)&&(!q||[t.name,S.clients[t.clientId]?.name,S.jobs[t.jobId]?.name,...(t.tags||[])].some(x=>String(x||'').toLowerCase().includes(q))))}
 const isActive=t=>ACTIVE_STAGES.has(stageOf(stOf(t)));
 function homeParts(ts){const t0=today(),w=addDays(t0,7),byDue=(a,b)=>a.due.localeCompare(b.due)||PRIO_RANK[a.priority||'normal']-PRIO_RANK[b.priority||'normal'],byAge=(a,b)=>(assignedOn(a)||'9').localeCompare(assignedOn(b)||'9');
-  return {late:ts.filter(t=>t.due&&t.due<t0).sort(byDue),today:ts.filter(t=>t.due===t0).sort(byDue),active:ts.filter(t=>!t.due&&isActive(t)).sort(byAge),idle:ts.filter(t=>!t.due&&!isActive(t)).sort(byAge),
+  return {late:ts.filter(t=>isLate(t,t0)).sort(byDue),today:ts.filter(t=>t.due===t0).sort(byDue),active:ts.filter(t=>!t.due&&isActive(t)).sort(byAge),idle:ts.filter(t=>!t.due&&!isActive(t)).sort(byAge),
     week:ts.filter(t=>t.due&&t.due>t0&&t.due<=w).sort(byDue),busy:ts.filter(isActive).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'))}}
 function upNow(ts){
   const q=upNextList().filter(t=>ts.includes(t)&&!UPNOW_SKIP.has(t.id));if(q.length)return {t:q[0],why:`Up next #${upNextPos(q[0])}`};
   const p=homeParts(ts),t=[...p.late,...p.today,...p.active,...p.week].find(t=>!UPNOW_SKIP.has(t.id));if(!t)return null;
-  const t0=today(),d=t.due?-diffDays(t.due,t0):0;
-  return {t,late:d>0,why:d>0?`${d} day${d===1?'':'s'} late`:t.due===t0?'Due today':!t.due?'In progress':`Due ${fmtRel(t.due,true).toLowerCase()}`};
+  const t0=today(),d=isLate(t,t0)?-diffDays(t.due,t0):0;
+  return {t,late:d>0,why:d>0?`${d} day${d===1?'':'s'} late`:t.due===t0?'Due today':!t.due?'In progress':`Due ${fmtRel(t.due,isLate(t)).toLowerCase()}`};
 }
 function homeGreet(){
   const d=new Date(),day=`${WEEKDAY_FULL[d.getDay()]}, ${absDate(today()).replace(/ ’\d+$/,'')}`,sea=pref('seasonal')?seasonNote():'';
@@ -6144,7 +6149,7 @@ function homeRow(t,extra){
     <span class="hm-name"><span class="hm-t">${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</span>${where?`<small>${esc(where)}</small>`:''}</span>
     <span class="hm-chips">${nr?`<span class="chip nr-chip" title="${nr} comment${nr===1?'':'s'} waiting for your reply">${rpIc}${nr}</span>`:''}${nn?`<span class="chip notes-chip" title="${nn} open update${nn===1?'':'s'}">${I.chat}${nn}</span>`:''}${(t.tags||[]).slice(0,2).map(x=>tagChip(x)).join('')}</span>
     <span class="qst" style="--c:${esc(stColor(st))}"><i></i>${esc(stLabel(st))}</span>
-    ${extra??`<span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,true):'No date'}</span>`}</div>`}
+    ${extra??`<span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,isLate(t)):'No date'}</span>`}</div>`}
 const setDateBtn=t=>`<span class="btn sm hm-set dedit" data-act="row-due-pick">Set date<input type="date" class="cell-date" data-act="row-due" data-id="${t.id}" value="" tabindex="-1" aria-label="Due date for ${esc(t.name||'task')}"></span>`;
 const agoTxt=iso=>{const m=(Date.now()-new Date(iso))/6e4;if(m<1)return 'just now';if(m<60)return `${Math.floor(m)}m ago`;if(m<24*60)return `${Math.floor(m/60)}h ago`;const d=ymd(new Date(iso));return d===ymd(new Date(Date.now()-864e5))?'yesterday':absDate(d)};
 function homeSeen(){return +(lsGet('cutroom.homeseen')||0)||Date.now()-3*864e5}
@@ -6197,7 +6202,7 @@ let HM_OPEN=new Set();
 function csGroups(ts){
   const t0=today(),t1=addDays(t0,1),w=addDays(t0,7),q=upNextList().filter(t=>ts.includes(t)),r=ts;
   const byDue=(a,b)=>a.due.localeCompare(b.due)||PRIO_RANK[a.priority||'normal']-PRIO_RANK[b.priority||'normal'],byAge=(a,b)=>(assignedOn(a)||'9').localeCompare(assignedOn(b)||'9');
-  return [['queue','Up next',q],['late','Late',r.filter(t=>t.due&&t.due<t0).sort(byDue)],['today','Due today',r.filter(t=>t.due===t0).sort(byDue)],['tom','Tomorrow',r.filter(t=>t.due===t1).sort(byDue)],
+  return [['queue','Up next',q],['late','Late',r.filter(t=>isLate(t,t0)).sort(byDue)],['past','Past due, out for review',r.filter(t=>pastDue(t,t0)&&!isLate(t,t0)).sort(byDue)],['today','Due today',r.filter(t=>t.due===t0).sort(byDue)],['tom','Tomorrow',r.filter(t=>t.due===t1).sort(byDue)],
     ['week','Next 7 days',r.filter(t=>t.due&&t.due>t1&&t.due<=w).sort(byDue)],['later','Later',r.filter(t=>t.due&&t.due>w).sort(byDue)],
     ['active','In progress, no date',r.filter(t=>!t.due&&isActive(t)).sort(byAge)],['nodate','No date',r.filter(t=>!t.due&&!isActive(t)).sort(byAge)]];
 }
@@ -6209,10 +6214,10 @@ function csRow(t,n,o={}){
   const acts=o.now?`<span class="cs-acts"><span class="cs-why ${o.now.late?'late':''}">${/^Up next/.test(o.now.why)?'Up now':'Up now · '+esc(o.now.why)}</span><button type="button" class="btn sm ${on?'on':''}" data-act="hn-focus" data-id="${t.id}">${TOMATO_IC}${on?'Pause':'Focus'}</button><button type="button" class="btn sm primary" data-act="hn-done" data-id="${t.id}">Mark done</button><button type="button" class="btn sm ghost" data-act="hn-skip" data-id="${t.id}" title="Show the next one">Not now</button></span>`:'';
   const a=o.nodate?ageDays(t):null;
   const tags=o.nodate?(a!=null&&a>=AGE_SHOW?`<span class="hm-age ${a>=AGE_OLD?'old':''}" title="Assigned ${a} day${a===1?'':'s'} ago">${a}d</span>`:''):`${t.format?`<i>${esc(t.format)}</i>`:''}${t.revision?`<i title="Revision round">R${t.revision}</i>`:''}${cl.length?`<span>${cl.filter(x=>x.done).length}/${cl.length}</span>`:''}`;
-  const due=o.nodate?setDateBtn(t):`<span class="cs-due ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,true):'No date'}</span>`;
+  const due=o.nodate?setDateBtn(t):`<span class="cs-due ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,isLate(t)):'No date'}</span>`;
   return `<div class="cs-r ${o.now?'cs-now':''}" data-act="open" data-id="${t.id}" tabindex="0" style="--jc:${esc(j.color||'var(--accent)')}">
     ${apCk(t)}<span class="cs-sl">${o.grip?`<span class="un-grip" data-stop aria-hidden="true" title="Drag to reorder">${GRIP_IC}</span>`:''}${o.now?'Now':n}</span><span class="cs-bar"></span>
-    <span class="cs-nm"><b>${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</b><small>${o.nodate||!t.due?'':`<span class="ap-due ${dueClass(t)}">${fmtRel(t.due,true)}</span>`}<span class="ap-jd" style="--jc:${esc(j.color||'var(--accent)')}"></span>${esc(where||j.name)}${chips?`<span class="cs-chips">${chips}</span>`:''}</small></span>
+    <span class="cs-nm"><b>${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</b><small>${o.nodate||!t.due?'':`<span class="ap-due ${dueClass(t)}">${fmtRel(t.due,isLate(t))}</span>`}<span class="ap-jd" style="--jc:${esc(j.color||'var(--accent)')}"></span>${esc(where||j.name)}${chips?`<span class="cs-chips">${chips}</span>`:''}</small></span>
     <span class="cs-st" style="--c:${esc(stColor(st))}"><i></i>${esc(stLabel(st))}</span><span class="cs-tg">${tags}</span>
     <span class="cs-end">${due}${o.grip?`<button class="icon-btn" data-act="un-rm" data-id="${t.id}" data-stop title="Remove from Up next" aria-label="Remove from Up next">${I.x}</button>`:''}</span>${acts}</div>`;
 }
@@ -6227,8 +6232,8 @@ function homeView(){
   const gr=homeGreet(),wait=inboxGroups().filter(g=>g.wait).length,d=new Date();
   const kick=[pref('greeting')?gr.h1:'',WEEKDAY_FULL[d.getDay()],pref('seasonal')?seasonNote():''].filter(Boolean).join(' · ');
   const tl=(k,n,l,cls='')=>`<button type="button" class="cs-t ${cls}" data-act="cs-jump" data-g="${k}"><b>${n}</b><span>${l}</span></button>`;
-  const lateN=all.filter(t=>t.due&&t.due<t0&&(jf==='all'||t.jobId===jf)).length;
-  const lateAll=ts.filter(t=>t.due&&t.due<t0).length,todayN=ts.filter(t=>t.due===t0).length;
+  const lateN=all.filter(t=>isLate(t,t0)&&(jf==='all'||t.jobId===jf)).length;
+  const lateAll=ts.filter(t=>isLate(t,t0)).length,todayN=ts.filter(t=>t.due===t0).length;
   const sum=[lateAll?`<b class="late">${lateAll} late</b>`:'',`<b>${todayN} due today</b>`,`${ts.length} open across ${new Set(ts.map(t=>t.jobId)).size} job${new Set(ts.map(t=>t.jobId)).size===1?'':'s'}`].filter(Boolean).join('<i>·</i>');
   const head=`<header class="v2-head ap-lt"><div><h1>Today</h1><p class="v2-sum">${esc(WEEKDAY_FULL[d.getDay()])}, ${esc(d.toLocaleDateString(pref('dateFmt')==='dm'?'en-GB':'en-US',{month:'long',day:'numeric'}))}${[lateAll?`<b class="late">${lateAll} late</b>`:'',todayN?`${todayN} due today`:'',`${ts.length} open`].filter(Boolean).map(x=>'<i>·</i>'+x).join('')}</p></div><b class="ap-cnt">${lateAll+todayN}</b><button type="button" class="btn primary v2-new" data-act="new-task" title="New task (N)">${I.plus}New Task</button></header>`;
   const jobsRow='';
@@ -6251,7 +6256,7 @@ function calPageView(){
   const list=all.filter(t=>jf==='all'||t.jobId===jf);
   const open=all.filter(t=>!isClosed(t)),nod=list.filter(t=>!isClosed(t)&&!t.due).sort((a,b)=>(assignedOn(a)||'9').localeCompare(assignedOn(b)||'9'));
   const tray=u.ctray!==false&&nod.length>0;
-  const chip=(id,label,mark,ts)=>{const late=ts.filter(t=>t.due&&t.due<t0).length;return `<button type="button" class="cj-chip ${jf===id?'on':''}" data-act="cal-job" data-j="${id}" aria-pressed="${jf===id}">${mark}${esc(label)}<small>${ts.length}${late?` · <b>${late} late</b>`:''}</small></button>`};
+  const chip=(id,label,mark,ts)=>{const late=ts.filter(t=>isLate(t,t0)).length;return `<button type="button" class="cj-chip ${jf===id?'on':''}" data-act="cal-job" data-j="${id}" aria-pressed="${jf===id}">${mark}${esc(label)}<small>${ts.length}${late?` · <b>${late} late</b>`:''}</small></button>`};
   return `<div class="cal-jobs">${chip('all','All jobs','',open)}${jobsSorted().map(j=>chip(j.id,j.name,`<span class="hm-dot" style="--jc:${esc(j.color||'var(--accent)')}"></span>`,open.filter(t=>t.jobId===j.id))).join('')}
       <span class="cj-sp"></span>${nod.length?`<button type="button" class="btn sm ${tray?'on':''}" data-act="cal-tray" aria-pressed="${tray}">No date <em>${nod.length}</em></button>`:''}<button type="button" class="btn sm primary" data-act="new-task">${I.plus}New task</button></div>
     <div class="cal-wrap ${tray?'with-tray':''}"><div class="cal-main">${calendarView(list)}</div>${tray?`<aside class="cal-tray"><div class="ct-h"><b>No due date</b><span>${nod.length}</span><button type="button" class="icon-btn" data-act="cal-tray" title="Hide" aria-label="Hide the no date list">${I.x}</button></div><p class="hint">Drag a task onto a day to give it that due date.</p>
@@ -6340,7 +6345,7 @@ const rowHtml=(t,job,showJob)=>`<div class="row ${isClosed(t)?'done-row':''} ${d
         <div class="c-status" data-stop>${statusSelect(t,'row-status')}${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}" title="Move to Archived">${I.archive}Archive</button>`:''}</div>
         <div class="c-prio pedit" title="Change priority">${prioHtml(t.priority)}<select class="cell-sel" data-act="row-prio" data-id="${t.id}" aria-label="Priority">${PRIORITIES.map(p=>`<option value="${p.id}" ${(t.priority||'normal')===p.id?'selected':''}>${p.label}</option>`).join('')}</select></div>
         <div class="c-start date ${t.start?'':'none'}"${relTitle(t.start)}>${t.start?fmtRel(t.start):'—'}</div>
-        <div class="c-due date ${dueClass(t)} dedit" data-act="row-due-pick"${relTitle(t.due)||' title="Set due date"'}>${t.due?fmtRel(t.due,!isClosed(t)):'—'}<input type="date" class="cell-date" data-act="row-due" data-id="${t.id}" value="${esc(t.due||'')}" tabindex="-1" aria-label="Due date"></div>
+        <div class="c-due date ${dueClass(t)} dedit" data-act="row-due-pick"${relTitle(t.due)||' title="Set due date"'}>${t.due?fmtRel(t.due,isLate(t)):'—'}<input type="date" class="cell-date" data-act="row-due" data-id="${t.id}" value="${esc(t.due||'')}" tabindex="-1" aria-label="Due date"></div>
         <div class="c-links">${linkIcons(t)}</div></div>`;
 function listView(list,job){
   const showJob=!job;
@@ -6368,7 +6373,7 @@ function boardView(list,job){
     return `<div class="col" data-drop="${s.id}" style="--sc:${stColor(s.id)}"><div class="col-head"><span class="pill" ${pillStyle(s.id)}><span class="pl">${esc(s.label)}</span></span>${(s.stage||s.id)==='done'&&cards.length?`<button class="btn sm ghost" data-act="archive-all" data-status="${s.id}" title="Archive every task in Done">${I.archive}All</button>`:''}<span class="count">${cards.length}</span></div>
       ${cards.map(t=>`<div class="card ${SEL.has(t.id)?'picked':''} ${isClosed(t)?'is-done':''} ${dueClass(t)==='over'?'is-over':''}" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}" draggable="true" data-act="open" data-id="${t.id}" tabindex="0">
         <div class="card-top"><div class="mark-wrap">${SEL.size||SELMODE?'':apCk(t)}${selBox(t)}</div><div class="t-name" title="Double-click to rename">${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</div></div>${metaLine(t,job,!job)}${searchHit(t)}
-        <div class="card-foot"><span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,!isClosed(t)):'No date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
+        <div class="card-foot"><span class="date ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,isLate(t)):'No date'}</span>${t.priority&&t.priority!=='normal'?prioHtml(t.priority):''}${linkIcons(t)}</div>${isClosed(t)?`<button class="btn sm archive-btn" data-act="archive" data-id="${t.id}">${I.archive}Archive</button>`:''}</div>`).join('')}
       </div>`;
   }).join('')}</div></div>`;
 }
@@ -6483,7 +6488,7 @@ function notifications(all){
   const steps=t=>{const c=t.checklist||[],left=c.filter(x=>!x.done).length;return left?`${left} of ${c.length} checklist step${c.length===1?'':'s'} left.`:''};
   for(const t of open){
     const nm=`“${t.name||'Untitled task'}”`;
-    if(t.due&&t.due<t0){const d=-diffDays(t.due,t0);out.push({key:`over:${t.id}:${t.due}`,rank:0,kind:'danger',icon:'warn',task:t,title:`${nm} is overdue`,body:`It was due ${d===1?'yesterday':d+' days ago'}.`})}
+    if(isLate(t,t0)){const d=-diffDays(t.due,t0);out.push({key:`over:${t.id}:${t.due}`,rank:0,kind:'danger',icon:'warn',task:t,title:`${nm} is overdue`,body:`It was due ${d===1?'yesterday':d+' days ago'}.`})}
     else if(t.due===t0)out.push({key:`today:${t.id}:${t.due}`,rank:1,kind:'warn',icon:'clock',task:t,title:`${nm} is due today`,body:steps(t)});
     else if(t.due&&diffDays(t.due,t0)===1)out.push({key:`tmrw:${t.id}:${t.due}`,rank:2,kind:'warn',icon:'clock',task:t,title:`${nm} is due tomorrow`,body:steps(t)});
     if(t.start===t0&&stageOf(t.status)==='not_started')out.push({key:`start:${t.id}:${t.start}`,rank:3,kind:'info',icon:'flag',task:t,title:`${nm} starts today`,body:"It's still Not started."});
@@ -7672,7 +7677,7 @@ function placeCat(){
 function catTick(){
   if(!CAT||!CAT.isConnected)return;
   catDraw();
-  if(S.ready){const t0=today(),open=live().filter(t=>!isClosed(t)),over=open.filter(t=>t.due&&t.due<t0).length;CAT_OVER=over;
+  if(S.ready){const t0=today(),open=live().filter(t=>!isClosed(t)),over=open.filter(t=>isLate(t,t0)).length;CAT_OVER=over;
     CAT.classList.toggle('worried',over>0);CAT.classList.toggle('happy',!over&&open.length>0&&!open.some(t=>t.due===t0));plantDraw();jarDraw();petDraw()}
   const T=pomoState(),now=Date.now(),focus=T.run==='running'&&T.mode==='focus',pm=T.run+'|'+T.mode;
   /* a focus session just ended and a break began: stretch, then nap through the break */
@@ -8151,7 +8156,7 @@ function stickerCheck(extra){
   if(!S.ready)return;
   const a=appSettings(),have=a.stickers||null,t0=today(),found={...stickerScan(),...(extra||{})},p={};
   const run=a.clearRun||{};
-  if(run.d!==t0){const over=live().some(t=>!isClosed(t)&&t.due&&t.due<t0),n=over?0:(run.d===addDays(t0,-1)?(+run.n||0)+1:1);p.clearRun={d:t0,n}}
+  if(run.d!==t0){const over=live().some(t=>isLate(t,t0)),n=over?0:(run.d===addDays(t0,-1)?(+run.n||0)+1:1);p.clearRun={d:t0,n}}
   if((p.clearRun||run).n>=7)found.clean7=t0;
   const fresh=Object.keys(found).filter(k=>STK_BY[k]&&!(have&&have[k]));
   if(fresh.length)p.stickers={...(have||{}),...Object.fromEntries(fresh.map(k=>[k,found[k]]))};
@@ -9973,7 +9978,7 @@ document.addEventListener('click',e=>{
     case 'notes-close': notesOpen=false;renderBell();break;
     case 'na-filter': NF=el.dataset.f;renderBell();if(u.tab==='inbox')render();break;
     case 'inb-handled': {const t=S.tasks[el.dataset.id];if(t){nrDone(t,null);NS.read[el.dataset.key]=1;notifications().forEach(n=>{if(/^cum?:/.test(n.key)&&n.task?.id===t.id){NS.hidden[n.key]=1;NS.read[n.key]=1}});saveNotes();toast('Marked as handled')}render();break}
-    case 'late-today': {const t0=today(),ts=homeTasks().filter(t=>t.due&&t.due<t0),was=ts.map(t=>[t.id,t.due]);
+    case 'late-today': {const t0=today(),ts=homeTasks().filter(t=>isLate(t,t0)),was=ts.map(t=>[t.id,t.due]);
       ts.forEach(t=>{patch('tasks',t.id,{due:t0});logAct('date',`Due date set to ${fmtDate(t0)}`,{task:t})});
       toast(`Moved ${ts.length} late task${ts.length===1?'':'s'} to today`,{label:'Undo',fn:()=>{was.forEach(([id,d])=>patch('tasks',id,{due:d}));render()}});render();break}
     case 'row-next': {const t=S.tasks[el.dataset.id],n=t&&nextStatus(t);if(n){setStatus(t.id,n.id);render();if(S.ui.openTask===t.id)renderDrawer()}break}
