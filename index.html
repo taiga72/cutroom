@@ -4144,7 +4144,6 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap .inb-news .ib-it{border-radius:0;padding:11px 0;border-bottom:.5px solid var(--line-strong)}
 .ap .inb-news .ib-it:last-of-type{border-bottom:0}
 }
-@media (min-width:821px){.ap .inb-news{display:none}}
 /* phone Up next page: one hairline per row (name and date/× were on different rows), date once; phone Calendar: no No-date tray (user's ask) */
 @media (max-width:820px){
 .ap .upn-cs .cs-r>.ap-ck,.ap .upn-cs .cs-r .cs-nm,.ap .upn-cs .cs-r .cs-end{grid-row:1}
@@ -4268,6 +4267,20 @@ body.ps-on,body.ps-on *{cursor:grabbing!important;user-select:none!important;-we
 .ap .v2-more .section-title{margin:0 0 8px;padding-left:0!important;padding-right:0!important}
 .ap .v2-more .xname,.ap .v2-more>div:has(>.section-title){padding-left:0!important;padding-right:0!important;margin-left:0!important;margin-right:0!important}
 .ap .v2-more>.props2 .prio-ctl select{color:inherit!important}
+/* Inbox groups (both screen sizes): grey grouped cards with a small uppercase heading */
+.ap .inb-news{background:var(--grp);border-radius:16px;padding:14px 16px 6px;margin:18px 0 0}
+.ap .inb-news .hm-sh{font:600 calc(12px*var(--ts)) var(--body)!important;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)!important;margin:0 0 4px;border:0!important;padding:0!important}
+.ap .inb-news .hm-sh em{font-style:normal;color:var(--faint)}
+.ap .inb-news .ib-it{border-radius:0;padding:11px 0;border-bottom:.5px solid var(--line-strong)}
+.ap .inb-news .ib-it:last-of-type,.ap .inb-alerts .inb-it:last-child{border-bottom:0}
+.ap .inb-alerts .inb-list{margin:0}
+/* touch drag (phones): the lifted task follows the finger */
+.td-ghost{box-shadow:0 12px 32px rgba(0,0,0,.25)!important;border-radius:12px;background:var(--card,var(--surface))!important;opacity:.96;transition:none!important}
+.td-src{opacity:.35}
+body.td-on{user-select:none;-webkit-user-select:none}
+.ap .cal-drop{background:color-mix(in srgb,var(--accent) 14%,transparent)!important}
+/* every dropdown in a dialog or form uses the app's chevron (Invoice defaults still showed the browser's arrow) */
+.ap :is(#modal,.ivd-body,.inv-form) select:not(.pill){-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23888' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 12px center!important;background-size:12px!important;padding-right:32px!important}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
@@ -5867,7 +5880,7 @@ function renderSide(){queueMicrotask(renderOffline);
   document.body.classList.toggle('side-mini',!!u.sideMini);
   const tt=n=>u.sideMini?` title="${n}"`:'';
   /* Inbox count: the ClickUp entries on phones (what the phone Inbox lists), unread alerts on desktop (user's pick) */
-  const inboxN=(()=>{try{return S.ready?(narrow.matches?inboxGroups().length:inboxList().filter(n=>!NS.read[n.key]).length):0}catch(e){return 0}})();
+  const inboxN=inboxCount();
   const nv=(tab,label,icon,count,act='nav')=>`<button class="nav-item ${(u.tab===tab||tab==='archived'&&['activity','trash'].includes(u.tab))&&act==='nav'?'on':''}" data-act="${act}" data-tab="${tab}"${tt(label)}>${icon}<span class="name">${label}</span><span class="count">${count||''}</span></button>`;
   let html=`<button type="button" class="icon-btn side-toggle" data-act="side-mini" aria-label="${u.sideMini?'Expand sidebar':'Collapse sidebar'}" title="${u.sideMini?'Expand sidebar':'Collapse sidebar'}">${I.left}</button><button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Today">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
   <div class="side-scroll">${(()=>{if(!S.ready)return '';const t0=today(),op=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)),onT=['archived','activity','trash'].includes(u.tab)?'archived':u.tab;
@@ -5942,7 +5955,7 @@ function renderMain(){
     const w=workOf(job),when=[daysLabel(w.days),w.shiftStart&&w.shiftEnd?`${fmtClock(w.shiftStart)}–${fmtClock(w.shiftEnd)}`:''].filter(Boolean).join(', ');
     const jsub=[job.type==='agency'?'Agency':'Direct client',job.type==='agency'?`${cl.length} client${cl.length===1?'':'s'}`:'',when].filter(Boolean).map(esc).join('<i>·</i>');
     const openN=live().filter(t=>t.jobId===job.id&&!isClosed(t)).length,lateN=live().filter(t=>t.jobId===job.id&&isLate(t)).length;
-    const csHead=`<header class="v2-jhead"><button type="button" class="v2-jname" data-act="edit-job" data-id="${job.id}" title="Edit job" aria-label="Edit ${esc(job.name)}">${apJob(job,'ap-big')}<span><b class="h1-name">${esc(job.name)}</b><small>${jsub}</small></span></button><p class="v2-jcount">${lateN?`<b class="late">${lateN} late</b><i>·</i>`:''}${openN} open</p></header>`;
+    const csHead=`<header class="v2-jhead"><button type="button" class="v2-jname" data-act="edit-job" data-id="${job.id}" title="Edit job" aria-label="Edit ${esc(job.name)}">${apJob(job,'ap-big')}<span><b class="h1-name">${esc(job.name)}</b><small>${jsub}</small></span></button>${lateN?`<p class="v2-jcount"><b class="late">${lateN} late</b></p>`:''}</header>`;
     $('#subnav').innerHTML=csHead+`<div class="pane-tabs v2-tabs" role="tablist" aria-label="Job sections"><button role="tab" class="${TASKS?'on':''}" aria-selected="${TASKS}" data-act="pane" data-pane="tasks">Tasks</button><button role="tab" class="${TASKS?'':'on'}" aria-selected="${!TASKS}" data-act="pane" data-pane="about">About</button>${TASKS?`<div class="seg pt-views" role="tablist" aria-label="View">${[['list','List'],['board','Board'],['calendar','Calendar']].map(([v,l])=>`<button type="button" data-act="view" data-view="${v}" class="${u.view===v?'on':''}" aria-selected="${u.view===v}">${l}</button>`).join('')}</div>`:''}</div>`;
     {const ct=job.type==='agency'&&TASKS?`<div class="client-tabs" role="tablist" aria-label="Clients"><button class="${u.client==='all'?'on':''}" data-act="nav" data-tab="${job.id}">All<em>${TASKS?openN:''}</em></button>${cl.map(c=>`<button class="${u.client===c.id?'on':''}" data-act="nav" data-tab="${job.id}" data-client="${c.id}" draggable="true" data-ctab="${c.id}" title="Drag to reorder">${esc(c.name)}<em>${TASKS?live().filter(t=>t.clientId===c.id&&!isClosed(t)).length||'':''}</em></button>`).join('')}<button class="add" data-act="edit-job" data-id="${job.id}">+ Add client</button></div>`:'';$('#tb-clients').innerHTML=TASKS?ct:'';if(!TASKS)$('#subnav').insertAdjacentHTML('beforeend',ct)}
   }
@@ -6077,7 +6090,7 @@ function renderTabbar(){
   const e=$('#tabbar');if(!e)return;const u=S.ui,cal=u.view==='calendar'&&!['inbox','archived','activity','trash','help','resume','upnext'].includes(u.tab);
   const b=(act,label,icon,on,extra='',short=label)=>`<button type="button" data-act="${act}" class="${on?'on':''} ${extra} tb-${act.slice(3)}" aria-label="${label}" ${on?'aria-current="page"':''}>${icon}<span>${short}</span></button>`;
   const busy=notesOpen||UPN;
-  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Today',V2_IC.today,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Inbox',V2_IC.inbox+(()=>{const n=S.ready?inboxGroups().length:0;return n?`<i class="tb-badge">${n>99?'99+':n}</i>`:''})(),notesOpen||u.tab==='inbox','','Inbox')+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-upnext','Up next',UP_IC+(()=>{const n=upNextList().length;return n?`<i class="tb-badge tb-cnt">${n}</i>`:''})(),UPN)}</div>`
+  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Today',V2_IC.today,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Inbox',V2_IC.inbox+(()=>{const n=inboxCount();return n?`<i class="tb-badge">${n>99?'99+':n}</i>`:''})(),notesOpen||u.tab==='inbox','','Inbox')+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-upnext','Up next',UP_IC+(()=>{const n=upNextList().length;return n?`<i class="tb-badge tb-cnt">${n}</i>`:''})(),UPN)}</div>`
     +`<button type="button" data-act="tb-search" class="tb-search" aria-label="Search" title="Search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 14 14"/></svg></button>`
     +`<button type="button" data-act="tb-plus" class="tb-fab ${PLUS?'on':''}" aria-label="New" aria-expanded="${PLUS}" title="New task, new job or focus timer">${I.plus}</button>`;
 }
@@ -6132,12 +6145,13 @@ document.addEventListener('contextmenu',e=>{
 /* long press on touch screens */
 let lpT=null,lpAt=null,lpFired=false;
 document.addEventListener('touchstart',e=>{
-  const r=e.target.closest?.(CTX_SEL);if(!r||e.touches.length>1||e.target.closest('input,textarea,select,a,button,.un-grip'))return;
+  const r=e.target.closest?.(CTX_SEL),bt=e.target.closest?.('button');if(!r||e.touches.length>1||e.target.closest('input,textarea,select,a,.un-grip,[data-sort-grip]')||(bt&&bt!==r))return;
   const p=e.touches[0];lpAt={x:p.clientX,y:p.clientY};lpFired=false;clearTimeout(lpT);
-  lpT=setTimeout(()=>{lpFired=true;haptic(12);openCtx(r.dataset.id,lpAt.x,lpAt.y)},480);
+  lpT=setTimeout(()=>{lpFired=true;haptic(12);if(tdCan(r))tdLift(r,lpAt);else openCtx(r.dataset.id,lpAt.x,lpAt.y)},480);
 },{passive:true});
 document.addEventListener('touchmove',e=>{if(!lpT||!lpAt)return;const p=e.touches[0];if(Math.hypot(p.clientX-lpAt.x,p.clientY-lpAt.y)>10){clearTimeout(lpT);lpT=null}},{passive:true});
-document.addEventListener('touchend',e=>{clearTimeout(lpT);lpT=null;if(lpFired){e.preventDefault();lpFired=false}});
+document.addEventListener('touchend',e=>{clearTimeout(lpT);lpT=null;if(lpFired){e.preventDefault();lpFired=false;tdEnd(e)}});
+document.addEventListener('touchcancel',()=>{if(TD)tdEnd(null,true)});
 window.addEventListener('scroll',e=>{if(CTX&&Date.now()-CTX.at>300&&!e.target.closest?.('#ctx'))closeCtx()},true);
 window.addEventListener('resize',()=>{if(CTX)closeCtx()});
 /* ================= Up next: your own queue across all jobs (task.upNext = sort key; empty = not queued) ================= */
@@ -6153,12 +6167,6 @@ function toggleUpNext(id){
 /* phones: Up next is its own tab in the bottom bar, a full page like Alerts */
 let UPN=false;
 /* the Up next page (desktop sidebar item; phones also have the bottom-bar tab) */
-function renderUpNextTab(){
-  const n=upNextList().length;
-  $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${UP_IC.replace('class="i"','class="i" style="width:28px;height:28px"')}Up next</h1><div class="sub">${n?`${n} task${n===1?'':'s'} queued across your jobs. Drag to reorder; finished tasks leave on their own.`:'Your own queue across every job.'}</div></div></div>`;
-  $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
-  $('#view').innerHTML=n?`<div class="upn-tab">${upNextStrip()}</div>`:`<div class="empty"><h3>Nothing queued yet</h3><p>Up next is your own to-do order across every job. Right-click a task and choose Up next, or use the queue icon at the top of a task, to line up what you'll work on next.</p></div>`;
-}
 function renderUpNextPage(){
   let e=$('#upnext-page');if(!e){e=document.createElement('div');e.id='upnext-page';e.className='upn-page';e.setAttribute('role','dialog');e.setAttribute('aria-label','Up next');document.body.appendChild(e)}
   const on=UPN&&narrow.matches;e.hidden=!on;if(!on){e.innerHTML='';sheetLock();return}
@@ -6167,19 +6175,8 @@ function renderUpNextPage(){
     ${n?`<div class="cs upn-cs">${csQueue(upNextList())}</div>`:`<p class="na-empty">Nothing queued yet. Press and hold a task and choose Add to Up next, or use the queue icon at the top of a task, to line up what you'll work on.</p>`}`;
   sheetLock();
 }
-function upNextStrip(){
-  const list=upNextList();if(!list.length)return '';
-  return `<section class="upnext"><h3>${UP_IC}Up next<span class="count">${list.length}</span><span class="un-hint">Drag to reorder</span></h3><ol class="un-list">${list.map((t,i)=>`<li class="un-row" draggable="true" data-un="${t.id}" data-act="open" data-id="${t.id}" tabindex="0" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}"><span class="un-grip" data-stop aria-hidden="true">${GRIP_IC}</span><span class="un-n">${i+1}</span>${taskMark(t)}<div class="pc-main"><b>${esc(t.name||'Untitled task')}</b><small>${esc([S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '))}</small></div><span class="pill" ${pillStyle(stOf(t))}><span class="pl">${esc(stLabel(stOf(t)))}</span></span><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):''}</span><button class="icon-btn" data-act="un-rm" data-id="${t.id}" data-stop title="Remove from Up next" aria-label="Remove from Up next">${I.x}</button></li>`).join('')}</ol></section>`;
-}
-let unDrag=null;
-function unMark(e){document.querySelectorAll('.un-row').forEach(x=>x.classList.remove('drop-before','drop-after'));const r=e.target.closest?.('.un-row');if(!r||r.dataset.un===unDrag)return null;const b=r.getBoundingClientRect(),after=e.clientY>b.top+b.height/2;r.classList.add(after?'drop-after':'drop-before');return {id:r.dataset.un,after}}
-document.addEventListener('dragstart',e=>{const r=e.target.closest?.('.un-row');if(!r)return;unDrag=r.dataset.un;r.classList.add('dragging');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',unDrag)}catch(x){}});
-document.addEventListener('dragover',e=>{if(unDrag&&e.target.closest?.('.un-list')){e.preventDefault();unMark(e)}});
-document.addEventListener('dragend',()=>{if(!unDrag)return;unDrag=null;document.querySelectorAll('.un-row').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'))});
 function unMove(id,m){const ids=upNextList().map(t=>t.id).filter(x=>x!==id);let i=ids.indexOf(m.id);if(i<0)return;if(m.after)i++;ids.splice(i,0,id);
   ids.forEach((tid,k)=>{if(S.tasks[tid].upNext!==(k+1)*1000)patch('tasks',tid,{upNext:(k+1)*1000})});render();if(UPN)renderUpNextPage()}
-document.addEventListener('drop',e=>{if(!unDrag)return;const m=unMark(e);const id=unDrag;unDrag=null;document.querySelectorAll('.un-row').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'));if(!m)return;e.preventDefault();unMove(id,m)});
-/* touch screens: drag a row by its grip (HTML drag and drop doesn't work with a finger) */
 const GRIP_IC='<svg viewBox="0 0 12 12" fill="currentColor"><circle cx="4" cy="2.5" r="1.1"/><circle cx="8" cy="2.5" r="1.1"/><circle cx="4" cy="6" r="1.1"/><circle cx="8" cy="6" r="1.1"/><circle cx="4" cy="9.5" r="1.1"/><circle cx="8" cy="9.5" r="1.1"/></svg>';
 
 /* Drag to reorder (user's ask): grab a row's grip with the mouse or a finger (pointer events, so desktop and phones
@@ -6212,10 +6209,6 @@ document.addEventListener('keydown',e=>{const g=e.target.closest?.('[data-sort-g
   const item=g.closest('[data-sort-item]'),list=item.closest('[data-sort]'),all=[...list.querySelectorAll('[data-sort-item]')],i=all.indexOf(item),j=e.key==='ArrowUp'?i-1:i+1;if(j<0||j>=all.length)return;
   const kind=list.dataset.sort,id=item.dataset.sortItem;psDrop(kind,id,{id:all[j].dataset.sortItem,after:j>i});
   requestAnimationFrame(()=>setTimeout(()=>{const l=document.querySelector(`[data-sort="${kind}"]`),n=l&&l.querySelectorAll('[data-sort-item]')[j];n?.querySelector('[data-sort-grip]')?.focus()},180))});
-let UNT=null;
-document.addEventListener('touchstart',e=>{const g=e.target.closest?.('.un-grip');if(!g||e.touches.length>1)return;const r=g.closest('.un-row');UNT={id:r.dataset.un,row:r,y:e.touches[0].clientY};unDrag=UNT.id;r.classList.add('dragging');r.style.pointerEvents='none';haptic(8)},{passive:true});
-document.addEventListener('touchmove',e=>{if(!UNT)return;e.preventDefault();const t=e.touches[0];UNT.row.style.transform=`translateY(${t.clientY-UNT.y}px)`;UNT.m=unMark({target:document.elementFromPoint(t.clientX,t.clientY),clientY:t.clientY})},{passive:false});
-document.addEventListener('touchend',()=>{const g=UNT;if(!g)return;UNT=null;unDrag=null;g.row.style.transform='';g.row.style.pointerEvents='';document.querySelectorAll('.un-row').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'));SHD_EAT=Date.now()+450;if(g.m)unMove(g.id,g.m)});
 /* "All clear": nothing overdue and nothing due today (Overview, Settings → Appearance; hidden for the day with ×) */
 function allClearHtml(){
   if(!pref('allClear')||!jobsSorted().length)return '';
@@ -6342,12 +6335,12 @@ function csRow(t,n,o={}){
   const tags=o.nodate?(a!=null&&a>=AGE_SHOW?`<span class="hm-age ${a>=AGE_OLD?'old':''}" title="Assigned ${a} day${a===1?'':'s'} ago">${a}d</span>`:''):`${t.format?`<i>${esc(t.format)}</i>`:''}${t.revision?`<i title="Revision round">R${t.revision}</i>`:''}${cl.length?`<span>${cl.filter(x=>x.done).length}/${cl.length}</span>`:''}`;
   const due=o.nodate?setDateBtn(t):`<span class="cs-due ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,isLate(t)):'No date'}</span>`;
   return `<div class="cs-r ${o.now?'cs-now':''}" data-act="open" data-id="${t.id}" tabindex="0" style="--jc:${esc(j.color||'var(--accent)')}">
-    ${apCk(t)}<span class="cs-sl">${o.grip?`<span class="un-grip" data-stop aria-hidden="true" title="Drag to reorder">${GRIP_IC}</span>`:''}${o.now?'Now':n}</span><span class="cs-bar"></span>
+    ${apCk(t)}<span class="cs-sl">${o.now?'Now':n}</span><span class="cs-bar"></span>
     <span class="cs-nm"><b>${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</b><small>${o.nodate||!t.due?'':`<span class="ap-due ${dueClass(t)}">${fmtRel(t.due,isLate(t))}</span>`}<span class="ap-jd" style="--jc:${esc(j.color||'var(--accent)')}"></span>${esc(where||j.name)}${chips?`<span class="cs-chips">${chips}</span>`:''}</small></span>
     <span class="cs-st" style="--c:${esc(stColor(st))}"><i></i>${esc(stLabel(st))}</span><span class="cs-tg">${tags}</span>
     <span class="cs-end">${due}${o.grip?`<button type="button" class="ps-grip" data-sort-grip data-stop title="Drag to reorder" aria-label="Drag to reorder ${esc(t.name||'task')} (arrow keys move it)">${GRIP_IC}</button><button class="icon-btn" data-act="un-rm" data-id="${t.id}" data-stop title="Remove from Up next" aria-label="Remove from Up next">${I.x}</button>`:''}</span>${acts}</div>`;
 }
-/* Up next under the Inbox (user's ask): the queue in order, dragged to reorder (unDrag / unMove / UNT) */
+/* Up next (user's ask): the queue in order, dragged to reorder by its grip (the shared [data-sort] engine → unMove) */
 function csQueue(q){
   return `<section class="cs-g cs-q" id="csg-queue"><div class="cs-gh"><b>Up next</b><span>${q.length}</span>${q.length>1?'<em>Drag to reorder</em>':''}</div>
     ${q.length?`<ol class="un-list cs-unl" data-sort="upnext">${q.map(t=>`<li class="un-row cs-un" data-un="${t.id}" data-sort-item="${t.id}">${csRow(t,'#'+upNextPos(t),{grip:true})}</li>`).join('')}</ol>`:`<p class="hm-empty" title="Right-click a task (press and hold on a phone) and choose Add to Up next">Nothing queued. Right-click a task to add it.</p>`}</section>`;
@@ -6369,7 +6362,7 @@ function homeView(){
     return `<section class="cs-g" id="csg-${k}"><div class="cs-gh ${k==='late'?'late':''}"><b>${label}</b><span>${list.length}</span>${k==='late'?`<button type="button" class="cs-gh-act" data-act="late-today">${list.length>1?'Move all to today':'Move to today'}</button>`:''}</div>
       ${rows}${list.length>lim||HM_OPEN.has(k)&&list.length>8?`<button type="button" class="hm-more" data-act="cs-more" data-g="${k}">${HM_OPEN.has(k)?'Show fewer':`Show ${list.length-lim} more`}</button>`:''}</section>`}).join('');
   const empty=`<p class="hm-empty">${ts.length?'':'No open tasks'+(jf==='all'?'':' in this job')+'. New tasks you add show up here, sorted by when they\'re due.'}</p>`;
-  return `<div class="cs v2-home">${head}${jobsRow}<div class="home cs-home"><div class="hm-main">${body||empty}<button type="button" class="ap-addrow" data-act="new-task">${AP_PLUS}New Task</button></div><aside class="hm-side">${csQueue(gd.queue)}<div id="csg-inbox">${inboxHtml()}</div></aside></div></div>`;
+  return `<div class="cs v2-home">${head}${jobsRow}<div class="home cs-home"><div class="hm-main">${body||empty}<button type="button" class="ap-addrow" data-act="new-task">${AP_PLUS}New Task</button></div><aside class="hm-side">${csQueue(gd.queue)}</aside></div></div>`;
 }
 /* ================= Calendar page (tab 'calendar') =================
    Job chips on top (S.ui.cjob) instead of the filters, and a No date tray (S.ui.ctray) whose tasks drag onto a day
@@ -6648,18 +6641,9 @@ function renderInbox(){
   const u=S.ui;
   $('#head').innerHTML='<div class="head head-ov head-cs"></div>';
   $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
-  /* phones: ClickUp comments already shown in "From ClickUp" at the top aren't repeated as alerts */
-  const news=inboxGroups(),inNews=new Set(news.filter(g=>g.t).map(g=>g.t.id));
-  /* phones: the Inbox page is only the ClickUp list (user's ask: the alerts below repeated it), with one Mark all read */
-  if(narrow.matches){
-    const nUnread=notifications().filter(n=>!NS.read[n.key]).length,canSeen=news.some(g=>!g.wait);
-    $('#view').innerHTML=`<div class="inb inb-ph">
-      <header class="v2-head"><div><h1>Inbox</h1>${news.length?`<p class="v2-sum"><b>${news.length} from ClickUp</b></p>`:''}</div>${news.length&&(canSeen||nUnread)?'<button type="button" class="btn" data-act="inb-allread">Mark all read</button>':''}</header>
-      ${news.length?`<section class="inb-news">${inboxHtml('From ClickUp',true)}</section>`:`<div class="empty"><h3>You're all caught up</h3><p>New ClickUp comments, replies and status changes show up here.</p></div>`}
-    </div>`;
-    return;
-  }
-  const list=inboxList().filter(n=>!(narrow.matches&&/^(cum?|nr):/.test(n.key)&&n.task&&inNews.has(n.task.id))),f=naSets(list),shown=f[NF]||list,unread=f.unread.length,kindOf=n=>n.key.split(':')[0],t0=today();
+  /* Inbox (same on phones and desktop, user's ask): "From ClickUp" first, then the other alerts (late, due today,
+     follow-ups). ClickUp comment / mention / needs-reply / new-task alerts are left out of Alerts: they're in From ClickUp. */
+  const news=inboxGroups(),list=inboxAlerts(),unread=list.filter(n=>!NS.read[n.key]).length,canSeen=news.some(g=>!g.wait),kindOf=n=>n.key.split(':')[0],t0=today();
   const act=n=>{const k=kindOf(n),t=n.task;
     if(k==='nr'&&t)return `<button type="button" class="btn sm" data-act="inb-handled" data-id="${t.id}" data-key="${esc(n.key)}">Mark handled</button>`;
     if(k==='over'&&t)return `<button type="button" class="btn sm" data-act="inb-push" data-id="${t.id}" data-key="${esc(n.key)}">Move to today</button>`;
@@ -6674,15 +6658,18 @@ function renderInbox(){
       <button type="button" class="inb-main" data-act="note-open" data-key="${esc(n.key)}"><b>${esc(n.title.replace(/[“”]/g,''))}</b>${n.body?`<span class="inb-body">${esc(n.body)}</span>`:''}
         <span class="inb-ctx">${j?`<i class="v2-sq" style="--jc:${esc(j.color||'var(--accent)')}"></i>`:''}${esc(NA_LBL[k]||'')}${n.sub?` · ${esc(n.sub)}`:''}</span></button>
       <div class="inb-r"><time>${esc(when(n))}</time><div class="inb-acts">${act(n)}<button type="button" class="icon-btn" data-act="note-snooze" data-key="${esc(n.key)}" title="Remind me tomorrow" aria-label="Remind me tomorrow"><svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="9" r="5.5"/><path d="M8 6.2V9l1.8 1.3M3 2.8 1.6 4.2M13 2.8l1.4 1.4"/></svg></button><button type="button" class="icon-btn" data-act="note-hide" data-key="${esc(n.key)}" title="Dismiss" aria-label="Dismiss">${I.x}</button></div></div></div>`};
-  const chips=[['all','All'],['unread','Unread'],...(f.replies.length?[['replies','Needs reply']]:[]),...(f.mentions.length?[['mentions','Mentions']]:[]),['deadlines','Deadlines'],['followups','Follow-ups']]
-    .map(([k,l])=>`<button type="button" class="${NF===k?'on':''}" data-act="na-filter" data-f="${k}">${l}<em>${f[k].length||''}</em></button>`).join('');
+  const sum=[news.length?`<b>${news.length} from ClickUp</b>`:'',unread?`${unread} unread alert${unread===1?'':'s'}`:''].filter(Boolean).join(' · ');
   $('#view').innerHTML=`<div class="inb">
-    <header class="v2-head"><div><h1>Inbox</h1><p class="v2-sum">${list.length?`${unread?`<b>${unread} unread</b><i>·</i>`:''}<span class="inb-lede">Comments that need you, deadlines and follow-ups. Dismiss one and it leaves.</span>`:'Nothing needs you right now.'}</p></div>${unread?'<button type="button" class="btn" data-act="notes-read">Mark all read</button>':''}</header>
-    ${news.length?`<section class="inb-news">${inboxHtml('From ClickUp')}</section>`:''}
-    <div class="inb-chips">${chips}</div>
-    ${shown.length?`<div class="inb-list">${shown.map(row).join('')}</div>`:`<div class="empty"><h3>${list.length?'Nothing in this filter':"You're all caught up"}</h3><p>${list.length?'Try All to see everything.':'Comments from ClickUp, late tasks, busy days and tasks that need a nudge show up here.'}</p>${list.length?'<button class="btn" data-act="na-filter" data-f="all">Show all</button>':''}</div>`}
+    <header class="v2-head"><div><h1>Inbox</h1>${sum?`<p class="v2-sum">${sum}</p>`:''}</div>${news.length||unread?'<button type="button" class="btn" data-act="inb-allread">Mark all read</button>':''}</header>
+    ${news.length?`<section class="inb-news">${inboxHtml('From ClickUp',true)}</section>`:''}
+    ${list.length?`<section class="inb-news inb-alerts"><div class="hm-sh">Alerts <em>${list.length}</em></div><div class="inb-list">${list.map(row).join('')}</div></section>`:''}
+    ${news.length||list.length?'':`<div class="empty"><h3>You're all caught up</h3><p>ClickUp comments, late tasks, busy days and tasks that need a nudge show up here.</p></div>`}
   </div>`;
 }
+/* the Inbox page's alerts: everything in inboxList() except what "From ClickUp" already shows */
+function inboxAlerts(){return inboxList().filter(n=>!/^(cum?|nr|cunew):/.test(n.key))}
+/* one Inbox count everywhere (sidebar tile, phone bottom bar): ClickUp entries + unread alerts */
+function inboxCount(){try{return S.ready?inboxGroups().length+inboxAlerts().filter(n=>!NS.read[n.key]).length:0}catch(e){return 0}}
 function renderBell(){
   const b=$('#bell');if(!b)return;
   let list=S.ready?inboxList():[];const unread=list.filter(n=>!NS.read[n.key]).length;
@@ -8551,6 +8538,9 @@ function exportCSV(jobId){
    Searchable topics; "Open …" buttons jump to the matching Settings section or page. Keep this list in step with new features. */
 const HELP_IC='<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.6 1.6c-.6.3-.9.7-.9 1.3M8 11.3h.01"/></svg>';
 const HELP=[
+  ['Tasks','Drag to reorder','Grab the ⋮⋮ grip on an Up next row, a checklist step or a status in Settings → Statuses and drag it up or down (arrow keys work too). On a phone, press and hold a list row, board card or calendar entry, then move your finger: drop it on another task or column to reorder or change its status, or on a calendar day to move its due date. Let go without moving to get the menu.',null],
+  ['Tasks','What counts as late','A task is late only when its due date has passed and it is Not started or In progress. Past-due tasks in review, revisions or waiting on the client are listed under Past due on Today, without the red, and send no overdue alert.',null],
+  ['Getting around','Inbox','Inbox shows new ClickUp comments, replies and status changes first, then Alerts: late, due today and tomorrow, busy days and follow-ups like a task stuck in review. Mark all read clears both; the number on Inbox counts the ClickUp items plus unread alerts.',null],
  ['Tasks','Move late work to today',`On Today, the Late group has a "Move all to today" button that sets every late task's due date to today in one go. Undo puts the old dates back.`,null],
  ['Tasks','Next status from the list',`Hover a task in a job's list and a small pill with the next status appears after its name (for example "Internal review ›"). Click it to move the task along without opening it.`,null],
  ['Tasks','Copy the export file name',`Right-click a task (press and hold on a phone) and choose Copy file name to copy its export name, built from the client's file name pattern.`,null],
@@ -10578,31 +10568,6 @@ document.addEventListener('focusout',e=>{
   if(!e.target.matches?.('#drawer textarea.notes')||e.relatedTarget?.closest?.('.notes-tools'))return;
   const ta=e.target;setTimeout(()=>{if(document.activeElement===ta||!S.ui.openTask||NOTES_EDIT!==S.ui.openTask)return;NOTES_EDIT=null;if(!$('#drawer').hidden)renderDrawer()},0);
 });
-/* checklist: drag the grip to reorder steps */
-let CKD=null;
-document.addEventListener('pointerdown',e=>{
-  const g=e.target.closest?.('.ck-grip');if(!g||!S.ui.openTask)return;
-  e.preventDefault();const row=g.closest('.check');
-  CKD={id:g.dataset.grip,row,list:row.parentElement,to:null};row.classList.add('ck-drag');document.body.classList.add('ck-dragging');
-  try{g.setPointerCapture(e.pointerId)}catch(x){}
-});
-document.addEventListener('pointermove',e=>{
-  if(!CKD)return;
-  const rows=[...CKD.list.querySelectorAll('.check')];rows.forEach(r=>r.classList.remove('ck-before','ck-after'));
-  let tgt=rows.find(r=>{const b=r.getBoundingClientRect();return e.clientY<b.top+b.height/2}),after=false;
-  if(!tgt){tgt=rows[rows.length-1];after=true}
-  if(!tgt||tgt===CKD.row){CKD.to=null;return}
-  CKD.to={id:tgt.dataset.cid,after};tgt.classList.add(after?'ck-after':'ck-before');
-});
-function ckDrop(){
-  if(!CKD)return;const d=CKD;CKD=null;document.body.classList.remove('ck-dragging');
-  d.list.querySelectorAll('.check').forEach(r=>r.classList.remove('ck-before','ck-after','ck-drag'));
-  const t=S.tasks[S.ui.openTask];if(!t||!d.to)return;
-  const arr=[...(t.checklist||[])],from=arr.findIndex(c=>c.id===d.id);if(from<0)return;
-  const [item]=arr.splice(from,1);let at=arr.findIndex(c=>c.id===d.to.id);if(at<0)return;if(d.to.after)at++;
-  arr.splice(at,0,item);patch('tasks',t.id,{checklist:arr});renderDrawer();
-}
-document.addEventListener('pointerup',ckDrop);document.addEventListener('pointercancel',ckDrop);
 document.addEventListener('focusout',e=>{if(e.target.dataset?.field&&S.ui.openTask)flush('tasks/'+S.ui.openTask)});
 document.addEventListener('submit',e=>{
   const f=e.target;e.preventDefault();
@@ -10692,10 +10657,37 @@ document.addEventListener('keydown',e=>{if(e.target.id==='reply-in'&&e.key==='En
 document.addEventListener('drop',e=>{
   const col=e.target.closest?.('[data-drop]');
   if(col&&dragId){e.preventDefault();const id=dragId,it=dropMark,after=it?.classList.contains('drop-after');clearDropMark();dragId=null;
-    if(stOf(S.tasks[id])!==col.dataset.drop)setStatus(id,col.dataset.drop);
-    if(it)dropOrder(col,id,it.dataset.id,after);
-    render()}
+    boardDrop(col,id,it,after)}
 });
+function boardDrop(col,id,it,after){if(!S.tasks[id])return;if(stOf(S.tasks[id])!==col.dataset.drop)setStatus(id,col.dataset.drop);if(it)dropOrder(col,id,it.dataset.id,after);render()}
+/* Touch drag (phones, user's ask): long-press a list row, board card or calendar entry, then move without lifting:
+   the task follows the finger and drops onto another task / status group or column (order + status, like the mouse
+   drag) or onto a calendar day (moves the due date). Lifting without moving opens the long-press menu as before. */
+let TD=null;
+const tdCan=r=>!SELMODE&&!!r.closest?.('.row[draggable],.card[draggable],[data-caldrag]');
+function tdLift(r,at){const b=r.getBoundingClientRect(),g=r.cloneNode(true);g.classList.add('td-ghost');g.removeAttribute('id');
+  Object.assign(g.style,{position:'fixed',left:b.left+'px',top:b.top+'px',width:b.width+'px',height:b.height+'px',margin:0,zIndex:90,pointerEvents:'none'});document.body.appendChild(g);r.classList.add('td-src');
+  const sx=(()=>{for(let e=r.parentElement;e;e=e.parentElement){const cs=getComputedStyle(e);if(/(auto|scroll)/.test(cs.overflowX)&&e.scrollWidth>e.clientWidth)return e}return null})();
+  if(sx){sx.dataset.snap=sx.style.scrollSnapType;sx.style.scrollSnapType='none'}
+  TD={id:r.dataset.id,src:r,ghost:g,x0:at.x,y0:at.y,x:at.x,y:at.y,b,moved:false,cal:!!r.closest('[data-caldrag]'),sx,timer:null};document.body.classList.add('td-on')}
+function tdTarget(){const p=TD;p.ghost.style.display='none';const el=document.elementFromPoint(p.x,p.y);p.ghost.style.display='';
+  document.querySelectorAll('.td-over,.cal-drop,.col.drag,.group.drag').forEach(x=>x.classList.remove('td-over','cal-drop','drag'));clearDropMark();p.drop=null;if(!el)return;
+  if(p.cal){const d=el.closest('[data-calday]');if(d){d.classList.add('cal-drop');p.drop={day:d.dataset.calday}}return}
+  const col=el.closest('[data-drop]');if(!col)return;col.classList.add('drag');const it=el.closest('.card,.row[draggable]');let after=false;
+  if(it&&it!==p.src&&col.contains(it)){const r=it.getBoundingClientRect();after=p.y>r.top+r.height/2;dropMark=it;it.classList.add(after?'drop-after':'drop-before')}
+  p.drop={col,it:it&&it!==p.src&&col.contains(it)?it:null,after}}
+function tdEdge(){const p=TD;if(!p||!p.moved)return;let dy=p.y<70?-12:p.y>innerHeight-130?12:0,dx=0;if(p.sx){const r=p.sx.getBoundingClientRect();dx=p.x<r.left+36?-8:p.x>r.right-36?8:0}
+  if(dy)window.scrollBy(0,dy);if(dx)p.sx.scrollLeft+=dx;if(dx||dy)tdTarget()}
+window.addEventListener('touchmove',e=>{if(!TD)return;e.stopPropagation();if(e.cancelable)e.preventDefault();const t=e.touches[0];TD.x=t.clientX;TD.y=t.clientY;
+  if(!TD.moved&&Math.hypot(TD.x-TD.x0,TD.y-TD.y0)>8){TD.moved=true;TD.timer=setInterval(tdEdge,16)}
+  if(TD.moved){TD.ghost.style.transform=`translate(${TD.x-TD.x0}px,${TD.y-TD.y0}px) scale(1.03)`;tdTarget()}},{capture:true,passive:false});
+function tdEnd(e,cancel){const p=TD;if(!p)return;TD=null;clearInterval(p.timer);p.ghost.remove();p.src.classList.remove('td-src');document.body.classList.remove('td-on');
+  if(p.sx){p.sx.style.scrollSnapType=p.sx.dataset.snap||''}
+  document.querySelectorAll('.td-over,.cal-drop,.col.drag,.group.drag').forEach(x=>x.classList.remove('td-over','cal-drop','drag'));clearDropMark();SHD_EAT=Date.now()+450;
+  if(cancel)return;
+  if(!p.moved){openCtx(p.id,p.x0,p.y0);return}
+  const d=p.drop;if(!d)return;haptic(8);
+  if(p.cal)moveDue(p.id,d.day);else boardDrop(d.col,p.id,d.it,d.after)}
 
 /* Calendar: drag a task (month entry or week card) onto another day to move its due date; logged, with Undo */
 let calDrag=null;
