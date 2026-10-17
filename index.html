@@ -4455,9 +4455,9 @@ const weekStartOf=d=>{d=new Date(d);d.setDate(d.getDate()-((d.getDay()-WS()+7)%7
 const isWeekend=d=>d.getDay()===0||d.getDay()===6;
 /* grid columns for a 7-day row; weekends narrow when "hide weekends" is on */
 const weekCols=()=>Array.from({length:7},(_,i)=>pref('hideWeekends')&&((WS()+i)%7===0||(WS()+i)%7===6)?'var(--wk)':'var(--wd)').join(' ');
-/* Late = past due AND still on you: not started, in progress or revisions (user's ask). A past-due task that's out
-   for review or waiting on the client isn't late; it shows as "past due" instead. */
-const LATE_STAGES=new Set(['not_started','in_progress','revisions']);
+/* Late = past due AND not started or in progress (user's ask). Any other past-due open task (review, revisions,
+   waiting on the client) isn't late; it shows as "past due" instead. */
+const LATE_STAGES=new Set(['not_started','in_progress']);
 const pastDue=(t,t0=today())=>!!t.due&&t.due<t0&&!isClosed(t);
 const isLate=(t,t0=today())=>pastDue(t,t0)&&LATE_STAGES.has(stageOf(stOf(t)));
 function dueClass(t){
@@ -6202,7 +6202,7 @@ let HM_OPEN=new Set();
 function csGroups(ts){
   const t0=today(),t1=addDays(t0,1),w=addDays(t0,7),q=upNextList().filter(t=>ts.includes(t)),r=ts;
   const byDue=(a,b)=>a.due.localeCompare(b.due)||PRIO_RANK[a.priority||'normal']-PRIO_RANK[b.priority||'normal'],byAge=(a,b)=>(assignedOn(a)||'9').localeCompare(assignedOn(b)||'9');
-  return [['queue','Up next',q],['late','Late',r.filter(t=>isLate(t,t0)).sort(byDue)],['past','Past due, out for review',r.filter(t=>pastDue(t,t0)&&!isLate(t,t0)).sort(byDue)],['today','Due today',r.filter(t=>t.due===t0).sort(byDue)],['tom','Tomorrow',r.filter(t=>t.due===t1).sort(byDue)],
+  return [['queue','Up next',q],['late','Late',r.filter(t=>isLate(t,t0)).sort(byDue)],['past','Past due',r.filter(t=>pastDue(t,t0)&&!isLate(t,t0)).sort(byDue)],['today','Due today',r.filter(t=>t.due===t0).sort(byDue)],['tom','Tomorrow',r.filter(t=>t.due===t1).sort(byDue)],
     ['week','Next 7 days',r.filter(t=>t.due&&t.due>t1&&t.due<=w).sort(byDue)],['later','Later',r.filter(t=>t.due&&t.due>w).sort(byDue)],
     ['active','In progress, no date',r.filter(t=>!t.due&&isActive(t)).sort(byAge)],['nodate','No date',r.filter(t=>!t.due&&!isActive(t)).sort(byAge)]];
 }
