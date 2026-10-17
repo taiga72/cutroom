@@ -4191,6 +4191,37 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap .pf-week{overflow:hidden}
 /* phones: Inbox and Calendar live in the bottom bar, so the sidebar drops their tiles (user's ask) */
 @media (max-width:820px){.ap .ap-tiles .ap-tile:is([data-tab="inbox"],[data-tab="calendar"]){display:none}}
+/* selected chips/tiles keep readable text in light and dark (user's report: the count matched the highlight) */
+.ap .pg-cal .cj-chip.on small{color:color-mix(in srgb,var(--bg) 68%,transparent)!important}
+.ap .pg-cal .cj-chip.on small b{color:color-mix(in srgb,var(--red) 80%,var(--bg))!important}
+:root.ap[data-theme="dark"] .ap-tile.on[data-tab="archived"]{background:color-mix(in srgb,var(--grey) 62%,var(--bg))}
+.ap #tb-clients .client-tabs button.on em{opacity:1!important}
+/* Apple roundness (user's ask): search fields, buttons and segmented controls are capsules; single-line fields 12px */
+.ap :is(.search,.v2-find,.jump-in,.pref-find,input[type="search"]){border-radius:999px!important}
+.ap :is(.search,.jump-in) input{border-radius:999px!important}
+.ap .btn:not(.icon-btn){border-radius:999px!important}
+.ap .icon-btn{border-radius:50%!important}
+.ap :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="search"]):not([type="file"]),select:not(.pill)){border-radius:12px!important}
+.ap .seg,.ap .seg>button{border-radius:999px!important}
+.ap .pomo-btn:not(.run):not(.paused){border-radius:50%!important}
+.ap .pomo-btn{border-radius:999px!important}
+.ap .d-tabs,.ap .d-tabs button,.ap .stepper,.ap .st-ctl{border-radius:999px!important}
+.ap .st-ctl{overflow:hidden}
+/* one look for "selected" (user's ask): filter chips = solid accent with white text; section switchers (Done tabs) =
+   segmented control like Month/Week and About's; Tasks | About = underlined section bar on phones too */
+.ap :is(.pg-cal .cj-chip,.cj-chip,.inb-chips button,.al-jobs>button).on{background:var(--accent)!important;color:var(--on-accent,#fff)!important;border-color:transparent!important}
+.ap :is(.cj-chip,.inb-chips button,.al-jobs>button).on :is(em,small){color:color-mix(in srgb,var(--on-accent,#fff) 78%,transparent)!important}
+.ap :is(.cj-chip).on small b{color:var(--on-accent,#fff)!important;font-weight:700}
+.ap .dn-tabs{display:inline-flex;gap:0;padding:2px;border-radius:999px;background:rgba(118,118,128,.12);margin-bottom:14px}
+.ap .dn-tabs button{background:none!important;border-radius:999px!important;padding:6px 16px;color:var(--text)}
+.ap .dn-tabs button.on{background:var(--seg-on)!important;color:var(--text)!important;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.ap .dn-tabs button.on em{color:var(--muted)!important}
+@media (max-width:820px){
+.ap .dn-tabs{display:flex}
+.ap #subnav .v2-tabs{gap:0;margin-top:14px;border-bottom:.5px solid var(--line-strong)}
+.ap #subnav .v2-tabs>button{flex:1;justify-content:center;background:none!important;border-radius:0!important;padding:10px 0 11px;margin-bottom:-.5px;border-bottom:2.5px solid transparent;color:var(--muted);font-weight:600;font-size:calc(16px*var(--ts))}
+.ap #subnav .v2-tabs>button.on{color:var(--text)!important;border-bottom-color:var(--accent)}
+}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
