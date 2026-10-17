@@ -240,6 +240,7 @@ UI preferences (tab, view, per-tab view `views`, collapsed groups, sort, hidden 
 ## Conventions
 
 - Git: the user wants every change shipped without asking. Commit to the working branch, push, open a pull request into `main` and merge it yourself (GitHub MCP tools), so Vercel deploys it. Don't republish the artifact (the user no longer wants it updated).
+- **Group changes into fewer pull requests (user's ask):** Vercel's free plan caps deploys per day across the whole account (about 100; every push to a branch makes a preview deploy and every merge a production deploy), and many one-fix PRs hit the cap ("Deployment rate limited — retry in 24 hours"). Collect related fixes on the branch and open one PR per batch of work, not one per small fix; avoid pushing the branch for every commit. If a deploy is rate limited, tell the user and have them Redeploy the latest main deployment in Vercel once the window passes.
 
 - Keep the app a single HTML file, and keep the artifact viewer's frame limits in mind. `alert()`, `confirm()` and `prompt()` don't work, so build confirmations in the page (click twice to delete). Use `el.hidden`, not `style.display`.
 - The layout must work at phone width (about 400px, breakpoint at 820px).
