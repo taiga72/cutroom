@@ -4143,6 +4143,14 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap .inb-news .ib-it:last-of-type{border-bottom:0}
 }
 @media (min-width:821px){.ap .inb-news{display:none}}
+/* phone Up next page: one hairline per row (name and date/× were on different rows), date once; phone Calendar: no No-date tray (user's ask) */
+@media (max-width:820px){
+.ap .upn-cs .cs-r>.ap-ck,.ap .upn-cs .cs-r .cs-nm,.ap .upn-cs .cs-r .cs-end{grid-row:1}
+.ap .upn-cs .cs-un .cs-end .cs-due{display:none}
+.ap .upn-cs .cs-r .cs-end{align-items:center;padding-left:12px}
+.ap .upn-cs .cs-r{column-gap:0;grid-template-columns:34px minmax(0,1fr) auto}
+.ap .cal-jobs [data-act="cal-tray"],.ap .cal-tray{display:none}
+}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
@@ -10046,7 +10054,7 @@ document.addEventListener('click',e=>{
     case 'hm-open': if(e.target.closest('button,a'))break;openTask(el.dataset.id,'activity');break;
     case 'hm-handled': {const t=S.tasks[el.dataset.id];if(t){nrDone(t,null);toast('Marked as handled')}render();break}
     case 'hm-seen': lsSet('cutroom.homeseen',String(Date.now()));if(Object.values(S.tasks).some(t=>t.cuNew))cuReviewAll();INBOX_ALL=false;render();break;
-    case 'inb-allread': notifications().forEach(n=>NS.read[n.key]=1);saveNotes();lsSet('cutroom.homeseen',String(Date.now()));if(Object.values(S.tasks).some(t=>t.cuNew))cuReviewAll();INBOX_ALL=false;renderBell();render();break;
+    case 'inb-allread': inboxGroups().forEach(g=>{if(g.wait&&g.t)nrDone(g.t,null)});notifications().forEach(n=>NS.read[n.key]=1);saveNotes();lsSet('cutroom.homeseen',String(Date.now()));if(Object.values(S.tasks).some(t=>t.cuNew))cuReviewAll();INBOX_ALL=false;renderBell();render();break;
     case 'hm-inall': INBOX_ALL=!INBOX_ALL;render();break;
     case 'hm-more': HM_MORE=!HM_MORE;render();break;
     case 'cs-more': {const g=el.dataset.g;HM_OPEN.has(g)?HM_OPEN.delete(g):HM_OPEN.add(g);render();break}
