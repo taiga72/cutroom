@@ -5766,8 +5766,8 @@ function renderSide(){queueMicrotask(renderOffline);
   const app=appSettings();const appLogo=imgSrc(app.logo);
   document.body.classList.toggle('side-mini',!!u.sideMini);
   const tt=n=>u.sideMini?` title="${n}"`:'';
-  /* Inbox count = what the Inbox page lists: the ClickUp entries on phones, the alerts list on desktop */
-  const inboxN=(()=>{try{return S.ready?(narrow.matches?inboxGroups().length:inboxList().length):0}catch(e){return 0}})();
+  /* Inbox count: the ClickUp entries on phones (what the phone Inbox lists), unread alerts on desktop (user's pick) */
+  const inboxN=(()=>{try{return S.ready?(narrow.matches?inboxGroups().length:inboxList().filter(n=>!NS.read[n.key]).length):0}catch(e){return 0}})();
   const nv=(tab,label,icon,count,act='nav')=>`<button class="nav-item ${(u.tab===tab||tab==='archived'&&['activity','trash'].includes(u.tab))&&act==='nav'?'on':''}" data-act="${act}" data-tab="${tab}"${tt(label)}>${icon}<span class="name">${label}</span><span class="count">${count||''}</span></button>`;
   let html=`<button type="button" class="icon-btn side-toggle" data-act="side-mini" aria-label="${u.sideMini?'Expand sidebar':'Collapse sidebar'}" title="${u.sideMini?'Expand sidebar':'Collapse sidebar'}">${I.left}</button><button type="button" class="brand" data-act="nav" data-tab="overview" title="Go to Today">${appLogo?`<img class="brand-logo" src="${esc(appLogo)}" alt="">`:defaultMark()}<b>${esc((app.name||'').trim()||APP_NAME)}</b></button>
   <div class="side-scroll">${(()=>{if(!S.ready)return '';const t0=today(),op=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)),onT=['archived','activity','trash'].includes(u.tab)?'archived':u.tab;
