@@ -2729,7 +2729,7 @@ html{overscroll-behavior-y:contain}
   .upn-page .upnext h3{display:none}
   .upn-page .un-row{padding:14px 12px;gap:12px;border-radius:14px}
   .upn-page .un-row .t-name,.upn-page .un-row b{font-size:calc(16px*var(--ts))}
-  .tb-pill{grid-template-columns:repeat(5,1fr)}
+  .tb-pill{grid-template-columns:repeat(4,1fr)}
   #me-btn{display:none!important}
   .tb-me .me-av{width:26px!important;height:26px!important;font-size:calc(10px*var(--ts))}.tb-me.on .me-av{box-shadow:0 0 0 2px var(--accent)}
   .tb-pill{gap:0;padding:5px 4px}
@@ -4189,6 +4189,8 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap #modal footer :is(.s-back,.s-cancel){background:none!important;box-shadow:none!important;border:0!important}
 }
 .ap .pf-week{overflow:hidden}
+/* phones: Inbox and Calendar live in the bottom bar, so the sidebar drops their tiles (user's ask) */
+@media (max-width:820px){.ap .ap-tiles .ap-tile:is([data-tab="inbox"],[data-tab="calendar"]){display:none}}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
