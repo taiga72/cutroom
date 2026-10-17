@@ -4151,6 +4151,22 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap .upn-cs .cs-r{column-gap:0;grid-template-columns:34px minmax(0,1fr) auto}
 .ap .cal-jobs [data-act="cal-tray"],.ap .cal-tray{display:none}
 }
+/* desktop job page hierarchy (user's ask): Tasks | About is the section bar (underlined text over a hairline),
+   clients are a smaller filter row under it (light chips, selected = tinted) */
+@media (min-width:821px){
+.ap #subnav .v2-tabs{gap:26px;margin-top:20px;border-bottom:.5px solid var(--line-strong)}
+.ap #subnav .v2-tabs>button{background:none;border-radius:0;padding:9px 0 11px;margin-bottom:-.5px;border-bottom:2.5px solid transparent;color:var(--muted);font-weight:600;font-size:calc(16px*var(--ts))}
+.ap #subnav .v2-tabs>button:hover{color:var(--text)}
+.ap #subnav .v2-tabs>button.on{background:none;color:var(--text);border-bottom-color:var(--accent)}
+.ap #subnav .v2-tabs .pt-views{align-self:center;margin-bottom:6px}
+.ap body.pg-job #toolbar{margin-top:6px}
+.ap #tb-clients .client-tabs{gap:6px}
+.ap #tb-clients .client-tabs button{height:28px;padding:0 11px;background:none;color:var(--muted);font-size:calc(13px*var(--ts));font-weight:500}
+.ap #tb-clients .client-tabs button:hover{background:rgba(118,118,128,.1);color:var(--text)}
+.ap #tb-clients .client-tabs button.on{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);font-weight:600}
+.ap #tb-clients .client-tabs button.on em{color:var(--accent);opacity:.75}
+.ap #tb-clients .client-tabs .add{padding:0 6px}
+}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
