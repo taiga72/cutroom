@@ -4136,7 +4136,7 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap .cs-home .hm-side:not(:has(.cs-q)){display:none}
 .ap .inb-news{background:var(--grp);border-radius:16px;padding:14px 14px 6px;margin:0 0 16px}
 .ap .inb-ph .v2-head{align-items:center}
-.ap .inb-ph .inb-news{margin-top:18px}
+.ap .inb-ph :is(.inb-news,.empty){margin-top:18px}
 .ap .inb-news .hm-sh{font:600 calc(12px*var(--ts)) var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
 .ap .inb-news .hm-sh button{text-transform:none;letter-spacing:0;color:var(--blue)}
 .ap .inb-news .ib-it{border-radius:0;padding:11px 0;border-bottom:.5px solid var(--line-strong)}
@@ -4221,6 +4221,13 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap #subnav .v2-tabs{gap:0;margin-top:14px;border-bottom:.5px solid var(--line-strong)}
 .ap #subnav .v2-tabs>button{flex:1;justify-content:center;background:none!important;border-radius:0!important;padding:10px 0 11px;margin-bottom:-.5px;border-bottom:2.5px solid transparent;color:var(--muted);font-weight:600;font-size:calc(16px*var(--ts))}
 .ap #subnav .v2-tabs>button.on{color:var(--text)!important;border-bottom-color:var(--accent)}
+}
+/* desktop: pages whose title lives in the page (Today, Inbox, Done, Help, job pages) share the top row with the
+   search box instead of leaving an empty band above the title, like Calendar (user's ask) */
+@media (min-width:821px){
+.ap .head-row:has(> #head > .head-cs:empty),.ap body.pg-job .head-row{height:0;min-height:0;margin-bottom:0;padding-bottom:0;align-items:flex-start;overflow:visible;position:relative;z-index:4}
+.ap :is(#view > .cs > .v2-head:first-child,#view .inb > .v2-head:first-child,#view .dn-head,#view .cs-top,#subnav .v2-jhead){padding-right:370px}
+.ap #view .cs-top{margin-top:0}
 }
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
@@ -6284,7 +6291,7 @@ function homeView(){
   const lateN=all.filter(t=>isLate(t,t0)&&(jf==='all'||t.jobId===jf)).length;
   const lateAll=ts.filter(t=>isLate(t,t0)).length,todayN=ts.filter(t=>t.due===t0).length;
   const sum=[lateAll?`<b class="late">${lateAll} late</b>`:'',`<b>${todayN} due today</b>`,`${ts.length} open across ${new Set(ts.map(t=>t.jobId)).size} job${new Set(ts.map(t=>t.jobId)).size===1?'':'s'}`].filter(Boolean).join('<i>·</i>');
-  const head=`<header class="v2-head ap-lt"><div><h1>Today</h1><p class="v2-sum">${esc(WEEKDAY_FULL[d.getDay()])}, ${esc(d.toLocaleDateString(pref('dateFmt')==='dm'?'en-GB':'en-US',{month:'long',day:'numeric'}))}${[lateAll?`<b class="late">${lateAll} late</b>`:'',todayN?`${todayN} due today`:'',`${ts.length} open`].filter(Boolean).map(x=>'<i>·</i>'+x).join('')}</p></div><b class="ap-cnt">${lateAll+todayN}</b><button type="button" class="btn primary v2-new" data-act="new-task" title="New task (N)">${I.plus}New Task</button></header>`;
+  const head=`<header class="v2-head ap-lt"><div><h1>Today</h1><p class="v2-sum">${esc(WEEKDAY_FULL[d.getDay()])}, ${esc(d.toLocaleDateString(pref('dateFmt')==='dm'?'en-GB':'en-US',{month:'long',day:'numeric'}))}${[lateAll?`<b class="late">${lateAll} late</b>`:'',todayN?`${todayN} due today`:'',`${ts.length} open`].filter(Boolean).map(x=>'<i>·</i>'+x).join('')}</p></div><button type="button" class="btn primary v2-new" data-act="new-task" title="New task (N)">${I.plus}New Task</button></header>`;
   const jobsRow='';
   let n=0;const body=G.map(([k,label,list])=>{if(!list.length||k==='queue')return '';
     const lim=['queue','late','today'].includes(k)||HM_OPEN.has(k)?list.length:8,show=list.slice(0,lim);
@@ -6577,7 +6584,7 @@ function renderInbox(){
   if(narrow.matches){
     const nUnread=notifications().filter(n=>!NS.read[n.key]).length,canSeen=news.some(g=>!g.wait);
     $('#view').innerHTML=`<div class="inb inb-ph">
-      <header class="v2-head"><div><h1>Inbox</h1><p class="v2-sum">${news.length?`<b>${news.length} from ClickUp</b>`:'Nothing new from ClickUp.'}</p></div>${canSeen||nUnread?'<button type="button" class="btn" data-act="inb-allread">Mark all read</button>':''}</header>
+      <header class="v2-head"><div><h1>Inbox</h1>${news.length?`<p class="v2-sum"><b>${news.length} from ClickUp</b></p>`:''}</div>${news.length&&(canSeen||nUnread)?'<button type="button" class="btn" data-act="inb-allread">Mark all read</button>':''}</header>
       ${news.length?`<section class="inb-news">${inboxHtml('From ClickUp',true)}</section>`:`<div class="empty"><h3>You're all caught up</h3><p>New ClickUp comments, replies and status changes show up here.</p></div>`}
     </div>`;
     return;
