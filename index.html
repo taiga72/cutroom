@@ -4166,6 +4166,12 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap #tb-clients .client-tabs button.on{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);font-weight:600}
 .ap #tb-clients .client-tabs button.on em{color:var(--accent);opacity:.75}
 .ap #tb-clients .client-tabs .add{padding:0 6px}
+.ap body.pg-job #toolbar{flex-wrap:nowrap}
+.ap body.pg-job #toolbar>*:not(#tb-clients){flex-shrink:0}
+.ap #tb-clients{flex:1 1 auto;min-width:0}
+.ap #tb-clients .client-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-right:28px;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+.ap #tb-clients .client-tabs::-webkit-scrollbar{display:none}
+.ap #tb-clients .client-tabs button{flex-shrink:0}
 }
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
@@ -9890,6 +9896,8 @@ document.addEventListener('touchend',e=>{
 },{passive:true});
 function closeSide(){$('#side').classList.remove('open');$('#side-scrim').hidden=true;$('#menu-btn')?.setAttribute('aria-expanded','false')}
 narrow.addEventListener?.('change',placeTopRight);
+/* job page client chips scroll sideways in one row; let a plain mouse wheel scroll them */
+document.addEventListener('wheel',e=>{const c=e.target.closest?.('#tb-clients .client-tabs');if(!c||e.ctrlKey||Math.abs(e.deltaX)>Math.abs(e.deltaY)||c.scrollWidth<=c.clientWidth)return;const max=c.scrollWidth-c.clientWidth;if((e.deltaY<0&&c.scrollLeft<=0)||(e.deltaY>0&&c.scrollLeft>=max-1))return;c.scrollLeft+=e.deltaY;e.preventDefault()},{passive:false});
 narrow.addEventListener?.('change',()=>{if(S.ready&&S.ui.tab==='inbox')render()});
 
 /* ================= toast ================= */
