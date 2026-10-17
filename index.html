@@ -4279,6 +4279,8 @@ body.ps-on,body.ps-on *{cursor:grabbing!important;user-select:none!important;-we
 .td-src{opacity:.35}
 body.td-on{user-select:none;-webkit-user-select:none}
 .ap .cal-drop{background:color-mix(in srgb,var(--accent) 14%,transparent)!important}
+/* every dropdown in a dialog or form uses the app's chevron (Invoice defaults still showed the browser's arrow) */
+.ap :is(#modal,.ivd-body,.inv-form) select:not(.pill){-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23888' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 12px center!important;background-size:12px!important;padding-right:32px!important}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
@@ -6165,12 +6167,6 @@ function toggleUpNext(id){
 /* phones: Up next is its own tab in the bottom bar, a full page like Alerts */
 let UPN=false;
 /* the Up next page (desktop sidebar item; phones also have the bottom-bar tab) */
-function renderUpNextTab(){
-  const n=upNextList().length;
-  $('#head').innerHTML=`<div class="head"><div class="head-title"><h1>${UP_IC.replace('class="i"','class="i" style="width:28px;height:28px"')}Up next</h1><div class="sub">${n?`${n} task${n===1?'':'s'} queued across your jobs. Drag to reorder; finished tasks leave on their own.`:'Your own queue across every job.'}</div></div></div>`;
-  $('#stats').innerHTML='';$('#jobcards').innerHTML='';$('#toolbar').hidden=true;$('#top-search').hidden=true;
-  $('#view').innerHTML=n?`<div class="upn-tab">${upNextStrip()}</div>`:`<div class="empty"><h3>Nothing queued yet</h3><p>Up next is your own to-do order across every job. Right-click a task and choose Up next, or use the queue icon at the top of a task, to line up what you'll work on next.</p></div>`;
-}
 function renderUpNextPage(){
   let e=$('#upnext-page');if(!e){e=document.createElement('div');e.id='upnext-page';e.className='upn-page';e.setAttribute('role','dialog');e.setAttribute('aria-label','Up next');document.body.appendChild(e)}
   const on=UPN&&narrow.matches;e.hidden=!on;if(!on){e.innerHTML='';sheetLock();return}
@@ -6179,19 +6175,8 @@ function renderUpNextPage(){
     ${n?`<div class="cs upn-cs">${csQueue(upNextList())}</div>`:`<p class="na-empty">Nothing queued yet. Press and hold a task and choose Add to Up next, or use the queue icon at the top of a task, to line up what you'll work on.</p>`}`;
   sheetLock();
 }
-function upNextStrip(){
-  const list=upNextList();if(!list.length)return '';
-  return `<section class="upnext"><h3>${UP_IC}Up next<span class="count">${list.length}</span><span class="un-hint">Drag to reorder</span></h3><ol class="un-list">${list.map((t,i)=>`<li class="un-row" draggable="true" data-un="${t.id}" data-act="open" data-id="${t.id}" tabindex="0" style="--jc:${esc(S.jobs[t.jobId]?.color||'transparent')}"><span class="un-grip" data-stop aria-hidden="true">${GRIP_IC}</span><span class="un-n">${i+1}</span>${taskMark(t)}<div class="pc-main"><b>${esc(t.name||'Untitled task')}</b><small>${esc([S.jobs[t.jobId]?.name,S.clients[t.clientId]?.name].filter(Boolean).join(' · '))}</small></div><span class="pill" ${pillStyle(stOf(t))}><span class="pl">${esc(stLabel(stOf(t)))}</span></span><span class="date ${dueClass(t)}">${t.due?fmtDate(t.due):''}</span><button class="icon-btn" data-act="un-rm" data-id="${t.id}" data-stop title="Remove from Up next" aria-label="Remove from Up next">${I.x}</button></li>`).join('')}</ol></section>`;
-}
-let unDrag=null;
-function unMark(e){document.querySelectorAll('.un-row').forEach(x=>x.classList.remove('drop-before','drop-after'));const r=e.target.closest?.('.un-row');if(!r||r.dataset.un===unDrag)return null;const b=r.getBoundingClientRect(),after=e.clientY>b.top+b.height/2;r.classList.add(after?'drop-after':'drop-before');return {id:r.dataset.un,after}}
-document.addEventListener('dragstart',e=>{const r=e.target.closest?.('.un-row');if(!r)return;unDrag=r.dataset.un;r.classList.add('dragging');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',unDrag)}catch(x){}});
-document.addEventListener('dragover',e=>{if(unDrag&&e.target.closest?.('.un-list')){e.preventDefault();unMark(e)}});
-document.addEventListener('dragend',()=>{if(!unDrag)return;unDrag=null;document.querySelectorAll('.un-row').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'))});
 function unMove(id,m){const ids=upNextList().map(t=>t.id).filter(x=>x!==id);let i=ids.indexOf(m.id);if(i<0)return;if(m.after)i++;ids.splice(i,0,id);
   ids.forEach((tid,k)=>{if(S.tasks[tid].upNext!==(k+1)*1000)patch('tasks',tid,{upNext:(k+1)*1000})});render();if(UPN)renderUpNextPage()}
-document.addEventListener('drop',e=>{if(!unDrag)return;const m=unMark(e);const id=unDrag;unDrag=null;document.querySelectorAll('.un-row').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'));if(!m)return;e.preventDefault();unMove(id,m)});
-/* touch screens: drag a row by its grip (HTML drag and drop doesn't work with a finger) */
 const GRIP_IC='<svg viewBox="0 0 12 12" fill="currentColor"><circle cx="4" cy="2.5" r="1.1"/><circle cx="8" cy="2.5" r="1.1"/><circle cx="4" cy="6" r="1.1"/><circle cx="8" cy="6" r="1.1"/><circle cx="4" cy="9.5" r="1.1"/><circle cx="8" cy="9.5" r="1.1"/></svg>';
 
 /* Drag to reorder (user's ask): grab a row's grip with the mouse or a finger (pointer events, so desktop and phones
@@ -6224,10 +6209,6 @@ document.addEventListener('keydown',e=>{const g=e.target.closest?.('[data-sort-g
   const item=g.closest('[data-sort-item]'),list=item.closest('[data-sort]'),all=[...list.querySelectorAll('[data-sort-item]')],i=all.indexOf(item),j=e.key==='ArrowUp'?i-1:i+1;if(j<0||j>=all.length)return;
   const kind=list.dataset.sort,id=item.dataset.sortItem;psDrop(kind,id,{id:all[j].dataset.sortItem,after:j>i});
   requestAnimationFrame(()=>setTimeout(()=>{const l=document.querySelector(`[data-sort="${kind}"]`),n=l&&l.querySelectorAll('[data-sort-item]')[j];n?.querySelector('[data-sort-grip]')?.focus()},180))});
-let UNT=null;
-document.addEventListener('touchstart',e=>{const g=e.target.closest?.('.un-grip');if(!g||e.touches.length>1)return;const r=g.closest('.un-row');UNT={id:r.dataset.un,row:r,y:e.touches[0].clientY};unDrag=UNT.id;r.classList.add('dragging');r.style.pointerEvents='none';haptic(8)},{passive:true});
-document.addEventListener('touchmove',e=>{if(!UNT)return;e.preventDefault();const t=e.touches[0];UNT.row.style.transform=`translateY(${t.clientY-UNT.y}px)`;UNT.m=unMark({target:document.elementFromPoint(t.clientX,t.clientY),clientY:t.clientY})},{passive:false});
-document.addEventListener('touchend',()=>{const g=UNT;if(!g)return;UNT=null;unDrag=null;g.row.style.transform='';g.row.style.pointerEvents='';document.querySelectorAll('.un-row').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'));SHD_EAT=Date.now()+450;if(g.m)unMove(g.id,g.m)});
 /* "All clear": nothing overdue and nothing due today (Overview, Settings → Appearance; hidden for the day with ×) */
 function allClearHtml(){
   if(!pref('allClear')||!jobsSorted().length)return '';
@@ -6354,12 +6335,12 @@ function csRow(t,n,o={}){
   const tags=o.nodate?(a!=null&&a>=AGE_SHOW?`<span class="hm-age ${a>=AGE_OLD?'old':''}" title="Assigned ${a} day${a===1?'':'s'} ago">${a}d</span>`:''):`${t.format?`<i>${esc(t.format)}</i>`:''}${t.revision?`<i title="Revision round">R${t.revision}</i>`:''}${cl.length?`<span>${cl.filter(x=>x.done).length}/${cl.length}</span>`:''}`;
   const due=o.nodate?setDateBtn(t):`<span class="cs-due ${dueClass(t)}"${relTitle(t.due)}>${t.due?fmtRel(t.due,isLate(t)):'No date'}</span>`;
   return `<div class="cs-r ${o.now?'cs-now':''}" data-act="open" data-id="${t.id}" tabindex="0" style="--jc:${esc(j.color||'var(--accent)')}">
-    ${apCk(t)}<span class="cs-sl">${o.grip?`<span class="un-grip" data-stop aria-hidden="true" title="Drag to reorder">${GRIP_IC}</span>`:''}${o.now?'Now':n}</span><span class="cs-bar"></span>
+    ${apCk(t)}<span class="cs-sl">${o.now?'Now':n}</span><span class="cs-bar"></span>
     <span class="cs-nm"><b>${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</b><small>${o.nodate||!t.due?'':`<span class="ap-due ${dueClass(t)}">${fmtRel(t.due,isLate(t))}</span>`}<span class="ap-jd" style="--jc:${esc(j.color||'var(--accent)')}"></span>${esc(where||j.name)}${chips?`<span class="cs-chips">${chips}</span>`:''}</small></span>
     <span class="cs-st" style="--c:${esc(stColor(st))}"><i></i>${esc(stLabel(st))}</span><span class="cs-tg">${tags}</span>
     <span class="cs-end">${due}${o.grip?`<button type="button" class="ps-grip" data-sort-grip data-stop title="Drag to reorder" aria-label="Drag to reorder ${esc(t.name||'task')} (arrow keys move it)">${GRIP_IC}</button><button class="icon-btn" data-act="un-rm" data-id="${t.id}" data-stop title="Remove from Up next" aria-label="Remove from Up next">${I.x}</button>`:''}</span>${acts}</div>`;
 }
-/* Up next under the Inbox (user's ask): the queue in order, dragged to reorder (unDrag / unMove / UNT) */
+/* Up next (user's ask): the queue in order, dragged to reorder by its grip (the shared [data-sort] engine → unMove) */
 function csQueue(q){
   return `<section class="cs-g cs-q" id="csg-queue"><div class="cs-gh"><b>Up next</b><span>${q.length}</span>${q.length>1?'<em>Drag to reorder</em>':''}</div>
     ${q.length?`<ol class="un-list cs-unl" data-sort="upnext">${q.map(t=>`<li class="un-row cs-un" data-un="${t.id}" data-sort-item="${t.id}">${csRow(t,'#'+upNextPos(t),{grip:true})}</li>`).join('')}</ol>`:`<p class="hm-empty" title="Right-click a task (press and hold on a phone) and choose Add to Up next">Nothing queued. Right-click a task to add it.</p>`}</section>`;
@@ -8557,6 +8538,9 @@ function exportCSV(jobId){
    Searchable topics; "Open …" buttons jump to the matching Settings section or page. Keep this list in step with new features. */
 const HELP_IC='<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.6 1.6c-.6.3-.9.7-.9 1.3M8 11.3h.01"/></svg>';
 const HELP=[
+  ['Tasks','Drag to reorder','Grab the ⋮⋮ grip on an Up next row, a checklist step or a status in Settings → Statuses and drag it up or down (arrow keys work too). On a phone, press and hold a list row, board card or calendar entry, then move your finger: drop it on another task or column to reorder or change its status, or on a calendar day to move its due date. Let go without moving to get the menu.',null],
+  ['Tasks','What counts as late','A task is late only when its due date has passed and it is Not started or In progress. Past-due tasks in review, revisions or waiting on the client are listed under Past due on Today, without the red, and send no overdue alert.',null],
+  ['Getting around','Inbox','Inbox shows new ClickUp comments, replies and status changes first, then Alerts: late, due today and tomorrow, busy days and follow-ups like a task stuck in review. Mark all read clears both; the number on Inbox counts the ClickUp items plus unread alerts.',null],
  ['Tasks','Move late work to today',`On Today, the Late group has a "Move all to today" button that sets every late task's due date to today in one go. Undo puts the old dates back.`,null],
  ['Tasks','Next status from the list',`Hover a task in a job's list and a small pill with the next status appears after its name (for example "Internal review ›"). Click it to move the task along without opening it.`,null],
  ['Tasks','Copy the export file name',`Right-click a task (press and hold on a phone) and choose Copy file name to copy its export name, built from the client's file name pattern.`,null],
@@ -10584,31 +10568,6 @@ document.addEventListener('focusout',e=>{
   if(!e.target.matches?.('#drawer textarea.notes')||e.relatedTarget?.closest?.('.notes-tools'))return;
   const ta=e.target;setTimeout(()=>{if(document.activeElement===ta||!S.ui.openTask||NOTES_EDIT!==S.ui.openTask)return;NOTES_EDIT=null;if(!$('#drawer').hidden)renderDrawer()},0);
 });
-/* checklist: drag the grip to reorder steps */
-let CKD=null;
-document.addEventListener('pointerdown',e=>{
-  const g=e.target.closest?.('.ck-grip');if(!g||!S.ui.openTask)return;
-  e.preventDefault();const row=g.closest('.check');
-  CKD={id:g.dataset.grip,row,list:row.parentElement,to:null};row.classList.add('ck-drag');document.body.classList.add('ck-dragging');
-  try{g.setPointerCapture(e.pointerId)}catch(x){}
-});
-document.addEventListener('pointermove',e=>{
-  if(!CKD)return;
-  const rows=[...CKD.list.querySelectorAll('.check')];rows.forEach(r=>r.classList.remove('ck-before','ck-after'));
-  let tgt=rows.find(r=>{const b=r.getBoundingClientRect();return e.clientY<b.top+b.height/2}),after=false;
-  if(!tgt){tgt=rows[rows.length-1];after=true}
-  if(!tgt||tgt===CKD.row){CKD.to=null;return}
-  CKD.to={id:tgt.dataset.cid,after};tgt.classList.add(after?'ck-after':'ck-before');
-});
-function ckDrop(){
-  if(!CKD)return;const d=CKD;CKD=null;document.body.classList.remove('ck-dragging');
-  d.list.querySelectorAll('.check').forEach(r=>r.classList.remove('ck-before','ck-after','ck-drag'));
-  const t=S.tasks[S.ui.openTask];if(!t||!d.to)return;
-  const arr=[...(t.checklist||[])],from=arr.findIndex(c=>c.id===d.id);if(from<0)return;
-  const [item]=arr.splice(from,1);let at=arr.findIndex(c=>c.id===d.to.id);if(at<0)return;if(d.to.after)at++;
-  arr.splice(at,0,item);patch('tasks',t.id,{checklist:arr});renderDrawer();
-}
-document.addEventListener('pointerup',ckDrop);document.addEventListener('pointercancel',ckDrop);
 document.addEventListener('focusout',e=>{if(e.target.dataset?.field&&S.ui.openTask)flush('tasks/'+S.ui.openTask)});
 document.addEventListener('submit',e=>{
   const f=e.target;e.preventDefault();
