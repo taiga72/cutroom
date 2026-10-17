@@ -4173,6 +4173,13 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap #tb-clients .client-tabs::-webkit-scrollbar{display:none}
 .ap #tb-clients .client-tabs button{flex-shrink:0}
 }
+/* Today's right column: Up next first, then Inbox (user's ask); Up next rows get one unbroken hairline (date once, in the sub line) */
+.ap .cs .hm-side .cs-q{margin-top:0}
+.ap .cs .hm-side #csg-inbox{margin-top:22px}
+.ap .hm-side .cs-un .cs-r{column-gap:0;grid-template-columns:34px minmax(0,1fr) auto}
+.ap .hm-side .cs-un .cs-r>.ap-ck,.ap .hm-side .cs-un .cs-r .cs-nm,.ap .hm-side .cs-un .cs-r .cs-end{grid-row:1}
+.ap .hm-side .cs-un .cs-end .cs-due{display:none}
+.ap .hm-side .cs-un .cs-r .cs-end{align-items:center;padding-left:12px}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
@@ -6243,7 +6250,7 @@ function homeView(){
     return `<section class="cs-g" id="csg-${k}"><div class="cs-gh ${k==='late'?'late':''}"><b>${label}</b><span>${list.length}</span>${k==='late'?`<button type="button" class="cs-gh-act" data-act="late-today">${list.length>1?'Move all to today':'Move to today'}</button>`:''}</div>
       ${rows}${list.length>lim||HM_OPEN.has(k)&&list.length>8?`<button type="button" class="hm-more" data-act="cs-more" data-g="${k}">${HM_OPEN.has(k)?'Show fewer':`Show ${list.length-lim} more`}</button>`:''}</section>`}).join('');
   const empty=`<p class="hm-empty">${ts.length?'':'No open tasks'+(jf==='all'?'':' in this job')+'. New tasks you add show up here, sorted by when they\'re due.'}</p>`;
-  return `<div class="cs v2-home">${head}${jobsRow}<div class="home cs-home"><div class="hm-main">${body||empty}<button type="button" class="ap-addrow" data-act="new-task">${AP_PLUS}New Task</button></div><aside class="hm-side"><div id="csg-inbox">${inboxHtml()}</div>${csQueue(gd.queue)}</aside></div></div>`;
+  return `<div class="cs v2-home">${head}${jobsRow}<div class="home cs-home"><div class="hm-main">${body||empty}<button type="button" class="ap-addrow" data-act="new-task">${AP_PLUS}New Task</button></div><aside class="hm-side">${csQueue(gd.queue)}<div id="csg-inbox">${inboxHtml()}</div></aside></div></div>`;
 }
 /* ================= Calendar page (tab 'calendar') =================
    Job chips on top (S.ui.cjob) instead of the filters, and a No date tray (S.ui.ctray) whose tasks drag onto a day
