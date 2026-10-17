@@ -4236,6 +4236,35 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap #modal .pref:not(.m-list) .pref-nav button.on>svg{background:rgba(255,255,255,.24)!important;color:#fff!important}
 .ap .pref-nav [data-sec="me"]{--tc:var(--accent)}.ap .pref-nav [data-sec="pay"]{--tc:var(--green)}.ap .pref-nav [data-sec="week"]{--tc:var(--orange)}
 .ap #modal footer :is(.s-back,.s-cancel){background:none!important;box-shadow:none!important;border:0!important}
+/* drag to reorder: grip handle on Up next rows and Settings → Statuses rows (mouse and touch) */
+.ap .ps-grip{display:inline-grid;place-items:center;width:32px;height:32px;border:0;background:none;color:var(--faint);cursor:grab;touch-action:none;border-radius:50%;padding:0;flex:none}
+.ap .ps-grip svg{width:16px;height:16px}
+.ap .ps-grip:hover{color:var(--muted);background:rgba(118,118,128,.1)}
+body.ps-on,body.ps-on *{cursor:grabbing!important;user-select:none!important;-webkit-user-select:none!important}
+.ap .ps-drag{position:relative;z-index:30;background:var(--card)!important;box-shadow:0 8px 24px rgba(0,0,0,.18)!important;border-radius:12px;opacity:.97}
+.ap .ps-drag .cs-r{background:var(--card)!important}
+.ap [data-sort] .drop-before{box-shadow:inset 0 2px 0 var(--accent)}
+.ap [data-sort] .drop-after{box-shadow:inset 0 -2px 0 var(--accent)}
+.ap .st-row{grid-template-columns:auto minmax(0,1fr) auto 72px 64px}
+.ap .st-row>:nth-child(4){justify-self:center}
+@media (max-width:820px){.ap .st-row{grid-template-columns:auto minmax(0,1fr) auto 72px}}
+.ap .cs-un .cs-end{display:flex;align-items:center;gap:2px}
+/* task panel: More details uses the same rows as the facts group above it (label left, value right, hairlines,
+   no boxed inputs), at the user's ask to make the panel consistent */
+.ap .v2-more>.props2{display:block!important;margin:0 0 10px;padding:0}
+.ap .v2-more>.props2 .pf{display:flex!important;align-items:center;justify-content:space-between;gap:12px;min-height:46px;padding:0;border-top:.5px solid var(--line-strong);grid-column:auto!important}
+.ap .v2-more>.props2 .pf>:is(label,.pf-l){font:400 calc(15px*var(--ts)) var(--body);color:var(--text);display:flex;align-items:center;gap:0;flex:none;min-width:0;width:auto}
+.ap .v2-more>.props2 .pf>:is(label,.pf-l) svg{display:none}
+.ap .v2-more>.props2 .pf-v{flex:1;min-width:0;display:flex;justify-content:flex-end}
+.ap .v2-more>.props2 .pf-v :is(select,input){border:0!important;background-color:transparent!important;box-shadow:none!important;color:var(--muted);font:400 calc(15px*var(--ts)) var(--body);text-align:right;height:36px;padding:0 4px;width:auto;max-width:100%;min-width:0;border-radius:8px!important}
+.ap .v2-more>.props2 .pf-v :is(select,input):hover{background-color:var(--card-hover)!important}
+.ap .v2-more>.props2 .pf-v input[type="text"],.ap .v2-more>.props2 .tags-ctl input{width:100%}
+.ap .v2-more>.props2 .tags-ctl{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;width:100%}
+.ap .v2-more>.props2 .tag-add{flex:1;min-width:140px}
+.ap .v2-more .xname,.ap .v2-more>div:has(>.section-title){border-top:.5px solid var(--line-strong);padding:10px 0}
+.ap .v2-more .section-title{margin:0 0 8px;padding-left:0!important;padding-right:0!important}
+.ap .v2-more .xname,.ap .v2-more>div:has(>.section-title){padding-left:0!important;padding-right:0!important;margin-left:0!important;margin-right:0!important}
+.ap .v2-more>.props2 .prio-ctl select{color:inherit!important}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
@@ -6149,6 +6178,36 @@ function unMove(id,m){const ids=upNextList().map(t=>t.id).filter(x=>x!==id);let 
 document.addEventListener('drop',e=>{if(!unDrag)return;const m=unMark(e);const id=unDrag;unDrag=null;document.querySelectorAll('.un-row').forEach(x=>x.classList.remove('drop-before','drop-after','dragging'));if(!m)return;e.preventDefault();unMove(id,m)});
 /* touch screens: drag a row by its grip (HTML drag and drop doesn't work with a finger) */
 const GRIP_IC='<svg viewBox="0 0 12 12" fill="currentColor"><circle cx="4" cy="2.5" r="1.1"/><circle cx="8" cy="2.5" r="1.1"/><circle cx="4" cy="6" r="1.1"/><circle cx="8" cy="6" r="1.1"/><circle cx="4" cy="9.5" r="1.1"/><circle cx="8" cy="9.5" r="1.1"/></svg>';
+
+/* Drag to reorder (user's ask): grab a row's grip with the mouse or a finger (pointer events, so desktop and phones
+   work the same). Lists are [data-sort="upnext|statuses"] with [data-sort-item] rows; arrow keys on the grip move a row too. */
+let PS=null;
+function psDrop(kind,id,m){
+  if(kind==='upnext')unMove(id,m);
+  else if(kind==='statuses'){const a=SM.statuses,from=+id;let to=+m.id;const [x]=a.splice(from,1);if(to>from)to--;if(m.after)to++;a.splice(to,0,x);SM.stPick=null;renderSettings()}
+}
+function psScroller(el){for(let e=el.parentElement;e;e=e.parentElement){const cs=getComputedStyle(e);if(/(auto|scroll)/.test(cs.overflowY)&&e.scrollHeight>e.clientHeight)return e}return null}
+document.addEventListener('pointerdown',e=>{const g=e.target.closest?.('[data-sort-grip]');if(!g||e.button>0)return;const item=g.closest('[data-sort-item]'),list=item?.closest('[data-sort]');if(!list)return;
+  e.preventDefault();PS={list,item,id:item.dataset.sortItem,kind:list.dataset.sort,touch:e.pointerType!=='mouse',y0:e.clientY,y:e.clientY,m:null,sc:psScroller(list),st:0};PS.st=PS.sc?PS.sc.scrollTop:window.scrollY;
+  try{g.setPointerCapture(e.pointerId)}catch(x){}item.classList.add('ps-drag');document.body.classList.add('ps-on');haptic(8)},{passive:false});
+function psMove(y){const p=PS;if(!p)return;p.y=y;const sc=p.sc,dS=(sc?sc.scrollTop:window.scrollY)-p.st;p.item.style.transform=`translateY(${y-p.y0+dS}px)`;
+  const others=[...p.list.querySelectorAll('[data-sort-item]')].filter(x=>x!==p.item);let m=null;
+  for(const o of others){const r=o.getBoundingClientRect();if(y<r.top+r.height/2){m={id:o.dataset.sortItem,after:false,el:o};break}}
+  if(!m&&others.length){const o=others[others.length-1];m={id:o.dataset.sortItem,after:true,el:o}}
+  others.forEach(o=>o.classList.remove('drop-before','drop-after'));if(m)m.el.classList.add(m.after?'drop-after':'drop-before');
+  const cur=[...p.list.querySelectorAll('[data-sort-item]')];const iSelf=cur.indexOf(p.item),iT=m?cur.indexOf(m.el)+(m.after?1:0):iSelf;p.m=(m&&iT!==iSelf&&iT!==iSelf+1)?m:null}
+document.addEventListener('pointermove',e=>{if(!PS)return;e.preventDefault();psMove(e.clientY);
+  const sc=PS.sc,top=sc?sc.getBoundingClientRect().top:0,bot=sc?sc.getBoundingClientRect().bottom:innerHeight,step=e.clientY<top+48?-10:e.clientY>bot-48?10:0;
+  if(step){sc?sc.scrollTop+=step:window.scrollBy(0,step);psMove(e.clientY)}},{passive:false});
+function psEnd(cancel){const p=PS;if(!p)return;PS=null;document.body.classList.remove('ps-on');p.item.classList.remove('ps-drag');p.item.style.transform='';
+  p.list.querySelectorAll('.drop-before,.drop-after').forEach(o=>o.classList.remove('drop-before','drop-after'));if(p.touch)SHD_EAT=Date.now()+450;if(!cancel&&p.m)psDrop(p.kind,p.id,{id:p.m.id,after:p.m.after})}
+/* a drag that starts on a grip belongs to the reorder only: sheet pull-down, swipes and pull-to-refresh never see it */
+['touchstart','touchmove'].forEach(t=>window.addEventListener(t,e=>{if(PS||e.target.closest?.('[data-sort-grip]'))e.stopPropagation()},{capture:true,passive:true}));
+document.addEventListener('pointerup',()=>psEnd(false));document.addEventListener('pointercancel',()=>psEnd(true));
+document.addEventListener('keydown',e=>{const g=e.target.closest?.('[data-sort-grip]');if(!g||!/^Arrow(Up|Down)$/.test(e.key))return;e.preventDefault();
+  const item=g.closest('[data-sort-item]'),list=item.closest('[data-sort]'),all=[...list.querySelectorAll('[data-sort-item]')],i=all.indexOf(item),j=e.key==='ArrowUp'?i-1:i+1;if(j<0||j>=all.length)return;
+  const kind=list.dataset.sort,id=item.dataset.sortItem;psDrop(kind,id,{id:all[j].dataset.sortItem,after:j>i});
+  requestAnimationFrame(()=>setTimeout(()=>{const l=document.querySelector(`[data-sort="${kind}"]`),n=l&&l.querySelectorAll('[data-sort-item]')[j];n?.querySelector('[data-sort-grip]')?.focus()},180))});
 let UNT=null;
 document.addEventListener('touchstart',e=>{const g=e.target.closest?.('.un-grip');if(!g||e.touches.length>1)return;const r=g.closest('.un-row');UNT={id:r.dataset.un,row:r,y:e.touches[0].clientY};unDrag=UNT.id;r.classList.add('dragging');r.style.pointerEvents='none';haptic(8)},{passive:true});
 document.addEventListener('touchmove',e=>{if(!UNT)return;e.preventDefault();const t=e.touches[0];UNT.row.style.transform=`translateY(${t.clientY-UNT.y}px)`;UNT.m=unMark({target:document.elementFromPoint(t.clientX,t.clientY),clientY:t.clientY})},{passive:false});
@@ -6282,12 +6341,12 @@ function csRow(t,n,o={}){
     ${apCk(t)}<span class="cs-sl">${o.grip?`<span class="un-grip" data-stop aria-hidden="true" title="Drag to reorder">${GRIP_IC}</span>`:''}${o.now?'Now':n}</span><span class="cs-bar"></span>
     <span class="cs-nm"><b>${cuBadge(t)}${freshDot(t)}${hlText(t.name||'Untitled task',qNow()).replace(/_/g,'_<wbr>')}</b><small>${o.nodate||!t.due?'':`<span class="ap-due ${dueClass(t)}">${fmtRel(t.due,isLate(t))}</span>`}<span class="ap-jd" style="--jc:${esc(j.color||'var(--accent)')}"></span>${esc(where||j.name)}${chips?`<span class="cs-chips">${chips}</span>`:''}</small></span>
     <span class="cs-st" style="--c:${esc(stColor(st))}"><i></i>${esc(stLabel(st))}</span><span class="cs-tg">${tags}</span>
-    <span class="cs-end">${due}${o.grip?`<button class="icon-btn" data-act="un-rm" data-id="${t.id}" data-stop title="Remove from Up next" aria-label="Remove from Up next">${I.x}</button>`:''}</span>${acts}</div>`;
+    <span class="cs-end">${due}${o.grip?`<button type="button" class="ps-grip" data-sort-grip data-stop title="Drag to reorder" aria-label="Drag to reorder ${esc(t.name||'task')} (arrow keys move it)">${GRIP_IC}</button><button class="icon-btn" data-act="un-rm" data-id="${t.id}" data-stop title="Remove from Up next" aria-label="Remove from Up next">${I.x}</button>`:''}</span>${acts}</div>`;
 }
 /* Up next under the Inbox (user's ask): the queue in order, dragged to reorder (unDrag / unMove / UNT) */
 function csQueue(q){
   return `<section class="cs-g cs-q" id="csg-queue"><div class="cs-gh"><b>Up next</b><span>${q.length}</span>${q.length>1?'<em>Drag to reorder</em>':''}</div>
-    ${q.length?`<ol class="un-list cs-unl">${q.map(t=>`<li class="un-row cs-un" draggable="true" data-un="${t.id}">${csRow(t,'#'+upNextPos(t),{grip:true})}</li>`).join('')}</ol>`:`<p class="hm-empty" title="Right-click a task (press and hold on a phone) and choose Add to Up next">Nothing queued. Right-click a task to add it.</p>`}</section>`;
+    ${q.length?`<ol class="un-list cs-unl" data-sort="upnext">${q.map(t=>`<li class="un-row cs-un" data-un="${t.id}" data-sort-item="${t.id}">${csRow(t,'#'+upNextPos(t),{grip:true})}</li>`).join('')}</ol>`:`<p class="hm-empty" title="Right-click a task (press and hold on a phone) and choose Add to Up next">Nothing queued. Right-click a task to add it.</p>`}</section>`;
 }
 function homeView(){
   S.ui.hjob='all';
@@ -9587,18 +9646,17 @@ function statusSettingsHtml(){
   const rows=SM.statuses.map((x,i)=>{
     const n=used(x.id),armed=SM.stArm===x.id,col=x.color||(STATUS_VAR[x.id]?`var(${STATUS_VAR[x.id]})`:'#7d8596');
     const others=SM.statuses.filter(o=>o.id!==x.id);
-    return `<div class="st-row ${armed?'armed':''}">
+    return `<div class="st-row ${armed?'armed':''}" data-sort-item="${i}">
       <button type="button" class="st-dot" data-act="st-color" data-i="${i}" style="--c:${col}" title="Change color" aria-label="Change color of ${esc(x.label)}"></button>
       <input type="text" data-st-label="${i}" data-fk="st-l-${x.id}" value="${esc(x.label)}" maxlength="30" aria-label="Status name">
-      <button type="button" class="icon-btn" data-act="st-move" data-i="${i}" data-d="-1" ${i?'':'disabled'} title="Move up" aria-label="Move up"><svg class="i" viewBox="0 0 16 16"><path d="M4 10l4-4 4 4"/></svg></button>
-      <button type="button" class="icon-btn" data-act="st-move" data-i="${i}" data-d="1" ${i<SM.statuses.length-1?'':'disabled'} title="Move down" aria-label="Move down"><svg class="i" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg></button>
+      <button type="button" class="ps-grip" data-sort-grip title="Drag to reorder" aria-label="Drag to reorder ${esc(x.label)} (arrow keys move it)">${GRIP_IC}</button>
       ${x.id==='done'?`<span class="st-lock" title="Tasks here count as finished. It can be renamed but not deleted.">Finished</span>`:`<button type="button" class="icon-btn ${armed&&!n?'danger':''}" data-act="st-del" data-i="${i}" title="${armed&&!n?'Click again to delete':'Delete status'}" aria-label="Delete ${esc(x.label)}">${I.trash}</button>`}
       <small class="st-count">${n?`${n} task${n===1?'':'s'}`:''}</small>
       ${SM.stPick===i?`<div class="st-swatches">${STATUS_VAR[x.id]?`<button type="button" data-act="st-swatch" data-i="${i}" data-c="" class="def ${x.color?'':'on'}" title="Default color" style="--c:var(${STATUS_VAR[x.id]})"></button>`:''}${STATUS_COLORS.map(c=>`<button type="button" data-act="st-swatch" data-i="${i}" data-c="${c}" style="--c:${c}" class="${x.color===c?'on':''}" aria-label="Color ${c}"></button>`).join('')}</div>`:''}
       ${armed&&n?`<div class="st-del-box">Move its ${n} task${n===1?'':'s'} to <select data-st-to aria-label="Move tasks to">${others.map(o=>`<option value="${o.id}" ${SM.stTo===o.id?'selected':''}>${esc(o.label)}</option>`).join('')}</select><button type="button" class="btn sm danger" data-act="st-del-go" data-i="${i}">Delete status</button><button type="button" class="btn sm ghost" data-act="st-del-cancel">Keep it</button></div>`:''}
     </div>`}).join('');
   return `<div class="field"><p class="hint" style="margin:0">Name them however you work. The order here is the order of the list groups and board columns. Changes apply when you click Save.</p>${Object.values(S.jobs).some(j=>jobStatuses(j))?'<p class="hint" style="margin:0"><b>ClickUp-linked jobs use their own statuses</b>, copied from ClickUp (see Edit job → Statuses). On the Overview their tasks sit under the status here that means the same thing.</p>':''}
-    <div class="st-list">${rows}</div>
+    <div class="st-list" data-sort="statuses">${rows}</div>
     <div class="acct-btns">${SM.statuses.length<14?`<button type="button" class="btn sm" data-act="st-add">${I.plus}Add status</button>`:''}<button type="button" class="btn sm ghost" data-act="st-reset">Reset to the defaults</button></div>
     ${SM.stMoves&&Object.keys(SM.stMoves).length?`<p class="hint">Deleted statuses' tasks move when you click Save.</p>`:''}</div>`;
 }
