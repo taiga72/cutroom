@@ -4180,6 +4180,15 @@ body.side-mini .ap-tiles{display:none}.ap body.side-mini .ap-mini-nav{display:fl
 .ap .hm-side .cs-un .cs-r>.ap-ck,.ap .hm-side .cs-un .cs-r .cs-nm,.ap .hm-side .cs-un .cs-r .cs-end{grid-row:1}
 .ap .hm-side .cs-un .cs-end .cs-due{display:none}
 .ap .hm-side .cs-un .cs-r .cs-end{align-items:center;padding-left:12px}
+/* phone Profile (user's ask): the list group rounds its top too (no group heading above it), plain Close/Back text
+   instead of a boxed button, bigger section icons; My week's today bar stays inside the rounded group */
+@media (max-width:820px){
+.ap .pref-s.m-list .pref-nav>button:first-of-type{border-radius:12px 12px 0 0}
+.ap .pref-s.m-list .pref-nav>button:first-of-type:not(:has(+button:not([hidden]))){border-radius:12px}
+.ap .pref-s.m-list .pref-nav button>svg{width:30px;height:30px;padding:7px;box-sizing:border-box}
+.ap #modal footer :is(.s-back,.s-cancel){background:none!important;box-shadow:none!important;border:0!important}
+}
+.ap .pf-week{overflow:hidden}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
@@ -5989,7 +5998,7 @@ function renderTabbar(){
   const e=$('#tabbar');if(!e)return;const u=S.ui,cal=u.view==='calendar'&&!['inbox','archived','activity','trash','help','resume','upnext'].includes(u.tab);
   const b=(act,label,icon,on,extra='',short=label)=>`<button type="button" data-act="${act}" class="${on?'on':''} ${extra} tb-${act.slice(3)}" aria-label="${label}" ${on?'aria-current="page"':''}>${icon}<span>${short}</span></button>`;
   const busy=notesOpen||UPN;
-  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Today',V2_IC.today,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Inbox',V2_IC.inbox+(()=>{const n=S.ready?inboxGroups().length:0;return n?`<i class="tb-badge">${n>99?'99+':n}</i>`:''})(),notesOpen||u.tab==='inbox','','Inbox')+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-upnext','Up next',UP_IC+(()=>{const n=upNextList().length;return n?`<i class="tb-badge tb-cnt">${n}</i>`:''})(),UPN)+b('tb-me','You',meAvatar(26),!!PRF)}</div>`
+  e.innerHTML=`<div class="tb-pill">${b('tb-overview','Today',V2_IC.today,u.tab==='overview'&&!cal&&!busy)+b('tb-notes','Inbox',V2_IC.inbox+(()=>{const n=S.ready?inboxGroups().length:0;return n?`<i class="tb-badge">${n>99?'99+':n}</i>`:''})(),notesOpen||u.tab==='inbox','','Inbox')+b('tb-cal','Calendar',I.cal,cal&&!busy)+b('tb-upnext','Up next',UP_IC+(()=>{const n=upNextList().length;return n?`<i class="tb-badge tb-cnt">${n}</i>`:''})(),UPN)}</div>`
     +`<button type="button" data-act="tb-search" class="tb-search" aria-label="Search" title="Search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 14 14"/></svg></button>`
     +`<button type="button" data-act="tb-plus" class="tb-fab ${PLUS?'on':''}" aria-label="New" aria-expanded="${PLUS}" title="New task, new job or focus timer">${I.plus}</button>`;
 }
