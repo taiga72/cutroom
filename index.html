@@ -4288,6 +4288,15 @@ body.td-on{user-select:none;-webkit-user-select:none}
 .ap .vf-st{gap:8px}
 /* phones: Done becomes a round ✓ so the status name has room */
 @media (max-width:820px){.ap .vf-st .st-done-l{display:none}.ap .vf-st .st-done{width:34px!important;height:34px;padding:0!important;border-radius:50%!important;justify-content:center;flex:none}.ap .vf-st>span{flex:none}}
+/* spacing audit: brand guide chips, Help search row, Inbox Mark all read */
+.ap #ab-brand .ab-cl.client-tabs{margin:14px 0 16px}
+.ap .al-sub.hp-sub{row-gap:12px}
+@media (min-width:821px){
+  .ap #view .inb > .v2-head:first-child{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:14px;justify-content:start}
+  .ap #view .inb > .v2-head:first-child > div{display:contents}
+  .ap #view .inb > .v2-head:first-child h1{grid-column:1/-1}
+  .ap #view .inb > .v2-head:first-child > [data-act="inb-allread"]{grid-column:2;justify-self:start;height:28px;padding:0 12px;font-size:calc(13px*var(--ts))}
+}
 /* dialogs: grouped look */
 .ap #modal .modal{border-radius:14px}
 .ap .pref-nav{background:var(--side-bg)}
