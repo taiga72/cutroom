@@ -4673,6 +4673,7 @@ function saveLocal(){lsSet(LS_DATA,{jobs:S.jobs,clients:S.clients,tasks:S.tasks,
 const clean=o=>{const {id,...r}=o;return r};
 
 function create(col,data,id){
+  if(MEMO)MEMO={};
   id=id||uid();
   S[col][id]={...data,id};
   if(B.mode==='db'){const ref=B.db.doc(col+'/'+id);chain(col+'/'+id,()=>ref.set(clean(S[col][id])))}
@@ -4684,6 +4685,7 @@ function create(col,data,id){
 /* A new task lives only on this page until "Save task" (so a stray click on New task creates nothing). */
 let DRAFT=null;
 function patch(col,id,p,delay){
+  if(MEMO)MEMO={};
   if(DRAFT&&col==='tasks'&&id===DRAFT.id){S.tasks[id]=DRAFT=merge(DRAFT,p);return}
   if(!S[col][id]) return;
   S[col][id]=merge(S[col][id],p);
@@ -4720,6 +4722,7 @@ function savedTick(w){
   });
 }
 function remove(col,id){
+  if(MEMO)MEMO={};
   if(DRAFT&&col==='tasks'&&id===DRAFT.id){delete S.tasks[id];DRAFT=null;scheduleRender();return}
   const key=col+'/'+id; delete pending[key]; clearTimeout(timers[key]);
   delete S[col][id];
@@ -4826,21 +4829,47 @@ async function cloudStart(session){
 async function cloudLoad(){
   const m={};COLS.forEach(c=>m[c]={});
   for(let from=0;;from+=1000){
-    const {data,error}=await B.sb.from('docs').select('col,id,data').order('col').order('id').range(from,from+999);
+    const {data,error}=await B.sb.from('docs').select('col,id,data,updated_at').order('col').order('id').range(from,from+999);
     if(error) throw error;
-    data.forEach(r=>{if(m[r.col])m[r.col][r.id]={...r.data,id:r.id}});
+    data.forEach(r=>{if(m[r.col])m[r.col][r.id]={...r.data,id:r.id};if(r.updated_at&&(!LAST_UP||r.updated_at>LAST_UP))LAST_UP=r.updated_at});
     if(data.length<1000) break;
   }
   for(const key in pending){const [c,id]=key.split('/');if(m[c][id])m[c][id]=merge(m[c][id],pending[key])}
   if(DRAFT)m.tasks[DRAFT.id]=DRAFT;
   COLS.forEach(c=>{S[c]=m[c]});
+  FULL_AT=Date.now();
+}
+/* The minute-by-minute check downloads only documents changed since the newest one seen (minus 10 minutes, since
+   each device stamps updated_at with its own clock), instead of the whole account. A full load every 10 minutes
+   still catches documents deleted on another device. Returns true when something changed. */
+let LAST_UP=null,FULL_AT=0;
+const stableStr=o=>JSON.stringify(o,(k,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.keys(v).sort().reduce((a,x)=>(a[x]=v[x],a),{}):v);
+async function cloudLoadChanged(){
+  const since=new Date(Date.parse(LAST_UP)-10*60000).toISOString();let changed=false;
+  for(let from=0;;from+=1000){
+    const {data,error}=await B.sb.from('docs').select('col,id,data,updated_at').gt('updated_at',since).order('col').order('id').range(from,from+999);
+    if(error) throw error;
+    for(const r of data){
+      if(r.updated_at>LAST_UP)LAST_UP=r.updated_at;
+      if(!S[r.col]||pending[r.col+'/'+r.id])continue;
+      const d={...r.data,id:r.id},cur=S[r.col][r.id];
+      if(cur&&stableStr(cur)===stableStr(d))continue;
+      S[r.col][r.id]=d;changed=true;
+    }
+    if(data.length<1000) break;
+  }
+  return changed;
 }
 /* Picks up changes made on another device. Skipped while this tab still has writes on the way. */
 /* a cheap fingerprint of everything loaded, so a refresh that brought nothing new doesn't redraw the page */
 const dataSig=()=>JSON.stringify([S.jobs,S.clients,S.tasks,S.settings]);
 async function cloudRefresh(){
   if(!S.ready||document.hidden||inflight||Object.keys(pending).length||Object.keys(OUT).length||!navigator.onLine) return;
-  try{const before=stamps(S.tasks),sig0=dataSig();await cloudLoad();noteSynced();markFresh(before);saveSnap();if(!inflight){if(dataSig()!==sig0)scheduleRender(true);else renderSide()}}catch(e){console.error(e)}
+  try{
+    const before=stamps(S.tasks);
+    if(LAST_UP&&Date.now()-FULL_AT<10*60000){const ch=await cloudLoadChanged();noteSynced();if(ch){markFresh(before);saveSnap()}if(!inflight){if(ch)scheduleRender(true);else renderSide()}return}
+    const sig0=dataSig();await cloudLoad();noteSynced();markFresh(before);saveSnap();if(!inflight){if(dataSig()!==sig0)scheduleRender(true);else renderSide()}
+  }catch(e){console.error(e)}
 }
 function showSetup(cfg){
   applyTheme('system');document.title='Finish setup · '+APP_NAME;
@@ -5586,7 +5615,12 @@ function mergeClients(keepId,fromId){
   toast(`Merged “${f.name}” into “${k.name}”`);render();
 }
 const clientsOf=jid=>Object.values(S.clients).filter(c=>c.jobId===jid).sort((a,b)=>(a.order??0)-(b.order??0)||a.name.localeCompare(b.name));
-const live=()=>Object.values(S.tasks).filter(t=>!t.archived&&!t._draft&&!t.deleted);
+/* MEMO: one redraw asks for the same lists many times (sidebar counts, tab bar, Inbox, the page), so while render()
+   or renderSide() runs they're worked out once; any write (create / patch / remove) clears it */
+let MEMO=null;
+function withMemo(fn){if(MEMO)return fn();MEMO={};try{return fn()}finally{MEMO=null}}
+function memo(k,fn){if(!MEMO)return fn();if(!(k in MEMO))MEMO[k]=fn();const v=MEMO[k];return Array.isArray(v)?v.slice():v}
+const live=()=>memo('live',()=>Object.values(S.tasks).filter(t=>!t.archived&&!t._draft&&!t.deleted));
 const archived=()=>Object.values(S.tasks).filter(t=>t.archived&&!t.deleted&&S.jobs[t.jobId]);
 const trashed=()=>Object.values(S.tasks).filter(t=>t.deleted&&S.jobs[t.jobId]);
 /* how long deleted tasks stay in Trash (Settings → Backup: 7, 30 or 90 days) */
@@ -5856,7 +5890,8 @@ function migrateStatuses(){
   }
   for(const j of Object.values(S.jobs))if(localPath(j.toolLinks?.storage)&&!j.folder)patch('jobs',j.id,{folder:j.toolLinks.storage,toolLinks:{storage:''}});
 }
-function render(){
+function render(){return withMemo(renderNow)}
+function renderNow(){
   NOTE_OPEN=null;
   if(matchMedia('(max-width:820px)').matches&&S.jobs[S.ui.tab]&&S.ui.pane!=='brand'&&S.ui.client!=='all')S.ui.client='all';
   const a=appSettings();
@@ -5888,7 +5923,8 @@ const apJob=(j,cls='')=>{const s=imgSrc(j?.logo);return s?`<img class="ap-ji ${c
 function apCk(t){const st=stOf(t),g=stageOf(st),c=stColor(st),cl=isClosed(t);
   return `<button type="button" class="ap-ck ${cl?'done':g==='in_progress'?'half':g==='not_started'?'':'ring'}" style="--c:${esc(c)}" data-act="ap-check" data-id="${t.id}" data-stop title="${cl?'Reopen':'Mark done'}" aria-label="${cl?'Reopen':'Mark done'}: ${esc(t.name||'task')}">${cl?'<svg viewBox="0 0 16 16"><path d="m4 8.5 2.6 2.6L12 5.5"/></svg>':''}</button>`}
 const V2_IC={today:'<svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 4.8V8l2.4 1.6"/></svg>',inbox:'<svg class="i" viewBox="0 0 16 16"><path d="M2.5 9.5 4 3.5h8l1.5 6v3h-11zM2.5 9.5h3.2l.8 1.5h3l.8-1.5h3.2"/></svg>',done:'<svg class="i" viewBox="0 0 16 16"><path d="m3 8.5 3 3 7-7"/></svg>'};
-function renderSide(){queueMicrotask(renderOffline);
+function renderSide(){return withMemo(renderSideNow)}
+function renderSideNow(){queueMicrotask(renderOffline);
   const u=S.ui,jobsOpen=u.jobsOpen!==false;
   const openCount=jid=>live().filter(t=>t.jobId===jid&&!isClosed(t)).length;
   const allOpen=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t)).length;
@@ -6304,7 +6340,8 @@ function homeNews(){
 }
 const plain=x=>String(x||'').replace(/\*\*|__|`/g,'').replace(/\[([^\]]+)\]\([^)]+\)/g,'$1').replace(/\s+/g,' ').trim();
 /* one Inbox entry per task: its newest comment leads, everything else that happened shows as tags */
-function inboxGroups(){
+function inboxGroups(){return memo('inboxGroups',inboxGroupsBuild)}
+function inboxGroupsBuild(){
   const by=new Map(),out=[];
   for(const x of homeNews()){if(x.kind==='new'){out.push(x);continue}
     let g=by.get(x.t.id);if(!g){g={kind:'task',t:x.t,items:[],at:x.at,wait:false,mention:false};by.set(x.t.id,g);out.push(g)}
@@ -6616,7 +6653,8 @@ function saveNotes(){
   for(const k in NS.snooze)if(!keep.has(k)||!snoozed(k))delete NS.snooze[k];
   lsSet(LS_NOTES,NS);
 }
-function notifications(all){
+function notifications(all){return memo('notes'+(all?1:0),()=>notesBuild(all))}
+function notesBuild(all){
   const t0=today(),out=[],lim=dayLimit();
   const open=live().filter(t=>S.jobs[t.jobId]&&!isClosed(t));
   const who=t=>{const c=S.clients[t.clientId],j=S.jobs[t.jobId];return (j.emoji?j.emoji+' ':'')+(c?`${j.name} · ${c.name}`:j.name)};
@@ -6868,10 +6906,13 @@ function renderArchive(){
       <span class="ar-d"><small>Archived</small>${t.archivedAt?fmtDate(t.archivedAt.slice(0,10)):'—'}</span>
       <span class="cs-end ar-acts"><button class="btn sm" data-act="restore" data-id="${t.id}">Restore</button><button class="btn sm danger ${archDelArmed===t.id?'armed':''}" data-act="arch-delete" data-id="${t.id}">${archDelArmed===t.id?'Delete for good':I.trash+'Delete'}</button></span></div>`};
   const doneM=t=>(t.doneAt||t.archivedAt||'').slice(0,7);
-  const grp=(h,rows)=>`<section class="cs-g"><div class="cs-gh"><b>${h}</b><span>${rows.length}</span></div>${rows.map(arow).join('')}</section>`;
+  /* only the first u.amore (100) rows are drawn: a long archive made this page build tens of thousands of elements */
+  let room=u.amore||100;
+  const grp=(h,rows)=>{if(room<=0)return '';const r=rows.slice(0,room);room-=r.length;return `<section class="cs-g"><div class="cs-gh"><b>${h}</b><span>${rows.length}</span></div>${r.map(arow).join('')}</section>`};
   if((u.agroup||'job')==='month'){
     for(const m of [...new Set(list.map(doneM))].sort().reverse())html+=grp(m?`Done in ${mLabel(m)}`:'No finish date',list.filter(t=>doneM(t)===m));
   }else for(const j of jobsWith){const rows=list.filter(t=>t.jobId===j.id);if(rows.length)html+=grp(`<span class="hm-dot" style="--jc:${esc(j.color||'var(--accent)')}"></span>${esc(j.name)}`,rows)}
+  {const shownN=Math.min(list.length,u.amore||100);if(list.length>shownN)html+=`<button type="button" class="hm-more" data-act="arch-more">Show ${Math.min(200,list.length-shownN)} more archived tasks</button>`}
   if(!list.length) html+=`<div class="empty"><h3>No archived tasks match</h3><p>Try another job, month or search.</p><button class="btn" data-act="arch-clear">Show all archived</button></div>`;
   $('#view').innerHTML=html+'</div>';
 }
@@ -10105,6 +10146,7 @@ document.addEventListener('click',e=>{
     case 'link-edit': LEDIT.add(u.openTask+':'+el.dataset.kind);renderDrawer();{const i=$(`#drawer [data-field="links.${el.dataset.kind}"]`);i?.focus();i?.select()}break;
     case 'link-add': LSHOW.add(u.openTask+':'+el.dataset.kind);renderDrawer();$(`#drawer [data-field="links.${el.dataset.kind}"]`)?.focus();break;
     case 'log-more': u.lmore=(u.lmore||200)+200;render();break;
+    case 'arch-more': u.amore=(u.amore||100)+200;render();break;
     case 'bell': notesOpen=!notesOpen;if(notesOpen)saveNotes();renderBell();break;
     case 'notes-close': notesOpen=false;renderBell();break;
     case 'na-filter': NF=el.dataset.f;renderBell();if(u.tab==='inbox')render();break;
@@ -10192,7 +10234,7 @@ document.addEventListener('click',e=>{
       ($('#grp-'+CSS.escape(el.dataset.status))||$(`.group[data-stage="${el.dataset.status}"]`))?.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'start'});break}
     case 'log-jobsel': u.ljob=el.dataset.j;u.lmore=0;saveUi();render();break;
     case 'al-filters': AL_FOPEN=!AL_FOPEN;render();break;
-    case 'arch-jobsel': u.ajob=el.dataset.j;u.aclient='all';saveUi();render();break;
+    case 'arch-jobsel': u.ajob=el.dataset.j;u.aclient='all';u.amore=0;saveUi();render();break;
     case 'help-jump': {const g=$('#hp-g'+el.dataset.i);if(g)g.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'start'});break}
     case 'log-clear': u.lq='';u.ljob='all';u.lkind='all';saveUi();render();break;
     case 'arch-clear': u.aq='';u.ajob='all';u.aclient='all';u.amonth='all';saveUi();render();break;
@@ -10463,9 +10505,9 @@ document.addEventListener('change',e=>{
   if(el.dataset.statKey){const k=el.dataset.statKey,cur=statKeys(),order=statDefs().map(d=>d[0]);let next=el.checked?[...cur,k]:cur.filter(x=>x!==k);if(!next.length){render();return}next=order.filter(x=>next.includes(x)).slice(0,STAT_MAX);saveStatKeys(next);return}
   if(el.dataset.col&&el.closest('#vopt')){(u.hideCols=u.hideCols||{})[el.dataset.col]=!el.checked;saveUi();render();return}
   if(el.id==='arch-job'){u.ajob=el.value;u.aclient='all';saveUi();render();return}
-  if(el.id==='arch-client'){u.aclient=el.value;saveUi();render();return}
-  if(el.id==='arch-month'){u.amonth=el.value;saveUi();render();return}
-  if(el.id==='arch-group'){u.agroup=el.value;saveUi();render();return}
+  if(el.id==='arch-client'){u.aclient=el.value;u.amore=0;saveUi();render();return}
+  if(el.id==='arch-month'){u.amonth=el.value;u.amore=0;saveUi();render();return}
+  if(el.id==='arch-group'){u.agroup=el.value;u.amore=0;saveUi();render();return}
   if(el.dataset.act==='asel'){el.checked?ASEL.add(el.dataset.id):ASEL.delete(el.dataset.id);aselDelArmed=false;render();return}
   if(el.id==='bulk-move'&&el.value){moveTasks([...SEL],el.value);return}
   if(el.id==='bulk-status'&&el.value){const v=el.value,undo=[];[...SEL].forEach(id=>{const prev=setStatus(id,v,{quiet:true});if(prev)undo.push([id,prev])});if(v==='done'&&undo.length)celebrate();render();toast(`Moved ${undo.length} task${undo.length===1?'':'s'} to ${stLabel(v)}`,undo.length?{label:'Undo',fn:()=>undoStatus(undo)}:null);return}
@@ -10519,7 +10561,7 @@ document.addEventListener('change',e=>{
 document.addEventListener('input',e=>{
   const el=e.target,u=S.ui;
   if(el.id==='q'){u.q=el.value;render();return}
-  if(el.id==='arch-q'){u.aq=el.value;render();return}
+  if(el.id==='arch-q'){u.aq=el.value;u.amore=0;render();return}
   if(el.id==='log-q'){u.lq=el.value;render();return}
   if(el.id==='help-q'){u.hq=el.value;render();return}
   if(el.id==='sticky-in'){STICKY_DRAFT=el.value;return}
