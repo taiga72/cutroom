@@ -14,7 +14,8 @@
 <meta name="theme-color" content="#f7f7f5" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <style>
 :root{
   --bg:#f7f7f5; --surface:#ffffff; --surface-2:#efefec; --surface-3:#e6e5e1;
@@ -2399,6 +2400,8 @@ body.side-mini .cork{display:none}
 .loading b{color:var(--text);font-weight:600}
 .loading small{color:var(--faint);font-size:calc(12px*var(--ts))}
 .ld-reel{width:34px;height:34px;color:var(--accent);animation:reelSpin 1.4s linear infinite}
+/* the loading screen only fades in after half a second, so a quick start never flashes it */
+.loading{animation:ldIn .25s .5s both}@keyframes ldIn{from{opacity:0}}
 @keyframes reelSpin{to{transform:rotate(360deg)}}
 :root[data-motion="reduce"] .ld-reel{animation:none}
 
@@ -4773,16 +4776,20 @@ const loadScript=src=>new Promise((res,rej)=>{const x=document.createElement('sc
 async function cloudBoot(){
   if(!/^https?:$/.test(location.protocol)) return false;
   let cfg;
-  try{
-    const r=await fetch('/api/config',{cache:'no-store'});
-    cfg=await r.json().catch(()=>null);
+  /* With settings saved from an earlier visit, start straight away and refresh them in the background:
+     /api/config is a server function, and waiting on it (a cold start can take a second) held up every open. */
+  const cached=lsGet('cutroom.cfg');
+  const getCfg=fetch('/api/config',{cache:'no-store'}).then(async r=>{const c=await r.json().catch(()=>null);if(r.ok&&c&&c.supabaseUrl)lsSet('cutroom.cfg',c);return {r,c}});
+  if(cached&&cached.supabaseUrl&&cached.supabaseAnonKey){cfg=cached;getCfg.catch(()=>{})}
+  else try{
+    const {r,c}=await getCfg;cfg=c;
     /* our own route answered, but the Vercel keys aren't set: say so instead of quietly saving locally */
     if(r.status===503&&cfg&&cfg.error){showSetup(cfg);return true}
     if(!r.ok) return false;
-    if(cfg&&cfg.supabaseUrl)lsSet('cutroom.cfg',cfg);
-  }catch(e){cfg=lsGet('cutroom.cfg');if(!cfg)return false}   // offline: use the settings from the last visit
+  }catch(e){return false}
   if(!cfg||!cfg.supabaseUrl||!cfg.supabaseAnonKey) return false;
   const hashErr=new URLSearchParams(location.hash.slice(1)).get('error_description');
+  try{const l=document.createElement('link');l.rel='preconnect';l.href=cfg.supabaseUrl;l.crossOrigin='';document.head.append(l)}catch(e){}
   try{await loadScript(SB_JS)}catch(e){showAuth({error:"Couldn't load the sign-in service. Check your connection and reload the page."});return true}
   B.mode='cloud';B.cfg=cfg;
   B.sb=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{auth:{flowType:'implicit',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
@@ -4808,11 +4815,16 @@ async function cloudStart(session){
   let offlineStart=false;
   B.syncedAt=lsGet('cutroom.synced.'+B.uid)||null;FRESH=new Set(lsGet(freshKey())||[]);
   const snap0=lsGet(snapKey());
+  /* The copy saved on this device shows at once; the fresh data replaces it a moment later. Only a first sign-in
+     on a device waits on the download (and sees the loading screen). */
+  if(snap0){COLS.forEach(c=>{S[c]=snap0[c]||{}});S.ready=true;render()}
   try{if(Object.keys(OUT).length&&navigator.onLine)await flushOut();await cloudLoad();noteSynced();if(snap0)markFresh(stamps(snap0.tasks));saveSnap()}
   catch(e){console.error(e);const snap=lsGet(snapKey());
     if(snap&&isNetErr(e)){COLS.forEach(c=>{S[c]=snap[c]||{}});offlineStart=true;B.offline=true}
+    else if(snap0){toast("Couldn't refresh your tasks. Showing what's saved on this device; reload to try again.");B.loaded=true;return}
     else{toast("Couldn't load your tasks. Reload the page to try again.");return}}
-  S.ready=true;if(!offlineStart)migrateStatuses();render();
+  S.ready=true;B.loaded=true;if(!offlineStart)migrateStatuses();
+  scheduleRender(true);
   if(!offlineStart)setTimeout(rpAuto,8000);
   if(offlineStart)toast("You're offline. Showing what's saved on this device; changes sync when you're back online.");
   setInterval(flushOut,30000);
@@ -10777,7 +10789,7 @@ document.addEventListener('drop',e=>{if(!calDrag)return;const d=e.target.closest
 
 /* every minute: the sidebar (shift dots, "synced … ago") and notifications; the whole page every 5 minutes or when the day changes */
 let TICK=0,TICK_DAY='';
-setInterval(()=>{if(S.ready&&!document.hidden&&$('#modal').hidden){autoArchive();invAutoDraft();const d=today();if(++TICK%5===0||d!==TICK_DAY){TICK_DAY=d;scheduleRender()}else{renderSide();renderBell()}}},60000);
+setInterval(()=>{if(S.ready&&!document.hidden&&$('#modal').hidden){if(B.mode!=='cloud'||B.loaded){autoArchive();invAutoDraft()}const d=today();if(++TICK%5===0||d!==TICK_DAY){TICK_DAY=d;scheduleRender()}else{renderSide();renderBell()}}},60000);
 document.addEventListener('toggle',e=>{if(e.target.classList?.contains('d-brand')){S.ui.brandTaskOpen=e.target.open;saveUi()}},true);
 placeTopRight();
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('/sw.js').catch(()=>{});
