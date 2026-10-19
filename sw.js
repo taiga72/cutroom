@@ -1,5 +1,6 @@
 /* Splice & Co. service worker: lets the app open without internet.
-   The page itself is network-first (so updates show up right away) with the last copy as a fallback;
+   The page itself is network-first (so updates show up right away), falling back to the last copy when offline
+   or when the network takes more than 1.5s;
    icons and the supabase-js library are cache-first. /api and Supabase calls are never cached:
    the page keeps its own data snapshot and outbox for offline use. */
 const CACHE = 'splice-v2';
@@ -24,10 +25,20 @@ self.addEventListener('fetch', e => {
 
   if (same && url.pathname.startsWith('/api/')) return;           // live data only
   if (req.mode === 'navigate' || (same && (url.pathname === '/' || url.pathname === '/index.html'))) {
-    e.respondWith(fetch(req).then(res => {
+    // Network first so updates show right away, but on a slow connection don't wait more than 1.5s:
+    // the saved copy opens instead and the download still finishes into the cache for next time.
+    const net = fetch(req).then(res => {
       if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put('/', copy)); }
       return res;
-    }).catch(() => caches.match('/').then(r => r || caches.match(req))));
+    });
+    const saved = () => caches.match('/').then(r => r || caches.match(req));
+    e.waitUntil(net.catch(() => {}));
+    e.respondWith(new Promise(done => {
+      let settled = false;
+      const t = setTimeout(() => saved().then(r => { if (r && !settled) { settled = true; done(r); } }), 1500);
+      net.then(res => { if (!settled) { settled = true; clearTimeout(t); done(res); } })
+         .catch(() => saved().then(r => { if (!settled) { settled = true; clearTimeout(t); done(r || Response.error()); } }));
+    }));
     return;
   }
   const lib = url.hostname === 'cdn.jsdelivr.net' || url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
