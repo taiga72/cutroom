@@ -2402,6 +2402,8 @@ body.side-mini .cork{display:none}
 .ld-reel{width:34px;height:34px;color:var(--accent);animation:reelSpin 1.4s linear infinite}
 /* the loading screen only fades in after half a second, so a quick start never flashes it */
 .loading{animation:ldIn .25s .5s both}@keyframes ldIn{from{opacity:0}}
+/* early start: the saved copy shows but can't be clicked until the session is confirmed (a fraction of a second) */
+body.booting .app{pointer-events:none}
 @keyframes reelSpin{to{transform:rotate(360deg)}}
 :root[data-motion="reduce"] .ld-reel{animation:none}
 
@@ -4646,6 +4648,14 @@ function onWriteError(e){console.error(e);toast(e&&e.code==='quota_exceeded'?'St
 /* Offline: writes that can't reach Supabase wait in an outbox on this device (OUT, localStorage) and are
    sent when the connection is back; a snapshot of the data lets the app open without internet. */
 let OUT={};const outKey=()=>'cutroom.outbox.'+B.uid,snapKey=()=>'cutroom.snap.'+B.uid;
+/* Signing out (or a session that's gone) forgets this device's copy of that account, so the early start below
+   never shows one person's tasks to whoever signs in next. Unsynced changes in the outbox are kept. */
+function forgetDevice(uid){
+  if(!uid)return;
+  if(uid===B.uid||uid===B.early)B.gone=true;   // the page saves its copy as it closes (pagehide): not any more
+  ['cutroom.snap.','cutroom.fresh.','cutroom.synced.'].forEach(k=>{try{localStorage.removeItem(k+uid)}catch(e){}});
+  try{const l=JSON.parse(localStorage.getItem('cutroom.lastuid')||'null');if(!l||l.uid===uid)localStorage.removeItem('cutroom.lastuid')}catch(e){}
+}
 const isNetErr=e=>!navigator.onLine||/fetch|network|load failed|timeout/i.test(String(e?.message||e));
 function queueOut(key,op){OUT[key]=op;lsSet(outKey(),OUT);saveSnap();B.offline=true;renderSide()}
 function cloudWrite(col,id,op){
@@ -4661,7 +4671,7 @@ async function flushOut(){
   finally{outBusy=false;if(!Object.keys(OUT).length){B.offline=false;toast('Back online. Your changes are saved to your account.');calSoon('tasks')}renderSide()}
 }
 let snapT=null;
-function saveSnap(){if(B.mode==='cloud'&&B.uid)lsSet(snapKey(),{jobs:S.jobs,clients:S.clients,tasks:S.tasks,settings:S.settings,at:Date.now()})}
+function saveSnap(){if(B.mode==='cloud'&&B.uid&&!B.gone)lsSet(snapKey(),{jobs:S.jobs,clients:S.clients,tasks:S.tasks,settings:S.settings,at:Date.now()})}
 function saveSnapSoon(){clearTimeout(snapT);snapT=setTimeout(saveSnap,800)}
 window.addEventListener('online',()=>{flushOut().then(()=>{if(!Object.keys(OUT).length)cloudRefresh()})});
 window.addEventListener('offline',()=>{if(B.mode==='cloud'){B.offline=true;renderSide()}});
@@ -4789,6 +4799,10 @@ async function cloudBoot(){
   }catch(e){return false}
   if(!cfg||!cfg.supabaseUrl||!cfg.supabaseAnonKey) return false;
   const hashErr=new URLSearchParams(location.hash.slice(1)).get('error_description');
+  /* Early start: the last signed-in account's copy on this device shows before supabase-js has even loaded.
+     The page can't be clicked (body.booting) until the session is confirmed; no session means forgetDevice. */
+  {const l0=lsGet('cutroom.lastuid'),sn=l0&&!/access_token|error/.test(location.hash)&&lsGet('cutroom.snap.'+l0.uid);
+   if(sn){B.mode='cloud';B.early=l0.uid;COLS.forEach(c=>{S[c]=sn[c]||{}});S.ready=true;document.body.classList.add('booting');$('#auth').hidden=true;$('.app').hidden=false;render()}}
   try{const l=document.createElement('link');l.rel='preconnect';l.href=cfg.supabaseUrl;l.crossOrigin='';document.head.append(l)}catch(e){}
   try{await loadScript(SB_JS)}catch(e){showAuth({error:"Couldn't load the sign-in service. Check your connection and reload the page."});return true}
   B.mode='cloud';B.cfg=cfg;
@@ -4796,10 +4810,11 @@ async function cloudBoot(){
   // offline, the session check can stall while it retries a token refresh, so don't wait on it for long
   const {data:{session}}=await Promise.race([B.sb.auth.getSession(),new Promise(r=>setTimeout(()=>r({data:{session:null}}),navigator.onLine?15000:2500))]).catch(()=>({data:{session:null}}));
   B.sb.auth.onAuthStateChange((ev,sess)=>{
-    if(ev==='SIGNED_OUT') location.replace(location.pathname);
+    if(ev==='SIGNED_OUT'){forgetDevice(B.uid||B.early);location.replace(location.pathname)}
     else if(sess&&!B.uid) cloudStart(sess);
   });
   const last=lsGet('cutroom.lastuid');
+  if(!session&&navigator.onLine&&B.early){forgetDevice(B.early)}
   if(session) cloudStart(session);
   else if(!navigator.onLine&&last&&lsGet('cutroom.snap.'+last.uid)) cloudStart({user:{id:last.uid,email:last.email}});
   else showAuth(hashErr?{error:hashErr.replace(/\+/g,' ')}:{});
@@ -4808,6 +4823,9 @@ async function cloudBoot(){
 }
 async function cloudStart(session){
   if(B.uid) return;
+  /* a different account than the early start showed: drop that copy before anything draws */
+  if(B.early&&B.early!==session.user.id){COLS.forEach(c=>{S[c]={}});S.ready=false}
+  B.early=null;document.body.classList.remove('booting');
   B.uid=session.user.id;B.email=session.user.email||'';B.name=session.user.user_metadata?.full_name||session.user.user_metadata?.name||'';B.avatar=session.user.user_metadata?.avatar_url||session.user.user_metadata?.picture||'';
   $('#auth').hidden=true;$('#auth').innerHTML='';$('.app').hidden=false;
   render();
@@ -4898,6 +4916,8 @@ function showSetup(cfg){
 }
 let authState={};
 function showAuth(st){
+  if(B.early){COLS.forEach(c=>{S[c]={}});S.ready=false;B.early=null;$('#view').innerHTML='';$('#side').innerHTML=''}
+  document.body.classList.remove('booting');
   authState={...authState,...st};
   applyTheme('system');document.title='Sign in · '+APP_NAME;
   $('.app').hidden=true;const a=$('#auth');a.hidden=false;
@@ -4929,7 +4949,7 @@ async function authGoogle(){
 }
 async function signOut(){
   flushAll();await Promise.allSettled(Object.values(chains));
-  await B.sb.auth.signOut();location.replace(location.pathname);
+  await B.sb.auth.signOut();forgetDevice(B.uid);location.replace(location.pathname);
 }
 
 /* ================= Google Calendar sync (cloud only) ================= */
