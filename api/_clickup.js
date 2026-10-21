@@ -179,12 +179,13 @@ async function syncUser(uid) {
       try {
       // every task assigned to you, updated in the window (subtasks included, closed ones too)
       const list = [];
+      let fullList = false;   // the whole assigned list came back (not cut off at 8 pages)
       for (let page = 0; page < 8; page++) {
         const q = new URLSearchParams({ page: String(page), subtasks: 'true', include_closed: 'true', include_markdown_description: 'true', order_by: 'updated', date_updated_gt: String(now - WINDOW_DAYS * DAY) });
         q.append('assignees[]', me);
         const j = await call(`/team/${team}/task?${q}`);
         list.push(...(j.tasks || []));
-        if (j.last_page || !(j.tasks || []).length) break;
+        if (j.last_page || !(j.tasks || []).length) { fullList = true; break; }
       }
       const byId = new Map(list.map(t => [t.id, t]));
       const jobTasks = Object.values(D.tasks).filter(t => t.jobId === jobId);
@@ -232,6 +233,12 @@ async function syncUser(uid) {
       for (const [cuId, c] of cands) {
         const linked = Object.entries(D.tasks).find(([, x]) => x.cu && x.cu.id === cuId && !x.deleted) || Object.entries(D.tasks).find(([, x]) => x.cu && x.cu.id === cuId) || (state.seen[cuId] && D.tasks[state.seen[cuId]] ? [state.seen[cuId], D.tasks[state.seen[cuId]]] : null);
         // a reply may not change the task's updated time, so tasks with comments in the last 14 days are re-read at most every 2 hours
+        // assigned to you again after being taken off: back out of Archived (unless you archived it yourself since)
+        if (linked && linked[1].cu && linked[1].cu.unassigned) {
+          const [lid, x] = linked, back = x.archived;
+          const d = { ...x, cu: { ...x.cu, unassigned: null, gone: null, chk: now }, ...(back ? { archived: false, archivedAt: null, restoredAt: ymdIn(now, tz) } : {}) };
+          D.tasks[lid] = d; put('tasks', lid, d); linked[1] = d; if (back) res.reassigned = (res.reassigned || 0) + 1;
+        }
         const lc = linked && linked[1].cu, threadsLive = lc && statusId({ status: lc.status }) !== 'done' && (lc.feed || []).some(f => f.k === 'comment' && Date.parse(f.at) > now - 14 * DAY) && now - (+lc.at || 0) > 2 * 3600e3;
         if (lc && lc.v === CU_V && +(lc.at || 0) >= (state.redo || 0) && +lc.upd >= c.upd && !threadsLive) continue;      // nothing new in ClickUp
         if (!linked && state.seen[cuId]) continue;                              // deleted in the app: don't bring it back
@@ -342,6 +349,31 @@ async function syncUser(uid) {
           }
           if (newCount && x.cu) { d.cuUnseen = (x.cuUnseen || 0) + newCount; res.news = (res.news || 0) + 1; }
           D.tasks[id] = d; state.seen[cuId] = id; put('tasks', id, d); res.updated++;
+        }
+      }
+      // Taken off a task in ClickUp: it drops out of the assigned list, so open linked tasks that are missing from it
+      // are read one by one (at most 10 a run, each re-checked at most every 6 hours). Not assigned (and no subtask
+      // assigned to you), deleted, or no longer visible to you → the app archives it once with cu.unassigned set; if you
+      // restore it yourself, it stays. Skipped when the list was cut off, so a long list can't look like "unassigned".
+      if (fullList) {
+        const meIn = t => (t.assignees || []).some(a => String(a.id) === me);
+        const gone = Object.entries(D.tasks).filter(([, x]) => x.jobId === jobId && x.cu && String(x.cu.team || team) === team && !x.deleted && !x.archived && !x.doneAt
+          && !x.cu.unassigned && !cands.has(x.cu.id) && statusId({ status: x.cu.status }) !== 'done' && !(x.cu.chk && now - x.cu.chk < 6 * 3600e3));
+        for (const [id, x] of gone.slice(0, 10)) {
+          if (calls >= BUDGET - 3) { res.more = true; break; }
+          let t = null, why = '';
+          try { t = await call(`/task/${x.cu.id}?include_subtasks=true`); }
+          catch (e) {
+            if (e instanceof RateLimited) throw e;
+            // the list call already worked with this token, so a 401 here means this one task is out of your reach
+            if (e instanceof NeedsToken || e.status === 401 || e.status === 403) why = 'noaccess';
+            else if (e.status === 404) why = 'deleted';
+            else continue;   // couldn't tell: try again next run
+          }
+          if (t && (meIn(t) || (t.subtasks || []).some(meIn))) { const d = { ...x, cu: { ...x.cu, chk: now } }; D.tasks[id] = d; put('tasks', id, d); continue; }
+          if (t && t.archived) why = 'deleted';
+          const d = { ...x, archived: true, archivedAt: ymdIn(now, tz), cu: { ...x.cu, unassigned: now, gone: why || 'unassigned', chk: now } };
+          D.tasks[id] = d; put('tasks', id, d); res.unassigned = (res.unassigned || 0) + 1;
         }
       }
       const inApp = [...cands.keys()].filter(k => state.seen[k] && D.tasks[state.seen[k]]);
