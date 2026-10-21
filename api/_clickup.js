@@ -15,7 +15,7 @@ const FIRST_DAYS = 60;      // a task new to the app is imported when it was upd
 const WINDOW_DAYS = 180;    // how far back the assigned-task list goes (to tell batches from videos)
 const BUDGET = 70;          // ClickUp allows 100 requests a minute per token; stay well under it in one run
 const FEED_MAX = 80;
-const CU_V = 4;            // 3 = replies inside comment threads are read too; 4 = links and attachments on comments; older tasks are re-read once
+const CU_V = 5;            // 3 = replies inside comment threads are read too; 4 = links and attachments on comments; 5 = start date, client and brief stored to compare; older tasks are re-read once
 const REPLY_MAX = 30;      // replies kept per comment
 
 class NeedsToken extends Error {}
@@ -294,9 +294,19 @@ async function syncUser(uid) {
         const iso = new Date(+t.date_updated || now).toISOString();
         if (existing && prev.status && prev.status !== statusName) { feed.push({ at: iso, k: 'status', text: `Status in ClickUp: ${prev.status} → ${statusName}` }); newCount++; }
         if (existing && prev.due !== undefined && prev.due !== due) { feed.push({ at: iso, k: 'due', text: due ? `Due date in ClickUp: ${due}` : 'Due date removed in ClickUp' }); newCount++; }
+        // other fields ClickUp changed since the last sync (each compared only once it has a stored value, so older links don't fire)
+        const brief = notesFrom(detail), PL = { urgent: 'Urgent', high: 'High', normal: 'Normal', low: 'Low' };
+        const chg = existing && prev.at ? [
+          prev.start !== undefined && prev.start !== start && (start ? `Start date in ClickUp: ${start}` : 'Start date removed in ClickUp'),
+          prev.name !== undefined && prev.name !== t.name && `Renamed in ClickUp: ${t.name}`,
+          prev.prio !== undefined && prev.prio !== prioOf(t) && `Priority in ClickUp: ${PL[prioOf(t)] || prioOf(t)}`,
+          prev.client !== undefined && prev.client !== clientName && (clientName ? `Client in ClickUp: ${clientName}` : 'Client removed in ClickUp'),
+          prev.brief !== undefined && prev.brief !== brief && (brief ? 'Brief updated in ClickUp' : 'Brief cleared in ClickUp')
+        ].filter(Boolean) : [];
+        for (const text of chg) { feed.push({ at: iso, k: 'field', text }); newCount++; }
         feed.sort((a, b) => a.at.localeCompare(b.at));
         const lastComment = Math.max(prev.lastComment || 0, ...comments.map(m => +m.date || 0));
-        const cuInfo = { v: readFail ? 1 : replyPending ? 2 : CU_V, at: now, id: cuId, team, url: t.url, status: statusName, due, prio: prioOf(t), name: t.name, upd: c.upd, lastComment, feed: feed.slice(-FEED_MAX) };
+        const cuInfo = { v: readFail ? 1 : replyPending ? 2 : CU_V, at: now, id: cuId, team, url: t.url, status: statusName, due, start, client: clientName, brief, prio: prioOf(t), name: t.name, upd: c.upd, lastComment, feed: feed.slice(-FEED_MAX) };
 
         // checklist steps from subtasks (main mode) and ClickUp checklists
         const steps = [];
@@ -341,6 +351,14 @@ async function syncUser(uid) {
             }
             if (prev.due !== due) d.due = due;
             if (prev.prio !== cuInfo.prio) d.priority = cuInfo.prio;
+            // start date, client and brief follow ClickUp too, once a value from an earlier sync is stored to compare with
+            if (prev.start !== undefined && prev.start !== start) d.start = start;
+            if (prev.client !== undefined && prev.client !== clientName && job.type === 'agency') d.clientId = clientId;
+            if (prev.brief !== undefined && prev.brief !== brief) {
+              const mine = String(x.notes || '').trim();
+              // notes you never changed are replaced; notes you wrote in are kept, with the new brief added under them
+              d.notes = !mine || mine === String(prev.brief || '').trim() ? brief : `${mine}\n\n**Brief updated in ClickUp (${ymdIn(now, tz)}):**\n${brief}`;
+            }
           }
           if (steps.length) {
             const list2 = (x.checklist || []).map(s => ({ ...s })), at = new Map(list2.map((s, i) => [s.id, i]));
